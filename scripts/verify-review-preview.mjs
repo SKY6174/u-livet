@@ -14,6 +14,16 @@ const valid = (input, target = 'preview') => readinessResult(inspectEnvironment(
 let passed = 0;
 function test(name, fn) { fn(); passed++; console.log(`PASS ${name}`); }
 test('isolated review Preview configuration passes', () => assert.ok(valid(env)));
+test('Vercel injected public metadata does not block a hosted Preview', () => assert.ok(valid({
+  ...env, NEXT_PUBLIC_VERCEL_ENV: 'preview', NEXT_PUBLIC_VERCEL_URL: 'review-uc.vercel.app',
+  NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA: 'a'.repeat(40), NEXT_PUBLIC_VERCEL_OBSERVABILITY_CLIENT_CONFIG: '{}',
+})));
+test('unreviewed Vercel-prefixed variables remain blocked', () => assert.equal(valid({
+  ...env, NEXT_PUBLIC_VERCEL_SECRET: 'synthetic-sensitive-value',
+}), false));
+test('review metadata exception does not change normal release policy', () => assert.equal(
+  inspectEnvironment({ ...env, PREVIEW_REVIEW_ONLY: 'false', NEXT_PUBLIC_VERCEL_OBSERVABILITY_CLIENT_CONFIG: '{}' }, 'preview')
+    .find(check => check.id === 'public-allowlist').status, 'BLOCK'));
 test('production target cannot use review mode', () => assert.equal(valid({ ...env, VERCEL_ENV: 'production' }, 'production'), false));
 for (const key of ['VERCEL', 'VERCEL_ENV', 'AUTH_SITE_ORIGIN', 'CERTIFICATE_VERIFY_ORIGIN', 'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'RELEASE_PRODUCTION_SITE_ORIGIN', 'RELEASE_PRODUCTION_SUPABASE_REF']) {

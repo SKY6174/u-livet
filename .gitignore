@@ -49,5 +49,6 @@ test.pdf
 .env.*.local
 docs/04-report/features/evidence/
 docs/04-report/features/assets/
+docs/.pdca-status.json
 .vercel
 .env*

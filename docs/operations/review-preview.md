@@ -25,7 +25,9 @@ Preview만 `PREVIEW_REVIEW_ONLY`, `SUPABASE_DEPLOYMENT_KIND=cloud`, `NEXT_PUBLIC
 
 Vercel API가 존재하지 않는 Git 브랜치의 설정을 거부하므로 최초 push 전에는 비어 있던 Preview 범위에 등록하고, 브랜치 생성 직후 `gitBranch=preview`로 좁힌다. Production 값은 변경하지 않는다. 실제 alias와 홈페이지·증명 origin의 일치를 확인한다.
 
-Supabase GitHub 연결은 `new_branch_per_pr=true`, `supabase_changes_only=true`로 확인했다. 이 배포에서는 PR을 만들지 않고 기존 별도 Preview DB를 지정한다. push 후 브랜치 목록과 migration 이력을 다시 확인한다. 로컬 `supabase/config.toml`을 원격에 push하지 않고 인증 관련 마지막 3개 migration도 적용하지 않는다.
+Supabase GitHub 연결은 `new_branch_per_pr=true`, `supabase_changes_only=true`로 확인했다. 이 배포에서는 PR을 만들지 않고 기존 별도 Preview DB를 지정한다. push 후 브랜치 목록과 migration 이력을 다시 확인한다. `supabase config push`를 실행하지 않고 인증 관련 마지막 3개 migration도 원격 DB에 적용하지 않는다. 설정·migration 파일 자체는 재현성을 위해 Git에 포함한다.
+
+Vercel이 자동 주입하는 공개 framework 메타데이터와 Observability client 설정은 검토용 빌드의 명시적 허용 목록에 포함한다. 임의의 Vercel 접두사 변수나 서버 비밀은 허용하지 않는다.
 
 ## 검증과 후속
 
