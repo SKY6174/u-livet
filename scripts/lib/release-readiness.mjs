@@ -31,6 +31,8 @@ const REVIEW_PUBLIC_NAMES = new Set([...PUBLIC_NAMES, ...[
   'GIT_COMMIT_SHA', 'GIT_COMMIT_MESSAGE', 'GIT_COMMIT_AUTHOR_LOGIN', 'GIT_COMMIT_AUTHOR_NAME',
   'GIT_PULL_REQUEST_ID', 'OBSERVABILITY_CLIENT_CONFIG',
 ].map(name => `NEXT_PUBLIC_VERCEL_${name}`)]);
+// Supabase's Vercel integration re-syncs this browser-safe key automatically.
+const MANAGED_PUBLIC_NAMES = new Set([...REVIEW_PUBLIC_NAMES, 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY']);
 const REF = /^[a-z0-9]{20}$/;
 const DIGEST = /^[a-f0-9]{64}$/;
 const row = (id, pass, message) => ({ id, status: pass ? 'PASS' : 'BLOCK', message });
@@ -121,7 +123,10 @@ export function inspectEnvironment(env, target) {
       validConfigDigest(env.SELF_HOSTED_CONFIG_DIGEST), '고정 스택 ID·Auth 이미지 버전/digest·비밀 없는 설정 지문이 필요합니다.')] : []),
     row('public-key-shape', keyShape(env.NEXT_PUBLIC_SUPABASE_ANON_KEY, 'anon', ref, selfHosted), '공개 키의 형식/역할/배포 종류를 확인합니다. 실제 키 유효성·서명·귀속 검증은 별도입니다.'),
     row('server-key-shape', keyShape(serviceKey, 'service_role', ref, selfHosted) && serviceKey !== env.NEXT_PUBLIC_SUPABASE_ANON_KEY, '서버 키의 형식/역할/배포 종류를 확인합니다. 실제 키 유효성·서명·귀속 검증은 별도입니다.'),
-    row('public-allowlist', publicValues.every(([name]) => (managed ? REVIEW_PUBLIC_NAMES : PUBLIC_NAMES).has(name)), '검토된 공개 변수만 허용합니다. 새 공개 변수는 설계 검토가 필요합니다.'),
+    row('public-allowlist', publicValues.every(([name]) => (managed ? MANAGED_PUBLIC_NAMES : PUBLIC_NAMES).has(name)), '검토된 공개 변수만 허용합니다. 새 공개 변수는 설계 검토가 필요합니다.'),
+    ...(managed ? [row('managed-integration-public-key', !Object.hasOwn(env, 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY') ||
+      (!placeholder(env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) && /^sb_publishable_[A-Za-z0-9_-]{20,}$/.test(env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)),
+      '자동 연동의 공개 키 변수에는 publishable 키만 허용합니다. 서버 비밀키는 거부합니다.')] : []),
     row('secret-exposure', [serviceKey, secret].filter(v => typeof v === 'string' && v.length > 0)
       .every(value => publicValues.every(([, publicValue]) => !String(publicValue).includes(value))), '서버 키와 요청 제한 비밀값은 공개 변수에 포함할 수 없습니다.'),
     row('rate-secret', !placeholder(secret) && secret.length >= 32 && secret.length <= 256 &&

@@ -32,6 +32,10 @@ const env = {
 };
 const valid = (e,target='preview') => inspectEnvironment(e,target).every(c=>c.status==='PASS');
 test('explicit managed profile can deploy while email is pending', () => assert.ok(valid(env)));
+test('Supabase integration publishable key survives automatic environment sync', () => assert.ok(valid({...env,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:env.NEXT_PUBLIC_SUPABASE_ANON_KEY})));
+for (const key of ['', 'sb_secret_DifferentServerSecret123456789', 'invalid-public-key'])
+  test('integration public variable rejects empty, secret and invalid values', () => assert.equal(valid({...env,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:key}),false));
+test('integration exception is limited to managed Cloud', () => assert.equal(inspectEnvironment({...env,AUTH_PROFILE:undefined,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:env.NEXT_PUBLIC_SUPABASE_ANON_KEY},'preview').find(c=>c.id==='public-allowlist').status,'BLOCK'));
 test('production uses its own DB and site', () => assert.ok(valid({...env,VERCEL_ENV:'production',NEXT_PUBLIC_SUPABASE_URL:`https://${env.RELEASE_PRODUCTION_SUPABASE_REF}.supabase.co`,AUTH_SITE_ORIGIN:env.RELEASE_PRODUCTION_SITE_ORIGIN,CERTIFICATE_VERIFY_ORIGIN:env.RELEASE_PRODUCTION_SITE_ORIGIN},'production')));
 for (const change of [{AUTH_EMAIL_ENABLED:undefined},{PREVIEW_REVIEW_ONLY:'true'},{AUTH_ABUSE_MODE:undefined},{AUTH_RATE_LIMIT_SECRET:''},{SUPABASE_SERVICE_ROLE_KEY:''},{NEXT_PUBLIC_UNKNOWN_SECRET:env.SUPABASE_SERVICE_ROLE_KEY},{AUTH_LOCAL_CAPTCHA_TEST:'true'},{SUPABASE_DEPLOYMENT_KIND:'self-hosted'}]) test('misconfigured managed deployment blocked', () => assert.equal(valid({...env,...change}),false));
 test('explicit managed native rate limits permit login guard', () => assert.equal(botProtectionConfig(env).unavailable,false));

@@ -11,6 +11,8 @@
 - 기능 소스 `cf6072850fa462b23775637da3c99ce37cdb18cb`를 main/preview에 동일하게 push. 두 Vercel 배포 Ready. 운영 health 200 및 canonical 확인, Preview 별도 origin 유지.
 - 관리 파일만 추출한 체크아웃에서 lint 및 Node 24 빌드 통과. 기존 미추적 ` 2` 복사본은 변경하거나 커밋하지 않았다.
 
+후속 문서 배포 중 Vercel의 Supabase 연동이 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`를 다시 등록하여 기존 allowlist가 Production 빌드를 차단했다. 기존 정상 배포는 유지됐다. 자동 연동을 고려하여 관리형 Cloud에서만 해당 공개 변수의 정확한 이름과 publishable 형식을 허용하도록 보완했다. 서버 비밀키·빈 값·잘못된 형식과 다른 프로필에서는 계속 거부한다.
+
 ## 메일 연결의 현재 위치
 
 사용자가 발신 주소 `noreply@uc-life.org`, 공급자 Resend를 선택했다. CLI에서 제공되는 무료 플랜(`free`, 0.00), 발신 리전 `ap-northeast-1`, 리소스 이름 `uc-life-auth`, 도메인 `uc-life.org`로 준비했다. 실제 리소스 생성은 아직 완료되지 않았다.

@@ -16,4 +16,6 @@ SMTP의 SPF/DKIM 및 발신 도메인 상태, 포트/사용자, 승인 수신함
 
 ## 검증
 
+Vercel의 Supabase 연동이 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`를 자동 재등록하는 것을 확인했다. 관리형 Cloud 프로필에서만 이 정확한 이름을 공개 변수 목록에 추가하고 `sb_publishable_` 형식 검사 및 기존 비밀값 유출 검사를 유지한다. 같은 이름의 서버 secret/service-role 값은 거부한다. 검토 전용·자체 서버·미등록 변수 허용 범위는 넓히지 않는다.
+
 신규 도메인 HTTPS 200, 이전 두 호스트 308→apex이며 경로/query 보존 및 순환 없음. 운영/Preview 동일 SHA, 각 DB health 정상. 브라우저의 메인 주소, 메타 canonical과 인증·증명 링크 origin을 확인한다. SMTP 미제공 시 그 제한을 정확히 기록하고 주소 전환 완료와 구분한다.
