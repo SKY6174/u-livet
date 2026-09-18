@@ -84,7 +84,7 @@ export default function HomePage() {
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-uc-orange border border-white/15">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>울산과학대학교 평생직업교육 앵커사업단 공식 포털</span>
+              <span>울산과학대학교 앵커사업단 RCC센터 공식 포털</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white">
@@ -291,7 +291,7 @@ export default function HomePage() {
               <span>공인 전자문서 위·변조 검증 서비스</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-bold">
-              울산과학대학교 앵커사업단 수료증 진위 확인
+              울산과학대학교 앵커사업단 RCC센터 수료증 진위 확인
             </h3>
             <p className="text-sm text-slate-300 leading-relaxed">
               수료증 상단에 인쇄된 <strong>수료증 고유 등록번호</strong>(예: UC-ANCHOR-2026-00001)를

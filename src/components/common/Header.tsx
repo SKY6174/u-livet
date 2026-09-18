@@ -47,7 +47,7 @@ export default function Header() {
       {/* 상단 최상위 미니 알림바 (관리자 바로가기 포함) */}
       <div className="bg-uc-navy text-white text-xs py-1.5 px-4 text-center sm:text-left flex justify-between items-center max-w-7xl mx-auto">
         <span className="font-medium">
-          🏛️ 울산광역시-울산과학대학교 지자체·대학 협력 평생직업교육 앵커사업단
+          🏛️ 울산광역시-울산과학대학교 지자체·대학 협력 앵커사업단 RCC센터
         </span>
         <div className="hidden sm:flex items-center space-x-3 text-slate-300 text-[11px]">
           <Link href="/admin/classrooms" className="hover:text-white transition flex items-center space-x-1">
@@ -82,7 +82,7 @@ export default function Header() {
                 울산과학대학교
               </span>
               <span className="text-xs font-semibold text-uc-orange tracking-wide">
-                평생직업교육 앵커사업단 포털
+                앵커사업단 RCC센터 포털
               </span>
             </div>
           </Link>

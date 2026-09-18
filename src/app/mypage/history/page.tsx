@@ -208,7 +208,7 @@ export default function LearnerHistoryPage() {
               {learnerProfile.name} 님의 평생직업교육 수강 및 학업 이력
             </h1>
             <p className="text-sm text-slate-300 mt-1">
-              울산과학대학교 평생직업교육 앵커사업단에서 이수한 모든 직무 교육 내역, 디지털 배지 및 장학 혜택입니다.
+              울산과학대학교 앵커사업단 RCC센터에서 이수한 모든 직무 교육 내역, 디지털 배지 및 장학 혜택입니다.
             </p>
           </div>
 
@@ -614,7 +614,7 @@ export default function LearnerHistoryPage() {
             <div className="text-center my-6">
               <p className="text-sm font-bold text-slate-800">2026년 09월 18일</p>
               <div className="mt-4 text-xl font-bold font-serif text-slate-900 tracking-wider">
-                울산과학대학교 총장 조홍래 · 평생직업교육 앵커사업단장
+                울산과학대학교 총장 조홍래 · 앵커사업단 RCC센터장
               </div>
             </div>
           </div>

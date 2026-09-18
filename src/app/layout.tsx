@@ -13,10 +13,10 @@ import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 
 export const metadata: Metadata = {
-  title: '울산과학대학교 평생직업교육 앵커사업단 | LMS 및 수강신청 포털',
+  title: '울산과학대학교 앵커사업단 RCC센터 | LMS 및 수강신청 포털',
   description: '울산 지역 재직자, 성인학습자 및 구직자를 위한 직무역량 강화 평생직업교육 플랫폼입니다. 강좌 수강신청, 출결 관리, 위변조 방지 전자수료증 발급 지원.',
-  keywords: ['울산과학대학교', '평생직업교육', '앵커사업단', 'LMS', '수강신청', '수료증', '재직자교육', '울산직업훈련'],
-  authors: [{ name: '울산과학대학교 평생직업교육 앵커사업단' }],
+  keywords: ['울산과학대학교', '앵커사업단 RCC센터', '앵커사업단', 'LMS', '수강신청', '수료증', '재직자교육', '울산직업훈련'],
+  authors: [{ name: '울산과학대학교 앵커사업단 RCC센터' }],
 };
 
 export default function RootLayout({

@@ -158,7 +158,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
           <div className="flex items-center space-x-2">
             <Award className="w-6 h-6 text-uc-orange" />
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-              울산과학대학교 앵커사업단 공식 수료 기준
+              울산과학대학교 앵커사업단 RCC센터 공식 수료 기준
             </h2>
           </div>
           <p className="text-sm text-slate-600">

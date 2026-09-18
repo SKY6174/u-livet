@@ -70,7 +70,7 @@ function VerifyContent() {
       finalScore: 94.5,
       issuedAt: '2026.08.26',
       verificationHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-      issuerOrg: '울산과학대학교 평생직업교육 앵커사업단',
+      issuerOrg: '울산과학대학교 앵커사업단 RCC센터',
       status: 'VALID',
       statusMessage: '울산과학대학교 공식 발급 대장에 정식 등록된 원본 수료증입니다.'
     },
@@ -84,7 +84,7 @@ function VerifyContent() {
       finalScore: 89.0,
       issuedAt: '2026.08.10',
       verificationHash: '8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4',
-      issuerOrg: '울산과학대학교 평생직업교육 앵커사업단',
+      issuerOrg: '울산과학대학교 앵커사업단 RCC센터',
       status: 'VALID',
       statusMessage: '울산과학대학교 공식 발급 대장에 정식 등록된 원본 수료증입니다.'
     },
@@ -98,7 +98,7 @@ function VerifyContent() {
       finalScore: 50.0,
       issuedAt: '2026.07.15',
       verificationHash: '3a5b2c918e7d4f6a1c2b3e4d5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a',
-      issuerOrg: '울산과학대학교 평생직업교육 앵커사업단',
+      issuerOrg: '울산과학대학교 앵커사업단 RCC센터',
       status: 'REVOKED',
       statusMessage: '출결 허위 대리출석 적발로 인해 학칙 및 사업단 운영규정에 의거 발급이 직권 취소된 수료증입니다.'
     }
@@ -129,7 +129,7 @@ function VerifyContent() {
           finalScore: 0,
           issuedAt: '-',
           verificationHash: 'N/A',
-          issuerOrg: '울산과학대학교 평생직업교육 앵커사업단',
+          issuerOrg: '울산과학대학교 앵커사업단 RCC센터',
           status: 'INVALID',
           statusMessage: '울산과학대학교 발급 대장에 등록되지 않은 수료번호입니다. 위·변조 문서일 가능성이 있으니 주의하십시오.'
         });
@@ -164,7 +164,7 @@ function VerifyContent() {
           전자 수료증 위·변조 진위 검증 포털
         </h1>
         <p className="text-slate-600 mt-2 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
-          울산과학대학교 평생직업교육 앵커사업단에서 발급한 공인 전자수료증의 고유 발급번호 및 암호화 해시를 대조하여 위변조 여부를 실시간으로 판정합니다.
+          울산과학대학교 앵커사업단 RCC센터에서 발급한 공인 전자수료증의 고유 발급번호 및 암호화 해시를 대조하여 위변조 여부를 실시간으로 판정합니다.
         </p>
       </div>
 
@@ -395,7 +395,7 @@ function VerifyContent() {
         <ul className="list-disc list-inside space-y-1 text-slate-500 leading-relaxed">
           <li>본 검증 서비스는 교육부 지자체·대학 협력기반 지역혁신사업(RIS) 평생직업교육 앵커사업 지침을 준수합니다.</li>
           <li>수료증을 위·변조하여 행사하는 행위는 형법 제225조(공문서등의 위조·변조) 또는 제231조(사문서등의 위조·변조)에 따라 처벌받을 수 있습니다.</li>
-          <li>기업 채용 시 공식 확인 서류가 추가로 필요하신 경우 울산과학대학교 앵커사업단 행정실(052-230-0500)로 문의하시기 바랍니다.</li>
+          <li>기업 채용 시 공식 확인 서류가 추가로 필요하신 경우 울산과학대학교 앵커사업단 RCC센터 행정실(052-230-0500)로 문의하시기 바랍니다.</li>
         </ul>
       </div>
     </div>

@@ -54,7 +54,7 @@ export default function DigitalBadgeDetailPage() {
     recipientName: '김*산',
     recipientEmailHash: 'sha256$e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
     courseTitle: '조선해양 미래 친환경 스마트 선박 실무 과정',
-    issuer: '울산과학대학교 평생직업교육 앵커사업단',
+    issuer: '울산과학대학교 앵커사업단 RCC센터',
     issuedDate: '2026년 08월 26일',
     attendanceRate: 95.0,
     finalScore: 94.5,
@@ -66,7 +66,7 @@ export default function DigitalBadgeDetailPage() {
       '조선가공 공정시뮬레이션',
       '선박 품질검사'
     ],
-    criteria: '울산과학대학교 평생직업교육 앵커사업단 주관 64시간 교육 이수, 출석률 80% 이상 및 종합평가 60점 이상 충족'
+    criteria: '울산과학대학교 앵커사업단 RCC센터 주관 64시간 교육 이수, 출석률 80% 이상 및 종합평가 60점 이상 충족'
   };
 
   // 링크드인 프로필에 자격증 직접 추가하는 공식 URL 빌더

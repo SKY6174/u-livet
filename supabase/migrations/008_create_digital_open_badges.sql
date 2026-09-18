@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS public.badge_classes (
     criteria_narrative TEXT NOT NULL,                         -- 수여 기준 설명 (출석 80% 이상, 종합평가 60점 이상 등)
     
     -- 발급 기관(Issuer) 정보 (Open Badges 규격 필수)
-    issuer_name TEXT NOT NULL DEFAULT '울산과학대학교 평생직업교육 앵커사업단',
+    issuer_name TEXT NOT NULL DEFAULT '울산과학대학교 앵커사업단 RCC센터',
     issuer_url TEXT NOT NULL DEFAULT 'https://uc-life.vercel.app',
     issuer_email TEXT NOT NULL DEFAULT 'anchor@uc.ac.kr',
     

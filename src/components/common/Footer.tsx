@@ -23,11 +23,11 @@ export default function Footer() {
                 UC
               </div>
               <span className="text-xl font-bold text-white">
-                울산과학대학교 평생직업교육 앵커사업단
+                울산과학대학교 앵커사업단 RCC센터
               </span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed max-w-lg">
-              울산광역시와 울산과학대학교가 함께하는 평생직업교육 앵커사업단은
+              울산광역시와 울산과학대학교가 함께하는 앵커사업단 RCC센터는
               지역 재직자, 성인학습자 및 구직자를 위한 맞춤형 직무역량 강화 교육과
               지역 5대 주력산업 맞춤형 미래인재 양성을 선도합니다.
             </p>
@@ -87,7 +87,7 @@ export default function Footer() {
                 <MapPin className="w-4 h-4 text-uc-orange shrink-0 mt-1" />
                 <span>
                   <strong>동부캠퍼스</strong>: 울산광역시 동구 봉수로 101<br />
-                  평생직업교육 앵커사업단 본부
+                  앵커사업단 RCC센터 본부
                 </span>
               </li>
               <li className="flex items-start space-x-2">
@@ -110,7 +110,7 @@ export default function Footer() {
 
         {/* 4. 하단 저작권 및 약관 */}
         <div className="pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 space-y-4 sm:space-y-0">
-          <p>© 2026 Ulsan College Lifelong Vocational Education Anchor Center. All rights reserved.</p>
+          <p>© 2026 Ulsan College Anchor RCC Center. All rights reserved.</p>
           <div className="flex space-x-6">
             <Link href="/privacy" className="hover:text-slate-300 font-semibold text-slate-400">
               개인정보처리방침

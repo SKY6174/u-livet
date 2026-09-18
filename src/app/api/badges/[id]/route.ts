@@ -36,12 +36,12 @@ export async function GET(
       description: '울산 주력산업인 조선해양 분야에서 미래 친환경 스마트 선박 3D 모델링, 선체 블록 검사 및 공정 설계 실무 역량을 마스터하였음을 인증합니다.',
       image: `${origin}/images/badges/badge_smart_ship.svg`,
       criteria: {
-        narrative: '울산과학대학교 평생직업교육 앵커사업단 주관 64시간 교육 이수, 출석률 80% 이상 및 종합평가 60점 이상 충족'
+        narrative: '울산과학대학교 앵커사업단 RCC센터 주관 64시간 교육 이수, 출석률 80% 이상 및 종합평가 60점 이상 충족'
       },
       issuer: {
         type: 'Issuer',
         id: `${origin}/api/issuer`,
-        name: '울산과학대학교 평생직업교육 앵커사업단',
+        name: '울산과학대학교 앵커사업단 RCC센터',
         url: origin,
         email: 'anchor@uc.ac.kr',
         description: '교육부 및 울산광역시 지자체-대학 협력기반 지역혁신사업(RIS) 평생직업교육 주관기관'

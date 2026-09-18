@@ -5,7 +5,7 @@
 // ==============================================================================
 // 파일 경로: src/app/certificate/[id]/page.tsx
 // 설명:
-//   1. 울산과학대학교 총장 및 평생직업교육 앵커사업단장 공식 직인이 날인된 수료증 화면입니다.
+//   1. 울산과학대학교 총장 및 앵커사업단 RCC센터장 공식 직인이 날인된 수료증 화면입니다.
 //   2. 수료번호, 수료자 성명, 강좌명, 교육기간, 이수시수, 최종평가 결과를 표시합니다.
 //   3. 스마트폰 카메라로 스캔하면 즉시 원본 대조가 가능한 2차원 QR 코드를 생성합니다.
 //   4. 위·변조 방지를 위한 SHA-256 전자 검증 해시값을 포함합니다.
@@ -70,7 +70,7 @@ export default function CertificateDetailPage() {
       attendanceRate: 95.0,
       issuedAt: '2026년 08월 26일',
       verificationHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-      issuerTitle: '울산과학대학교 총장 조홍래 · 평생직업교육 앵커사업단장',
+      issuerTitle: '울산과학대학교 총장 조홍래 · 앵커사업단 RCC센터장',
       badgeId: 'badge-uc-2026-0042'
     };
 
@@ -189,7 +189,7 @@ export default function CertificateDetailPage() {
               </div>
               <div className="text-right">
                 <p className="text-xs font-bold text-uc-navy leading-tight">울산과학대학교</p>
-                <p className="text-[10px] text-uc-orange font-semibold">평생직업교육 앵커사업단</p>
+                <p className="text-[10px] text-uc-orange font-semibold">앵커사업단 RCC센터</p>
               </div>
             </div>
           </div>
@@ -290,7 +290,7 @@ export default function CertificateDetailPage() {
                 울산과학대학교 총 장
               </div>
               <div className="text-sm font-semibold text-slate-600 mt-1">
-                평생직업교육 앵커사업단장
+                앵커사업단 RCC센터장
               </div>
 
               {/* 공식 인영 (붉은색 직인 도장 이미지 그래픽) */}

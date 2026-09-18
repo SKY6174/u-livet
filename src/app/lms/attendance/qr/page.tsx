@@ -218,7 +218,7 @@ export default function MobileQrAttendancePage() {
 
       {/* 하단 푸터 표기 */}
       <div className="text-center text-[11px] text-slate-500 py-4">
-        울산과학대학교 평생직업교육 앵커사업단 스마트 출결 시스템
+        울산과학대학교 앵커사업단 RCC센터 스마트 출결 시스템
       </div>
     </div>
   );

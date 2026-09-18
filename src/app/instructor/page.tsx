@@ -98,7 +98,7 @@ export default function InstructorRegistrationPage() {
             <span>최고 산업체 전문가 & 겸임교원 초빙</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold leading-tight">
-            울산과학대학교 앵커사업단 강사 풀(Pool) 등록
+            울산과학대학교 앵커사업단 RCC센터 강사 풀(Pool) 등록
           </h1>
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
             울산의 주력 산업을 이끌어갈 미래 인재 양성에 여러분의 현장 노하우를 나눠주세요.
@@ -155,7 +155,7 @@ export default function InstructorRegistrationPage() {
                 강사 풀 등록 신청이 성공적으로 접수되었습니다!
               </h2>
               <p className="text-sm text-slate-600 max-w-lg mx-auto">
-                울산과학대학교 앵커사업단 자격심의위원회에서 학력 및 경력 서류 검토 후 
+                울산과학대학교 앵커사업단 RCC센터 자격심의위원회에서 학력 및 경력 서류 검토 후 
                 영업일 기준 3일 이내에 적격 등급 판정 결과를 안내해 드립니다.
               </p>
             </div>
