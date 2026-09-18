@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   ArrowUpRight,
   BookOpen,
@@ -7,6 +8,7 @@ import {
 } from "lucide-react";
 import { getOfferings } from "@/lib/portal/data";
 import { CourseCard, Empty } from "@/components/portal/ui";
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 export default async function Home() {
   const { offerings, unavailable } = await getOfferings();
   const courses = offerings.filter((o) => o.status === "PUBLISHED").slice(0, 3);

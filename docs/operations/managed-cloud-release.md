@@ -8,10 +8,12 @@
 
 | 환경 | 사이트 | Supabase |
 |---|---|---|
-| Production / main | https://uc-life.vercel.app | `uoebygejgglgiivzgyks` |
+| Production / main | https://uc-life.org | `uoebygejgglgiivzgyks` |
 | Preview / preview | https://uc-life-git-preview-ucsky6174.vercel.app | `bfqwntulxabfrimcypvx` |
 
 같은 Git commit을 두 브랜치에 적용하되 환경별로 다시 빌드한다. Preview 산출물을 그대로 운영으로 promote하지 않는다. `/api/version`의 revision이 같은지, environment만 다른지 확인한다. Preview 접근 보호는 유지한다. 기존 운영 배포 `1a4bf13`은 이전 Antigravity 개발 화면이며 이번 교체 대상이다.
+
+사용자가 지정한 메인 주소는 `uc-life.org`이며 `www.uc-life.org`와 `uc-life.vercel.app`에서 경로를 유지하여 이동한다. 인증·증명서 링크 기준과 홈 canonical도 메인 주소를 사용한다. 지정 발신 주소는 `noreply@uc-life.org`이며 실제 SMTP 연결 상태는 별도로 확인한다.
 
 ## 현재 인증 정책
 
