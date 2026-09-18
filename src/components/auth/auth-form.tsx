@@ -5,6 +5,7 @@ import type { Policy } from "@/lib/portal/types";
 import { PasswordField } from "./password-field";
 import { getBotProtection } from "@/lib/auth/bot-config";
 import { isReviewOnly } from "@/lib/deployment/review-mode";
+import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 export function AuthForm({
   signup = false,
   next = "/mypage",
@@ -20,9 +21,10 @@ export function AuthForm({
       <ActionForm
         action={signup ? register : authenticate}
         label={signup ? "가입 신청" : "로그인"}
-        disabled={reviewOnly || (signup && !policy)}
+        disabled={reviewOnly || (signup && (!policy || !authEmailEnabled()))}
         botProtection={reviewOnly ? undefined : getBotProtection()}
       >
+        {signup && !authEmailEnabled() && <p role="status" className="notice">{AUTH_EMAIL_PENDING}</p>}
         <input type="hidden" name="next" value={next} />
         {signup && (
           <label className="field text-base">

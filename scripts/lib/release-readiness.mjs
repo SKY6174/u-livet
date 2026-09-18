@@ -66,6 +66,7 @@ function keyShape(value, role, ref, selfHosted = false) {
 }
 
 export function inspectEnvironment(env, target) {
+  const managed = env.AUTH_PROFILE === 'managed-cloud-v1';
   const kind = env.SUPABASE_DEPLOYMENT_KIND ?? 'cloud';
   const selfHosted = kind === 'self-hosted';
   const ref = projectRef(env.NEXT_PUBLIC_SUPABASE_URL);
@@ -120,14 +121,18 @@ export function inspectEnvironment(env, target) {
       validConfigDigest(env.SELF_HOSTED_CONFIG_DIGEST), '고정 스택 ID·Auth 이미지 버전/digest·비밀 없는 설정 지문이 필요합니다.')] : []),
     row('public-key-shape', keyShape(env.NEXT_PUBLIC_SUPABASE_ANON_KEY, 'anon', ref, selfHosted), '공개 키의 형식/역할/배포 종류를 확인합니다. 실제 키 유효성·서명·귀속 검증은 별도입니다.'),
     row('server-key-shape', keyShape(serviceKey, 'service_role', ref, selfHosted) && serviceKey !== env.NEXT_PUBLIC_SUPABASE_ANON_KEY, '서버 키의 형식/역할/배포 종류를 확인합니다. 실제 키 유효성·서명·귀속 검증은 별도입니다.'),
-    row('public-allowlist', publicValues.every(([name]) => PUBLIC_NAMES.has(name)), '검토된 공개 변수만 허용합니다. 새 공개 변수는 설계 검토가 필요합니다.'),
+    row('public-allowlist', publicValues.every(([name]) => (managed ? REVIEW_PUBLIC_NAMES : PUBLIC_NAMES).has(name)), '검토된 공개 변수만 허용합니다. 새 공개 변수는 설계 검토가 필요합니다.'),
     row('secret-exposure', [serviceKey, secret].filter(v => typeof v === 'string' && v.length > 0)
       .every(value => publicValues.every(([, publicValue]) => !String(publicValue).includes(value))), '서버 키와 요청 제한 비밀값은 공개 변수에 포함할 수 없습니다.'),
     row('rate-secret', !placeholder(secret) && secret.length >= 32 && secret.length <= 256 &&
       !/\s/.test(secret) && new Set(secret).size >= 12 && secret !== serviceKey && secret !== env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     '독립적으로 생성한 32자 이상 HMAC 비밀값이 필요합니다. 형식 검사는 임의성을 보장하지 않습니다.'),
-    row('captcha', env.AUTH_CAPTCHA_ENABLED === 'true' && typeof captcha === 'string' &&
-      /^[A-Za-z0-9_-]{20,100}$/.test(captcha) && !/^[123]x0{8}/.test(captcha) && !placeholder(captcha), 'CAPTCHA를 켜고 실제 환경의 site key를 지정해야 합니다.'),
+    row('captcha', (env.AUTH_CAPTCHA_ENABLED === 'true' && typeof captcha === 'string' &&
+      /^[A-Za-z0-9_-]{20,100}$/.test(captcha) && !/^[123]x0{8}/.test(captcha) && !placeholder(captcha)) ||
+      (managed && kind === 'cloud' && env.AUTH_ABUSE_MODE === 'native-rate-limits' && env.AUTH_CAPTCHA_ENABLED === 'false' && !captcha),
+      '실제 CAPTCHA 또는 관리형 native·앱 요청 제한을 명시해야 합니다.'),
+    ...(managed ? [row('managed-profile', kind === 'cloud' && ['true','false'].includes(env.AUTH_EMAIL_ENABLED) &&
+      env.PREVIEW_REVIEW_ONLY === 'false' && env.VERCEL === '1', '관리형 배포는 Cloud·메일 상태·정상 업무 모드를 명시해야 합니다.')] : []),
     row('local-test-disabled', !env.AUTH_LOCAL_CAPTCHA_TEST, '로컬 CAPTCHA 시험 변수가 없어야 합니다.'),
     row('trusted-proxy', env.AUTH_TRUSTED_IP_HEADER === 'x-vercel-forwarded-for' &&
       (!env.TRUST_PROXY_IP || env.TRUST_PROXY_IP === 'false'), 'Vercel 신뢰 IP 헤더를 지정하고 legacy TRUST_PROXY_IP를 사용하지 않아야 합니다.'),

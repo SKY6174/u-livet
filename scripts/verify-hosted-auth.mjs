@@ -26,13 +26,11 @@ await test('matching config still runtime pending', () => {
 for (const key of Object.keys(config)) await test(`missing ${key}`, () => { const c = { ...config }; delete c[key]; blocked(c); });
 for (const value of [null, [], 7, 'SensitiveInput']) await test('nonobject blocked', () => blocked(value));
 for (const value of [6, 11, 13, '12']) await test('wrong minimum rejected', () => blocked({ ...config, password_min_length: value }));
-for (const value of ['', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789', 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789', 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~']) {
-  await test('published preset does not replace exact policy', () => blocked({ ...config, password_required_characters: value }));
+for (const value of ['', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789', 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789']) {
+  await test('weaker presets rejected', () => blocked({ ...config, password_required_characters: value }));
 }
-await test('exact local native character string', async () => {
-  const source = await readFile('scripts/configure-auth-local.mjs', 'utf8');
-  assert.ok(source.includes('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:'));
-  assert.ok(REQUIRED_CHARACTERS.includes('\\:')); assert.ok(REQUIRED_CHARACTERS.endsWith('{|}~'));
+await test('managed native preset uses separate upper and lowercase groups', () => {
+  assert.ok(REQUIRED_CHARACTERS.startsWith('abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:'));
 });
 for (const change of [{ mailer_autoconfirm: true }, { mailer_otp_exp: 3600 }, { smtp_max_frequency: 59 }, { smtp_max_frequency: '60' }, { smtp_host: 'localhost' }, { security_captcha_enabled: false }, { security_captcha_provider: 'hcaptcha' }, { mfa_totp_enroll_enabled: false }, { mfa_totp_verify_enabled: false }]) {
   await test('unsafe or mismatched setting rejected', () => blocked({ ...config, ...change }));

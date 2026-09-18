@@ -7,6 +7,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { isValidPassword, PASSWORD_GUIDANCE } from "@/lib/auth/password-policy";
 import type { ActionState } from "@/lib/portal/types";
 import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
+import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 
 const REQUEST_MESSAGE =
   "요청을 접수했습니다. 등록된 이메일이면 재설정 안내를 받을 수 있습니다. 반복 요청은 잠시 제한될 수 있습니다. 메일이 오지 않으면 스팸함과 주소를 확인하고, 대기 후에도 오지 않으면 잠시 더 기다리거나 사업단에 문의해 주세요.";
@@ -17,6 +18,7 @@ export async function requestPasswordReset(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  if (!authEmailEnabled()) return { message: AUTH_EMAIL_PENDING };
   const email = String(form.get("email") ?? "").trim();
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     return { message: "회원가입할 때 사용한 이메일 주소를 확인해 주세요." };

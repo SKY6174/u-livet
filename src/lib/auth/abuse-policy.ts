@@ -82,6 +82,9 @@ export function botProtectionConfig(env: Record<string, string | undefined>) {
     loopback(env.AUTH_SITE_ORIGIN) && loopback(env.NEXT_PUBLIC_SUPABASE_URL);
   const siteKey = env.AUTH_TURNSTILE_SITE_KEY?.trim() || null;
   const enabled = env.AUTH_CAPTCHA_ENABLED === "true";
+  const nativeRateLimits = env.AUTH_PROFILE === "managed-cloud-v1" &&
+    env.SUPABASE_DEPLOYMENT_KIND === "cloud" && env.AUTH_ABUSE_MODE === "native-rate-limits" &&
+    env.AUTH_CAPTCHA_ENABLED === "false" && !siteKey;
   const testKey = siteKey !== null && /^[123]x0{8}/.test(siteKey);
   const valid =
     siteKey !== null &&
@@ -89,6 +92,6 @@ export function botProtectionConfig(env: Record<string, string | undefined>) {
     (local || !testKey);
   return {
     siteKey: enabled && valid ? siteKey : null,
-    unavailable: !((enabled && valid) || (local && !enabled && !siteKey)),
+    unavailable: !((enabled && valid) || nativeRateLimits || (local && !enabled && !siteKey)),
   };
 }

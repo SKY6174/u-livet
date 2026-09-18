@@ -19,7 +19,8 @@
     "check:self-hosted": "node -- scripts/check-self-hosted.mjs",
     "test:self-hosted": "node scripts/verify-self-hosted.mjs",
     "test:auth-candidate": "node scripts/verify-auth-candidate.mjs",
-    "test:review-preview": "node scripts/verify-review-preview.mjs"
+    "test:review-preview": "node scripts/verify-review-preview.mjs",
+    "test:managed-cloud": "node scripts/verify-managed-cloud.mjs"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "1.1.1",

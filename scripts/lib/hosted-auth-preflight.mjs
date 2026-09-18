@@ -1,8 +1,7 @@
 import { isIP } from 'node:net';
+import { CLOUD_REQUIRED_CHARACTERS } from './managed-cloud.mjs';
 
-const LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const SYMBOLS = Array.from({ length: 94 }, (_, i) => String.fromCharCode(i + 33)).filter(c => !/[a-zA-Z0-9]/.test(c)).join('');
-export const REQUIRED_CHARACTERS = `${LETTERS}:0123456789:${SYMBOLS.replaceAll(':', '\\:')}`;
+export const REQUIRED_CHARACTERS = CLOUD_REQUIRED_CHARACTERS;
 const REF = /^[a-z0-9]{20}$/;
 const MAX_BYTES = 1024 * 1024;
 const item = (id, pass, message) => ({ id, status: pass ? 'PASS' : 'BLOCK', message });
@@ -29,7 +28,7 @@ export function inspectHostedAuth(input, siteOrigin) {
     item('config-object', !!validObject, 'Auth 설정 JSON 객체가 필요합니다.'),
     item('site-origin', validSiteOrigin(siteOrigin) && config.site_url === siteOrigin, '지정한 Preview HTTPS origin과 Site URL이 같아야 합니다.'),
     item('password-length', config.password_min_length === 12, 'native 최소 길이는 확정된 12자여야 합니다.'),
-    item('password-characters', config.password_required_characters === REQUIRED_CHARACTERS, '영문을 한 집합으로 묶은 영문·숫자·ASCII 특수문자 규칙을 확인해야 합니다. 프리셋으로 대체하지 않습니다.'),
+    item('password-characters', config.password_required_characters === REQUIRED_CHARACTERS, '관리형 기본 규칙인 소문자·대문자·숫자·특수문자 각각 필수를 확인합니다.'),
     item('email-confirmation', config.external_email_enabled === true && config.mailer_autoconfirm === false, '이메일 인증 로그인과 가입 이메일 확인이 필요합니다.'),
     item('recovery-expiry', config.mailer_otp_exp === 900, '복구 증명 유효기간은 15분이어야 합니다.'),
     item('smtp-host', typeof config.smtp_host === 'string' && !!config.smtp_host.trim() && !/localhost|example|replace|placeholder/i.test(config.smtp_host), '승인 SMTP 설정이 필요합니다. 비밀값과 실제 발송은 검사하지 않습니다.'),
@@ -41,8 +40,8 @@ export function inspectHostedAuth(input, siteOrigin) {
   return {
     status: blocked ? 'CONFIG_BLOCKED' : 'CONFIG_MATCH_RUNTIME_PENDING', blocked, checks,
     pending: [
-      'DB 감사 로그 저장 활성 및 비밀번호 변경 이벤트의 동일 transaction 처리',
-      'managed auth.mfa_factors의 트리거 권한과 공급자 지원 범위',
+      '비밀번호 변경 후 이전 세션의 업무 접근 차단',
+      'native TOTP 및 역할별 DB 접근 검증',
       '실제 native 비밀번호 허용/거부·복구·구세션 차단·MFA 우회 시험',
       '실제 SMTP/CAPTCHA 및 대상별 접근권한 검증',
     ],

@@ -6,6 +6,7 @@ import { safeReturnTo } from "@/lib/auth/session";
 import { getPolicies } from "@/lib/portal/data";
 import type { ActionState } from "@/lib/portal/types";
 import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
+import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 import {
   isValidPassword,
   PASSWORD_GUIDANCE,
@@ -89,6 +90,7 @@ export async function register(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  if (!authEmailEnabled()) return { message: AUTH_EMAIL_PENDING };
   const name = String(form.get("name") ?? "").trim();
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
