@@ -220,3 +220,68 @@ export interface AuditLog {
   details?: Record<string, unknown> | null;
   created_at: string;
 }
+
+// ==============================================================================
+// 14. 역할별 전용 고속 최적화 뷰 인터페이스 (010 마이그레이션 연계)
+// ==============================================================================
+
+/**
+ * 수강생(학습자) 전용 마이포털 원스톱 집계 뷰 (v_learner_my_portal)
+ * - 수강 강좌, 실시간 출결률, 수료증 및 디지털 배지, 장학금 정산 상태를 단일 쿼리로 제공
+ */
+export interface VLearnerMyPortal {
+  enrollment_id: string;
+  user_id: string;
+  course_id: string;
+  course_title: string;
+  course_category: string;
+  total_hours: number;
+  enrollment_status: EnrollmentStatus;
+  enrolled_at: string;
+  attended_lectures: number;
+  total_lectures: number;
+  real_time_attendance_rate: number;
+  certificate_no?: string | null;
+  cert_hash?: string | null;
+  cert_issued_at?: string | null;
+  badge_code?: string | null;
+  badge_name?: string | null;
+  scholarship_name?: string | null;
+  scholarship_amount?: number | null;
+  scholarship_status?: string | null;
+}
+
+/**
+ * 강사(산업체 전문가/교원) 전용 강의실 배정 및 학급 관리 뷰 (v_instructor_class_status)
+ * - 담당 강좌 진행 상태, 배정 강의실(캠퍼스/호수), 정원 대비 수강생 수, 과제 미채점 건수 제공
+ */
+export interface VInstructorClassStatus {
+  instructor_id: string;
+  course_id: string;
+  course_title: string;
+  course_category: string;
+  is_published: boolean;
+  course_progress_status: 'UPCOMING' | 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED' | 'OPEN';
+  capacity: number;
+  current_enrolled_students: number;
+  campus_type?: 'EAST' | 'WEST' | null;
+  building_name?: string | null;
+  room_number?: string | null;
+  classroom_name?: string | null;
+  pending_evaluation_count: number;
+}
+
+/**
+ * 사업단(관리자/운영자) 전용 실시간 KPI 종합 현황 뷰 (v_admin_kpi_overview)
+ * - 활성 강좌수, 승인 수강생수, 수료증/배지 발행 누계, 강사 심사 대기건, 장학금 총 지급액 등 요약
+ */
+export interface VAdminKpiOverview {
+  total_active_courses: number;
+  total_enrolled_learners: number;
+  total_issued_certificates: number;
+  total_issued_badges: number;
+  pending_instructor_applicants: number;
+  total_scholarship_disbursed_krw: number | string;
+  total_classrooms_equipped: number;
+}
+
