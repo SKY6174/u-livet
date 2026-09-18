@@ -10,6 +10,8 @@
 
 Vercel이 주입하는 공개 framework 메타데이터(환경·도메인·Git·hash salt)와 실제 배포에서 확인한 `NEXT_PUBLIC_VERCEL_OBSERVABILITY_CLIENT_CONFIG`는 검토용 빌드의 명시적 허용 목록에 포함한다. `NEXT_PUBLIC_VERCEL_*` 전체를 허용하지 않는다. 일반 배포의 기존 허용 목록은 유지한다. 근거: [Vercel framework 변수](https://vercel.com/docs/environment-variables/framework-environment-variables), 최초 Preview 배포의 환경변수 이름 목록.
 
+현재 Vercel build-utils의 `getPrefixedEnvVars`가 추가하는 지역·배포 ID·프로젝트 ID·이전 Git SHA도 공개 메타데이터로 포함한다. 검사 실패 시 값은 출력하지 않고 미등록 변수 이름만 표시한다.
+
 middleware에서 GET/HEAD 외 요청을 403으로 거부한다. 검토 모드에서는 사용자 세션 갱신을 하지 않는다. 서버 Supabase client는 cookie를 읽거나 쓰지 않으므로 업무 요청에는 공개 역할만 사용한다. 로그인 상태 조회는 null로 고정한다. 인증·회원 폼은 설명과 함께 제출을 비활성화하고 공통 배너를 제공한다. 검색 색인은 막는다. 이는 권한을 부여하는 데모 계정이나 관리자 우회가 아니다.
 
 ## 배포

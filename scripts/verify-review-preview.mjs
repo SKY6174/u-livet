@@ -17,6 +17,8 @@ test('isolated review Preview configuration passes', () => assert.ok(valid(env))
 test('Vercel injected public metadata does not block a hosted Preview', () => assert.ok(valid({
   ...env, NEXT_PUBLIC_VERCEL_ENV: 'preview', NEXT_PUBLIC_VERCEL_URL: 'review-uc.vercel.app',
   NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA: 'a'.repeat(40), NEXT_PUBLIC_VERCEL_OBSERVABILITY_CLIENT_CONFIG: '{}',
+  NEXT_PUBLIC_VERCEL_REGION: 'cle1', NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID: 'dpl_synthetic',
+  NEXT_PUBLIC_VERCEL_PROJECT_ID: 'prj_synthetic', NEXT_PUBLIC_VERCEL_GIT_PREVIOUS_SHA: 'b'.repeat(40),
 })));
 test('unreviewed Vercel-prefixed variables remain blocked', () => assert.equal(valid({
   ...env, NEXT_PUBLIC_VERCEL_SECRET: 'synthetic-sensitive-value',

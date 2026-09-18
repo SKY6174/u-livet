@@ -26,7 +26,8 @@ const PUBLIC_NAMES = new Set(['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_
 // Vercel injects these public metadata names during hosted builds. No prefix wildcard.
 const REVIEW_PUBLIC_NAMES = new Set([...PUBLIC_NAMES, ...[
   'ENV', 'TARGET_ENV', 'URL', 'BRANCH_URL', 'PROJECT_PRODUCTION_URL', 'HASH_SALT',
-  'GIT_PROVIDER', 'GIT_REPO_SLUG', 'GIT_REPO_OWNER', 'GIT_REPO_ID', 'GIT_COMMIT_REF',
+  'REGION', 'DEPLOYMENT_ID', 'PROJECT_ID',
+  'GIT_PROVIDER', 'GIT_PREVIOUS_SHA', 'GIT_REPO_SLUG', 'GIT_REPO_OWNER', 'GIT_REPO_ID', 'GIT_COMMIT_REF',
   'GIT_COMMIT_SHA', 'GIT_COMMIT_MESSAGE', 'GIT_COMMIT_AUTHOR_LOGIN', 'GIT_COMMIT_AUTHOR_NAME',
   'GIT_PULL_REQUEST_ID', 'OBSERVABILITY_CLIENT_CONFIG',
 ].map(name => `NEXT_PUBLIC_VERCEL_${name}`)]);
@@ -87,7 +88,8 @@ export function inspectEnvironment(env, target) {
       !!site && !!baseline && site.origin !== baseline.origin && env.CERTIFICATE_VERIFY_ORIGIN === site.origin,
       '검토 DB·사이트는 운영 기준과 달라야 하며 HTTPS origin을 사용해야 합니다.'),
     row('review-public-key', keyShape(env.NEXT_PUBLIC_SUPABASE_ANON_KEY, 'anon', ref), 'Preview 공개 키의 형식·역할을 확인합니다. 실제 연결은 별도로 검증합니다.'),
-    row('review-public-allowlist', publicValues.every(([name]) => REVIEW_PUBLIC_NAMES.has(name)), '허용한 앱·Vercel 공개 변수만 사용할 수 있습니다.'),
+    row('review-public-allowlist', publicValues.every(([name]) => REVIEW_PUBLIC_NAMES.has(name)),
+      `허용한 앱·Vercel 공개 변수만 사용할 수 있습니다. 미등록 이름: ${publicValues.filter(([name]) => !REVIEW_PUBLIC_NAMES.has(name)).map(([name]) => name).join(', ') || '없음'}`),
     row('review-no-privileged-auth', !serviceKey && !secret && !env.AUTH_CAPTCHA_ENABLED && !captcha &&
       !env.AUTH_LOCAL_CAPTCHA_TEST && !env.SUPABASE_SECRET_KEY && !env.SUPABASE_JWT_SECRET &&
       !env.POSTGRES_URL && !env.DATABASE_URL, '검토 배포에는 서버 키·DB 비밀·인증 실행 설정을 넣지 않습니다.'),
