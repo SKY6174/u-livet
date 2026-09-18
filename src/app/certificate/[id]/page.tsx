@@ -243,8 +243,8 @@ export default function CertificateDetailPage() {
           {/* 수료 인증 본문 문구 */}
           <div className="text-center my-10 px-4 sm:px-12">
             <p className="text-base sm:text-lg text-slate-800 leading-relaxed font-serif">
-              위 사람은 교육부 및 울산광역시가 주관하는 지자체-대학 협력기반<br className="hidden sm:inline" />
-              지역혁신사업(RIS) 평생직업교육 앵커사업의 일환으로 개설된<br className="hidden sm:inline" />
+              위 사람은 교육부 및 울산광역시가 주관하는 지자체-대학 협력 기반<br className="hidden sm:inline" />
+              지역성장 인재양성 앵커사업의 일환으로 개설된<br className="hidden sm:inline" />
               위 교육과정을 성실히 이수하였으므로 본 증서를 수여합니다.
             </p>
           </div>

@@ -5,7 +5,7 @@
 // ==============================================================================
 // 파일 경로: src/app/admin/scholarships/page.tsx
 // 설명:
-//   1. 교육부 RIS 지역혁신사업 및 울산시 평생직업교육 장학금 예산 집행을 총괄 관리합니다.
+//   1. 교육부 앵커사업 및 울산시 평생직업교육 장학금 예산 집행을 총괄 관리합니다.
 //   2. 수료 기준(출석률 80% 이상, 성적 60점 이상)을 충족한 학습자를 시스템이 자동 선별합니다.
 //   3. 금융 계좌 마스킹 처리(보안 8원칙)를 적용하여 안전하게 이체 심사를 진행합니다.
 //   4. 교육부 및 지자체 연차평가 보고서 증빙용 [장학금 지급 대장 CSV]를 다운로드합니다.
@@ -65,8 +65,8 @@ export default function AdminScholarshipsPage() {
   const [disbursements, setDisbursements] = useState<ScholarshipDisbursementItem[]>([
     {
       id: 'dsb-01',
-      scholarshipCode: 'SCH-RIS-INNOV',
-      scholarshipName: 'RIS 미래인재 혁신 장학금 (전액환급)',
+      scholarshipCode: 'SCH-ANCHOR-INNOV',
+      scholarshipName: '앵커 미래인재 혁신 장학금 (전액환급)',
       learnerName: '김울산',
       learnerPhoneMasked: '010-****-5678',
       courseTitle: '조선해양 미래 친환경 스마트 선박 실무 과정',
@@ -82,8 +82,8 @@ export default function AdminScholarshipsPage() {
     },
     {
       id: 'dsb-02',
-      scholarshipCode: 'SCH-RIS-INNOV',
-      scholarshipName: 'RIS 미래인재 혁신 장학금 (전액환급)',
+      scholarshipCode: 'SCH-ANCHOR-INNOV',
+      scholarshipName: '앵커 미래인재 혁신 장학금 (전액환급)',
       learnerName: '이동현',
       learnerPhoneMasked: '010-****-1234',
       courseTitle: '이차전지 스마트 팩토리 품질관리 엔지니어 양성',
@@ -199,7 +199,7 @@ export default function AdminScholarshipsPage() {
         <div>
           <div className="flex items-center space-x-2">
             <span className="px-2.5 py-1 bg-uc-navy text-white text-xs font-bold rounded-md">
-              RIS 성과 및 장학금 정산
+              앵커 성과 및 장학금 정산
             </span>
             <span className="text-xs text-slate-500 font-semibold">
               평생직업교육 학습비 지원 관리
@@ -240,7 +240,7 @@ export default function AdminScholarshipsPage() {
           <strong className="text-2xl font-black text-slate-900 block mt-1">
             {budgetSummary.totalBudget.toLocaleString()}원
           </strong>
-          <span className="text-xs text-slate-400 mt-2 block">교육부 RIS 및 울산시 매칭</span>
+          <span className="text-xs text-slate-400 mt-2 block">교육부·울산시 앵커사업 예산</span>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">

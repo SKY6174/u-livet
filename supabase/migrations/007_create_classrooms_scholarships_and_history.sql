@@ -60,11 +60,11 @@ COMMENT ON TABLE public.course_classroom_assignments IS '강좌별 강의실 배
 
 
 -- 3. 평생직업교육 특화 장학금 정책 마스터 (scholarships)
--- 초보자 안내: RIS 지역혁신 인재장학금, 지역 협약기업 재직자 장학금, 취약계층 훈련장려금 등 지원 정책을 정의합니다.
+-- 초보자 안내: 앵커 지역성장 인재장학금, 지역 협약기업 재직자 장학금, 취약계층 훈련장려금 등 지원 정책을 정의합니다.
 CREATE TABLE IF NOT EXISTS public.scholarships (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    code TEXT UNIQUE NOT NULL,                                        -- 장학금 코드 (예: SCH-RIS-INNOV, SCH-WORKER-RE)
-    name TEXT NOT NULL,                                               -- 장학금 명칭 (예: RIS 미래인재 혁신 장학금)
+    code TEXT UNIQUE NOT NULL,                                        -- 장학금 코드 (예: SCH-ANCHOR-INNOV, SCH-WORKER-RE)
+    name TEXT NOT NULL,                                               -- 장학금 명칭 (예: 앵커 미래인재 혁신 장학금)
     description TEXT,                                                 -- 장학금 지원 목적 및 개요
     
     benefit_type TEXT NOT NULL CHECK (benefit_type IN ('FULL_REFUND', 'PARTIAL_REFUND', 'FIXED_ALLOWANCE')), 
@@ -118,7 +118,7 @@ COMMENT ON TABLE public.scholarship_disbursements IS '학습자별 장학금 수
 
 
 -- 5. [자동화 함수] 수료 완료 학습자 대상 장학금 자동 선별 및 추천 함수
--- 초보자 안내: 수료증 발급 함수 실행 후, 해당 강좌 수료생에게 부여 가능한 장학금(예: RIS 전액환급 장학금)을 자동 매칭하여 대장에 등록합니다.
+-- 초보자 안내: 수료증 발급 함수 실행 후, 해당 강좌 수료생에게 부여 가능한 장학금(예: 앵커 전액환급 장학금)을 자동 매칭하여 대장에 등록합니다.
 CREATE OR REPLACE FUNCTION public.auto_evaluate_scholarship_eligibility(
     p_enrollment_id UUID
 )
@@ -211,7 +211,7 @@ ON CONFLICT (campus_type, building_name, room_number) DO NOTHING;
 -- 6.2. 대표 장학금 정책 기초 데이터
 INSERT INTO public.scholarships (code, name, description, benefit_type, benefit_amount, min_attendance_rate, min_final_score)
 VALUES 
-    ('SCH-RIS-INNOV', 'RIS 미래인재 혁신 장학금', '울산 지역 미래 핵심전략산업 교육과정 수료자 전원에게 수강료 100%를 지원금으로 환급합니다.', 'FULL_REFUND', 300000.00, 80.00, 60.00),
+    ('SCH-ANCHOR-INNOV', '앵커 미래인재 혁신 장학금', '울산 지역 미래 핵심전략산업 교육과정 수료자 전원에게 수강료 100%를 지원금으로 환급합니다.', 'FULL_REFUND', 300000.00, 80.00, 60.00),
     ('SCH-WORKER-RE', '울산 주력제조 재직자 역량도약 장학금', '울산 소재 중견·중소기업 협약 재직자의 직무 능력 향상을 위해 지급되는 맞춤형 장학금입니다.', 'PARTIAL_REFUND', 150000.00, 80.00, 70.00),
     ('SCH-HOPE-YOUTH', '청년·신중년 구직희망 훈련장려금', '신산업 분야 취업을 준비하는 지역 미취업 청년 및 신중년에게 지급되는 교육생활 장려금입니다.', 'FIXED_ALLOWANCE', 200000.00, 85.00, 70.00)
 ON CONFLICT (code) DO NOTHING;

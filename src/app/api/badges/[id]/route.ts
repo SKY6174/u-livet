@@ -44,7 +44,7 @@ export async function GET(
         name: '울산과학대학교 앵커사업단 RCC센터',
         url: origin,
         email: 'anchor@uc.ac.kr',
-        description: '교육부 및 울산광역시 지자체-대학 협력기반 지역혁신사업(RIS) 평생직업교육 주관기관'
+        description: '교육부 및 울산광역시 지자체-대학 협력 기반 지역성장 인재양성 앵커체계 평생직업교육 주관기관'
       },
       tags: [
         '스마트선박',

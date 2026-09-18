@@ -5,7 +5,7 @@
 // ==============================================================================
 // 파일 경로: src/app/admin/kpi/page.tsx
 // 설명:
-//   1. 교육부 및 울산광역시 주관 지자체-대학 협력기반 지역혁신사업(RIS)의
+//   1. 교육부 및 울산광역시 주관 지자체-대학 협력 기반 지역성장 인재양성 앵커사업의
 //      핵심 성과 지표(KPI)를 실시간으로 집계하고 시각화하는 관리자 전용 대시보드입니다.
 //   2. 누적 수료생 수, 수료율, 교육 만족도(4대 영역), 재직자 비율, 예산 집행률을 종합 제공합니다.
 //   3. 정부 및 지자체 연차 실적 평가 보고서 제출을 위한 엑셀(CSV) 다운로드 기능을 지원합니다.
@@ -170,7 +170,7 @@ export default function AnchorKpiDashboardPage() {
         <div>
           <div className="flex items-center space-x-2">
             <span className="px-2.5 py-1 bg-uc-navy text-white text-xs font-bold rounded-md">
-              RIS 앵커사업단 관리자
+              앵커사업단 RCC센터 관리자
             </span>
             <span className="text-xs text-slate-500 font-semibold">
               평생직업교육 성과관리 시스템
@@ -180,7 +180,7 @@ export default function AnchorKpiDashboardPage() {
             사업단 핵심 성과 지표 (KPI) 대시보드
           </h1>
           <p className="text-sm text-slate-600 mt-1">
-            지자체-대학 협력기반 울산 지역혁신사업의 교육 실적 및 교육부 연차평가 지표를 종합 집계합니다.
+            지자체-대학 협력 기반 울산 지역성장 인재양성 앵커체계의 교육 실적 및 연차평가 지표를 종합 집계합니다.
           </p>
         </div>
 

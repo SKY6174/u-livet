@@ -9,7 +9,7 @@
 //   2. 각 강좌별 배정된 캠퍼스 및 강의실/실습실 정보를 실시간으로 안내합니다.
 //   3. 취득한 공식 전자수료증 재열람 및 취업/이직 제출용 [평생직업교육 수강·이수증명서] 인쇄를 지원합니다.
 //   4. Open Badges v2.0 규격의 [나의 디지털 배지 지갑(Badge Wallet)] 및 링크드인 연동을 지원합니다.
-//   5. RIS 미래인재 장학금 등 수강료 환급 및 장학금 수혜 정산 내역을 투명하게 공개합니다.
+//   5. 앵커 미래인재 장학금 등 수강료 환급 및 장학금 수혜 정산 내역을 투명하게 공개합니다.
 // ==============================================================================
 
 import React, { useState } from 'react';
@@ -166,7 +166,7 @@ export default function LearnerHistoryPage() {
   const scholarshipHistoryList: ScholarshipHistoryItem[] = [
     {
       id: 'sch-01',
-      scholarshipName: 'RIS 미래인재 혁신 장학금 (수강료 100% 환급)',
+      scholarshipName: '앵커 미래인재 혁신 장학금 (수강료 100% 환급)',
       courseTitle: '조선해양 미래 친환경 스마트 선박 실무 과정',
       amount: 300000,
       status: 'PAID',
@@ -176,7 +176,7 @@ export default function LearnerHistoryPage() {
     },
     {
       id: 'sch-02',
-      scholarshipName: 'RIS 미래인재 혁신 장학금 (수료 예정자 환급 대기)',
+      scholarshipName: '앵커 미래인재 혁신 장학금 (수료 예정자 환급 대기)',
       courseTitle: '스마트 조선·해양 3D 선체 블록 모델링 및 검사 실무',
       amount: 300000,
       status: 'ELIGIBLE',
@@ -606,8 +606,8 @@ export default function LearnerHistoryPage() {
 
             {/* 증명 문구 */}
             <p className="text-center text-sm font-serif text-slate-800 leading-relaxed my-8">
-              위 사람은 교육부 및 울산광역시 주관 지자체-대학 협력기반 지역혁신사업(RIS)<br />
-              평생직업교육 앵커사업의 일환으로 개설된 위 과정을 성실히 이수하였음을 증명합니다.
+              위 사람은 교육부 및 울산광역시 주관 지자체-대학 협력 기반<br />
+              지역성장 인재양성 앵커사업의 일환으로 개설된 위 과정을 성실히 이수하였음을 증명합니다.
             </p>
 
             {/* 발급일 및 총장 직인 */}

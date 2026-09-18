@@ -34,7 +34,7 @@ export default function Footer() {
             <div className="flex items-center space-x-4 pt-2 text-xs text-slate-400">
               <span className="flex items-center space-x-1">
                 <Award className="w-4 h-4 text-uc-orange" />
-                <span>교육부·한국연구재단 지원사업</span>
+                <span>지역성장 인재양성 앵커체계</span>
               </span>
               <span className="flex items-center space-x-1">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
