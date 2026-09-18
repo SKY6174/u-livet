@@ -1,0 +1,31 @@
+{
+  "name": "uc-life",
+  "displayName": "울산과학대학교 앵커사업단 평생직업교육 플랫폼",
+  "version": "1.0.0",
+  "framework": "bkit (Vibecoding Kit)",
+  "methodology": "PDCA (Plan-Do-Check-Act)",
+  "roles": {
+    "architect": "요구사항 분석 및 전체 데이터 흐름, 모듈 구조 설계",
+    "developer": "한글 주석 포함 완전한 코드 작성 및 보안/암호화 적용",
+    "qaTester": "테스트 실행, 코드 무결성 및 계획 대비 Gap 분석",
+    "reviewer": "규칙 준수 여부 점검 및 워크플로우 최종 승인"
+  },
+  "rules": {
+    "language": "ko-KR",
+    "noCodeOmission": true,
+    "userSafetyFirst": true,
+    "stepByStep": true,
+    "supabaseMigrations": {
+      "path": "supabase/migrations",
+      "prefixFormat": "000_"
+    },
+    "security": {
+      "encryption": "pgcrypto AES-256",
+      "rlsEnabled": true
+    }
+  },
+  "logs": {
+    "devLog": "DEV_LOG.md",
+    "milestoneLog": "MILESTONE_LOG.md"
+  }
+}
