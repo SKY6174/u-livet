@@ -6,7 +6,8 @@
 // 파일 경로: src/components/common/Header.tsx
 // 설명:
 //   PC 및 모바일 환경에서 포털의 주요 메뉴(사업단 소개, 수강신청, LMS 강의실,
-//   강사지원, 수료증 검증)로 신속하게 이동할 수 있도록 안내하는 상단 헤더입니다.
+//   나의 수강이력, 강사지원, 수료증 검증, 성과 KPI, 강의실/장학금 관리)로
+//   신속하게 이동할 수 있도록 안내하는 통합 상단 헤더입니다.
 // ==============================================================================
 
 import React, { useState } from 'react';
@@ -16,6 +17,10 @@ import {
   BookOpen, 
   FileCheck2, 
   UserCheck, 
+  BarChart3,
+  History,
+  Building2,
+  Coins,
   Menu, 
   X, 
   LogIn, 
@@ -31,19 +36,34 @@ export default function Header() {
     { name: '사업단 소개', href: '/about', icon: GraduationCap },
     { name: '교육과정 & 수강신청', href: '/courses', icon: BookOpen },
     { name: 'LMS 강의실', href: '/lms', icon: BookOpen },
+    { name: '나의 수강이력', href: '/mypage/history', icon: History },
     { name: '강사 풀(Pool) 지원', href: '/instructor', icon: UserCheck },
     { name: '수료증 진위검증', href: '/verify', icon: FileCheck2 },
+    { name: '성과 KPI', href: '/admin/kpi', icon: BarChart3 },
   ];
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-uc-gray-border shadow-sm">
-      {/* 상단 최상위 미니 알림바 */}
+      {/* 상단 최상위 미니 알림바 (관리자 바로가기 포함) */}
       <div className="bg-uc-navy text-white text-xs py-1.5 px-4 text-center sm:text-left flex justify-between items-center max-w-7xl mx-auto">
         <span className="font-medium">
           🏛️ 울산광역시-울산과학대학교 지자체·대학 협력 평생직업교육 앵커사업단
         </span>
-        <div className="hidden sm:flex items-center space-x-4 text-slate-300">
-          <Link href="/admin" className="hover:text-white transition">사업단 관리자</Link>
+        <div className="hidden sm:flex items-center space-x-3 text-slate-300 text-[11px]">
+          <Link href="/admin/classrooms" className="hover:text-white transition flex items-center space-x-1">
+            <Building2 className="w-3 h-3" />
+            <span>강의실 배정</span>
+          </Link>
+          <span>|</span>
+          <Link href="/admin/scholarships" className="hover:text-white transition flex items-center space-x-1">
+            <Coins className="w-3 h-3" />
+            <span>장학금 정산</span>
+          </Link>
+          <span>|</span>
+          <Link href="/admin/kpi" className="hover:text-white transition flex items-center space-x-1">
+            <BarChart3 className="w-3 h-3" />
+            <span>성과 KPI</span>
+          </Link>
           <span>|</span>
           <span className="text-uc-orange font-semibold">교육문의 052-230-0500</span>
         </div>
@@ -68,16 +88,33 @@ export default function Header() {
           </Link>
 
           {/* 2. 데스크톱 네비게이션 메뉴 */}
-          <nav className="hidden md:flex space-x-1 lg:space-x-2">
+          <nav className="hidden xl:flex space-x-1">
             {navItems.map((item) => {
               const IconComponent = item.icon;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-slate-700 hover:text-uc-navy hover:bg-slate-50 font-semibold transition text-[15px]"
+                  className="flex items-center space-x-1 px-3 py-2 rounded-lg text-slate-700 hover:text-uc-navy hover:bg-slate-50 font-semibold transition text-sm"
                 >
                   <IconComponent className="w-4 h-4 text-slate-500" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* 중간 해상도 (md ~ xl) 메뉴 */}
+          <nav className="hidden md:flex xl:hidden space-x-1">
+            {navItems.slice(0, 5).map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="flex items-center space-x-1 px-2.5 py-2 rounded-lg text-slate-700 hover:text-uc-navy hover:bg-slate-50 font-semibold transition text-xs"
+                >
+                  <IconComponent className="w-3.5 h-3.5 text-slate-500" />
                   <span>{item.name}</span>
                 </Link>
               );
@@ -132,6 +169,24 @@ export default function Header() {
               </Link>
             );
           })}
+
+          <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
+            <Link
+              href="/admin/classrooms"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-slate-50 rounded-lg text-center"
+            >
+              강의실 배정
+            </Link>
+            <Link
+              href="/admin/scholarships"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2.5 bg-slate-50 rounded-lg text-center"
+            >
+              장학금 정산
+            </Link>
+          </div>
+
           <div className="pt-4 border-t border-slate-100 flex flex-col space-y-2">
             <Link
               href="/auth/login"

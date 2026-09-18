@@ -7,6 +7,7 @@
 // 설명:
 //   학습자가 현재 수강 중인 강좌 목록, 실시간 출석률(수료기준 80% 대비),
 //   과제 제출 현황 및 수료증 발급 자격 달성 여부를 한눈에 모니터링하는 화면입니다.
+//   수료한 강좌에 대해서는 위·변조 방지 전자 수료증을 즉시 열람 및 인쇄할 수 있습니다.
 // ==============================================================================
 
 import React from 'react';
@@ -19,7 +20,7 @@ import {
   Clock, 
   Award, 
   ChevronRight,
-  TrendingUp,
+  Printer,
   FileText
 } from 'lucide-react';
 
@@ -56,6 +57,19 @@ export default function LmsDashboardPage() {
       is_ready_for_completion: false,
       next_lecture: '온라인 자율수강 - 4차시: 이상치 탐지 알고리즘 실습',
     },
+  ];
+
+  // 이미 수료를 완료하여 전자 수료증이 발급된 강좌 목록 (시연용)
+  const completedCertificates = [
+    {
+      certificateNo: 'UC-ANCHOR-2026-00042',
+      courseTitle: '조선해양 미래 친환경 스마트 선박 실무 과정',
+      category: '신산업 특화 직무전환',
+      period: '2026.07.01 ~ 2026.08.25',
+      attendanceRate: 95.0,
+      finalScore: 94.5,
+      issuedAt: '2026.08.26'
+    }
   ];
 
   return (
@@ -103,7 +117,7 @@ export default function LmsDashboardPage() {
             </div>
             <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
               <span className="text-xs text-slate-400 block">취득 수료증</span>
-              <strong className="text-2xl font-extrabold text-uc-orange">1건</strong>
+              <strong className="text-2xl font-extrabold text-uc-orange">1건 (발급완료)</strong>
             </div>
           </div>
         </div>
@@ -225,7 +239,86 @@ export default function LmsDashboardPage() {
           </div>
         </div>
 
-        {/* 3. 평생직업교육 수료 사정 가이드 카드 */}
+        {/* 3. 취득한 공식 전자 수료증 목록 섹션 */}
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl sm:text-2xl font-bold text-uc-navy flex items-center space-x-2">
+              <Award className="w-6 h-6 text-uc-orange" />
+              <span>나의 취득 전자 수료증 (위·변조 방지 QR)</span>
+            </h2>
+            <Link
+              href="/verify"
+              className="text-xs text-slate-600 hover:text-uc-navy font-semibold transition"
+            >
+              수료증 진위 검증 포털 &rarr;
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {completedCertificates.map((cert) => (
+              <div
+                key={cert.certificateNo}
+                className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-amber-500/30 shadow-sm flex flex-col justify-between hover:shadow-md transition"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                      제 {cert.certificateNo} 호
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">
+                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                      수료 완료
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-bold text-slate-900 leading-snug">
+                    {cert.courseTitle}
+                  </h3>
+                  <span className="text-xs text-uc-navy font-semibold block mt-1">
+                    {cert.category}
+                  </span>
+
+                  <div className="mt-4 bg-slate-50 p-3.5 rounded-2xl space-y-1.5 text-xs text-slate-600 border border-slate-100">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">교육 기간</span>
+                      <span className="font-medium text-slate-800">{cert.period}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">최종 성적 / 출석률</span>
+                      <span className="font-semibold text-emerald-700">
+                        종합 {cert.finalScore}점 (출석률 {cert.attendanceRate}%)
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">발급 일자</span>
+                      <span className="font-medium text-slate-800">{cert.issuedAt}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                  <Link
+                    href={`/verify?cert=${cert.certificateNo}`}
+                    target="_blank"
+                    className="text-xs font-bold text-slate-600 hover:text-emerald-700 transition"
+                  >
+                    진위 검증 링크
+                  </Link>
+
+                  <Link
+                    href={`/certificate/${cert.certificateNo}`}
+                    className="inline-flex items-center space-x-1.5 px-4 py-2.5 bg-uc-navy hover:bg-uc-navy-light text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>수료증 열람 및 인쇄</span>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 4. 평생직업교육 수료 사정 가이드 카드 */}
         <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-4">
           <div className="flex items-center space-x-3 text-uc-navy font-bold text-lg">
             <Award className="w-6 h-6 text-uc-orange" />
