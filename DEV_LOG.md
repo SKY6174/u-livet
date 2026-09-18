@@ -5,32 +5,26 @@
 
 ---
 
-## 📅 2026-09-18 (Phase 9: M9 1EdTech Open Badges v2.0 디지털 배지 인프라 구축)
+## 📅 2026-09-18 (Phase 10: Vercel 배포 Output Directory 오류 해결 및 환경 설정 표준화)
 
 ### 1. Plan (계획)
-- **목표**: 1EdTech Open Badges v2.0 국제 표준 디지털 배지 발급 인프라, JSON-LD 검증 API, 인터랙티브 배지 뷰어 및 LinkedIn 자격증 원클릭 연동 구축.
+- **목표**: Vercel 배포 시 `Error: No Output Directory named "public" found after the Build completed` 오류 원인 해결.
 - **주요 산출물**:
-  - `supabase/migrations/008_create_digital_open_badges.sql` (배지 마스터/수여 대장 DB 스키마 및 자동 수여 함수)
-  - `src/app/api/badges/[id]/route.ts` (W3C Open Badges v2.0 표준 JSON-LD API 엔드포인트)
-  - `src/app/badges/[id]/page.tsx` (디지털 배지 뷰어, 직무 역량 태그, LinkedIn 원클릭 연동)
-  - `src/app/certificate/[id]/page.tsx` (수료증 내 디지털 배지 확인 버튼 연동)
-  - `src/app/mypage/history/page.tsx` (마이페이지 내 취득 디지털 배지 지갑 섹션 연동)
+  - `vercel.json` (Next.js 프레임워크 프리셋 및 빌드 명령 명시)
+  - `public/robots.txt` (표준 정적 자산 디렉터리 생성)
 
 ### 2. Do (실행)
-- [x] 008 마이그레이션 작성 완료 (Open Badges v2.0 스키마 및 SHA-256 해시 검증)
-- [x] W3C 호환 Open Badges JSON-LD Route Handler API 구현 완료 (`CORS: *`)
-- [x] 3D 메달 그래픽, 직무 역량 태그 및 LinkedIn 프로필 자격증 추가 버튼 구현 완료
-- [x] 수료증 및 마이페이지 수강이력과 디지털 배지 상호 링크 연동 완료
-- [x] `npm run build` 프로덕션 빌드 17개 라우트 정상 컴파일 완료
+- [x] 프로젝트 루트에 `public` 디렉터리 및 `robots.txt` 생성 완료
+- [x] `vercel.json`을 통해 Vercel 빌드 환경에 `framework: "nextjs"` 명시적 고정
+- [x] GitHub `main` 브랜치 푸시 완료
 
-### 3. Check (검증 및 Quality Gate)
-- [x] 한글 주석 100%, 코드 생략 0% 준수
-- [x] 이메일 SHA-256 해싱을 통한 개인정보 노출 방지(보안 8원칙) 준수
-- [x] Next.js 14 17개 전체 라우트 빌드 에러 0건 확인
+### 3. Check (검증)
+- [x] 로컬 `npm run build` 15개 라우트 정상 생성 및 정적 자산 호스팅 무결성 검증
 
-### 4. Act (개선 및 확장)
-- [x] `walkthrough.md` 업데이트 완료
-- [x] `MILESTONE_LOG.md` 업데이트 완료
+---
+
+## 📅 2026-09-18 (Phase 9: M9 1EdTech Open Badges v2.0 디지털 배지 인프라 구축)
+- [x] 008 마이그레이션, W3C JSON-LD API, 배지 뷰어 및 LinkedIn 원클릭 연동 구축 완료
 
 ---
 
