@@ -30,3 +30,24 @@ yarn-error.log*
 # Supabase Local
 .supabase/
 supabase/.temp/
+
+# Deployment metadata and private review evidence
+.vercel/
+ops/release.local.json
+ops/evidence/
+.env.production
+ops/self-hosted/*.local.json
+ops/self-hosted/*.local.env
+ops/self-hosted/private/
+
+# Local browser profiles, generated review files and caches
+.chrome_temp/
+tmp/
+output/
+test.pdf
+*.tsbuildinfo
+.env.*.local
+docs/04-report/features/evidence/
+docs/04-report/features/assets/
+.vercel
+.env*

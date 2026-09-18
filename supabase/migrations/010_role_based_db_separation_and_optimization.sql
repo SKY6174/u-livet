@@ -75,24 +75,28 @@ DROP POLICY IF EXISTS "운영자 및 관리자 수강생 관리 허용" ON publi
 DROP POLICY IF EXISTS "강사 담당 강좌 수강생 조회 허용" ON public.course_enrollments;
 
 -- 수강생: 본인 신청 내역만 조회
+DROP POLICY IF EXISTS "수강생 본인 수강신청 조회" ON public.course_enrollments;
 CREATE POLICY "수강생 본인 수강신청 조회"
     ON public.course_enrollments
     FOR SELECT
     USING (auth.uid() = user_id);
 
 -- 수강생: 신규 수강신청 생성
+DROP POLICY IF EXISTS "수강생 본인 수강신청 등록" ON public.course_enrollments;
 CREATE POLICY "수강생 본인 수강신청 등록"
     ON public.course_enrollments
     FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
 -- 강사: 본인이 가르치는 강좌의 수강생 명단만 조회 가능
+DROP POLICY IF EXISTS "강사 담당 강좌 수강생 명단 조회" ON public.course_enrollments;
 CREATE POLICY "강사 담당 강좌 수강생 명단 조회"
     ON public.course_enrollments
     FOR SELECT
     USING (public.is_instructor_of_course(course_id));
 
 -- 사업단 관리자: 전체 수강신청 승인 및 취소 전권
+DROP POLICY IF EXISTS "사업단 수강신청 전체 관리" ON public.course_enrollments;
 CREATE POLICY "사업단 수강신청 전체 관리"
     ON public.course_enrollments
     FOR ALL
@@ -105,6 +109,7 @@ DROP POLICY IF EXISTS "강사 담당 강좌 출결 조회 및 승인" ON public.
 DROP POLICY IF EXISTS "사업단 출결 관리" ON public.lms_attendance;
 
 -- 수강생: 본인의 출결 및 시청 기록만 조회
+DROP POLICY IF EXISTS "수강생 본인 출결 기록 조회" ON public.lms_attendance;
 CREATE POLICY "수강생 본인 출결 기록 조회"
     ON public.lms_attendance
     FOR SELECT
@@ -127,6 +132,7 @@ CREATE POLICY "강사 담당 강좌 출결 조회 및 승인"
     );
 
 -- 사업단 관리자: 전체 출결 관리
+DROP POLICY IF EXISTS "사업단 전체 출결 관리" ON public.lms_attendance;
 CREATE POLICY "사업단 전체 출결 관리"
     ON public.lms_attendance
     FOR ALL
@@ -161,6 +167,7 @@ CREATE POLICY "강사 과제 채점 및 피드백 입력"
     );
 
 -- 사업단 관리자: 전체 관리
+DROP POLICY IF EXISTS "사업단 과제 제출 전체 관리" ON public.lms_submissions;
 CREATE POLICY "사업단 과제 제출 전체 관리"
     ON public.lms_submissions
     FOR ALL
@@ -172,6 +179,7 @@ DROP POLICY IF EXISTS "강사 본인 프로필 조회 및 수정 허용" ON publ
 DROP POLICY IF EXISTS "운영자 및 관리자 강사 프로필 관리 허용" ON public.instructor_profiles;
 
 -- 강사: 본인의 학력, 전문분야, 강사료 등급 조회 및 자기소개 수정
+DROP POLICY IF EXISTS "강사 본인 프로필 조회 및 수정" ON public.instructor_profiles;
 CREATE POLICY "강사 본인 프로필 조회 및 수정"
     ON public.instructor_profiles
     FOR ALL
@@ -179,6 +187,7 @@ CREATE POLICY "강사 본인 프로필 조회 및 수정"
     WITH CHECK (auth.uid() = id);
 
 -- 사업단 관리자: 전체 강사진 자격 심사 승인 및 시간당 강사료 등급 부여
+DROP POLICY IF EXISTS "사업단 강사 프로필 심사 및 관리" ON public.instructor_profiles;
 CREATE POLICY "사업단 강사 프로필 심사 및 관리"
     ON public.instructor_profiles
     FOR ALL

@@ -4,14 +4,18 @@
 // ==============================================================================
 // 파일 경로: next.config.js
 // 설명:
-//   1. Vercel 클라우드 배포 시 빌드가 중단되지 않도록 빌드 옵션을 최적화합니다.
+//   1. 빌드에서 린트·타입 검사를 실행합니다.
 //   2. Supabase 스토리지 및 외부 이미지 리소스를 안전하게 불러올 수 있도록 설정합니다.
 // ==============================================================================
 
 const nextConfig = {
-  // Vercel 클라우드 빌드 시 사소한 린트 경고로 인해 배포가 실패하는 것을 방지
+  // 서버 PDF 생성에서 사용하는 한글 글꼴을 배포 산출물에 포함한다.
+  outputFileTracingIncludes: {
+    "/*": ["./assets/fonts/NanumGothic-Regular.ttf"],
+  },
+  // 빌드에서도 린트·타입 오류를 확인한다.
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   // TypeScript 엄격한 타입 검사는 유지하여 코드 품질 보장
   typescript: {
@@ -21,8 +25,8 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**.supabase.co',
+        protocol: "https",
+        hostname: "**.supabase.co",
       },
     ],
   },

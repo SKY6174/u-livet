@@ -63,6 +63,7 @@ DROP POLICY IF EXISTS "본인 프로필만 조회 가능" ON public.user_profile
 DROP POLICY IF EXISTS "본인 프로필만 수정 가능" ON public.user_profiles;
 
 -- 신규 안전 정책 등록
+DROP POLICY IF EXISTS "본인 및 관리자 프로필 조회 허용" ON public.user_profiles;
 CREATE POLICY "본인 및 관리자 프로필 조회 허용"
     ON public.user_profiles
     FOR SELECT
@@ -71,6 +72,7 @@ CREATE POLICY "본인 및 관리자 프로필 조회 허용"
         OR public.is_admin_or_operator()
     );
 
+DROP POLICY IF EXISTS "본인 및 관리자 프로필 수정 허용" ON public.user_profiles;
 CREATE POLICY "본인 및 관리자 프로필 수정 허용"
     ON public.user_profiles
     FOR UPDATE
@@ -92,11 +94,13 @@ CREATE POLICY "본인 및 관리자 프로필 수정 허용"
 DROP POLICY IF EXISTS "운영자 및 관리자 강좌 전체 관리 허용" ON public.courses;
 DROP POLICY IF EXISTS "누구나 공개 강좌 조회 가능" ON public.courses;
 
+DROP POLICY IF EXISTS "누구나 공개 강좌 조회 허용" ON public.courses;
 CREATE POLICY "누구나 공개 강좌 조회 허용"
     ON public.courses
     FOR SELECT
     USING (is_published = TRUE OR public.is_admin_or_operator());
 
+DROP POLICY IF EXISTS "운영자 및 관리자 강좌 CUD 허용" ON public.courses;
 CREATE POLICY "운영자 및 관리자 강좌 CUD 허용"
     ON public.courses
     FOR ALL
@@ -152,11 +156,13 @@ CREATE POLICY "운영자 배지 클래스 관리 허용"
 DROP POLICY IF EXISTS "누구나 수료번호로 원본 검증 조회 가능" ON public.certificates;
 DROP POLICY IF EXISTS "운영자 및 관리자 수료증 발급 및 관리" ON public.certificates;
 
+DROP POLICY IF EXISTS "수료증 진위 검증 공개 조회 허용" ON public.certificates;
 CREATE POLICY "수료증 진위 검증 공개 조회 허용"
     ON public.certificates
     FOR SELECT
     USING (TRUE);
 
+DROP POLICY IF EXISTS "운영자 및 관리자 수료증 관리 허용" ON public.certificates;
 CREATE POLICY "운영자 및 관리자 수료증 관리 허용"
     ON public.certificates
     FOR ALL
