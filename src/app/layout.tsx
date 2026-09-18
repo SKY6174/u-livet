@@ -11,6 +11,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import { RoleProvider } from '@/lib/auth/roleContext';
 
 export const metadata: Metadata = {
   title: '울산과학대학교 앵커사업단 RCC센터 | LMS 및 수강신청 포털',
@@ -27,16 +28,18 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="flex flex-col min-h-screen bg-slate-50 text-slate-900 selection:bg-uc-orange selection:text-white">
-        {/* 상단 공통 네비게이션 헤더 */}
-        <Header />
+        <RoleProvider>
+          {/* 상단 공통 네비게이션 헤더 */}
+          <Header />
 
-        {/* 메인 컨텐츠 영역 (페이지별 가변 본문) */}
-        <main className="flex-grow">
-          {children}
-        </main>
+          {/* 메인 컨텐츠 영역 (페이지별 가변 본문) */}
+          <main className="flex-grow">
+            {children}
+          </main>
 
-        {/* 하단 공통 푸터 */}
-        <Footer />
+          {/* 하단 공통 푸터 */}
+          <Footer />
+        </RoleProvider>
       </body>
     </html>
   );
