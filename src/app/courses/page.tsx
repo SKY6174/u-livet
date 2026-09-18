@@ -167,6 +167,7 @@ export default function CoursesPage() {
 
       return matchCategory && matchType && matchSearch;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, selectedType, searchKeyword]);
 
   return (
