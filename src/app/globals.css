@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==============================================================================
+   울산과학대학교 앵커사업단 평생직업교육 플랫폼 - 전역 스타일
+   ============================================================================== */
+
+:root {
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+html {
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  /* 성인학습자 및 시니어 학습자를 위한 기본 텍스트 렌더링 최적화 */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  color: #1e293b;
+  background-color: #f8fafc;
+  font-size: 16px; /* 기본 폰트 크기를 16px로 유지하여 높은 가독성 확보 */
+  line-height: 1.6;
+}
+
+/* 직관적인 포커스 링 (웹 접근성 강화) */
+:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* 수료증 및 증명서 인쇄용 스타일 */
+@media print {
+  header, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+}
