@@ -78,7 +78,13 @@ export async function verifyMfa(
           "코드를 확인하지 못했습니다. 인증 앱의 현재 6자리 숫자로 다시 시도해 주세요. 반복해서 실패하면 잠시 기다려 주세요.",
       };
     const status = await client.rpc("life_security_status");
-    if (status.error || !status.data?.active || !status.data?.recent)
+    if (
+      status.error ||
+      !status.data?.active ||
+      status.data?.needs_reset ||
+      !status.data?.mfa_verified ||
+      !status.data?.recent
+    )
       return {
         message: "인증 상태를 확인하지 못했습니다. 다시 로그인해 주세요.",
       };
@@ -86,7 +92,7 @@ export async function verifyMfa(
     return {
       ok: true,
       message:
-        "추가 인증을 마쳤습니다. 원래 작업 화면에서 다시 저장하거나 아래 버튼으로 이동해 주세요.",
+        "추가 인증을 마쳤습니다. 다른 창에서 작성 중인 내용은 그대로 유지됩니다.",
     };
   } catch {
     return {
