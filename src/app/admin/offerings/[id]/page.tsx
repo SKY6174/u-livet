@@ -53,7 +53,7 @@ export default async function ManageOffering(props: {
       <section className="panel mb-8">
         <h2 className="section-title">수강료·환불 규정</h2>
         <p className="mb-4">
-          현재 수강료 {o.tuition.toLocaleString("ko-KR")}원
+          {o.tuition === null ? "수강료: 원본 미기재" : `현재 수강료 ${o.tuition.toLocaleString("ko-KR")}원`}
           {finance ? ` · ${finance.title} ${finance.version}` : ""}
         </p>
         {o.status === "DRAFT" ? (
@@ -133,7 +133,7 @@ export default async function ManageOffering(props: {
           </details>
         ) : (
           <p className="whitespace-pre-wrap text-sm">
-            {finance?.instructions ?? "무료 과정입니다."}
+            {finance?.instructions ?? (o.tuition === null ? "기존 운영 결과보고서를 보관하는 과정입니다. 모집·납부를 진행하지 않습니다." : "무료 과정입니다.")}
           </p>
         )}
       </section>
@@ -241,7 +241,7 @@ export default async function ManageOffering(props: {
                     결정
                     <select name="decision" required>
                       <option value="ACCEPTED">
-                        {o.tuition > 0 ? "선발 · 납부 대기" : "수강 확정"}
+                        {o.tuition !== null && o.tuition > 0 ? "선발 · 납부 대기" : "수강 확정"}
                       </option>
                       <option value="REJECTED">미선정</option>
                     </select>

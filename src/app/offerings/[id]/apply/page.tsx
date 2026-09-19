@@ -25,6 +25,7 @@ export default async function ApplyPage(props: {
   const finance = financeData as FinanceConfig | null;
   const open =
     o.status === "PUBLISHED" &&
+    !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
     Date.now() < Date.parse(o.apply_until) &&
     (o.tuition === 0 || !!finance?.valid);
@@ -41,7 +42,7 @@ export default async function ApplyPage(props: {
         >
           <input type="hidden" name="offering" value={o.id} />
           <input type="hidden" name="policy" value={policy?.id ?? ""} />
-          {o.tuition > 0 && (
+          {o.tuition !== null && o.tuition > 0 && (
             <div className="notice">
               <p className="font-bold">
                 수강료 {o.tuition.toLocaleString("ko-KR")}원 · 선발 후 입금 확인

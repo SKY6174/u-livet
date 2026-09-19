@@ -21,6 +21,14 @@ export function validDate(x: unknown) {
 }
 export function validateReport(x: unknown): x is ReportPayload {
   if (!object(x) || JSON.stringify(x).length > 150000) return false;
+  if (x.sourceReport !== undefined) {
+    const s = x.sourceReport;
+    if (!object(s) || !text(s.filename, 200) || !s.filename ||
+      typeof s.sha256 !== "string" || !/^[0-9a-f]{64}$/.test(s.sha256) ||
+      !text(s.notes) || !["enrolled", "completed", "classCount", "scholarshipRecipients"].every(k => number(s[k], 10000)) ||
+      !number(s.educationHours, 10000, false) || !number(s.scholarshipAmount, 1e9) ||
+      Number(s.completed) > Number(s.enrolled)) return false;
+  }
   if (
     !["operator", "professor", "program"].every((k) => text(x[k], 200)) ||
     !validDate(x.reportDate)

@@ -7,6 +7,7 @@ export const statusLabel: Record<string, string> = {
   DRAFT: "준비 중",
   PUBLISHED: "모집 공개",
   CLOSED: "모집 종료",
+  ARCHIVED: "운영 완료 · 보고서 보관",
   SUBMITTED: "심사 대기",
   WAITLISTED: "대기 접수",
   PENDING_PAYMENT: "납부 대기",
@@ -16,7 +17,8 @@ export const statusLabel: Record<string, string> = {
   ACTIVE: "수강 중",
   WITHDRAWN: "수강 취소",
 };
-export function dateTime(value: string) {
+export function dateTime(value: string | null) {
+  if (!value) return "미기재";
   return new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",
     dateStyle: "medium",
