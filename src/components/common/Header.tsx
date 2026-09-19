@@ -12,6 +12,22 @@ export default function Header() {
   const finance = identity?.roles.some((r) => r.role === "FINANCE");
   const performance = identity?.roles.some((r) => r.role === "PERFORMANCE");
   const teacher = identity?.roles.some((r) => r.role === "INSTRUCTOR");
+  // Display category only; each menu and server action keeps its own role check.
+  const roleLabel = identity?.roles.some((r) => r.role === "SYSTEM_ADMIN")
+    ? "관리자"
+    : manager || reviewer || finance || performance
+      ? "운영자"
+      : teacher
+        ? "강사"
+        : "수강생";
+  const userLabel = identity ? (
+    <span className="inline-flex items-center gap-2 whitespace-nowrap">
+      <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
+        {roleLabel}
+      </span>
+      <span>{identity.name} 님</span>
+    </span>
+  ) : null;
   const links = [
     ["교육과정", "/courses"],
     ["수강안내", "/terms"],
@@ -67,7 +83,7 @@ export default function Header() {
         <div className="hidden items-center gap-4 text-sm lg:flex">
           {identity ? (
             <>
-              <span>{identity.name} 님</span>
+              {userLabel}
               <form action={signOut}>
                 <button className="text-slate-600 underline">로그아웃</button>
               </form>
@@ -105,9 +121,12 @@ export default function Header() {
             </Link>
           ))}
           {identity ? (
-            <form action={signOut}>
-              <button className="p-3">로그아웃</button>
-            </form>
+            <>
+              <div className="px-3 pt-3 text-sm">{userLabel}</div>
+              <form action={signOut}>
+                <button className="p-3">로그아웃</button>
+              </form>
+            </>
           ) : (
             <Link
               onClick={() => setOpen(false)}
