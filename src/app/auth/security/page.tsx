@@ -14,13 +14,22 @@ export default async function SecurityPage({
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
-  const rawNext = safeReturnTo((await searchParams).next);
+  const params = await searchParams;
+  const returnToWork = typeof params.next === "string" && params.next.length > 0;
+  const rawNext = safeReturnTo(params.next);
   const next = rawNext.startsWith("/auth") ? "/mypage" : rawNext;
   const context = await getSecurityContext();
   if (!context)
     redirect(
       `/auth/login?next=${encodeURIComponent("/auth/security?next=" + encodeURIComponent(next))}`,
     );
+  if (
+    returnToWork &&
+    !context.status.needs_reset &&
+    context.status.mfa_verified &&
+    context.status.recent
+  )
+    redirect(next);
   const { data, error } = await (
     await createServerSupabaseClient()
   ).auth.mfa.listFactors();
@@ -47,6 +56,7 @@ export default async function SecurityPage({
         <MfaPanel
           status={context.status}
           next={next}
+          returnToWork={returnToWork}
           factors={(data?.all ?? [])
             .filter((f) => f.factor_type === "totp")
             .map((f) => ({

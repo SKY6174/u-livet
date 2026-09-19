@@ -15,10 +15,12 @@ export function MfaPanel({
   status,
   factors,
   next,
+  returnToWork = false,
 }: {
   status: SecurityStatus;
   factors: Factor[];
   next: string;
+  returnToWork?: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -51,7 +53,8 @@ export function MfaPanel({
           setCode("");
           setEnrollment(undefined);
           setShowKey(false);
-          router.refresh();
+          if (kind === "verify" && returnToWork) router.replace(next);
+          else router.refresh();
         }
         if (kind === "remove" && response.ok) setSelected("");
       } catch {
@@ -142,7 +145,7 @@ export function MfaPanel({
           </p>
         </div>
       )}
-      {factorId && (
+      {factorId && (enrollment || !status.mfa_verified || !status.recent) && (
         <form
           className="space-y-4"
           onSubmit={(e) => {
