@@ -24,6 +24,15 @@ export default async function Admin() {
       <PageIntro eyebrow="OPERATIONS" title="사업단 과정 관리">
         과정 개설부터 신청 심사, 운영 기록과 결과보고서 출력까지 관리합니다.
       </PageIntro>
+      <section className="panel mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold">결과보고서 양식 먼저 살펴보기</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            과정 등록 없이 6종 양식과 입력 담당을 확인하고 예시를 출력할 수 있습니다.
+          </p>
+        </div>
+        <Link className="btn-primary" href="/admin/reports/preview">양식 구성 검토</Link>
+      </section>
       <div className="mb-6 flex flex-wrap gap-3">
         <Link className="btn-secondary" href="/admin/instructors">
           강사 이력 심사

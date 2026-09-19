@@ -5,10 +5,12 @@ export function PrintToolbar({
   offering,
   document,
   reveal,
+  preview = false,
 }: {
-  offering: string;
+  offering?: string;
   document: string;
   reveal: boolean;
+  preview?: boolean;
 }) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -31,22 +33,22 @@ export function PrintToolbar({
     <nav className="no-print mx-auto flex max-w-7xl flex-wrap items-center gap-4 p-5">
       <Link
         className="btn-secondary"
-        href={`/admin/offerings/${offering}/reports`}
+        href={preview ? "/admin" : `/admin/offerings/${offering}/reports`}
       >
-        ← 과정 보고서 관리
+        {preview ? "← 과정 운영 관리" : "← 과정 보고서 관리"}
       </Link>
       <button className="btn-primary" onClick={print} disabled={busy}>
         {busy ? "출력 준비 중…" : "인쇄 / PDF 저장"}
       </button>
-      <Link
+      {!preview && <Link
         className="btn-secondary"
         href={`?document=${document}&reveal=${reveal ? "0" : "1"}`}
       >
         {reveal ? "계좌번호 가리기" : "계좌번호 포함하여 출력"}
-      </Link>
+      </Link>}
       <p className="text-sm text-slate-600">
         인쇄 설정에서 머리글·바닥글을 끄고 배율 100%를 선택하세요.{" "}
-        {reveal ? "계좌번호가 표시됩니다." : "계좌번호는 가려져 있습니다."}
+        {preview ? "검토용 예시이며 제출용으로 사용할 수 없습니다." : reveal ? "계좌번호가 표시됩니다." : "계좌번호는 가려져 있습니다."}
       </p>
       {error && (
         <p role="alert" className="text-red-700">
