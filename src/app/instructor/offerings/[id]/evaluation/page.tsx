@@ -76,6 +76,15 @@ export default async function TeachingEvaluation({
         {o.name} · 모든 수업을 등록한 뒤 종료된 수업의 인정 출석시간과 근거를
         기록하세요.
       </PageIntro>
+      <div className="notice mb-6">
+        입력한 출결은 운영진의 과정별 출석부와 결과보고서에 연결됩니다.{" "}
+        <Link
+          className="font-semibold text-teal-800 underline"
+          href="/instructor/records"
+        >
+          실제 강의실적 제출 →
+        </Link>
+      </div>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <section className="space-y-5">
           <h2 className="section-title">수업 일정과 출결</h2>

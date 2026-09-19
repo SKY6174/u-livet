@@ -83,3 +83,214 @@ body {
     @apply inline-block rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800;
   }
 }
+
+/* Course report print templates: named pages retain portrait/landscape in one PDF. */
+.report-output {
+  color: #111827;
+}
+.report-sheet {
+  box-sizing: border-box;
+  background: white;
+  margin: 24px auto;
+  padding: 16mm;
+  box-shadow: 0 3px 20px #0f172a18;
+  font-size: 10pt;
+  line-height: 1.55;
+}
+.report-portrait {
+  width: 210mm;
+  min-height: 297mm;
+}
+.report-landscape {
+  width: 297mm;
+  min-height: 210mm;
+  font-size: 8.5pt;
+}
+.report-brand {
+  color: #155e75;
+  font-size: 9pt;
+  font-weight: 700;
+  padding-bottom: 4mm;
+  border-bottom: 2px solid #155e75;
+}
+.report-sheet h1 {
+  font-size: 21pt;
+  font-weight: 700;
+  text-align: center;
+  margin: 9mm 0 4mm;
+}
+.report-sheet h2 {
+  font-size: 13pt;
+  font-weight: 700;
+  margin: 7mm 0 3mm;
+  break-after: avoid;
+}
+.report-sheet h3 {
+  font-weight: 700;
+  margin-bottom: 2mm;
+  break-after: avoid;
+}
+.report-meta {
+  text-align: center;
+  margin-bottom: 8mm;
+}
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4mm 0;
+  table-layout: fixed;
+}
+.report-table th,
+.report-table td {
+  border: 1px solid #4b5563;
+  padding: 2.5mm 1.5mm;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.report-table th {
+  background: #edf3ed;
+  font-weight: 700;
+}
+.report-table thead {
+  display: table-header-group;
+}
+.report-table tr {
+  break-inside: avoid;
+}
+.report-table td {
+  text-align: center;
+}
+.report-narrative {
+  margin: 5mm 0;
+}
+.report-narrative p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.report-note {
+  color: #475569;
+  font-size: 8.5pt;
+  margin: 3mm 0;
+}
+.report-total {
+  text-align: right;
+  font-weight: 700;
+  margin: 6mm 0;
+}
+.report-cover {
+  text-align: center;
+  padding-top: 25mm;
+}
+.report-cover h2 {
+  font-size: 26pt;
+  margin: 14mm 0;
+}
+.report-cover-date {
+  margin: 14mm 0;
+  font-size: 14pt;
+}
+.report-cover .report-table {
+  margin-top: 24mm;
+}
+.report-foot {
+  margin-top: 10mm;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 3mm;
+  font-size: 8pt;
+  text-align: right;
+  color: #64748b;
+}
+.report-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+}
+.report-photos figure {
+  break-inside: avoid;
+}
+.report-photos img {
+  width: 100%;
+  height: 64mm;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
+}
+.report-photos figcaption {
+  text-align: center;
+  padding: 3mm;
+  overflow-wrap: anywhere;
+}
+.signature-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 8mm;
+  margin-top: 2mm;
+  font-size: 7pt;
+  color: #64748b;
+}
+.signature-pair span {
+  border-top: 1px dashed #94a3b8;
+}
+.signature-pair span + span {
+  border-left: 1px dashed #94a3b8;
+}
+.signature-space {
+  min-height: 9mm;
+}
+@media screen and (max-width: 1120px) {
+  .report-output {
+    overflow-x: auto;
+  }
+  .report-sheet {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+}
+@page reportPortrait {
+  size: A4 portrait;
+  margin: 12mm;
+}
+@page reportLandscape {
+  size: A4 landscape;
+  margin: 10mm;
+}
+@media print {
+  .report-portrait {
+    page: reportPortrait;
+  }
+  .report-landscape {
+    page: reportLandscape;
+  }
+  .report-sheet {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    break-after: page;
+  }
+  .report-sheet:last-child {
+    break-after: auto;
+  }
+  .report-output {
+    overflow: visible;
+  }
+  .report-table th {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  body:has(.report-output) {
+    display: block;
+    min-height: 0;
+  }
+  .report-portrait {
+    width: 186mm;
+  }
+  .report-landscape {
+    width: 277mm;
+  }
+  .report-cover {
+    min-height: 200mm;
+    padding-top: 15mm;
+  }
+}

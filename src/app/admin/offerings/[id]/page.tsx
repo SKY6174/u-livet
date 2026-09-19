@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import {
@@ -43,6 +44,12 @@ export default async function ManageOffering(props: {
       <PageIntro eyebrow="OFFERING MANAGEMENT" title={o.name}>
         {statusLabel[o.status]} · 정원 {o.capacity}명
       </PageIntro>
+      <Link
+        className="btn-primary mb-8"
+        href={`/admin/offerings/${o.id}/reports`}
+      >
+        운영 결과보고서 · 6종 출력 →
+      </Link>
       <section className="panel mb-8">
         <h2 className="section-title">수강료·환불 규정</h2>
         <p className="mb-4">

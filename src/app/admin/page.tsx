@@ -21,7 +21,7 @@ export default async function Admin() {
   return (
     <div className="page-shell">
       <PageIntro eyebrow="OPERATIONS" title="사업단 과정 관리">
-        개설 초안을 등록하고 승인된 운영 기준을 연결해 모집을 공개합니다.
+        과정 개설부터 신청 심사, 운영 기록과 결과보고서 출력까지 관리합니다.
       </PageIntro>
       <div className="mb-6 flex flex-wrap gap-3">
         <Link className="btn-secondary" href="/admin/instructors">
@@ -42,17 +42,27 @@ export default async function Admin() {
       ) : (
         <div className="mb-8 grid gap-4 md:grid-cols-2">
           {own.map((o) => (
-            <Link
-              key={o.id}
-              className="panel"
-              href={`/admin/offerings/${o.id}`}
-            >
+            <article key={o.id} className="panel">
               <span className="badge">{statusLabel[o.status]}</span>
               <h2 className="mt-3 text-lg font-bold">{o.name}</h2>
               <p className="mt-2 text-sm text-slate-600">
-                {o.year_label} · 정원 {o.capacity}명 · 신청 심사 →
+                {o.year_label} · 정원 {o.capacity}명
               </p>
-            </Link>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link
+                  className="btn-secondary"
+                  href={`/admin/offerings/${o.id}`}
+                >
+                  과정 관리
+                </Link>
+                <Link
+                  className="btn-primary"
+                  href={`/admin/offerings/${o.id}/reports`}
+                >
+                  결과보고서 · 출력
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       )}
