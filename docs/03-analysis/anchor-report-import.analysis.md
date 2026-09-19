@@ -15,6 +15,7 @@
 
 저장소에 있던 사용하지 않는 `src/**/* 2.ts(x)` 사본 88개는 타입 검사 대상에서 제외했다. 사본을 가져오는 import는 없으며 실제 라우트·원본 코드의 타입 검사를 유지한다. 파일은 삭제하지 않았다. 별도 빌드 디렉터리와 검증 자료도 타입 검사에서 제외한다.
 
+실자료 이관의 최종 확인은 `ARCHIVED_REPORT_IMPORTED` 감사기록과 파일별 SHA-256·3건의 원본 집계로 수행한다. 원본 및 private manifest/SQL은 `ops/evidence/report-import`에 Git 제외 상태로 보관한다.
 ## 운영 반영 확인
 
 - 운영 배포 `688d2e14248f2de73983bada1f45334a01902418`의 version과 health 정상 응답을 확인했다.
