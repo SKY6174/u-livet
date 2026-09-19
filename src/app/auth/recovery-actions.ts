@@ -45,10 +45,28 @@ export async function resetPassword(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  return finishPassword(form, "recovery");
+}
+
+export async function acceptInvitation(
+  _: ActionState,
+  form: FormData,
+): Promise<ActionState> {
+  return finishPassword(form, "invite");
+}
+
+async function finishPassword(
+  form: FormData,
+  purpose: "recovery" | "invite",
+): Promise<ActionState> {
+  const linkMessage =
+    purpose === "invite"
+      ? "초대 링크를 사용할 수 없습니다. 이미 사용했거나 시간이 지났을 수 있습니다. 사업단에 새 초대 메일을 요청해 주세요."
+      : LINK_MESSAGE;
   const tokenHash = String(form.get("token_hash") ?? "");
   const password = String(form.get("password") ?? "");
   const mfaCode = String(form.get("mfa_code") ?? "").trim();
-  if (!/^[a-f0-9]{32,128}$/i.test(tokenHash)) return { message: LINK_MESSAGE };
+  if (!/^[a-f0-9]{32,128}$/i.test(tokenHash)) return { message: linkMessage };
   if (!isValidPassword(password)) return { message: PASSWORD_GUIDANCE };
   if (mfaCode && !/^\d{6}$/.test(mfaCode))
     return { message: "인증 앱의 숫자 6자리를 입력해 주세요." };
@@ -61,15 +79,17 @@ export async function resetPassword(
     client = createRecoveryClient();
     const proof = await client.auth.verifyOtp({
       token_hash: tokenHash,
-      type: "recovery",
+      type: purpose,
     });
     if (proof.error || !proof.data.user || !proof.data.session)
-      return { message: LINK_MESSAGE };
+      return { message: linkMessage };
     verified = true;
+    if (purpose === "invite" && !proof.data.user.invited_at)
+      return { message: linkMessage };
     const status = await client.rpc("life_auth_status");
-    if (status.error || !status.data?.active) return { message: LINK_MESSAGE };
+    if (status.error || !status.data?.active) return { message: linkMessage };
     const factors = await client.auth.mfa.listFactors();
-    if (factors.error) return { message: LINK_MESSAGE };
+    if (factors.error) return { message: linkMessage };
     const verifiedFactors = factors.data.totp.filter(
       (f) => f.status === "verified",
     );
@@ -105,7 +125,7 @@ export async function resetPassword(
       };
     changed = true;
   } catch {
-    return { message: LINK_MESSAGE };
+    return { message: linkMessage };
   } finally {
     if (verified && client) {
       // DB authorization also rejects every session predating the password change.
@@ -122,5 +142,9 @@ export async function resetPassword(
     // The password was changed; cookie cleanup cannot turn that into a failure.
   }
   revalidatePath("/", "layout");
-  redirect("/auth/password-updated");
+  redirect(
+    purpose === "invite"
+      ? "/auth/invitation-accepted"
+      : "/auth/password-updated",
+  );
 }
