@@ -16,6 +16,7 @@ export default async function Layout({
       >
         <Link className="btn-secondary" href="/admin">과정 운영 관리</Link>
         <Link className="btn-secondary" href="/admin/course-plan">2026 과정 현황</Link>
+        <Link className="btn-secondary" href="/admin/course-plan/opening">2026 개설 준비</Link>
         <Link className="btn-secondary" href="/admin/reports/preview">결과보고서 양식 검토</Link>
       </nav>
       {children}

@@ -4,6 +4,8 @@
 
 ## 준비 자료
 
+2026-09-19 추가 근거: [16개 수행계획서 기반 개설 정리](../../operations/2026-course-opening-plans.md)와 [구조화 자료](../../operations/2026-course-opening-plans.json)를 우선 확인한다. 종전 현황표만으로 미확인이던 강사 소속·실제 차시·수강료 산식·대상을 보완했다. 서로 다른 일정·금액과 원문 예시는 확인 항목으로 유지한다. 자료 정리 완료는 개설 승인·등록·공개 완료가 아니다.
+
 `docs/operations/production-course-opening.md`에 다음을 기록한다.
 
 - 원본 PDF의 제목·SHA-256 및 기준일.
