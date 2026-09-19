@@ -82,6 +82,10 @@ supabase migration list --local
 
 `test:core`는 로컬 가상 학습자의 이전 과제·신청을 초기화하고 33개 DB/Auth/Data API/RPC 검증을 실행한다. 신규 로컬 DB에서 전체 SQL 재생은 `supabase db reset --local --no-seed`로 검사할 수 있다. 이 명령은 해당 로컬 프로젝트의 데이터를 삭제하므로 운영 연결 옵션을 추가하지 않는다.
 
+`npm run test:db-performance`는 조회 범위·실패 처리 회귀검사를 DB 연결 없이 실행한다. 기존 로컬 시험 데이터를 준비한 뒤 `npm run test:auth-load`로 로그인/MFA, 역할별 화면의 동시 요청 1·4·8개, 권한 차단과 사용자 세션 격리를 확인할 수 있다. 로컬 Supabase 55321과 가상 계정만 허용하며 URL이나 부하 인자를 받지 않는다. 현재 Git 추적 파일을 별도 임시 폴더에서 프로덕션 빌드하므로 `.env.local`과 기존 `.next`는 유지된다. 소스 파일을 새로 추가했다면 측정 전에 Git 추적 대상에 포함해야 한다.
+
+부하 검증은 로그인 후 페이지 216회와 사용자 혼합 페이지 24회를 요청한다. 완료 또는 검증 오류 시 이번 실행의 로그인 세션·서버·임시 빌드를 정리한다. 집계 결과는 `ops/evidence/auth-load-result.json`에 저장한다. 로컬 측정값은 운영 수용량이나 사용자 체감 속도를 의미하지 않는다. [로그인·부하 검증 설계](docs/02-design/features/anchor-auth-load-verification.design.md).
+
 학사 검증은 새 기수에서 33개 검사를, 증명 검증은 그 기수에서 24개 검사를 실행한다. 순서는 위와 같이 지킨다. 증명 검증을 다시 실행할 때는 학사 검증도 먼저 실행한다. 증명 검증은 Node.js 26 환경에서 확인했으며 `output/pdf/test-*.pdf`에 가상 정보로 만든 검증용 PDF를 남긴다. 프로그램 실행의 최소 Node 버전과 검증 스크립트에 사용한 버전은 다르다.
 
 ## 운영 적용 경계

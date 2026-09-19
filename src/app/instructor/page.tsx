@@ -1,23 +1,23 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getOfferings } from "@/lib/portal/data";
+import { getWorkspaceOfferings } from "@/lib/portal/data";
 import { Empty, PageIntro } from "@/components/portal/ui";
 export default async function Instructor() {
   const me = await requireIdentity("/instructor");
-  const [{ data, error }, { offerings }] = await Promise.all([
-    (await createServerSupabaseClient())
-      .from("life_offering_instructors")
-      .select("offering_id,valid_until")
-      .eq("person_id", me.id),
-    getOfferings(),
-  ]);
-  const assigned = new Set(
+  if (!me.roles.some((r) => r.role === "INSTRUCTOR")) notFound();
+  const { data, error } = await (await createServerSupabaseClient())
+    .from("life_offering_instructors")
+    .select("offering_id,valid_until")
+    .eq("person_id", me.id);
+  const assigned =
     (data ?? [])
       .filter((i) => !i.valid_until || Date.parse(i.valid_until) > Date.now())
-      .map((i) => i.offering_id),
+      .map((i) => i.offering_id);
+  const { offerings: own, unavailable } = await getWorkspaceOfferings(
+    "id", error ? [] : assigned,
   );
-  const own = offerings.filter((o) => assigned.has(o.id));
   return (
     <div className="page-shell">
       <PageIntro eyebrow="TEACHING" title={`${me.name} 님의 강사 공간`}>
@@ -34,7 +34,7 @@ export default async function Instructor() {
       <Link className="btn-secondary mb-6" href="/instructor/records">
         강의실적·경력증명 →
       </Link>
-      {error ? (
+      {error || unavailable ? (
         <Empty title="담당 과정을 불러오지 못했습니다" />
       ) : !own.length ? (
         <Empty title="배정된 교육과정이 없습니다">

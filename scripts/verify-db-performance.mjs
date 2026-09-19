@@ -22,6 +22,7 @@ const requests = [];
 let fail = false;
 const fixtures = ['DRAFT', 'CLOSED', 'PUBLISHED', 'PUBLISHED', 'PUBLISHED', 'PUBLISHED'].map((status, i) => ({
   id: `10000000-0000-4000-8000-${String(i).padStart(12, '0')}`, status,
+  org_id: `20000000-0000-4000-8000-${String(i % 2).padStart(12, '0')}`,
   name: `과정 ${i}`, academy: '교육원', summary: '요약', curriculum: '긴 교육내용'.repeat(2000),
   mode: 'ONLINE', capacity: 10, tuition: 0, apply_from: '2026-01-01', apply_until: '2027-01-01',
   starts_on: '2026-10-01', ends_on: '2026-10-31', created_at: `2026-09-${20 - i}`,
@@ -34,6 +35,10 @@ const client = createClient('https://synthetic.example', 'synthetic-public-key',
     if (fail) return new Response(JSON.stringify({ code: '42501', message: 'denied' }), { status: 403 });
     if (url.pathname.endsWith('/life_policy_versions')) return new Response('[]', { status: 200 });
     let rows = [...fixtures];
+    for (const column of ['id', 'org_id']) {
+      const scope = url.searchParams.get(column);
+      if (scope) rows = rows.filter(row => scope.slice(4, -1).split(',').includes(row[column]));
+    }
     const filter = url.searchParams.get('status');
     if (filter === 'eq.PUBLISHED') rows = rows.filter(r => r.status === 'PUBLISHED');
     if (filter === 'neq.DRAFT') rows = rows.filter(r => r.status !== 'DRAFT');
@@ -67,6 +72,32 @@ await test('staff catalog retains the full record contract', async () => {
   const result = await data.getOfferings();
   assert.equal(result.offerings.length, 6);
   assert('curriculum' in result.offerings[0]);
+});
+await test('workspace lookup limits courses to assigned IDs without curriculum', async () => {
+  const result = await data.getWorkspaceOfferings('id', [fixtures[1].id, fixtures[1].id, fixtures[3].id]);
+  assert.deepEqual(result.offerings.map(r => r.id), [fixtures[1].id, fixtures[3].id]);
+  assert.equal(result.unavailable, false);
+  assert(result.offerings.every(r => !('curriculum' in r)));
+  assert.equal(requests.at(-1).searchParams.get('id'), `in.(${fixtures[1].id},${fixtures[3].id})`);
+  assert.equal(requests.at(-1).searchParams.get('order'), 'created_at.desc,id.asc');
+});
+await test('manager workspace includes drafts only in managed organizations', async () => {
+  const result = await data.getWorkspaceOfferings('org_id', [fixtures[0].org_id]);
+  assert.deepEqual(result.offerings.map(r => r.id), [fixtures[0].id, fixtures[2].id, fixtures[4].id]);
+  assert.equal(result.offerings[0].status, 'DRAFT');
+});
+await test('empty and invalid workspace scope never fetch the full catalog', async () => {
+  const before = requests.length;
+  assert.equal((await data.getWorkspaceOfferings('id', [])).unavailable, false);
+  assert.equal((await data.getWorkspaceOfferings('org_id', ['invalid'])).unavailable, true);
+  assert.equal((await data.getWorkspaceOfferings('id', [fixtures[0].id, 'invalid'])).unavailable, true);
+  assert.equal(requests.length, before);
+});
+await test('workspace DB failure remains an error instead of an empty assignment list', async () => {
+  fail = true;
+  const result = await data.getWorkspaceOfferings('id', [fixtures[0].id]);
+  assert.equal(result.unavailable, true); assert.equal(result.offerings.length, 0);
+  fail = false;
 });
 await test('failed catalog reads remain unavailable instead of successful empty results', async () => {
   fail = true;

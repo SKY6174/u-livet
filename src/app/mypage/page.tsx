@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getOfferings, statusLabel, dateTime } from "@/lib/portal/data";
+import { getWorkspaceOfferings, statusLabel, dateTime } from "@/lib/portal/data";
 import type { Application } from "@/lib/portal/types";
 import { ActionForm } from "@/components/portal/action-form";
 import { decideApplication } from "@/app/actions";
@@ -9,15 +9,15 @@ import { Empty, PageIntro } from "@/components/portal/ui";
 export default async function MyPage() {
   const me = await requireIdentity();
   const db = await createServerSupabaseClient();
-  const [{ data, error }, { offerings }] = await Promise.all([
-    db
-      .from("life_applications")
-      .select("*")
-      .eq("person_id", me.id)
-      .order("submitted_at", { ascending: false }),
-    getOfferings(),
-  ]);
+  const { data, error } = await db
+    .from("life_applications")
+    .select("*")
+    .eq("person_id", me.id)
+    .order("submitted_at", { ascending: false });
   const items = (data ?? []) as Application[];
+  const { offerings, unavailable } = await getWorkspaceOfferings(
+    "id", error ? [] : items.map((item) => item.offering_id),
+  );
   return (
     <div className="page-shell">
       <PageIntro eyebrow="MY LEARNING" title={`${me.name} 님의 나의 공간`}>
@@ -53,7 +53,7 @@ export default async function MyPage() {
         나의 납부·환불
       </Link>
       <h2 className="section-title">신청 현황과 강의실</h2>
-      {error ? (
+      {error || unavailable ? (
         <Empty title="신청 현황을 불러오지 못했습니다">
           잠시 후 다시 확인해 주세요.
         </Empty>

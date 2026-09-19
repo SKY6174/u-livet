@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { CourseSummary, Offering, Policy } from "./types";
+import type { CourseSummary, Offering, Policy, WorkspaceOffering } from "./types";
 export const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const modeLabel = { ONLINE: "온라인", OFFLINE: "대면", BLENDED: "혼합" };
@@ -52,6 +52,26 @@ export async function getOfferings() {
     return { offerings: (data ?? []) as Offering[], unavailable: !!error };
   } catch {
     return { offerings: [] as Offering[], unavailable: true };
+  }
+}
+export async function getWorkspaceOfferings(
+  column: "id" | "org_id",
+  values: string[],
+) {
+  const empty = { offerings: [] as WorkspaceOffering[], unavailable: false };
+  if (!values.length) return empty;
+  if (!values.every((value) => UUID.test(value)))
+    return { ...empty, unavailable: true };
+  try {
+    const { data, error } = await (await createServerSupabaseClient())
+      .from("life_catalog")
+      .select("id,name,status,capacity,year_label,starts_on,ends_on")
+      .in(column, Array.from(new Set(values)))
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: true });
+    return { offerings: (data ?? []) as WorkspaceOffering[], unavailable: !!error };
+  } catch {
+    return { ...empty, unavailable: true };
   }
 }
 export async function getOffering(id: string) {

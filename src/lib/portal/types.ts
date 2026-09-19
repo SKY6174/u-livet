@@ -44,6 +44,10 @@ export type CourseSummary = Pick<
   | "starts_on"
   | "ends_on"
 >;
+export type WorkspaceOffering = Pick<
+  Offering,
+  "id" | "name" | "status" | "capacity" | "year_label" | "starts_on" | "ends_on"
+>;
 export type Policy = {
   id: string;
   org_id: string;
