@@ -49,7 +49,19 @@ export type FeeRow = {
   paidOn: string;
   note: string;
 };
+export type SourceReport = {
+  filename: string;
+  sha256: string;
+  enrolled: number;
+  completed: number;
+  educationHours: number;
+  classCount: number;
+  scholarshipRecipients: number;
+  scholarshipAmount: number;
+  notes: string;
+};
 export type ReportPayload = {
+  sourceReport?: SourceReport;
   operator: string;
   professor: string;
   reportDate: string;
@@ -128,7 +140,7 @@ export function emptyReport(offering: Offering): ReportPayload {
     fees: [],
   };
 }
-export const money = (value: number) => value.toLocaleString("ko-KR");
+export const money = (value: number | null) => value === null ? "미기재" : value.toLocaleString("ko-KR");
 export const feeAmount = (row: FeeRow) =>
   Math.floor((Math.round(row.hours * 100) * row.rate) / 100);
 export const isCompleted = (m: CompletionRow) =>

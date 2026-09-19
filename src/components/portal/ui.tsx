@@ -38,6 +38,7 @@ export function Empty({
 export function CourseCard({ offering: o }: { offering: CourseSummary }) {
   const open =
     o.status === "PUBLISHED" &&
+    !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
     Date.now() < Date.parse(o.apply_until);
   return (
@@ -73,7 +74,7 @@ export function CourseCard({ offering: o }: { offering: CourseSummary }) {
         <div className="flex gap-3">
           <dt className="text-slate-500">수강료</dt>
           <dd>
-            {o.tuition === 0
+            {o.tuition === null ? "원본 미기재" : o.tuition === 0
               ? "무료"
               : `${o.tuition.toLocaleString("ko-KR")}원`}
           </dd>

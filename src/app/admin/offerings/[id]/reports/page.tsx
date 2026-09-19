@@ -11,6 +11,7 @@ import {
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ReportEditor } from "@/components/reports/report-editor";
 import { ReportFiles } from "@/components/reports/report-files";
+import { SourceReportSummary } from "@/components/reports/source-report-summary";
 import { ActionForm } from "@/components/portal/action-form";
 import { approveTeaching } from "@/app/certificate-actions";
 import { dateTime } from "@/lib/portal/data";
@@ -32,6 +33,8 @@ export default async function CourseReports({
       </div>
     );
   const p = b.report?.payload ?? emptyReport(o),
+    source = o.status === "ARCHIVED" ? p.sourceReport : undefined,
+    original = b.files.find((file) => file.kind === "result"),
     active = b.members.filter((m) => m.enrollment_status === "ACTIVE"),
     missing = active.reduce(
       (n, m) => n + attendanceSummary(b, m.person_id).missing,
@@ -49,14 +52,15 @@ export default async function CourseReports({
         {o.starts_on} ~ {o.ends_on} · 운영 담당 {p.operator} · 과정별 운영
         기록과 결과보고서를 관리합니다.
       </PageIntro>
+      {source && <SourceReportSummary source={source} originalUrl={original ? `/api/course-reports/${id}/files/${original.id}` : undefined} />}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          ["등록 학습자", `${active.length}명`],
-          ["수료 승인", `${b.members.filter(isCompleted).length}명`],
-          ["출결 미입력", `${missing}건`],
+          [source ? "모집인원 · 원본 집계" : "등록 학습자", `${source?.enrolled ?? active.length}명`],
+          [source ? "수료인원 · 원본 집계" : "수료 승인", `${source?.completed ?? b.members.filter(isCompleted).length}명`],
+          ["출결 기록", source && !b.sessions.length ? "개인별 자료 미등록" : `${missing}건 미입력`],
           [
             "강사료 합계",
-            `${money(p.fees.reduce((n, r) => n + feeAmount(r), 0))}원`,
+            source && !p.fees.length ? "개별 지급자료 미등록" : `${money(p.fees.reduce((n, r) => n + feeAmount(r), 0))}원`,
           ],
         ].map(([label, value]) => (
           <div className="panel" key={label}>
