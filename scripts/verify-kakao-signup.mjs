@@ -38,6 +38,7 @@ function form(values={}) {const f=new FormData();for(const[k,v]of Object.entries
  const m=mock();await assert.rejects(m.actions.loginWithKakao({},form({next:'//evil.invalid'})),/REDIRECT https:\/\/db.example.invalid/);
  const input=m.calls.find(c=>c[0]==='oauth')[1];check('Kakao PKCE uses fixed site origin and safe return path',input.provider==='kakao' && input.options.redirectTo==='https://uc-life.example.invalid/auth/callback?next=%2Fmypage');
  check('OAuth rate limit uses separate flow',m.calls.find(c=>c[0]==='guard')[4]==='oauth');
+ check('unneeded nickname and photo scopes are omitted',input.options.queryParams.scope==='account_email');
 }
 {const m=mock({guard:false});check('rate limit prevents OAuth start',(await m.actions.loginWithKakao({},form())).message==='LIMIT'&&!m.calls.some(c=>c[0]==='oauth'));}
 for(const [state,expected]of [['PENDING','/auth/complete-signup'],['EMAIL_LOGIN_REQUIRED','social_error=staff'],['CLOSED','social_error=closed'],['UNAVAILABLE','social_error=unavailable'],['COMPLETE','/courses']]){const m=mock({state});check('callback destination for '+state,(await m.social.socialDestination('/courses')).includes(expected));}

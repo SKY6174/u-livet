@@ -20,7 +20,9 @@ export async function loginWithKakao(_: ActionState, form: FormData): Promise<Ac
     const callback = new URL("/auth/callback", recoveryOrigin());
     callback.searchParams.set("next", socialReturnTo(form.get("next")));
     const client = await createServerSupabaseClient();
-    const result = await client.auth.signInWithOAuth({ provider: "kakao", options: { redirectTo: callback.toString(), skipBrowserRedirect: true } });
+    // Override the provider's default profile/photo scopes: signup collects a
+    // name directly and only needs the Kakao account identity and email.
+    const result = await client.auth.signInWithOAuth({ provider: "kakao", options: { redirectTo: callback.toString(), skipBrowserRedirect: true, queryParams: { scope: "account_email" } } });
     if (result.error || !result.data.url) return { message: "카카오 로그인에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." };
     const destination = new URL(result.data.url);
     if (destination.origin !== new URL(getSupabaseConfig()!.url).origin || destination.pathname !== "/auth/v1/authorize") throw new Error("INVALID_OAUTH_URL");

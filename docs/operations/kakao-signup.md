@@ -34,3 +34,5 @@ Supabase 보안 점검은 경고/오류 없이 private table의 의도적인 기
 ## 가입 일시 중단
 
 Supabase disable_signup=true, DB signup_settings.enabled=false, Vercel AUTH_SIGNUP_ENABLED=false 및 재배포로 신규 가입을 중단할 수 있다. 이미 가입한 사용자의 로그인까지 임의로 정지하지 않는다. 기존 사용자와 동의 증빙이 있으므로 다운 마이그레이션이나 테이블 삭제를 롤백 수단으로 사용하지 않는다.
+
+개방 확인: 2026-09-19 운영·스테이징 모두 공개 가입 활성. 별도 카카오 앱을 사용하며 양쪽 계정 로그인 화면까지 확인. 클라이언트 queryParams.scope=account_email로 기본 사진·닉네임 요청을 제외한다.
