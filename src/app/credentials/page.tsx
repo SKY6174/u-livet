@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getOfferings, dateTime } from "@/lib/portal/data";
+import { getWorkspaceOfferings, dateTime } from "@/lib/portal/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import {
@@ -23,13 +23,14 @@ export default async function Credentials() {
   if (!me.roles.some((r) => ["COURSE_MANAGER", "CERTIFIER"].includes(r.role)))
     notFound();
   const db = await createServerSupabaseClient();
-  const [records, requests, options, { offerings }] = await Promise.all([
+  const orgs = me.roles.filter((r) => r.role === "COURSE_MANAGER").map((r) => r.org_id);
+  const [records, requests, options, { offerings, unavailable }] = await Promise.all([
     db.rpc("life_teaching_records"),
     db.rpc("life_certificate_list"),
     db.rpc("life_certificate_options"),
-    getOfferings(),
+    getWorkspaceOfferings("org_id", orgs),
   ]);
-  if ([records, requests, options].some((x) => x.error))
+  if ([records, requests, options].some((x) => x.error) || unavailable)
     return (
       <div className="page-shell">
         <Empty title="증명 관리 정보를 불러오지 못했습니다" />
