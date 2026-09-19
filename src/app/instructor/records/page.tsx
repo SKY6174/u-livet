@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getOfferings, dateTime } from "@/lib/portal/data";
+import { getWorkspaceOfferings, dateTime } from "@/lib/portal/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import { submitTeaching } from "@/app/certificate-actions";
@@ -9,28 +10,37 @@ import type { TeachingRecord } from "@/lib/certificates/types";
 import type { ClassSession } from "@/lib/portal/evaluation";
 export default async function Records() {
   const me = await requireIdentity("/instructor/records");
+  if (!me.roles.some((r) => r.role === "INSTRUCTOR")) notFound();
   const db = await createServerSupabaseClient();
-  const [records, assignments, { offerings }] = await Promise.all([
+  const [records, assignments] = await Promise.all([
     db.rpc("life_teaching_records"),
     db
       .from("life_offering_instructors")
       .select("offering_id,valid_until")
       .eq("person_id", me.id),
-    getOfferings(),
   ]);
+  if (records.error || assignments.error)
+    return (
+      <div className="page-shell">
+        <Empty title="강의실적을 불러오지 못했습니다" />
+      </div>
+    );
   const ids = (assignments.data ?? [])
     .filter((a) => !a.valid_until || Date.parse(a.valid_until) > Date.now())
     .map((a) => a.offering_id);
-  const sessions = ids.length
-    ? await db
+  const [sessions, { offerings, unavailable }] = await Promise.all([
+    ids.length
+    ? db
         .from("life_class_sessions")
         .select("*")
         .in("offering_id", ids)
         .eq("status", "SCHEDULED")
         .lte("ends_at", new Date().toISOString())
         .order("starts_at")
-    : { data: [], error: null };
-  if ([records, assignments, sessions].some((x) => x.error))
+    : { data: [], error: null },
+    getWorkspaceOfferings("id", ids),
+  ]);
+  if (sessions.error || unavailable)
     return (
       <div className="page-shell">
         <Empty title="강의실적을 불러오지 못했습니다" />
