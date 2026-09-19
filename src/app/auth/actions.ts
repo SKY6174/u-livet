@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { safeReturnTo } from "@/lib/auth/session";
-import { getPolicies } from "@/lib/portal/data";
+import { getSignupPolicy } from "@/lib/auth/social";
+import { normalizeMobilePhone, MOBILE_GUIDANCE } from "@/lib/auth/registration";
 import type { ActionState } from "@/lib/portal/types";
 import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
@@ -96,6 +97,8 @@ export async function register(
 ): Promise<ActionState> {
   if (!publicSignupEnabled()) return { message: PUBLIC_SIGNUP_PENDING };
   if (!authEmailEnabled()) return { message: AUTH_EMAIL_PENDING };
+  const phone = normalizeMobilePhone(form.get("phone"));
+  if (!phone) return { message: MOBILE_GUIDANCE };
   const name = String(form.get("name") ?? "").trim();
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
@@ -109,10 +112,8 @@ export async function register(
   if (!isValidPassword(password)) return { message: PASSWORD_GUIDANCE };
   const guard = await guardAuthRequest("signup", email, form);
   if (!guard.allowed) return guard.state;
-  const policy = (await getPolicies("ACCOUNT_PRIVACY")).find(
-    (p) => p.id === form.get("privacy_policy_id"),
-  );
-  if (!policy || form.get("privacy_accepted") !== "on")
+  const policy = await getSignupPolicy();
+  if (!policy || policy.id !== form.get("privacy_policy_id") || form.get("privacy_accepted") !== "on")
     return {
       message: "현재 개인정보 수집·이용 안내를 확인하고 동의해 주세요.",
     };
@@ -124,7 +125,7 @@ export async function register(
       password,
       options: {
         captchaToken: guard.captchaToken,
-        data: { name, privacy_policy_id: policy.id, privacy_accepted: true },
+        data: { name, mobile_phone: phone, privacy_policy_id: policy.id, privacy_accepted: true },
       },
     });
     if (error)

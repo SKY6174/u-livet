@@ -25,13 +25,14 @@ export async function guardAuthRequest(
   action: AuthAttempt,
   subject: string,
   form: FormData,
+  flow: "native" | "oauth" = "native",
 ): Promise<Result> {
   try {
     const config = getSupabaseConfig();
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const secret = process.env.AUTH_RATE_LIMIT_SECRET ?? "";
     const bot = getBotProtection();
-    if (!config || !serviceKey || bot.unavailable)
+    if (!config || !serviceKey || (flow === "native" && bot.unavailable))
       throw new Error("AUTH_GUARD_CONFIGURATION");
     const network = requestNetwork(
       await headers(),
@@ -50,7 +51,9 @@ export async function guardAuthRequest(
     });
     const result = await client.rpc(
       "life_check_auth_request",
-      authRequestKeys(action, subject, network, secret),
+      // OAuth has no email yet. Scope its subject to the trusted network so a
+      // single global provider bucket cannot block every learner on the site.
+      authRequestKeys(action, flow === "oauth" ? `oauth:${subject}:${network}` : subject, network, secret),
     );
     if (
       result.error ||
@@ -71,13 +74,13 @@ export async function guardAuthRequest(
       };
     // Native Auth owns token verification; avoid consuming the one-time token twice.
     const token = String(form.get("cf-turnstile-response") ?? "");
-    if (action !== "reset" && bot.siteKey && (!token || token.length > 2048))
+    if (flow === "native" && action !== "reset" && bot.siteKey && (!token || token.length > 2048))
       return {
         allowed: false,
         reason: "captcha",
         state: { message: BOT_RETRY_MESSAGE },
       };
-    return { allowed: true, captchaToken: bot.siteKey ? token : undefined };
+    return { allowed: true, captchaToken: flow === "native" && bot.siteKey ? token : undefined };
   } catch {
     // No account identifiers, tokens, or credentials are logged.
     return {

@@ -25,6 +25,7 @@ for (const value of [undefined, '', 'false', 'FALSE', 'TRUE', '1', ' true ', 'tr
   pass(`Explicit setting ${JSON.stringify(value)} is handled safely`);
 }
 const passwordPolicy = load('src/lib/auth/password-policy.ts');
+const registration = load('src/lib/auth/registration.ts');
 const POLICY = '00000000-0000-4000-8000-000000000123';
 function actions({ enabled = false, mail = true, policy = true } = {}) {
   const calls = [];
@@ -36,7 +37,8 @@ function actions({ enabled = false, mail = true, policy = true } = {}) {
       return { auth: { signUp: async input => { calls.push(['signup', input]); return { error: null }; } } };
     } },
     '@/lib/auth/session': { safeReturnTo: () => '/mypage' },
-    '@/lib/portal/data': { getPolicies: async () => { calls.push('policies'); return policy ? [{ id: POLICY }] : []; } },
+    '@/lib/auth/social': { getSignupPolicy: async () => { calls.push('policies'); return policy ? { id: POLICY } : undefined; } },
+    '@/lib/auth/registration': registration,
     '@/lib/auth/abuse': { guardAuthRequest: async () => { calls.push('guard'); return { allowed: true }; }, authProviderError: () => null },
     '@/lib/auth/email-config': { authEmailEnabled: () => mail, AUTH_EMAIL_PENDING: 'MAIL_PENDING' },
     '@/lib/auth/signup-config': { publicSignupEnabled: () => enabled, PUBLIC_SIGNUP_PENDING: 'SIGNUP_CLOSED' },
@@ -46,7 +48,7 @@ function actions({ enabled = false, mail = true, policy = true } = {}) {
 }
 function form(accepted = 'on') {
   const f = new FormData();
-  for (const [k, v] of Object.entries({ name: 'Synthetic learner', email: 'signup-test@example.invalid', password: 'SyntheticExample123!', privacy_policy_id: POLICY, privacy_accepted: accepted, AUTH_SIGNUP_ENABLED: 'true', role: 'SYSTEM_ADMIN' })) f.set(k, v);
+  for (const [k, v] of Object.entries({ name: 'Synthetic learner', phone: '010-1234-5678', email: 'signup-test@example.invalid', password: 'SyntheticExample123!', privacy_policy_id: POLICY, privacy_accepted: accepted, AUTH_SIGNUP_ENABLED: 'true', role: 'SYSTEM_ADMIN' })) f.set(k, v);
   return f;
 }
 {
@@ -71,6 +73,8 @@ for (const options of [{ policy: false, accepted: 'on' }, { policy: true, accept
   assert.equal(input.options.data.privacy_policy_id, POLICY);
   assert.equal(input.options.data.privacy_accepted, true);
   assert.equal(input.options.data.role, undefined);
+  assert.equal(input.options.data.mobile_phone, '+821012345678');
+  assert.equal(input.options.data.phone_confirmed_at, undefined);
   pass('Authorized signup preserves consent and excludes forged roles');
 }
 console.log(`${passed} public-signup gate checks passed; no network or mail.`);

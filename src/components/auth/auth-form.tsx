@@ -3,6 +3,8 @@ import { ActionForm } from "@/components/portal/action-form";
 import { authenticate, register } from "@/app/auth/actions";
 import type { Policy } from "@/lib/portal/types";
 import { PasswordField } from "./password-field";
+import { PhoneField } from "./phone-field";
+import { KakaoLogin } from "./kakao-login";
 import { getBotProtection } from "@/lib/auth/bot-config";
 import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
@@ -58,6 +60,7 @@ export function AuthForm({
   }
   return (
     <div className="[&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
+      {!reviewOnly && <KakaoLogin next={next} />}
       <ActionForm
         action={signup ? register : authenticate}
         label={signup ? "가입 신청" : "로그인"}
@@ -71,6 +74,7 @@ export function AuthForm({
             <input name="name" autoComplete="name" maxLength={100} required />
           </label>
         )}
+        {signup && <PhoneField />}
         <label className="field text-base">
           이메일 (아이디)
           <input
