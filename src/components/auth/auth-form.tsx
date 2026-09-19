@@ -6,6 +6,10 @@ import { PasswordField } from "./password-field";
 import { getBotProtection } from "@/lib/auth/bot-config";
 import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
+import {
+  publicSignupEnabled,
+  PUBLIC_SIGNUP_PENDING,
+} from "@/lib/auth/signup-config";
 export function AuthForm({
   signup = false,
   next = "/mypage",
@@ -16,7 +20,10 @@ export function AuthForm({
   policy?: Policy;
 }) {
   const reviewOnly = isReviewOnly();
-  if (signup && (reviewOnly || !policy || !authEmailEnabled())) {
+  if (
+    signup &&
+    (reviewOnly || !publicSignupEnabled() || !policy || !authEmailEnabled())
+  ) {
     return (
       <div className="space-y-5 text-base leading-7">
         <div role="status" className="rounded-xl bg-slate-50 p-5">
@@ -26,9 +33,11 @@ export function AuthForm({
           <p>
             {reviewOnly
               ? REVIEW_MESSAGE
-              : !policy
-                ? "개인정보 수집·이용 안내를 준비하고 있습니다. 안내가 확정되면 내용을 확인한 뒤 가입할 수 있습니다."
-                : AUTH_EMAIL_PENDING}
+              : !publicSignupEnabled()
+                ? PUBLIC_SIGNUP_PENDING
+                : !policy
+                  ? "개인정보 수집·이용 안내를 준비하고 있습니다. 안내가 확정되면 내용을 확인한 뒤 가입할 수 있습니다."
+                  : AUTH_EMAIL_PENDING}
           </p>
           <p className="mt-3">
             지금은 이름이나 비밀번호를 입력하지 않아도 됩니다.

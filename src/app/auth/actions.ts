@@ -8,6 +8,10 @@ import type { ActionState } from "@/lib/portal/types";
 import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 import {
+  publicSignupEnabled,
+  PUBLIC_SIGNUP_PENDING,
+} from "@/lib/auth/signup-config";
+import {
   isValidPassword,
   PASSWORD_GUIDANCE,
   PASSWORD_MAX_LENGTH,
@@ -90,6 +94,7 @@ export async function register(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  if (!publicSignupEnabled()) return { message: PUBLIC_SIGNUP_PENDING };
   if (!authEmailEnabled()) return { message: AUTH_EMAIL_PENDING };
   const name = String(form.get("name") ?? "").trim();
   const email = String(form.get("email") ?? "").trim();
