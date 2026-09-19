@@ -116,7 +116,8 @@ await check("Admin route checks identity and role before loading a plan, and han
     "@/lib/course-opening/server": { getCourseOpeningPlan: async () => { reads++; return plan; } },
     "@/lib/course-opening/prefill": prefill,
     "@/components/course-plan/offering-draft-form": { OfferingDraftForm },
-    "@/lib/portal/data": { getWorkspaceOfferings: async () => ({ offerings: [], unavailable: false }), statusLabel: {} },
+    "@/lib/course-workspace/data": { getCourseWorkspaces: async () => ({ courses: [], unavailable: false }) },
+    "@/components/course-workspace/course-list": { CourseList: () => null },
     "@/lib/supabase/server": { createServerSupabaseClient: async () => ({ from: (table) => {
       assert.equal(table, "life_project_years");
       return { select: () => ({ in: async () => ({ data: [{ ...years[0], org_id: "test-org" }, { id: "other-year", label: "타기관", org_id: "other-org" }] }) }) };
@@ -129,7 +130,13 @@ await check("Admin route checks identity and role before loading a plan, and han
   const admin = makePage(async () => ({ roles: [{ role: "COURSE_MANAGER", org_id: "test-org" }] }));
   for (const value of ["", "P17", ["P01"]]) await assert.rejects(admin({ searchParams: Promise.resolve({ plan: value }) }), /NOT_FOUND/);
   const tree = await admin({ searchParams: Promise.resolve({ plan: "P08", title: "injected", year: "other-year" }) });
-  const form = React.Children.toArray(tree.props.children).find((child) => child.type === OfferingDraftForm);
+  const findForm = (node) => {
+    if (node?.type === OfferingDraftForm) return node;
+    return React.Children.toArray(node?.props?.children).map(findForm).find(Boolean);
+  };
+  const form = findForm(tree);
+  const registration = React.Children.toArray(tree.props.children).find((child) => child.props?.id === "new-course");
+  assert.equal(registration.props.open, true);
   assert.equal(form.props.plan.sourceId, "P08");
   assert.ok(form.key.includes("P08"));
   assert.deepEqual(form.props.years, years);
@@ -137,6 +144,9 @@ await check("Admin route checks identity and role before loading a plan, and han
   const before = reads;
   const manual = await admin({ searchParams: Promise.resolve({}) });
   assert.equal(reads, before);
-  assert.equal(React.Children.toArray(manual.props.children).find((child) => child.type === OfferingDraftForm).props.plan, undefined);
+  assert.equal(findForm(manual).props.plan, undefined);
+  assert.equal(React.Children.toArray(manual.props.children).find((child) => child.props?.id === "new-course").props.open, false);
+  const create = await admin({ searchParams: Promise.resolve({ create: "1" }) });
+  assert.equal(React.Children.toArray(create.props.children).find((child) => child.props?.id === "new-course").props.open, true);
 });
 console.log(`${checks} course-opening prefill checks passed.`);
