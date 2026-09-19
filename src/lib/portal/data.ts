@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { Offering, Policy } from "./types";
+import type { CourseSummary, Offering, Policy, WorkspaceOffering } from "./types";
 export const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const modeLabel = { ONLINE: "온라인", OFFLINE: "대면", BLENDED: "혼합" };
@@ -23,6 +23,24 @@ export function dateTime(value: string) {
     timeStyle: "short",
   }).format(new Date(value));
 }
+export async function getCourseCards(featured = false) {
+  try {
+    let query = (await createServerSupabaseClient())
+      .from("life_catalog")
+      .select(
+        "id,name,academy,summary,mode,capacity,tuition,status,apply_from,apply_until,starts_on,ends_on",
+      )
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: true });
+    query = featured
+      ? query.eq("status", "PUBLISHED").limit(3)
+      : query.neq("status", "DRAFT");
+    const { data, error } = await query;
+    return { offerings: (data ?? []) as CourseSummary[], unavailable: !!error };
+  } catch {
+    return { offerings: [] as CourseSummary[], unavailable: true };
+  }
+}
 export async function getOfferings() {
   try {
     const { data, error } = await (
@@ -34,6 +52,26 @@ export async function getOfferings() {
     return { offerings: (data ?? []) as Offering[], unavailable: !!error };
   } catch {
     return { offerings: [] as Offering[], unavailable: true };
+  }
+}
+export async function getWorkspaceOfferings(
+  column: "id" | "org_id",
+  values: string[],
+) {
+  const empty = { offerings: [] as WorkspaceOffering[], unavailable: false };
+  if (!values.length) return empty;
+  if (!values.every((value) => UUID.test(value)))
+    return { ...empty, unavailable: true };
+  try {
+    const { data, error } = await (await createServerSupabaseClient())
+      .from("life_catalog")
+      .select("id,name,status,capacity,year_label,starts_on,ends_on")
+      .in(column, Array.from(new Set(values)))
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: true });
+    return { offerings: (data ?? []) as WorkspaceOffering[], unavailable: !!error };
+  } catch {
+    return { ...empty, unavailable: true };
   }
 }
 export async function getOffering(id: string) {
@@ -51,7 +89,8 @@ export async function getOffering(id: string) {
     return null;
   }
 }
-export async function getPolicies(kind?: string) {
+export async function getPolicies(kind?: string, id?: string | null) {
+  if (id !== undefined && (!id || !UUID.test(id))) return [];
   try {
     let query = (await createServerSupabaseClient())
       .from("life_policy_versions")
@@ -61,6 +100,7 @@ export async function getPolicies(kind?: string) {
       .eq("status", "APPROVED")
       .order("effective_from", { ascending: false });
     if (kind) query = query.eq("kind", kind);
+    if (id) query = query.eq("id", id);
     const { data, error } = await query;
     if (error) return [];
     const now = Date.now();

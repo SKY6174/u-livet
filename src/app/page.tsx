@@ -6,12 +6,11 @@ import {
   ClipboardCheck,
   GraduationCap,
 } from "lucide-react";
-import { getOfferings } from "@/lib/portal/data";
+import { getCourseCards } from "@/lib/portal/data";
 import { CourseCard, Empty } from "@/components/portal/ui";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 export default async function Home() {
-  const { offerings, unavailable } = await getOfferings();
-  const courses = offerings.filter((o) => o.status === "PUBLISHED").slice(0, 3);
+  const { offerings: courses, unavailable } = await getCourseCards(true);
   return (
     <>
       <section className="relative overflow-hidden bg-uc-navy text-white">

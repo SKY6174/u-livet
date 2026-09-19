@@ -1,8 +1,10 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { getSupabaseConfig } from "./config";
 import { isReviewOnly } from "@/lib/deployment/review-mode";
-export async function createServerSupabaseClient() {
+// React cache is scoped to one server render; never share session cookies globally.
+export const createServerSupabaseClient = cache(async () => {
   const config = getSupabaseConfig();
   if (!config) throw new Error("SUPABASE_NOT_CONFIGURED");
   const cookieStore = await cookies();
@@ -24,4 +26,4 @@ export async function createServerSupabaseClient() {
       },
     },
   });
-}
+});

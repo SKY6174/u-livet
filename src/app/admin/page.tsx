@@ -1,23 +1,24 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
-import { getOfferings, statusLabel } from "@/lib/portal/data";
+import { getWorkspaceOfferings, statusLabel } from "@/lib/portal/data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import { createOffering } from "@/app/actions";
 export default async function Admin() {
   const me = await requireIdentity("/admin");
+  if (!me.roles.some((r) => r.role === "COURSE_MANAGER")) notFound();
   const orgs = me.roles
     .filter((r) => r.role === "COURSE_MANAGER")
     .map((r) => r.org_id);
-  const [{ offerings, unavailable }, { data: years }] = await Promise.all([
-    getOfferings(),
+  const [{ offerings: own, unavailable }, { data: years }] = await Promise.all([
+    getWorkspaceOfferings("org_id", orgs),
     (await createServerSupabaseClient())
       .from("life_project_years")
       .select("*")
       .in("org_id", orgs),
   ]);
-  const own = offerings.filter((o) => orgs.includes(o.org_id));
   return (
     <div className="page-shell">
       <PageIntro eyebrow="OPERATIONS" title="사업단 과정 관리">

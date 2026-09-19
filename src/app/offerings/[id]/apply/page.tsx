@@ -14,12 +14,14 @@ export default async function ApplyPage(props: {
   await requireIdentity(`/offerings/${params.id}/apply`);
   const o = await getOffering(params.id);
   if (!o) notFound();
-  const policy = (await getPolicies("ENROLLMENT")).find(
+  const db = await createServerSupabaseClient();
+  const [policies, { data: financeData }] = await Promise.all([
+    getPolicies("ENROLLMENT", o.enrollment_policy_id),
+    db.rpc("life_offering_finance", { f: o.id }),
+  ]);
+  const policy = policies.find(
     (p) => p.id === o.enrollment_policy_id,
   );
-  const { data: financeData } = await (
-    await createServerSupabaseClient()
-  ).rpc("life_offering_finance", { f: o.id });
   const finance = financeData as FinanceConfig | null;
   const open =
     o.status === "PUBLISHED" &&

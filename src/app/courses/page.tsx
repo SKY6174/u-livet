@@ -1,15 +1,14 @@
-import { getOfferings } from "@/lib/portal/data";
+import { getCourseCards } from "@/lib/portal/data";
 import { CourseCard, Empty, PageIntro } from "@/components/portal/ui";
 export default async function Courses(props: {
   searchParams: Promise<{ q?: string; mode?: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const { offerings, unavailable } = await getOfferings();
+  const { offerings, unavailable } = await getCourseCards();
   const q = (searchParams.q ?? "").slice(0, 100);
   const mode = searchParams.mode ?? "";
   const items = offerings.filter(
     (o) =>
-      o.status !== "DRAFT" &&
       (!q ||
         `${o.name} ${o.summary} ${o.academy}`
           .toLowerCase()
