@@ -16,11 +16,11 @@ export type Offering = {
   mode: "ONLINE" | "OFFLINE" | "BLENDED";
   location: string;
   capacity: number;
-  tuition: number;
-  selection_method: string;
+  tuition: number | null;
+  selection_method: string | null;
   status: string;
-  apply_from: string;
-  apply_until: string;
+  apply_from: string | null;
+  apply_until: string | null;
   starts_on: string;
   ends_on: string;
   year_label: string;

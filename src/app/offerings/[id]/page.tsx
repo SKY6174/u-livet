@@ -31,6 +31,7 @@ export default async function OfferingPage(props: {
   }[];
   const open =
     o.status === "PUBLISHED" &&
+    !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
     Date.now() < Date.parse(o.apply_until);
   return (
@@ -85,13 +86,13 @@ export default async function OfferingPage(props: {
               ["모집정원", `${o.capacity}명`],
               [
                 "선발방식",
-                o.selection_method === "REVIEW"
+                o.selection_method === null ? "원본 미기재" : o.selection_method === "REVIEW"
                   ? "신청 후 심사"
                   : "선착순 · 정원 초과 시 대기",
               ],
               [
                 "수강료",
-                o.tuition === 0
+                o.tuition === null ? "원본 미기재" : o.tuition === 0
                   ? "무료"
                   : `${o.tuition.toLocaleString("ko-KR")}원`,
               ],

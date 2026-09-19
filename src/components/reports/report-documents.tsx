@@ -83,6 +83,9 @@ function Sheet({
       <p className="report-meta">
         {offering.name} · {offering.starts_on} ~ {offering.ends_on}
       </p>
+      {offering.status === "ARCHIVED" && <p className="report-note">
+        원본 보고서 보관 과정 · 집계는 원본 기준입니다. 개인별 명단·출결·강의확인·지급 내역은 별도 등록 전이며 원본 PDF에서 전체 자료를 확인할 수 있습니다.
+      </p>}
       {children}
       <div className="report-foot">
         {offering.year_label} · {offering.academy}
@@ -110,6 +113,7 @@ export function ReportDocuments({
   reveal?: boolean;
 }) {
   const p = b.report?.payload ?? emptyReport(o),
+    source = o.status === "ARCHIVED" ? p.sourceReport : undefined,
     members = b.members,
     active = members.filter((m) => m.enrollment_status === "ACTIVE"),
     completed = members.filter(isCompleted);
@@ -119,7 +123,9 @@ export function ReportDocuments({
     0,
   );
   const sumFees = p.fees.reduce((n, r) => n + feeAmount(r), 0),
-    sumScholarships = p.scholarships.reduce((n, r) => n + r.amount, 0);
+    sumScholarships = source?.scholarshipAmount ?? p.scholarships.reduce((n, r) => n + r.amount, 0);
+  const enrolledCount = source?.enrolled ?? active.length;
+  const completedCount = source?.completed ?? completed.length;
   const details = (id: string) => p.participants.find((r) => r.personId === id);
   const member = (id: string) => members.find((m) => m.person_id === id);
   const yes = (id: string) => {
@@ -160,7 +166,7 @@ export function ReportDocuments({
                   ["교육 기간", `${o.starts_on} ~ ${o.ends_on}`],
                   [
                     "교육 시간",
-                    `${sessions.length}회 · ${hours(totalMinutes)}시간`,
+                    `${source?.classCount ?? sessions.length}회 · ${source?.educationHours ?? hours(totalMinutes)}시간${source ? " (원본 집계)" : ""}`,
                   ],
                 ]}
               />
@@ -183,22 +189,22 @@ export function ReportDocuments({
               rows={[
                 [
                   o.capacity,
-                  active.length,
-                  `${completed.length} / ${active.length ? ((completed.length / active.length) * 100).toFixed(1) + "%" : "—"}`,
+                  enrolledCount,
+                  `${completedCount} / ${enrolledCount ? ((completedCount / enrolledCount) * 100).toFixed(1) + "%" : "—"}`,
                   p.certificates === null
                     ? "미집계"
-                    : `${p.certificates}명 / ${active.length ? ((p.certificates / active.length) * 100).toFixed(1) + "%" : "—"}`,
+                    : `${p.certificates}명 / ${enrolledCount ? ((p.certificates / enrolledCount) * 100).toFixed(1) + "%" : "—"}`,
                   p.employed === null
                     ? "미집계"
-                    : `${p.employed}명 / ${active.length ? ((p.employed / active.length) * 100).toFixed(1) + "%" : "—"}`,
+                    : `${p.employed}명 / ${enrolledCount ? ((p.employed / enrolledCount) * 100).toFixed(1) + "%" : "—"}`,
                   `${p.surveyResponses ?? "미집계"} / ${p.satisfaction === null ? "미집계" : p.satisfaction + "%"}`,
                 ],
               ]}
             />
             <p className="report-note">
-              수료인원은 유효한 최신 수료 승인을 받은 학습자 기준입니다.
-              등록인원은 수강취소자를 제외하며 성과 비율의 분모로 사용합니다.
+              {source ? "모집·수료·시수·장학금은 원본 보고서의 집계입니다. 개인별 전산 승인이나 지급 증빙을 의미하지 않습니다. 사진·강의표는 연결된 원본 PDF를 확인하세요." : "수료인원은 유효한 최신 수료 승인을 받은 학습자 기준입니다. 등록인원은 수강취소자를 제외하며 성과 비율의 분모로 사용합니다."}
             </p>
+            {source?.notes && <Narrative title="원본 확인 사항" body={source.notes} />}
             <h2>4. 강사별 교육시간 상세 내역</h2>
             <Table
               head={[
@@ -286,7 +292,7 @@ export function ReportDocuments({
             <h2>8. 장학금 지원</h2>
             <Table
               head={["구분", "인원수", "장학금액 (원)"]}
-              rows={Array.from(
+              rows={source ? [["학습활동 우수장학 · 원본 집계", source.scholarshipRecipients, money(source.scholarshipAmount)]] : Array.from(
                 new Set(p.scholarships.map((r) => r.category)),
               ).map((k) => [
                 k,
@@ -303,8 +309,7 @@ export function ReportDocuments({
               ])}
             />
             <p className="report-note">
-              장학금 합계 {money(sumScholarships)}원 · 지급내역의 지급일로 실제
-              지급 여부를 확인합니다.
+              장학금 합계 {money(sumScholarships)}원 · {source ? "원본 보고서의 집계이며 개인별 지급일은 미등록입니다." : "지급내역의 지급일로 실제 지급 여부를 확인합니다."}
             </p>
           </Sheet>
         </>
