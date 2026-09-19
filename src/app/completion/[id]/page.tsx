@@ -72,6 +72,14 @@ export default async function CompletionReview({
       <Link className="text-sm text-teal-800" href="/completion">
         ← 수료 검토 목록
       </Link>
+      {manager && (
+        <div className="my-4 flex flex-wrap gap-4 text-sm font-semibold text-teal-800">
+          <Link href={`/admin/offerings/${id}`}>← 이 과정 운영 개요</Link>
+          <Link href={`/admin/offerings/${id}/reports`}>
+            결과보고서에 반영된 내용 확인 →
+          </Link>
+        </div>
+      )}
       <PageIntro eyebrow="COMPLETION REVIEW" title={o.name}>
         과정 종료 후 승인된 기준으로 판정합니다. 수료 확정과 증명서·배지 발급은
         별도 단계입니다.

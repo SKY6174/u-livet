@@ -161,6 +161,22 @@ export function ReportEditor({
   const [report, setReport] = useState(initial);
   const dirty = JSON.stringify(report) !== JSON.stringify(initial);
   useEffect(() => {
+    const reveal = () => {
+      const element = document.getElementById(window.location.hash.slice(1));
+      if (
+        element instanceof HTMLDetailsElement &&
+        element.id.startsWith("report-")
+      ) {
+        element.open = true;
+        element.scrollIntoView({ block: "start" });
+      }
+    };
+    reveal();
+    window.addEventListener("hashchange", reveal);
+    return () => window.removeEventListener("hashchange", reveal);
+  }, []);
+
+  useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
@@ -196,6 +212,36 @@ export function ReportEditor({
       label="보고서·지급내역 저장"
       resetOnSuccess={false}
     >
+      <div className="sticky top-32 z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur">
+        <nav
+          aria-label="보고서 입력 항목"
+          className="flex flex-wrap gap-3 text-xs font-semibold text-slate-600"
+        >
+          {[
+            ["basic", "기본정보"],
+            ["budget", "예산"],
+            ["review", "총평"],
+            ["participants", "인적사항"],
+            ["scholarships", "장학금"],
+            ["fees", "강사료"],
+          ].map(([key, label]) => (
+            <a
+              key={key}
+              href={`#report-${key}`}
+              className="hover:text-teal-800"
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+        <button
+          type="submit"
+          className="btn-primary"
+          disabled={!dirty && revision > 0}
+        >
+          변경사항 저장
+        </button>
+      </div>
       <input type="hidden" name="offering" value={offering} />
       <input type="hidden" name="revision" value={revision} />
       <input type="hidden" name="payload" value={JSON.stringify(report)} />
@@ -209,7 +255,7 @@ export function ReportEditor({
             ? "저장된 보고서입니다. 수정 후 저장하면 출력에 반영됩니다."
             : "아직 저장하지 않은 초안입니다. 내용을 확인하고 저장해 주세요."}
       </p>
-      <details className="panel" open>
+      <details id="report-basic" className="panel scroll-mt-64" open>
         <summary className="cursor-pointer text-lg font-bold">
           1. 기본정보·운영 결과
         </summary>
@@ -250,12 +296,13 @@ export function ReportEditor({
             ))}
           </div>
           <p className="text-sm text-slate-600">
-            정원·등록인원·수료인원·출석률은 학사 기록에서 가져옵니다. 미집계
-            수치는 빈칸으로 두세요.
+            {initial.sourceReport
+              ? "보관 과정의 인원·총시수는 원본 집계를 사용합니다. 개인별 출결과 수료 승인은 별도 기록입니다."
+              : "정원·등록인원·수료인원·출석률은 학사 기록에서 가져옵니다. 미집계 수치는 빈칸으로 두세요."}
           </p>
         </div>
       </details>
-      <details className="panel">
+      <details id="report-budget" className="panel scroll-mt-64">
         <summary className="cursor-pointer text-lg font-bold">
           2. 예산 집행
         </summary>
@@ -292,7 +339,7 @@ export function ReportEditor({
           </p>
         </div>
       </details>
-      <details className="panel">
+      <details id="report-review" className="panel scroll-mt-64">
         <summary className="cursor-pointer text-lg font-bold">
           3. 품질 개선·총평
         </summary>
@@ -306,7 +353,7 @@ export function ReportEditor({
           {field("followUp", "환류 계획", true)}
         </div>
       </details>
-      <details className="panel">
+      <details id="report-participants" className="panel scroll-mt-64">
         <summary className="cursor-pointer text-lg font-bold">
           4. 수료자 인적사항 보완
         </summary>
@@ -330,7 +377,7 @@ export function ReportEditor({
           />
         </div>
       </details>
-      <details className="panel">
+      <details id="report-scholarships" className="panel scroll-mt-64">
         <summary className="cursor-pointer text-lg font-bold">
           5. 장학금 지급내역
         </summary>
@@ -370,7 +417,7 @@ export function ReportEditor({
           </p>
         </div>
       </details>
-      <details className="panel">
+      <details id="report-fees" className="panel scroll-mt-64">
         <summary className="cursor-pointer text-lg font-bold">
           6. 강사료 지급내역 · 운영진 입력
         </summary>
