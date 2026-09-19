@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Offering } from "@/lib/portal/types";
+import type { CourseSummary } from "@/lib/portal/types";
 import { modeLabel } from "@/lib/portal/data";
 
 export function PageIntro({
@@ -35,7 +35,7 @@ export function Empty({
     </div>
   );
 }
-export function CourseCard({ offering: o }: { offering: Offering }) {
+export function CourseCard({ offering: o }: { offering: CourseSummary }) {
   const open =
     o.status === "PUBLISHED" &&
     Date.now() >= Date.parse(o.apply_from) &&

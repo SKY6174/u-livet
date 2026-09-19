@@ -15,15 +15,15 @@ export default async function OfferingPage(props: {
   const params = await props.params;
   const o = await getOffering(params.id);
   if (!o) notFound();
-  const policies = await getPolicies();
+  const db = await createServerSupabaseClient();
+  const [policies, { data: financeData }, { data: instructorData }] =
+    await Promise.all([
+      getPolicies(undefined, o.completion_policy_id),
+      db.rpc("life_offering_finance", { f: o.id }),
+      db.rpc("life_public_instructors", { f: o.id }),
+    ]);
   const completion = policies.find((p) => p.id === o.completion_policy_id);
-  const { data: financeData } = await (
-    await createServerSupabaseClient()
-  ).rpc("life_offering_finance", { f: o.id });
   const finance = financeData as FinanceConfig | null;
-  const { data: instructorData } = await (
-    await createServerSupabaseClient()
-  ).rpc("life_public_instructors", { f: o.id });
   const instructors = (instructorData ?? []) as {
     name: string;
     specialty: string;

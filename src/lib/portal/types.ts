@@ -29,6 +29,21 @@ export type Offering = {
   academic_revision: number;
   academic_sealed: boolean;
 };
+export type CourseSummary = Pick<
+  Offering,
+  | "id"
+  | "name"
+  | "academy"
+  | "summary"
+  | "mode"
+  | "capacity"
+  | "tuition"
+  | "status"
+  | "apply_from"
+  | "apply_until"
+  | "starts_on"
+  | "ends_on"
+>;
 export type Policy = {
   id: string;
   org_id: string;
