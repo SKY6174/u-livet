@@ -4,11 +4,19 @@ import { requireIdentity } from "@/lib/auth/session";
 import { getWorkspaceOfferings, statusLabel } from "@/lib/portal/data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PageIntro, Empty } from "@/components/portal/ui";
-import { ActionForm } from "@/components/portal/action-form";
-import { createOffering } from "@/app/actions";
-export default async function Admin() {
+import { OfferingDraftForm } from "@/components/course-plan/offering-draft-form";
+import { getCourseOpeningPlan } from "@/lib/course-opening/server";
+import { findOpeningCourse } from "@/lib/course-opening/prefill";
+export default async function Admin({ searchParams }: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const me = await requireIdentity("/admin");
   if (!me.roles.some((r) => r.role === "COURSE_MANAGER")) notFound();
+  const params = await searchParams;
+  const plan = params.plan === undefined
+    ? undefined
+    : findOpeningCourse(await getCourseOpeningPlan(), params.plan);
+  if (params.plan !== undefined && !plan) notFound();
   const orgs = me.roles
     .filter((r) => r.role === "COURSE_MANAGER")
     .map((r) => r.org_id);
@@ -76,99 +84,12 @@ export default async function Admin() {
           ))}
         </div>
       )}
-      <details className="panel">
-        <summary className="cursor-pointer text-lg font-bold">
-          새 과정·기수 초안 등록
-        </summary>
-        <div className="mt-6">
-          <ActionForm action={createOffering} label="초안 저장">
-            <input type="hidden" name="org" value={orgs[0] ?? ""} />
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="field">
-                사업연도
-                <select name="year" required>
-                  {(years ?? [])
-                    .filter((y) => y.org_id === orgs[0])
-                    .map((y) => (
-                      <option key={y.id} value={y.id}>
-                        {y.label}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <label className="field">
-                과정명
-                <input name="title" maxLength={200} required />
-              </label>
-              <label className="field">
-                아카데미·분야
-                <input name="academy" maxLength={100} required />
-              </label>
-              <label className="field">
-                교육장소
-                <input name="location" maxLength={200} required />
-              </label>
-              <label className="field">
-                운영방식
-                <select name="mode">
-                  <option value="OFFLINE">대면</option>
-                  <option value="ONLINE">온라인</option>
-                  <option value="BLENDED">혼합</option>
-                </select>
-              </label>
-              <label className="field">
-                선발방식
-                <select name="selection_method">
-                  <option value="REVIEW">심사</option>
-                  <option value="FIRST_COME">선착순</option>
-                </select>
-              </label>
-              <label className="field">
-                정원
-                <input
-                  type="number"
-                  name="capacity"
-                  min={1}
-                  max={1000}
-                  required
-                />
-              </label>
-              <p className="notice self-end">
-                기수 초안은 무료로 등록됩니다.
-                <br />
-                유료 과정은 기수 상세에서 승인된 환불 규정과 납부 안내를
-                설정하세요.
-              </p>
-              {[
-                ["apply_from", "접수 시작"],
-                ["apply_until", "접수 마감"],
-              ].map(([name, label]) => (
-                <label key={name} className="field">
-                  {label} (한국시간)
-                  <input type="datetime-local" name={name} required />
-                </label>
-              ))}
-              {[
-                ["starts_on", "교육 시작일"],
-                ["ends_on", "교육 종료일"],
-              ].map(([name, label]) => (
-                <label key={name} className="field">
-                  {label}
-                  <input type="date" name={name} required />
-                </label>
-              ))}
-            </div>
-            <label className="field">
-              과정 소개
-              <textarea name="summary" rows={3} maxLength={3000} required />
-            </label>
-            <label className="field">
-              교육내용·대상·준비사항
-              <textarea name="curriculum" rows={6} maxLength={20000} required />
-            </label>
-          </ActionForm>
-        </div>
-      </details>
+      <OfferingDraftForm
+        key={plan?.sourceId ?? "manual"}
+        orgId={orgs[0] ?? ""}
+        years={(years ?? []).filter((year) => year.org_id === orgs[0]).map((year) => ({ id: year.id, label: year.label }))}
+        plan={plan}
+      />
     </div>
   );
 }

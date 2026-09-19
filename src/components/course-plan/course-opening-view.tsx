@@ -179,6 +179,10 @@ export function CourseOpeningView({ plan, filters }: { plan: OpeningPlan; filter
             <Field label="담당교수 (계획서)">{course.facultyCoordinator}</Field>
           </dl>
           {course.existingCourseId && <Link className="mt-3 inline-block py-2 text-sm text-teal-800 underline" href={`/admin/course-plan#${course.existingCourseId}`}>기존 현황표 비교</Link>}
+          <div className="mt-4">
+            <Link className="btn-secondary" href={`/admin?plan=${course.sourceId}#offering-draft`}>등록 양식에 불러오기<span className="sr-only"> · {course.title}</span></Link>
+            <p className="mt-2 text-sm text-slate-500">기본정보를 편집할 수 있습니다. 모집기간·최종 일정은 등록 양식에서 확인해 입력하세요.</p>
+          </div>
           <OpeningDetails course={course} source={plan.sources.find((source) => source.id === course.sourceId)} />
         </article>)}
         {!courses.length && <section className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
