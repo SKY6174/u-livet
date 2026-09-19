@@ -1,6 +1,9 @@
 # 운영 보고서 DB 적용 절차
 
-2026-09-19 · 준비 완료, 운영 적용 전 · `anchor-production-db-preparation`
+2026-09-19 · 운영 적용 및 사후 검증 완료 · `anchor-production-db-rollout`
+
+현재 운영 이력은 25개이며 보고서 migration이 적용됐다. 아래 사전 상태와 명령은 적용 기록 및 복구 참고용이다.
+이미 적용된 SQL을 직접 재실행하지 않는다. [적용 결과](../04-report/features/anchor-production-db-rollout.report.md).
 
 ## 확정 대상
 
@@ -63,7 +66,8 @@ supabase db dump --project-ref uoebygejgglgiivzgyks --schema public,life_private
 
 ## 실제 적용과 사후 검증
 
-아래 실제 적용 명령은 이번 준비 단계에서 실행하지 않았다. 운영 DB 적용을 진행할 때 위 사전 점검을 다시 한 뒤 실행한다.
+아래 실제 적용 명령은 준비 단계 후 사용자 진행 요청에 따라 운영에 실행했고 사후 검증을 통과했다.
+재점검에는 읽기 전용 SQL과 dry-run을 사용한다. 처음 적용하는 다른 대상에는 사전 목록을 다시 확인한다.
 
 ```sh
 supabase db push --project-ref uoebygejgglgiivzgyks --include-all --skip-vault
