@@ -2,7 +2,7 @@
 
 2026-09-19 · `anchor-managed-cloud-release`
 
-사용자가 Supabase Cloud 사용과 공급자에 맞춘 비밀번호 정책 변경, ChatGPT/Codex 개발 소스의 Preview·Production 동시 배포를 요청했다. 메일 발송 서비스는 아직 없으며 후속 설정하기로 했다. 별도 인증 서버는 필요하지 않다.
+사용자가 Supabase Cloud 사용과 공급자에 맞춘 비밀번호 정책 변경, ChatGPT/Codex 개발 소스의 Preview·Production 동시 배포를 요청했다. 인증 메일은 Resend 직접 무료 계정의 SMTP를 사용한다. 별도 인증 서버는 필요하지 않다.
 
 ## 환경과 소스
 
@@ -26,15 +26,17 @@
 
 ## Vercel 설정
 
-두 환경에 `AUTH_PROFILE=managed-cloud-v1`, `SUPABASE_DEPLOYMENT_KIND=cloud`, `PREVIEW_REVIEW_ONLY=false`, `AUTH_EMAIL_ENABLED=false`, `AUTH_ABUSE_MODE=native-rate-limits`, `AUTH_CAPTCHA_ENABLED=false`, `AUTH_TRUSTED_IP_HEADER=x-vercel-forwarded-for`를 명시한다.
+두 환경에 `AUTH_PROFILE=managed-cloud-v1`, `SUPABASE_DEPLOYMENT_KIND=cloud`, `PREVIEW_REVIEW_ONLY=false`, `AUTH_EMAIL_ENABLED=true`, `AUTH_ABUSE_MODE=native-rate-limits`, `AUTH_CAPTCHA_ENABLED=false`, `AUTH_TRUSTED_IP_HEADER=x-vercel-forwarded-for`를 명시한다. SMTP 장애 시 `AUTH_EMAIL_ENABLED=false`로 바꾸고 재배포하여 복구 요청을 일시 중지할 수 있다.
 
 환경별 DB URL/공개 키, 서버 서비스 키, 서로 다른 무작위 `AUTH_RATE_LIMIT_SECRET`, `AUTH_SITE_ORIGIN`/`CERTIFICATE_VERIFY_ORIGIN`을 사용한다. `RELEASE_PRODUCTION_SITE_ORIGIN`과 `RELEASE_PRODUCTION_SUPABASE_REF`는 양쪽에 동일한 운영 기준을 둔다. `VERCEL*`은 공급자 시스템 변수를 사용한다. 비밀값은 Git·화면·로그에 남기지 않는다.
 
 ## 후속 운영 준비
 
-회원가입 및 비밀번호 복구 요청은 화면·server action에서 중단하고 사유를 안내한다. Native 공개 가입도 끈다. 기존 계정 로그인은 가능하지만 초기 운영 관리자 계정과 업무 역할은 실제 담당자 확인 후 별도 구성해야 한다. 이 배포에서 실제 계정을 임의로 생성하거나 승인된 기관 개인정보 문안을 만들지 않는다.
+비밀번호 복구 요청은 활성화한다. 회원가입은 승인된 기관 개인정보 문안이 등록되기 전까지 화면·server action·DB에서 제한하고 native 공개 가입도 꺼 둔다. 초기 운영 관리자 계정과 업무 역할은 실제 담당자 확인 후 별도 구성해야 한다. 실제 계정을 임의로 생성하거나 기관 개인정보 문안을 임의 승인하지 않는다.
 
-SMTP 발신 도메인 인증과 메일 템플릿·재발송 한도·15분 복구 링크를 실제 수신함으로 검증한 뒤 native signup과 `AUTH_EMAIL_ENABLED`를 함께 활성화한다. 승인된 개인정보 처리방침·동의 문안도 먼저 등록한다. 환불·감면·강사 심사 기준은 승인 등록 전 제한을 유지한다. 카카오·네이버·PASS는 별도 연동 항목이다.
+Resend `uc-life.org`는 Verified이며 `noreply@uc-life.org`에서 발송한다. 도메인 발송 전용 키 두 개를 Supabase 운영·Preview에 각각 저장하고, 호스트 `smtp.resend.com`, 포트 465, 사용자 `resend`, 발신 이름 `U-LIFE`를 사용한다. 키를 Vercel 공개 변수나 저장소에 복사하지 않는다. 무료 한도는 계정 전체 월 3,000통·하루 100통으로 다른 사업의 발송과 합산된다. Supabase 시간당 제한은 운영 10통, Preview 2통이며 사용자별 최소 간격은 60초다. 유료 초과 사용은 켜지 않았다.
+
+Preview에서 공식 Resend 진단 주소로 보낸 한국어 복구 메일의 SMTP 200 및 Delivered 이벤트와 15분 복구 안내·Preview 링크를 확인했다. 이 검사는 실제 담당자 메일함의 스팸 분류까지 보장하지 않는다. 실제 담당자 수신 주소 확인, 개인정보 처리방침·동의 문안 승인 등록, 초기 관리자 지정 후 가입을 개방한다. 환불·감면·강사 심사 기준은 승인 등록 전 제한을 유지한다. 카카오·네이버·PASS는 별도 연동 항목이다.
 
 ## 검증과 복구
 

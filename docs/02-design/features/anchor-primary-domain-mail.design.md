@@ -10,9 +10,13 @@ Supabase Production site_url은 apex, redirect allowlist는 필요한 인증 경
 
 ## 메일
 
-SMTP 공급자, 발신 주소, 자격 증명을 확인한다. 키는 공급자/Supabase 보안 설정 또는 사용자가 지정한 비공개 로컬 파일에서만 읽는다. 현재 Vercel과 Supabase에 SMTP 키/host가 없고 DNS에 메일 레코드가 없는 상태를 확인했다. 공급자가 알려지기 전 임의의 유료 서비스 가입·DNS 값 추측은 하지 않는다.
+SMTP 공급자는 Resend, 발신 주소는 `noreply@uc-life.org`로 확정되었다. 키는 공급자/Supabase 보안 설정 또는 사용자가 지정한 비공개 로컬 파일에서만 읽는다. 실제 공급자 DNS 레코드와 자격 증명을 사용한다.
 
-SMTP의 SPF/DKIM 및 발신 도메인 상태, 포트/사용자, 승인 수신함을 통한 발송 확인 후 AUTH_EMAIL_ENABLED를 켠다. 이메일 인증은 유지하고 복구 링크 15분, 1회 사용 정책을 유지한다. 승인 개인정보 문안이 없으면 공개 가입을 열지 않는다. 메일 서비스 준비만으로 개인정보 승인이나 관리자 계정 생성을 대체하지 않는다.
+사용자는 Resend 직접 무료 계정 연결을 선택했다. 유료 Vercel 구독은 생성하지 않는다. `uc-life.org`의 Verified 상태와 도쿄 리전을 확인하고, 사용자 승인에 따라 도메인 발송 전용 키를 운영·Preview 각각 발급하여 해당 Supabase SMTP 설정에 저장한다. 키는 코드·채팅·파일에 남기지 않는다. `smtp.resend.com:465`, 사용자 `resend`, 발신 이름 `U-LIFE`를 사용한다. 현재 무료 플랜은 계정 전체 월 3,000통·하루 100통이며 다른 사업과 한도를 공유한다. Supabase 시간당 제한은 운영 10통, Preview 2통, 사용자별 재발송 간격은 60초로 둔다.
+
+복구 메일은 저장소의 `supabase/templates/recovery.html`과 한국어 제목을 양 환경에 적용한다. 링크는 각 Supabase 프로젝트의 SiteURL과 `/auth/reset-password#token_hash={{ .TokenHash }}`를 사용하며, 사용자의 명시적 새 비밀번호 제출 전에는 토큰을 소비하지 않는다. 템플릿 준비와 SMTP 발송 가능 여부를 별도로 검증한다.
+
+SMTP의 SPF/DKIM 및 발신 도메인 상태, 포트/사용자를 검사한다. Preview에서만 합성 계정과 테스트용 동의 문안을 사용하고, 공식 `delivered+…@resend.dev` 진단 주소로 복구 메일을 발송한다. Resend의 SMTP 요청 성공·Delivered 이벤트·발신 주소·한국어 문안·환경별 복구 링크를 확인하고 테스트 데이터를 정리한 뒤 AUTH_EMAIL_ENABLED를 켠다. 실제 담당자 수신함 검사는 별도 수신 주소를 받은 뒤 수행한다. 이메일 인증과 복구 링크 15분·1회 사용 정책을 유지한다. 승인 개인정보 문안이 없으면 공개 가입을 열지 않는다. 메일 서비스 준비만으로 개인정보 승인이나 관리자 계정 생성을 대체하지 않는다.
 
 ## 검증
 
