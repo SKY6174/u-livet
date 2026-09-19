@@ -44,3 +44,22 @@
 운영 DB가 비어 있어 대규모 실제 과정·동시 접속·로그인 후 업무 지연은 측정하지 않았다. 검색·전체 목록의 기존 동작은 유지했다. 데이터 증가 시 서버 검색·페이지 나누기와 RLS 실행계획을 별도로 확인한다.
 
 성능 Advisor의 WARN 33개(auth_rls_initplan)와 234개(multiple_permissive_policies)는 life_ 이전 테이블에서 발생한다. 현재 공개 화면의 지연 원인과 분리해 후속 검토한다. 권한 의미를 바꾸는 정책 통합은 이번에 수행하지 않았다. [RLS initplan 설명](https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan), [중복 정책 설명](https://supabase.com/docs/guides/database/database-linter?lint=0006_multiple_permissive_policies)
+
+## 운영 데이터 재측정 준비 상태 — 2026-09-19 22:10 KST
+
+운영 `/api/version`에서 revision `404b43c26388ab7ec6faeb369e0718461f778138`, production, managed-cloud-v1, reviewOnly=false를 확인했다. `/api/health`는 200/healthy다.
+
+현재 도메인에서 경로별 GET 9회(첫 요청 제외, 표본 8개)를 순차 실행했다. 요청 시작부터 본문 수신까지의 시간이며 36회 모두 HTTP 200, health 오류 0건이었다. 직접 PostgREST 측정과 인증 쿠키는 사용하지 않았다.
+
+| 경로 | 중앙값 | p95 |
+|---|---:|---:|
+| /api/health | 145.5ms | 183ms |
+| / | 145ms | 206ms |
+| /courses | 151.5ms | 171ms |
+| /auth/login | 125ms | 194ms |
+
+운영 DB 집계: 과정·기수·신청·수강·강사 배정 모두 0건. 이메일 인증 계정, SYSTEM_ADMIN, COURSE_MANAGER는 각각 1명이고 두 역할은 TOTP 등록을 확인했다. 현재 사업연도는 1개다. 승인된 수강신청·수료·환불 정책 및 수료 규칙은 모두 0개다. 등록된 TOTP는 실제 로그인 세션 검증을 대신하지 않는다.
+
+실제 운영 데이터 성능 측정은 아직 진행할 수 없다. 첫 개설 과정, 모집 시작·마감, 대상·수강료·선발 방식, 확정 차시표, 신청·수료 규정과 승인 담당자의 정보가 필요하다. [운영 개방 준비표](../operations/production-course-opening.md)의 후보 3개와 누락값을 기준으로 사용자에게 확인을 요청했다. 기존 PDF 편성표는 실제 개설 과정이나 실적 데이터로 취급하지 않는다.
+
+이번 점검은 읽기 전용이다. 원본 집계는 Git 제외 `ops/evidence/production-performance/public-latency.jsonl`에 저장했다. 수치는 비로그인·빈 카탈로그 기준이며 로그인 후 업무 성능 또는 동시 사용자 수용량을 나타내지 않는다. 제품 코드 변경이 없어 기존 로컬 부하 검증·빌드를 반복하지 않았다.
