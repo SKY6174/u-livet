@@ -4,7 +4,7 @@ import { authenticate, register } from "@/app/auth/actions";
 import type { Policy } from "@/lib/portal/types";
 import { PasswordField } from "./password-field";
 import { getBotProtection } from "@/lib/auth/bot-config";
-import { isReviewOnly } from "@/lib/deployment/review-mode";
+import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 export function AuthForm({
   signup = false,
@@ -16,15 +16,45 @@ export function AuthForm({
   policy?: Policy;
 }) {
   const reviewOnly = isReviewOnly();
+  if (signup && (reviewOnly || !policy || !authEmailEnabled())) {
+    return (
+      <div className="space-y-5 text-base leading-7">
+        <div role="status" className="rounded-xl bg-slate-50 p-5">
+          <h2 className="mb-2 text-lg font-semibold">
+            회원가입을 준비하고 있습니다
+          </h2>
+          <p>
+            {reviewOnly
+              ? REVIEW_MESSAGE
+              : !policy
+                ? "개인정보 수집·이용 안내를 준비하고 있습니다. 안내가 확정되면 내용을 확인한 뒤 가입할 수 있습니다."
+                : AUTH_EMAIL_PENDING}
+          </p>
+          <p className="mt-3">
+            지금은 이름이나 비밀번호를 입력하지 않아도 됩니다.
+          </p>
+        </div>
+        <p>회원가입 전에도 공개 교육과정 안내를 볼 수 있습니다.</p>
+        <Link href="/courses" className="btn-primary w-full text-base">
+          교육과정 먼저 살펴보기
+        </Link>
+        <Link
+          href="/auth/login"
+          className="flex min-h-11 items-center text-base underline"
+        >
+          이미 계정이 있으신가요? 로그인
+        </Link>
+      </div>
+    );
+  }
   return (
     <div className="[&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
       <ActionForm
         action={signup ? register : authenticate}
         label={signup ? "가입 신청" : "로그인"}
-        disabled={reviewOnly || (signup && (!policy || !authEmailEnabled()))}
+        disabled={reviewOnly}
         botProtection={reviewOnly ? undefined : getBotProtection()}
       >
-        {signup && !authEmailEnabled() && <p role="status" className="notice">{AUTH_EMAIL_PENDING}</p>}
         <input type="hidden" name="next" value={next} />
         {signup && (
           <label className="field text-base">
@@ -59,34 +89,35 @@ export function AuthForm({
             비밀번호를 잊으셨나요?
           </Link>
         )}
-        {signup &&
-          (policy ? (
-            <div className="space-y-3">
-              <details className="rounded-lg border p-4">
-                <summary>
-                  {policy.title} · {policy.version}
-                </summary>
-                <p className="mt-3 whitespace-pre-wrap text-sm">
-                  {policy.body}
-                </p>
-              </details>
-              <input type="hidden" name="privacy_policy_id" value={policy.id} />
-              <label className="flex min-h-11 items-start gap-3 py-2 text-base">
-                <input
-                  className="mt-1 h-5 w-5 shrink-0"
-                  type="checkbox"
-                  name="privacy_accepted"
-                  required
-                />
-                <span>[필수] 위 개인정보 수집·이용에 동의합니다.</span>
-              </label>
-            </div>
-          ) : (
-            <p role="status" className="notice">
-              회원가입 안내가 준비 중입니다. 가입이 열리면 개인정보 수집
-              목적·항목·보유기간을 먼저 안내합니다.
-            </p>
-          ))}
+        {signup && policy && (
+          <div className="space-y-3">
+            <section
+              aria-labelledby="signup-privacy-title"
+              className="rounded-lg border p-4"
+            >
+              <h2 id="signup-privacy-title" className="text-lg font-semibold">
+                {policy.title} · {policy.version}
+              </h2>
+              <p className="mt-3 text-base leading-7 text-slate-600">
+                수집 목적·항목·보유기간과 동의를 거부할 때의 제한을 읽고 선택해
+                주세요.
+              </p>
+              <p className="mt-4 whitespace-pre-wrap break-words text-base leading-7">
+                {policy.body}
+              </p>
+            </section>
+            <input type="hidden" name="privacy_policy_id" value={policy.id} />
+            <label className="flex min-h-11 items-start gap-3 py-2 text-base">
+              <input
+                className="mt-1 h-5 w-5 shrink-0"
+                type="checkbox"
+                name="privacy_accepted"
+                required
+              />
+              <span>[필수] 위 개인정보 수집·이용에 동의합니다.</span>
+            </label>
+          </div>
+        )}
         <p className="text-base text-slate-600">
           {signup
             ? "강사·관리자 권한은 사업단의 확인 후 부여됩니다."
