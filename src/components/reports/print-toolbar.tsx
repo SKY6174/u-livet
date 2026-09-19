@@ -1,0 +1,58 @@
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+export function PrintToolbar({
+  offering,
+  document,
+  reveal,
+}: {
+  offering: string;
+  document: string;
+  reveal: boolean;
+}) {
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  async function print() {
+    setBusy(true);
+    setError("");
+    try {
+      await window.document.fonts.ready;
+      await Promise.all(
+        Array.from(window.document.images).map((img) => img.decode()),
+      );
+      window.print();
+    } catch {
+      setError("사진을 불러오지 못했습니다. 새로고침 후 다시 출력해 주세요.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <nav className="no-print mx-auto flex max-w-7xl flex-wrap items-center gap-4 p-5">
+      <Link
+        className="btn-secondary"
+        href={`/admin/offerings/${offering}/reports`}
+      >
+        ← 과정 보고서 관리
+      </Link>
+      <button className="btn-primary" onClick={print} disabled={busy}>
+        {busy ? "출력 준비 중…" : "인쇄 / PDF 저장"}
+      </button>
+      <Link
+        className="btn-secondary"
+        href={`?document=${document}&reveal=${reveal ? "0" : "1"}`}
+      >
+        {reveal ? "계좌번호 가리기" : "계좌번호 포함하여 출력"}
+      </Link>
+      <p className="text-sm text-slate-600">
+        인쇄 설정에서 머리글·바닥글을 끄고 배율 100%를 선택하세요.{" "}
+        {reveal ? "계좌번호가 표시됩니다." : "계좌번호는 가려져 있습니다."}
+      </p>
+      {error && (
+        <p role="alert" className="text-red-700">
+          {error}
+        </p>
+      )}
+    </nav>
+  );
+}
