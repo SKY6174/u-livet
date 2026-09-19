@@ -98,7 +98,7 @@ export function PasswordField({
       </div>
       <p id={`${id}-hint`} className="text-base leading-relaxed text-slate-600">
         {signup
-          ? "영문은 대문자나 소문자 중 편한 것을 쓰세요. 공백은 특수문자에 포함되지 않습니다."
+          ? "영문 대문자와 소문자를 각각 넣어 주세요. 공백은 특수문자에 포함되지 않습니다."
           : "보이기를 누르면 입력한 글자를 확인할 수 있습니다."}
       </p>
       {signup && (

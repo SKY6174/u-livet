@@ -119,7 +119,9 @@ async function finishPassword(
     if (update.error)
       return {
         message:
-          update.error.code === "same_password"
+          purpose === "invite"
+            ? "비밀번호 설정을 마치지 못했습니다. 사업단에 계정 설정 도움을 요청해 주세요."
+            : update.error.code === "same_password"
             ? "이전과 다른 비밀번호를 사용해 주세요. 새 재설정 메일을 요청한 뒤 다시 진행해 주세요."
             : "비밀번호를 바꾸지 못했습니다. 새 재설정 메일을 요청한 뒤 다시 진행해 주세요.",
       };
