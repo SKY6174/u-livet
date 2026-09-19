@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
-import { getOfferings } from "@/lib/portal/data";
+import { getWorkspaceOfferings } from "@/lib/portal/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
 export default async function CompletionIndex() {
   const me = await requireIdentity("/completion");
@@ -9,8 +9,7 @@ export default async function CompletionIndex() {
     .filter((r) => ["COURSE_MANAGER", "CERTIFIER"].includes(r.role))
     .map((r) => r.org_id);
   if (!orgs.length) notFound();
-  const { offerings: data, unavailable: error } = await getOfferings();
-  const offerings = data.filter((o) => orgs.includes(o.org_id));
+  const { offerings, unavailable: error } = await getWorkspaceOfferings("org_id", orgs);
   return (
     <div className="page-shell">
       <PageIntro eyebrow="COMPLETION REVIEW" title="수료 검토·승인">

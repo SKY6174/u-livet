@@ -1,0 +1,2062 @@
+{
+  "schemaVersion": 1,
+  "preparedAt": "2026-09-19",
+  "purpose": "운영계획서 기반 내부 개설 검토 자료. 운영 DB 자동 입력 또는 승인 자료가 아님.",
+  "sourceFolderName": "2026년 RISE사업 평생직업교육과정 운영계획서",
+  "sourceCount": 16,
+  "sourcePageCount": 122,
+  "totals": {
+    "courses": 16,
+    "capacity": 244,
+    "teachingHours": 541,
+    "academies": [
+      {
+        "academy": "스마트테크",
+        "courses": 0,
+        "capacity": 0,
+        "hours": 0
+      },
+      {
+        "academy": "라이프케어",
+        "courses": 6,
+        "capacity": 94,
+        "hours": 232
+      },
+      {
+        "academy": "로컬창업",
+        "courses": 6,
+        "capacity": 88,
+        "hours": 195
+      },
+      {
+        "academy": "팝업",
+        "courses": 4,
+        "capacity": 62,
+        "hours": 114
+      }
+    ]
+  },
+  "reconciliation": {
+    "matchedExistingCourses": 13,
+    "additionalSourceIds": [
+      "P03",
+      "P07",
+      "P15"
+    ],
+    "existingWithoutPlan": [
+      {
+        "id": "2026-life-care-06",
+        "title": "재활운동지도사 자격증과정",
+        "capacity": 20,
+        "teachingHours": 48
+      }
+    ],
+    "unionCourseCount": 17,
+    "unionCapacity": 264,
+    "unionTeachingHours": 589,
+    "note": "합집합은 자료 대조용이며 확정 개설 총계가 아님. 기존 PDF 소계267명/543시간과 별개."
+  },
+  "interpretation": [
+    "아카데미는 각 PDF 표지 체크 표시 기준.",
+    "원문 계획값이며 실제 모집·운영·수료 실적을 나타내지 않음.",
+    "공통 작성 유의사항의 모집정원80% 이상은 모집 목표이며 출석률·수료 기준이 아님.",
+    "90% 실습 교육 문구는 수료 출석률이 아님.",
+    "장학금 예산의80% 산식은 자동 환급·수료 장학금 지급 확정을 뜻하지 않음.",
+    "수강료는 예산표의 산식값이며 최종 승인·감면·환불·납부 조건 별도 확인. 자격비와 합산하지 않음.",
+    "예시 자격명·빈칸·00원은 확정값으로 쓰지 않음.",
+    "각 sourcePages는 PDF 물리 페이지. source 파일은 저장소에 포함하지 않음.",
+    "별도 담당자 권한 연결은 사용자가 연기했으며 기존 관리자 시범 운영을 유지."
+  ],
+  "sources": [
+    {
+      "id": "P01",
+      "filename": "2026년 RISE사업 평생직업교육 가구소품전문시공인력양성과정 운영계획서(실내건축 김동욱).pdf",
+      "sha256": "7d1ebc1c044909004de6ef2788332323ebb14f1c9f81c867f5a412ed0d6c4dfd",
+      "pages": 8
+    },
+    {
+      "id": "P02",
+      "filename": "2026년 RISE사업 평생직업교육 건강식생활지도사과정 운영계획서(식품영양 정영혜).pdf",
+      "sha256": "72fe5e6570e1e09274168a67aab3f0a9d409410b8ae45a2dd1ed7a02802e1a8c",
+      "pages": 8
+    },
+    {
+      "id": "P03",
+      "filename": "2026년 RISE사업 평생직업교육 골프피팅전문가양성과정 운영계획서(골프산업 임종석).pdf",
+      "sha256": "ca7cd42770806bc05e07ccd700e58cbc22880998ffbb97fbf5cfacd25b17e197",
+      "pages": 9
+    },
+    {
+      "id": "P04",
+      "filename": "2026년 RISE사업 평생직업교육 달콤한도약로컬쿠키창업마스터 프로그램 운영계획서(호텔조리 신언환).pdf",
+      "sha256": "f432e162095ea59b93ffbec717e3c56ad707fd994868f56f2649e684332f1516",
+      "pages": 6
+    },
+    {
+      "id": "P05",
+      "filename": "2026년 RISE사업 평생직업교육 도배전문시공인력양성과정 운영계획서(실내건축 김동욱).pdf",
+      "sha256": "6d9754695386bffc973588f125f5d169757fd93862b62894c10dbdd0b141679c",
+      "pages": 8
+    },
+    {
+      "id": "P06",
+      "filename": "2026년 RISE사업 평생직업교육 도수물리치료전문인력양성프로그램 운영계획서(물리치료 이관우).pdf",
+      "sha256": "b11c5378368ef3495e50b21df067bba561ac4852186c4fd6db8950aad892a731",
+      "pages": 8
+    },
+    {
+      "id": "P07",
+      "filename": "2026년 RISE사업 평생직업교육 로컬페스타기획자양성과정 프로그램 운영계획서(동구청년센터협업).pdf",
+      "sha256": "25ac2ada62a28d3ce47d791415c6513514d29a68b1ebe9e4e919eb4f81b50e7e",
+      "pages": 8
+    },
+    {
+      "id": "P08",
+      "filename": "2026년 RISE사업 평생직업교육 반려동물수제간식만들기과정 운영계획서(식품영양 최수경).pdf",
+      "sha256": "90011b7c0346bd2c78923ecbe658e0ca89ac54447d3e2992ad72121c222f64d3",
+      "pages": 7
+    },
+    {
+      "id": "P09",
+      "filename": "2026년 RISE사업 평생직업교육 반려동물행동교정사3급양성과정 운영계획서(반려동물 박성혁).pdf",
+      "sha256": "bcb46cde6545089f4b22087d5d2baa65a4284fa28deac5413f9209a902d43e4c",
+      "pages": 7
+    },
+    {
+      "id": "P10",
+      "filename": "2026년 RISE사업 평생직업교육 산과필라테스자격증프로그램 운영계획서(물리치료 김원호).pdf",
+      "sha256": "e7a76bd331d59d04a33891d7cb521b1fc5584cfe30aeb133993482580ef65374",
+      "pages": 8
+    },
+    {
+      "id": "P11",
+      "filename": "2026년 RISE사업 평생직업교육 스포츠테이핑관리사(자격증) 양성과정 운영계획서(스포츠재활 서봉한).pdf",
+      "sha256": "e81e9f120f339dccc5cbd255a6f2c0a91e8cff534917baa573881b872bdc2366",
+      "pages": 7
+    },
+    {
+      "id": "P12",
+      "filename": "2026년 RISE사업 평생직업교육 실버푸드전문가과정 운영계획서(식품영양 김일낭).pdf",
+      "sha256": "89aeea56671ab84b98c649c4ead06b5a8cf4ff79c5692d2a751e8aedeb080eea",
+      "pages": 8
+    },
+    {
+      "id": "P13",
+      "filename": "2026년 RISE사업 평생직업교육 애견미용사3급양성과정 운영계획서(반려동물 박성혁).pdf",
+      "sha256": "4e0d1ecd4f3a6103f69514ccaa82456f42f69b7b31bd3f3beeb68b9d1d8504ed",
+      "pages": 7
+    },
+    {
+      "id": "P14",
+      "filename": "2026년 RISE사업 평생직업교육 인테리어목공전문시공인력양성과정 운영계획서(실내건축 김동욱).pdf",
+      "sha256": "dc4398f36b63e73f2f9baba8ba414c16519214f1fb941b619e9955a8f71e8943",
+      "pages": 8
+    },
+    {
+      "id": "P15",
+      "filename": "2026년 RISE사업 평생직업교육 질문소통퍼실리테이터양성과정 운영계획서(정영은-동구청협업).pdf",
+      "sha256": "1cf81a20f1391188a714ff4b01e484cbfefe18ea04b74b020eb8488c60f73ac7",
+      "pages": 8
+    },
+    {
+      "id": "P16",
+      "filename": "2026년 RISE사업 평생직업교육 파크골프지도사(자격증) 양성과정 운영계획서(스포츠재활 서봉한).pdf",
+      "sha256": "907b0d5bad75c6bf02c98563c869e04fa017d21ea491bf6aec80b228c53d6276",
+      "pages": 7
+    }
+  ],
+  "courses": [
+    {
+      "sourceId": "P01",
+      "title": "가구소품 전문시공인력 양성과정",
+      "academy": "팝업",
+      "existingCourseId": "2026-popup-01",
+      "capacity": 14,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "김동욱",
+      "targetAsPlanned": "일반인 10명·재직자 4명",
+      "partnerAsPlanned": "디자인그룹아이엠씨㈜",
+      "summaryFromPlan": "가구소품 제작에 필요한 재료·도구와 제작 기법을 익히고 액자·시계 제작 및 과정평가를 수행하는 실습 과정.",
+      "curriculumFromPlan": [
+        "목재·공구의 이해와 관리, 장비사용 안전교육",
+        "측정도구·수공구 활용",
+        "전동공구·목공기계 활용",
+        "액자·시계 제작 연습",
+        "제작연습 및 과정평가"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-10-06",
+          "endsOn": "2026-10-29"
+        },
+        "sessionDatesAsWritten": [
+          "2026-10-06",
+          "2026-10-08",
+          "2026-10-13",
+          "2026-10-15",
+          "2026-10-20",
+          "2026-10-22",
+          "2026-10-27",
+          "2026-10-29"
+        ],
+        "teachingHoursByDate": [
+          3,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          3
+        ],
+        "summary": "화·목, 첫날·마지막 날 18:00~21:00 / 나머지 18:00~22:00",
+        "location": "2대학관 110호",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "손창서",
+            "classification": "교외",
+            "affiliationAndPosition": "나손향 대표",
+            "hours": 30
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [
+          {
+            "name": "김두영",
+            "department": "실내건축디자인과",
+            "hours": 30
+          }
+        ],
+        "supportStatus": "명시"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 14,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 1260000,
+        "totalCellAsWritten": 1260000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "목공예기능사·가구제작기능사(한국산업인력공단), 목공지도사(한국목공교육협회, 등록번호 2010-0481, 원문 비용 50,000원). 국가자격의 시험일정·비용은 공고 전 재확인.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "기존 현황표의 일괄 18:00~21:00와 달리 중간 6일은 22:00 종료. 차시표로 30시간을 설명할 수 있음.",
+        "가구제작기능사 시험일정이 교육 시작 전인 회차로 적혀 있어 실제 연계 시험 확인 필요."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P02",
+      "title": "건강식생활지도사",
+      "academy": "라이프케어",
+      "existingCourseId": "2026-life-care-04",
+      "capacity": 14,
+      "teachingHours": 45,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "정영혜",
+      "targetAsPlanned": "성인학습자; 일반인 12명·기타 2명",
+      "partnerAsPlanned": "한국식생활건강교육협회",
+      "summaryFromPlan": "식생활과 영양소, 지속가능한 식생활교육을 학습하고 전통음식·건강밥상 실습과 교육 실습을 진행하는 과정.",
+      "curriculumFromPlan": [
+        "한국인의 식생활·건강문제와 영양소 이해",
+        "기본 양념·맛간장·천연재료 우리음식 실습",
+        "환경과 식생활, 전통간식 및 건강밥상",
+        "식생활교육 방법 및 실습",
+        "파이토케미컬, 체중관리, 계절밥상·전통음료",
+        "자체평가 및 수료식"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-07-03",
+          "endsOn": "2026-07-24"
+        },
+        "sessionDatesAsWritten": [
+          "2026-07-03",
+          "2026-07-04",
+          "2026-07-10",
+          "2026-07-11",
+          "2026-07-18",
+          "2026-07-24"
+        ],
+        "teachingHoursByDate": [
+          7,
+          8,
+          8,
+          7,
+          7,
+          8
+        ],
+        "summary": "6일, 오전·오후 분리 운영. 시작 09:30, 종료는 날짜별 17:00 또는 18:00",
+        "location": "1-302, 1-330",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "정영혜",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 식품영양학과 전임",
+            "hours": 21
+          },
+          {
+            "name": "박전순",
+            "classification": "교외",
+            "affiliationAndPosition": "동경요리제과제빵학원 연구원/강사",
+            "hours": 21
+          },
+          {
+            "name": "신효정",
+            "classification": "교외",
+            "affiliationAndPosition": "한국식생활건강교육협회 연구원",
+            "hours": 3
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [
+          {
+            "name": "김태호",
+            "department": "식품영양학과",
+            "hours": 40
+          },
+          {
+            "name": "박규태",
+            "department": "식품영양학과",
+            "hours": 20
+          },
+          {
+            "name": "강민석",
+            "department": "식품영양학과",
+            "hours": 20
+          }
+        ],
+        "supportStatus": "명시"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 45,
+        "formulaCapacity": 14,
+        "perPersonDerivedFromFormula": 135000,
+        "totalDerivedFromFormula": 1890000,
+        "totalCellAsWritten": 1890000,
+        "perPersonDerivedFromTeachingHours": 135000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "건강식생활지도사(한국식생활건강교육협회), 원문 응시·발급비 80,000원. 등록번호는 '예정'으로 기재되어 확정 정보 확인 필요.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "교육방법 p.3의 이론22/실습23시간과 강사표 p.7의 이론20/실습25시간이 다름. 총45시간은 일치.",
+        "외부 강사료 산식·기재 결과·금액란이 서로 달라 예산 재확인 필요(p.8)."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P03",
+      "title": "골프피팅 전문가 양성과정",
+      "academy": "로컬창업",
+      "existingCourseId": null,
+      "capacity": 12,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 5,
+        "qualifications": 6,
+        "schedule": 7,
+        "staff": 8,
+        "budget": 9
+      },
+      "facultyCoordinator": "임종석",
+      "targetAsPlanned": "일반인 6명·재직자 6명",
+      "partnerAsPlanned": "앤라이프샵",
+      "summaryFromPlan": "골프클럽 구조와 피팅 이론, 스윙데이터 분석, 그립·샤프트 수리 및 조정을 통해 골프피팅 실무를 익히는 과정.",
+      "curriculumFromPlan": [
+        "오리엔테이션·골프클럽 피팅 이해와 기초이론",
+        "그립 피팅 및 교체",
+        "스윙데이터 해석·스윙분석",
+        "헤드·샤프트 역할, 샤프트 피팅 실무",
+        "웨이트 밸런스 조정·헤드 리피니시",
+        "샤프트 파손수리·종합 테스트"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-09-01",
+          "endsOn": "2026-11-14"
+        },
+        "sessionDatesAsWritten": [
+          "2026-09-05",
+          "2026-09-12",
+          "2026-10-10",
+          "2026-10-17",
+          "2026-10-24",
+          "2026-10-31",
+          "2026-11-07",
+          "2026-11-14"
+        ],
+        "teachingHoursByDate": [
+          2,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "summary": "13회차, 8일 편성; 시각·시수 충돌이 있어 시간표 확정 필요",
+        "location": "피팅 실습실",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "임종석",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 특임",
+            "hours": 11
+          },
+          {
+            "name": "송상용",
+            "classification": "교외",
+            "affiliationAndPosition": "앤라이프샵 대표",
+            "hours": 9
+          },
+          {
+            "name": "박귀홍",
+            "classification": "교외",
+            "affiliationAndPosition": "골프 샵 대표",
+            "hours": 6
+          },
+          {
+            "name": "문준석",
+            "classification": "교외",
+            "affiliationAndPosition": "준골프 대표",
+            "hours": 4
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "김진열",
+            "classification": "교외",
+            "affiliationAndPosition": "온양스포츠센터 강사",
+            "hours": 10
+          }
+        ],
+        "supportStaff": [],
+        "supportStatus": "미기재"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 12,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 1080000,
+        "totalCellAsWritten": 1080000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "골프피팅 전문가 2급(㈜한국골프산업협회), 원문 등록번호 2019-00001·총350,000원(응시100,000+발급250,000). 등록번호는 원문 기재값으로 확인 필요.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "기존 14개 현황표에 없는 추가 과정.",
+        "표제 시작일9/1과 첫 차시9/5가 다름.",
+        "10/17의 18:00~22:00와 20:00~22:00가 겹치며, 앞 회차는 시수2로 표기됨.",
+        "11/7·11/14는 각각18:00~20:00이지만 시수4로 적혀 있음. 시수란 합계30과 실제 시간표를 재확정해야 함."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P04",
+      "title": "달콤한 도약: 로컬 쿠키 창업 마스터 클래스",
+      "academy": "로컬창업",
+      "existingCourseId": "2026-local-business-01",
+      "capacity": 15,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 2,
+        "target": 3,
+        "qualifications": null,
+        "schedule": 4,
+        "staff": 5,
+        "budget": 6
+      },
+      "facultyCoordinator": "신언환",
+      "targetAsPlanned": "일반인 5명·재직자 3명·경력단절여성 5명·기타 2명",
+      "partnerAsPlanned": "랑콩뜨레과자점; 울산 동구청·토탈베이커리시스템 연계",
+      "summaryFromPlan": "울산 동구의 로컬 콘텐츠를 쿠키 제품으로 연결하는 리빙랩과 스마트 제조 실습, 스토리텔링·패키징·품평회를 결합한 창업 과정.",
+      "curriculumFromPlan": [
+        "지역의 발견 리빙랩",
+        "쿠키·필링 기초 실습",
+        "문제점 완화 리빙랩",
+        "자동 포앙기를 활용한 스마트 제조·제품 완성",
+        "제품 스토리텔링",
+        "최종 발표·패키징·품평회"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-07-20",
+          "endsOn": "2026-07-31"
+        },
+        "sessionDatesAsWritten": [
+          "2026-07-20",
+          "2026-07-21",
+          "2026-07-22",
+          "2026-07-28",
+          "2026-07-29",
+          "2026-07-30",
+          "2026-07-31"
+        ],
+        "teachingHoursByDate": [
+          3,
+          6,
+          3,
+          6,
+          6,
+          3,
+          3
+        ],
+        "summary": "7일, 10:00~13:00 또는09:00~16:00; 7/29는09:00~13:00·시수6 충돌",
+        "location": "1-206·플립러닝실습실, AG-104 FAB Lab.",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "신언환",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 호텔조리제빵과 전임",
+            "hours": 6
+          },
+          {
+            "name": "정영은",
+            "classification": "교외",
+            "affiliationAndPosition": "울산 동구청 퍼실리테이터",
+            "hours": 9
+          },
+          {
+            "name": "구범기",
+            "classification": "교외",
+            "affiliationAndPosition": "토탈베이커리시스템 부장",
+            "hours": 12
+          },
+          {
+            "name": "김중록",
+            "classification": "교외",
+            "affiliationAndPosition": "랑콩뜨레과자점 이사",
+            "hours": 3
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "미정 3명",
+            "classification": "교외",
+            "affiliationAndPosition": "울산 동구청 퍼실리테이터, 각9시간",
+            "hours": 27
+          },
+          {
+            "name": "미정 1명",
+            "classification": "교외",
+            "affiliationAndPosition": "토탈베이커리시스템",
+            "hours": 12
+          },
+          {
+            "name": "미정 1명",
+            "classification": "교외",
+            "affiliationAndPosition": "랑콩뜨레과자점",
+            "hours": 3
+          }
+        ],
+        "supportStaff": [
+          {
+            "name": "미정 1",
+            "department": "호텔조리제빵과",
+            "hours": 24
+          },
+          {
+            "name": "미정 2",
+            "department": "호텔조리제빵과",
+            "hours": 24
+          }
+        ],
+        "supportStatus": "미정 2명"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 15,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 1350000,
+        "totalCellAsWritten": 1350000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "별도 자격증 정보 미기재.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "기존 현황표6/30~7/13과 계획서7/20~7/31이 다름. 어느 일정이 최종인지 확인 필요.",
+        "7/29의09:00~13:00는4시간이나 교육시수는6시간.",
+        "차시표 보조강사 합계24시간, 인력표는9시간×3명+12시간+3시간=42인시. 7/21에는 구범기가 보조강사로 적혀 있어 실제 배정·예산 조정 필요.",
+        "모집표 기타2명은15명 대비 약13.3%이나20%로 표기됨. 외부 강사료 산식과 금액란도 불일치."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P05",
+      "title": "도배 전문시공인력 양성과정",
+      "academy": "팝업",
+      "existingCourseId": "2026-popup-02",
+      "capacity": 14,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "김동욱",
+      "targetAsPlanned": "일반인 10명·재직자 4명",
+      "partnerAsPlanned": "㈜유이디자인",
+      "summaryFromPlan": "도배 작업에 필요한 측정·자재계산·바탕면 처리·재단·시공과 마감 품질관리를 단계별 실습하는 과정.",
+      "curriculumFromPlan": [
+        "오리엔테이션·장비사용 안전교육",
+        "측정·치수 및 자재계산",
+        "하도·면처리 및 표면정리",
+        "풀바름 실습",
+        "재단·붙이기 기초",
+        "이음·모서리·창틀·문틀 시공",
+        "벽지·마감 품질관리",
+        "종합실습·과정평가"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-10-06",
+          "endsOn": "2026-10-29"
+        },
+        "sessionDatesAsWritten": [
+          "2026-11-03",
+          "2026-11-05",
+          "2026-11-10",
+          "2026-11-12",
+          "2026-11-17",
+          "2026-11-19",
+          "2026-11-24",
+          "2026-11-26"
+        ],
+        "teachingHoursByDate": [
+          3,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          3
+        ],
+        "summary": "차시표는11/3~11/26 화·목, 첫날·마지막 날18:00~21:00 / 나머지18:00~22:00",
+        "location": "2대학관 211호",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "조영민",
+            "classification": "교외",
+            "affiliationAndPosition": "집닥 주식회사 실장",
+            "hours": 30
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [
+          {
+            "name": "홍성혁",
+            "department": "실내건축디자인과",
+            "hours": 30
+          }
+        ],
+        "supportStatus": "명시"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 14,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 1260000,
+        "totalCellAsWritten": 1260000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "도배기능사(한국산업인력공단). 계획서 기재 응시료·발급비·시험일정은 공식 공고 확인 후 안내. 기존 현황표의 '도배시공사'와 명칭 다름.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "p.6 표제10/6~10/29와 실제8개 차시11/3~11/26이 충돌. 차시표는 기존 현황표 교육기간과 일치하나 표제 정정 필요.",
+        "기존 일괄18:00~21:00와 달리 중간6일은22:00 종료. 30시간 합계 확인."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P06",
+      "title": "도수물리치료 전문인력양성과정",
+      "academy": "라이프케어",
+      "existingCourseId": "2026-life-care-01",
+      "capacity": 15,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "이관우",
+      "targetAsPlanned": "물리치료분야 종사자; 일반인3명·재직자6명·경력단절여성5명·기타1명",
+      "partnerAsPlanned": "동천동강병원 물리치료실",
+      "summaryFromPlan": "물리치료분야 종사자를 주요 대상으로 척추 표면해부학, 허리척추 평가와 도수치료, 골반 관련 실습을 편성한 직무교육 과정.",
+      "curriculumFromPlan": [
+        "척추 표면해부학 실습",
+        "허리척추 평가 실습",
+        "허리척추 도수치료 실습 및 심화",
+        "골반 도수치료 실습"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-07-01",
+          "endsOn": "2026-07-16"
+        },
+        "sessionDatesAsWritten": [
+          "2026-07-01",
+          "2026-07-03",
+          "2026-07-06",
+          "2026-07-08",
+          "2026-07-10",
+          "2026-07-13",
+          "2026-07-15",
+          "2026-07-16"
+        ],
+        "teachingHoursByDate": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          2
+        ],
+        "summary": "7/1·3·6·8·10·13·15 17:00~21:00, 7/16 17:00~19:00",
+        "location": "2-417",
+        "modeAsWritten": "교육방법과 차시표 불일치: 비대면5시간 언급 / 차시표 전부 대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "이관우",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 물리치료학과 조교수",
+            "hours": 22
+          },
+          {
+            "name": "김정현",
+            "classification": "교외",
+            "affiliationAndPosition": "동천동강병원 팀장",
+            "hours": 8
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "김정현",
+            "classification": "교외",
+            "affiliationAndPosition": "동천동강병원 팀장",
+            "hours": 15
+          },
+          {
+            "name": "최유진",
+            "classification": "교외",
+            "affiliationAndPosition": "동천동강병원 팀원",
+            "hours": 6
+          }
+        ],
+        "supportStaff": [
+          {
+            "name": "미정",
+            "department": "학과 미정",
+            "hours": 30
+          }
+        ],
+        "supportStatus": "미정"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 15,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 1350000,
+        "totalCellAsWritten": 1350000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "관련 자격증 표에 '00상담사·000협회·000원' 예시가 남아 있어 실제 자격정보로 사용할 수 없음.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "p.3 비대면5시간·90% 이상 대면 실습 문구와 p.6 전부 오프라인 및 p.7 이론7/실습23시간이 일치하지 않음.",
+        "주요 대상은 종사자이나 소개에 일반인 교육을 함께 언급함. 자격·선수요건과 실습 범위 확인 필요.",
+        "차시표 주제에 도수치료 실습(3)이 반복되어 차시명 확인 필요. 외부 강사료 산식의 결과600,000원과 금액란710,000원이 다름."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P07",
+      "title": "로컬 페스타(LOCAL FESTA) 기획자 양성과정",
+      "academy": "로컬창업",
+      "existingCourseId": null,
+      "capacity": 20,
+      "teachingHours": 12,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "현용환",
+      "targetAsPlanned": "지역 내 대학생·청년·예술가·일반주민; 일반인5·재직자5·경력단절여성5·기타5명",
+      "partnerAsPlanned": "청년스테이지 ON",
+      "summaryFromPlan": "지역 자산을 활용한 문화기획을 배우고 팀별 아이디어 발산·사업계획·예산 작성·기획안 발표를 진행하는 액션러닝 과정.",
+      "curriculumFromPlan": [
+        "운영 안내·지역 브랜딩 특강·팀빌딩",
+        "로컬콘텐츠 자원 분석·아이디어 워크숍·멘토링",
+        "기획자 커리어와 사업계획서·예산안 작성",
+        "기획안 발표·전문가 심사·실행 가이드"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-06-06",
+          "endsOn": "2026-06-27"
+        },
+        "sessionDatesAsWritten": [
+          "2026-06-06",
+          "2026-06-13",
+          "2026-06-20",
+          "2026-06-27"
+        ],
+        "teachingHoursByDate": [
+          3,
+          3,
+          3,
+          3
+        ],
+        "summary": "토09:00~12:00, 4일",
+        "location": "청년스테이지 ON",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "오명훈",
+            "classification": "교외",
+            "affiliationAndPosition": "(재)영월문화관광재단 차장",
+            "hours": 1
+          },
+          {
+            "name": "황동윤",
+            "classification": "교외",
+            "affiliationAndPosition": "파래소 국악실내악단 대표",
+            "hours": 11
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "김성엽",
+            "classification": "교외",
+            "affiliationAndPosition": "포시크루 대표",
+            "hours": 4
+          },
+          {
+            "name": "서승연",
+            "classification": "교외",
+            "affiliationAndPosition": "해피키키 대표",
+            "hours": 4
+          },
+          {
+            "name": "이뤄라",
+            "classification": "교외",
+            "affiliationAndPosition": "놀래놀래 대표",
+            "hours": 4
+          }
+        ],
+        "supportStaff": [],
+        "supportStatus": "미기재"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 12,
+        "formulaCapacity": 20,
+        "perPersonDerivedFromFormula": 36000,
+        "totalDerivedFromFormula": 720000,
+        "totalCellAsWritten": 720000,
+        "perPersonDerivedFromTeachingHours": 36000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "관련 자격증 표의 '00상담사·000협회·000원'은 미수정 예시로 처리.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "기존 14개 현황표에 없는 추가 과정.",
+        "차시표 보조강사 합계4시간은 동시 수업시간, 인력표 합계12인시는3명×4시간. 인건비 산출 시 구별 필요.",
+        "대학생 대상 문구와 같은 모집표의 재학생10% 미만 원칙을 함께 검토하고 실제 자격을 확정해야 함."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P08",
+      "title": "반려동물수제간식 만들기",
+      "academy": "로컬창업",
+      "existingCourseId": "2026-local-business-02",
+      "capacity": 10,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 2,
+        "target": 3,
+        "qualifications": 4,
+        "schedule": 5,
+        "staff": 6,
+        "budget": 7
+      },
+      "facultyCoordinator": "최수경",
+      "targetAsPlanned": "일반인5명·경력단절여성5명",
+      "partnerAsPlanned": "국제펫푸드영양협회",
+      "summaryFromPlan": "반려동물 영양·식재료 관리 이론과 건조간식·수제간식 조리 실습, 펫푸드 창업 연계 내용을 구성한 과정.",
+      "curriculumFromPlan": [
+        "사료 영양표준·반려동물 핫도그",
+        "식재료 소독·손질, 보틀케이크·연어머핀",
+        "건조간식 식재료·4종 실습",
+        "오리채소푸딩·함박스테이크·채소고구마타르트",
+        "반려동물 생리학·피자·치킨세트",
+        "치킨스쿱쿠키·꼬꼬링쿠키·영양관리"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-08-05",
+          "endsOn": "2026-08-21"
+        },
+        "sessionDatesAsWritten": [
+          "2025-08-05",
+          "2025-08-07",
+          "2025-08-12",
+          "2025-08-14",
+          "2025-08-19",
+          "2025-08-21"
+        ],
+        "teachingHoursByDate": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "summary": "차시표 월일8/5·7·12·14·19·21, 10:00~16:00 중 교육5시간; 연도 확인 필요",
+        "location": "1-302, 1-331",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "최수경",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 식품영양학과 전임",
+            "hours": 6
+          },
+          {
+            "name": "문해담",
+            "classification": "교외",
+            "affiliationAndPosition": "국제펫푸드영양협회 대표",
+            "hours": 24
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [
+          {
+            "name": "미정",
+            "department": "식품영양학과",
+            "hours": 30
+          }
+        ],
+        "supportStatus": "미정"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 10,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 900000,
+        "totalCellAsWritten": 900000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "반려동물영양전문가2급(국제펫푸드영양협회, 제2021-004737호), 원문 발급비80,000원·응시료0원.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "교육기간 표제는2026년, 차시별 날짜는모두2025년. 연도를 조용히 변경하지 않고 확인 필요로 유지.",
+        "매일10:00~16:00는6시간이고 수업시수5시간. 휴게시간 편성 확인 필요.",
+        "강사표 이론3/실습27시간과 차시 주제별 이론·실습 분류를 맞출 필요가 있음."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P09",
+      "title": "반려동물행동교정사 3급 양성과정",
+      "academy": "로컬창업",
+      "existingCourseId": "2026-local-business-03",
+      "capacity": 16,
+      "teachingHours": 48,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 2,
+        "target": 3,
+        "qualifications": 4,
+        "schedule": 5,
+        "staff": 6,
+        "budget": 7
+      },
+      "facultyCoordinator": "박성혁",
+      "targetAsPlanned": "일반인12명·경력단절여성4명",
+      "partnerAsPlanned": "필애견엽견훈련학교",
+      "summaryFromPlan": "반려동물 행동과 심리를 이해하고 사회화·기초훈련 및 반복 실습을 통해 행동교정 관련 역량을 기르는 과정.",
+      "curriculumFromPlan": [
+        "개의 역사·견종 분류·훈련견 소개",
+        "행동·심리·사회화와 성격별 훈련",
+        "3급훈련사 시험·CD등급 과목 소개",
+        "이리와·앉아·붙어·따라·엎드려·서 훈련",
+        "사회화·켄넬·대기 및 기초 반복훈련"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-06-05",
+          "endsOn": "2026-09-18"
+        },
+        "sessionDatesAsWritten": [
+          "2026-06-05",
+          "2026-06-12",
+          "2026-06-19",
+          "2026-06-26",
+          "2026-07-03",
+          "2026-07-10",
+          "2026-07-17",
+          "2026-07-24",
+          "2026-07-31",
+          "2026-08-07",
+          "2026-08-14",
+          "2026-08-21",
+          "2026-08-28",
+          "2026-09-04",
+          "2026-09-11",
+          "2026-09-18"
+        ],
+        "teachingHoursByDate": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "summary": "금15:00~18:00, 16회 예정",
+        "location": "동부캠퍼스 1대학관114호",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "이채원",
+            "classification": "교외",
+            "affiliationAndPosition": "필애견엽견훈련학교 대표",
+            "hours": 48
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [],
+        "supportStatus": "미기재"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 48,
+        "formulaCapacity": 16,
+        "perPersonDerivedFromFormula": 144000,
+        "totalDerivedFromFormula": 2304000,
+        "totalCellAsWritten": 2304000,
+        "perPersonDerivedFromTeachingHours": 144000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "반려동물행동교정사3급((사)한국애견연맹, 2022-004084), 원문150,000원(응시50,000+발급100,000).",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "교육기간은 원문에서 '예정'으로 기재. 실제 운영·수료 실적을 뜻하지 않음.",
+        "차시표의 '3급훈련사·CD등급'과 자격표의 '반려동물행동교정사3급' 연계 및 실제 응시 조건 확인 필요."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P10",
+      "title": "산과 필라테스 자격증과정",
+      "academy": "라이프케어",
+      "existingCourseId": "2026-life-care-02",
+      "capacity": 15,
+      "teachingHours": 50,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "김원호",
+      "targetAsPlanned": "물리치료분야 종사자; 일반인10명·재직자1명·경력단절여성3명·기타1명",
+      "partnerAsPlanned": "비엔비네오필라테스; 신체기능향상협회 연계",
+      "summaryFromPlan": "산전·산후 필라테스 운동지도 프로그램의 이론과 실습을 학습하고 그룹 레슨 구성·직업윤리·종합평가를 진행하는 과정.",
+      "curriculumFromPlan": [
+        "오리엔테이션·산과적 평가 및 실습",
+        "필라테스 이해",
+        "Center/Breathing 방법",
+        "Alignment/Pre-Pilates(Mat)",
+        "산전 Pilates(Mat·equipments)",
+        "산후 Pilates(Mat·equipments)",
+        "Professional Manner(Ethics), Group Lesson Program Skill 및 종합평가"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-10-10",
+          "endsOn": "2026-12-05"
+        },
+        "sessionDatesAsWritten": [
+          "2026-10-10",
+          "2026-10-17",
+          "2026-10-24",
+          "2026-10-31",
+          "2026-11-07",
+          "2026-11-14",
+          "2026-11-21",
+          "2026-11-28",
+          "2026-12-05"
+        ],
+        "teachingHoursByDate": [
+          5,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          3
+        ],
+        "summary": "토, 첫날14:00~19:00 / 중간7일14:00~20:00 / 마지막14:00~17:00",
+        "location": "첫날2-417, 10/17·24 2-418, 이후 비엔비네오필라테스센터",
+        "modeAsWritten": "혼합: 첫 회 온라인 이론+대면 실습, 나머지 대면(비대면 시수 확인 필요)",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "김원호",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 물리치료학과 교수",
+            "hours": 5
+          },
+          {
+            "name": "김동주",
+            "classification": "교외",
+            "affiliationAndPosition": "비엔비네오필라테스센터 대표",
+            "hours": 45
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [],
+        "supportStatus": "미기재"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 50,
+        "formulaCapacity": 15,
+        "perPersonDerivedFromFormula": 150000,
+        "totalDerivedFromFormula": 2250000,
+        "totalCellAsWritten": 2225000,
+        "perPersonDerivedFromTeachingHours": 150000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "임산부필라테스지도자1급(신체기능향상협회, 2019-006473), 원문50,000원(응시20,000+발급30,000).",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "5+6×7+3=50시간으로 기존54시간 추정 차이가 해소됨. 첫날2-417을 기존 장소 목록에 보완해야 함.",
+        "p.3 비대면6시간·90% 이상 대면 실습과 p.6 첫 회 총5시간 혼합, p.7 이론12/실습38시간 사이의 운영방식 정합성 확인 필요.",
+        "p.8 수강료 산식2,250,000원과 금액란2,225,000원이25,000원 차이. 1인150,000원은 산식 기준값으로만 기록.",
+        "비앤비/비엔비 표기가 기존 현황표와 달라 기관 공식 명칭 확인 필요."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P11",
+      "title": "스포츠테이핑관리사(자격증) 양성과정",
+      "academy": "라이프케어",
+      "existingCourseId": "2026-life-care-07",
+      "capacity": 20,
+      "teachingHours": 42,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 2,
+        "target": 3,
+        "qualifications": 4,
+        "schedule": 5,
+        "staff": 6,
+        "budget": 7
+      },
+      "facultyCoordinator": "서봉한",
+      "targetAsPlanned": "일반인18명·기타2명; 주요 대상 세부 자격 미기재",
+      "partnerAsPlanned": "한국스포츠산업인력개발원㈜",
+      "summaryFromPlan": "스포츠테이핑 이론과 상지·하지·통증부위별 기초 및 심화 실습, 평가·활용방안을 편성한 과정.",
+      "curriculumFromPlan": [
+        "스포츠테이핑 이해·기초이론",
+        "상지·하지 테이핑 기초 실습",
+        "통증부위별 기초 및 심화 실습",
+        "상지·하지 테이핑 심화",
+        "실습 평가와 활용방안"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-07-04",
+          "endsOn": "2026-07-19"
+        },
+        "sessionDatesAsWritten": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-11",
+          "2026-07-12",
+          "2026-07-18",
+          "2026-07-19"
+        ],
+        "teachingHoursByDate": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "summary": "토·일09:00~17:00, 일별 교육7시간·총6일",
+        "location": "스포츠재활실습실 G-113(교육방법에는 서부캠퍼스 강의실)",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "서봉한",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 스포츠재활학부 전임",
+            "hours": 6
+          },
+          {
+            "name": "조경호",
+            "classification": "교외",
+            "affiliationAndPosition": "K-스포츠재활운동과학연구소 대표",
+            "hours": 36
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "우철호",
+            "classification": "교외",
+            "affiliationAndPosition": "한국스포츠산업인력개발원㈜ 대표",
+            "hours": 18
+          },
+          {
+            "name": "손승우",
+            "classification": "교외",
+            "affiliationAndPosition": "한국스포츠산업인력개발원㈜ 대표강사",
+            "hours": 12
+          }
+        ],
+        "supportStaff": [],
+        "supportStatus": "해당없음"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 48,
+        "formulaCapacity": 20,
+        "perPersonDerivedFromFormula": 144000,
+        "totalDerivedFromFormula": 2880000,
+        "totalCellAsWritten": 2880000,
+        "perPersonDerivedFromTeachingHours": 126000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "스포츠테이핑관리사(한국스포츠산업인력개발원㈜, 2019-000844), 원문 발급비80,000원. 응시료 '00원' 표기는 확인 필요.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "강의·강사표는42시간이나 수강료·운영비 산식은48시간. 원문 수강료 산식은1인144,000원이며42시간 기준 계산은126,000원으로 달라 확정 필요.",
+        "09:00~17:00 체류8시간 중 교육7시간으로 표기. 휴게시간 확인 필요.",
+        "시범·실습90% 이상 문구와 강사표 실습37/42시간의 산정 기준 확인 필요."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P12",
+      "title": "실버푸드전문가과정",
+      "academy": "라이프케어",
+      "existingCourseId": "2026-life-care-03",
+      "capacity": 10,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "김일낭",
+      "targetAsPlanned": "성인학습자; 일반인8명·경력단절여성2명",
+      "partnerAsPlanned": "(사)올바른식생활연구협회",
+      "summaryFromPlan": "시니어 식생활·영양·조리·식품안전 교육을 위해 노년기 영양과 고령친화식품을 학습하고 관련 요리 실습을 진행하는 과정.",
+      "curriculumFromPlan": [
+        "오리엔테이션·노년기 영양진단",
+        "노인 맞춤형 디저트",
+        "노년기 혈당·혈압, 관련 요리 실습",
+        "면역력·근육건강·정신건강과 영양관리",
+        "고령친화식품 특징·종류·실습"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-08-04",
+          "endsOn": "2026-08-18"
+        },
+        "sessionDatesAsWritten": [
+          "2026-08-04",
+          "2026-08-06",
+          "2026-08-11",
+          "2026-08-13",
+          "2026-08-18"
+        ],
+        "teachingHoursByDate": [
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "summary": "5일·10회차, 10:00~13:00 및14:00~17:00",
+        "location": "1-302, 1-331",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "김일낭",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 식품영양학과 전임",
+            "hours": 15
+          },
+          {
+            "name": "김은경",
+            "classification": "교외",
+            "affiliationAndPosition": "올바른식생활연구협회 대표",
+            "hours": 12
+          },
+          {
+            "name": "최진혁",
+            "classification": "교외",
+            "affiliationAndPosition": "너프 대표",
+            "hours": 3
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [
+          {
+            "name": "미정 1",
+            "department": "식품영양학과",
+            "hours": 20
+          },
+          {
+            "name": "미정 2",
+            "department": "식품영양학과",
+            "hours": 20
+          }
+        ],
+        "supportStatus": "미정 2명"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 10,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 900000,
+        "totalCellAsWritten": 900000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "시니어요리지도사((사)올바른식생활연구협회, 2021-004820), 원문 발급80,000원·응시0원. 본문은1급 및 시험합격 후 발급을 명시.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "자격 발급은 수료 자격과 시험합격을 전제로 하나 출석·성적 등 수료 자격의 수치는 미기재.",
+        "보조인력은 이름 미정2명, 각20시간. 실제 배정 확인 필요."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P13",
+      "title": "애견미용사 3급 양성과정",
+      "academy": "로컬창업",
+      "existingCourseId": "2026-local-business-04",
+      "capacity": 15,
+      "teachingHours": 45,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 2,
+        "target": 3,
+        "qualifications": 4,
+        "schedule": 5,
+        "staff": 6,
+        "budget": 7
+      },
+      "facultyCoordinator": "박성혁",
+      "targetAsPlanned": "일반인10명·경력단절여성5명",
+      "partnerAsPlanned": "울산퍼스트애견미용학원",
+      "summaryFromPlan": "미용 도구·기본 시저링·클리핑·위그 실습과 안전관리·고객상담을 학습하는 애견미용 입문 및 자격 대비 과정.",
+      "curriculumFromPlan": [
+        "도구 관리·용어·기초 시저링",
+        "목욕·털 자르기·위그 램 클립",
+        "기본미용·몸 클리핑·응용 스타일",
+        "안전교육·장비 점검·고객상담",
+        "품종 표준·위그 실습 및 시험 대비"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-06-05",
+          "endsOn": "2026-09-11"
+        },
+        "sessionDatesAsWritten": [
+          "2026-06-05",
+          "2026-06-12",
+          "2026-06-19",
+          "2026-06-26",
+          "2026-07-03",
+          "2026-07-10",
+          "2026-07-17",
+          "2026-07-24",
+          "2026-07-31",
+          "2026-08-07",
+          "2026-08-14",
+          "2026-08-21",
+          "2026-08-28",
+          "2026-09-04",
+          "2026-09-11"
+        ],
+        "teachingHoursByDate": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "summary": "금15:00~18:00, 15회 예정",
+        "location": "동부캠퍼스 1대학관113호",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "김선아",
+            "classification": "교외",
+            "affiliationAndPosition": "울산퍼스트애견미용학원 강사",
+            "hours": 45
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "곽나영",
+            "classification": "교외",
+            "affiliationAndPosition": "울산퍼스트애견미용학원 대표",
+            "hours": 15
+          }
+        ],
+        "supportStaff": [],
+        "supportStatus": "미기재"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 45,
+        "formulaCapacity": 15,
+        "perPersonDerivedFromFormula": 135000,
+        "totalDerivedFromFormula": 2025000,
+        "totalCellAsWritten": 2025000,
+        "perPersonDerivedFromTeachingHours": 135000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "자격표: 애견미용사3급((사)한국애견연맹, 2008-0204), 원문160,000원(응시60,000+발급100,000). 본문은 '반려견스타일리스트3급'으로 기재.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "본문의 반려견스타일리스트3급과 자격표의 애견미용사3급 명칭·자격 체계 일치 여부 확인 필요.",
+        "교육기간은 예정이며 실제 운영 여부는 별도 확인."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P14",
+      "title": "인테리어목공 전문시공인력 양성과정",
+      "academy": "팝업",
+      "existingCourseId": "2026-popup-03",
+      "capacity": 14,
+      "teachingHours": 30,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "김동욱",
+      "targetAsPlanned": "일반인10명·재직자4명",
+      "partnerAsPlanned": "노브디자인",
+      "summaryFromPlan": "인테리어 목공 작업을 위한 안전교육·현치도 작도·부재 제작과 창호를 포함한 제작 연습을 진행하는 실습 과정.",
+      "curriculumFromPlan": [
+        "장비사용 안전교육·현치도 작도",
+        "현치도 및 A·B·D·C 부재 연습",
+        "제작연습",
+        "창호 포함 제작연습"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-09-01",
+          "endsOn": "2026-09-29"
+        },
+        "sessionDatesAsWritten": [
+          "2026-09-01",
+          "2026-09-03",
+          "2026-09-08",
+          "2026-09-10",
+          "2026-09-15",
+          "2026-09-17",
+          "2026-09-22",
+          "2026-09-29"
+        ],
+        "teachingHoursByDate": [
+          3,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          3
+        ],
+        "summary": "첫날·마지막 날18:00~21:00 / 중간6일18:00~22:00; 9/24 차시 없음",
+        "location": "2대학관110호",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "한충목",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 실내건축디자인과 전임",
+            "hours": 30
+          }
+        ],
+        "assistantInstructors": [],
+        "supportStaff": [
+          {
+            "name": "김기범",
+            "department": "실내건축디자인과",
+            "hours": 30
+          }
+        ],
+        "supportStatus": "명시"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 30,
+        "formulaCapacity": 14,
+        "perPersonDerivedFromFormula": 90000,
+        "totalDerivedFromFormula": 1260000,
+        "totalCellAsWritten": 1260000,
+        "perPersonDerivedFromTeachingHours": 90000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "자격표: 건축목공기능사(한국산업인력공단), 목공지도사(한국목공교육협회, 2010-0481, 원문50,000원). 본문에는 목공기능사·목공산업기사도 언급돼 연계 자격 확정 필요.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "기존 일괄18:00~21:00와 달리 중간6일22:00 종료. 실제8일·30시간 편성.",
+        "원문 기간만으로 운영 중·이수 완료 실적을 생성하지 않음."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P15",
+      "title": "질문 소통 퍼실리테이터(2급) 양성 과정",
+      "academy": "팝업",
+      "existingCourseId": null,
+      "capacity": 20,
+      "teachingHours": 24,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 3,
+        "target": 4,
+        "qualifications": 5,
+        "schedule": 6,
+        "staff": 7,
+        "budget": 8
+      },
+      "facultyCoordinator": "현용환",
+      "targetAsPlanned": "울산 거주 지역 주민; 일반인15명·경력단절여성5명",
+      "partnerAsPlanned": "동구청; 엠토리움 더 질문 연계",
+      "summaryFromPlan": "지역사회 소통 파트너를 양성하기 위해 질문·경청·의제 분석·의사결정·갈등조율을 실습하고 토론회 스크립트와 촉진 시뮬레이션을 수행하는 과정.",
+      "curriculumFromPlan": [
+        "연결의 시작·퍼실리테이터 역할",
+        "공감적 경청",
+        "핵심 질문 디자인",
+        "아이디어 발산·브레인스토밍",
+        "지역 현안 분석·로직 트리",
+        "합의·의사결정",
+        "갈등 조율",
+        "지역 토론회 스크립트·실전 시뮬레이션"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-05-28",
+          "endsOn": "2026-07-16"
+        },
+        "sessionDatesAsWritten": [
+          "2026-05-28",
+          "2026-06-04",
+          "2026-06-11",
+          "2026-06-18",
+          "2026-06-25",
+          "2026-07-02",
+          "2026-07-09",
+          "2026-07-16"
+        ],
+        "teachingHoursByDate": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "summary": "목10:00~13:00, 8회",
+        "location": "화정가족문화센터",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "정영은",
+            "classification": "교외",
+            "affiliationAndPosition": "엠토리움 더 질문 대표",
+            "hours": 24
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "진경선",
+            "classification": "교외",
+            "affiliationAndPosition": "엠토리움 더 질문 수석강사",
+            "hours": 24
+          }
+        ],
+        "supportStaff": [],
+        "supportStatus": "미기재"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 24,
+        "formulaCapacity": 20,
+        "perPersonDerivedFromFormula": 72000,
+        "totalDerivedFromFormula": 1440000,
+        "totalCellAsWritten": 1440000,
+        "perPersonDerivedFromTeachingHours": 72000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "질문 소통 퍼실리테이터2급(엠토리움 더 질문). 등록번호 공란, 비용 '00원'은 확정된 무료로 해석하지 않음.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "기존 14개 현황표에 없는 추가 과정.",
+        "모집표 일반인15/20명인데 비율100%로 기재되어 인원·비율 정정 필요.",
+        "자격 등록번호·비용·발급 조건 미확정."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    },
+    {
+      "sourceId": "P16",
+      "title": "파크골프지도사(자격증) 양성과정",
+      "academy": "라이프케어",
+      "existingCourseId": "2026-life-care-05",
+      "capacity": 20,
+      "teachingHours": 35,
+      "sourcePages": {
+        "cover": 1,
+        "overview": 2,
+        "target": 3,
+        "qualifications": 4,
+        "schedule": 5,
+        "staff": 6,
+        "budget": 7
+      },
+      "facultyCoordinator": "서봉한",
+      "targetAsPlanned": "일반인18명·기타2명; 주요 대상 세부 자격 미기재",
+      "partnerAsPlanned": "㈜K-스포츠재활운동과학연구소",
+      "summaryFromPlan": "파크골프 장비·코스·규정·에티켓과 스윙·퍼팅·라운딩을 학습하고 안전교육·스포츠인권·실기평가를 진행하는 지도자 과정.",
+      "curriculumFromPlan": [
+        "파크골프 이해·장비·코스·에티켓·규정",
+        "그립·스탠스·기본스윙",
+        "응급처치 및 상해 관련 교육",
+        "스윙·티샷·어프로치·퍼팅",
+        "스포츠인권",
+        "라운딩·스코어 작성·실기평가"
+      ],
+      "schedule": {
+        "declaredPeriod": {
+          "startsOn": "2026-07-14",
+          "endsOn": "2026-07-24"
+        },
+        "sessionDatesAsWritten": [
+          "2026-07-14",
+          "2026-07-15",
+          "2026-07-16",
+          "2026-07-20",
+          "2026-07-21"
+        ],
+        "teachingHoursByDate": [
+          8,
+          8,
+          8,
+          6,
+          5
+        ],
+        "summary": "7/14~16 09:00~18:00(교육8시간), 7/20 10:00~12:00·14:00~18:00, 7/21 13:00~18:00",
+        "location": "G-110 스포츠재활실습실·인조축구장·지역 파크골프장",
+        "modeAsWritten": "대면",
+        "confirmed": false
+      },
+      "staff": {
+        "classificationBasis": "원문 강사현황 소속·직위 및 내부/외부 강사료 예산란. 담당교수는 운영 담당 계정과 별개.",
+        "teachers": [
+          {
+            "name": "서봉한",
+            "classification": "교내",
+            "affiliationAndPosition": "울산과학대학교 스포츠재활학부 전임",
+            "hours": 6
+          },
+          {
+            "name": "조경호",
+            "classification": "교외",
+            "affiliationAndPosition": "K-스포츠재활운동과학연구소 대표",
+            "hours": 29
+          }
+        ],
+        "assistantInstructors": [
+          {
+            "name": "우철호",
+            "classification": "교외",
+            "affiliationAndPosition": "한국스포츠산업인력개발원㈜ 대표",
+            "hours": 22
+          }
+        ],
+        "supportStaff": [],
+        "supportStatus": "해당없음"
+      },
+      "tuition": {
+        "status": "BUDGET_FORMULA_NOT_APPROVED",
+        "currency": "KRW",
+        "hourlyRate": 3000,
+        "formulaHours": 35,
+        "formulaCapacity": 20,
+        "perPersonDerivedFromFormula": 105000,
+        "totalDerivedFromFormula": 2100000,
+        "totalCellAsWritten": 2100000,
+        "perPersonDerivedFromTeachingHours": 105000,
+        "confirmedPerPerson": null,
+        "includesQualificationCosts": null
+      },
+      "qualificationInformationAsWritten": "파크골프지도사(㈜K-스포츠재활운동과학연구소, 2025-006639), 원문 발급100,000원. 국가 스포츠지도사 항목도 별도 나열되어 실제 연계 자격 확인 필요.",
+      "missingOpeningConditions": {
+        "applicationStartsAt": null,
+        "applicationEndsAt": null,
+        "selectionMethod": null,
+        "attendanceThreshold": null,
+        "passingScore": null,
+        "enrollmentPolicyVersion": null,
+        "completionPolicyVersion": null,
+        "refundPolicyVersion": null
+      },
+      "issues": [
+        "표제·현황표 종료일7/24이나 마지막 차시는7/21. 실제 종료일 확정 필요.",
+        "7/21 13:00~17:00의 시각과 강사시수는4시간이지만 괄호에3시간. 총35시간은 강사시수 기준으로 일치.",
+        "90% 이상 시범·실습 문구와 강사표 이론12/실습23시간의 산정 기준 및 실제 캠퍼스·외부 실습장 확정 필요."
+      ],
+      "approvalStatus": "PLAN_ONLY_NOT_OPENING_APPROVAL"
+    }
+  ]
+}
