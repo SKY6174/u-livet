@@ -1,15 +1,27 @@
 "use client";
 import { useActionState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { loginWithSocial } from "@/app/auth/social-actions";
 import type { LoginAudience } from "@/lib/auth/login-audience";
 import type { SocialProvider } from "@/lib/auth/social-providers";
 
 const providers = {
-  kakao: { label: "카카오", color: "bg-[#FEE500] text-black/[.85]" },
-  naver: { label: "네이버", color: "bg-[#03C75A] text-black" },
-  google: { label: "구글", color: "border border-slate-300 bg-white text-slate-900" },
+  kakao: { label: "카카오", color: "bg-[#FEE500] text-black/[.85]", icon: "kakao-login.png", width: 244, height: 60, offset: 16 },
+  naver: { label: "네이버", color: "bg-[#03A94D] text-white", icon: "naver-icon.png", width: 72, height: 72, offset: 22 },
+  google: { label: "구글", color: "border border-[#8E918F] bg-[#131314] text-[#E3E3E3]", icon: "google-icon.png", width: 48, height: 48, offset: 10 },
 };
+
+function ProviderLogo({ provider }: { provider: SocialProvider }) {
+  const { icon, width, height, offset } = providers[provider];
+  return (
+    // Show the symbol from the unmodified official asset, preserving its proportions.
+    <span aria-hidden="true" className="relative block h-7 w-7 shrink-0 overflow-hidden">
+      <Image src={`/images/auth/${icon}`} alt="" width={width} height={height} unoptimized
+        className="absolute max-w-none" style={{ left: -offset, top: -offset }} />
+    </span>
+  );
+}
 export function SocialLogin({ next, audience, options }: {
   next: string;
   audience: LoginAudience;
@@ -24,8 +36,12 @@ export function SocialLogin({ next, audience, options }: {
         <input type="hidden" name="audience" value={audience} />
         {options.map(({ id, enabled }) => (
           <button key={id} type="submit" name="provider" value={id} disabled={pending || !enabled}
-            className={`flex min-h-14 w-full items-center justify-center gap-3 rounded-xl px-5 py-4 text-lg font-semibold disabled:cursor-not-allowed ${providers[id].color}`}>
-            {providers[id].label} 로그인{!enabled && <span className="rounded bg-white/70 px-2 py-1 text-sm text-slate-700">준비 중</span>}
+            className={`flex min-h-16 w-full flex-wrap items-center justify-center gap-2 rounded-xl px-4 py-3 text-xl font-bold transition-shadow enabled:hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-700 disabled:cursor-not-allowed ${providers[id].color}`}>
+            <span className="inline-flex items-center gap-2 whitespace-nowrap text-xl font-bold">
+              <ProviderLogo provider={id} />
+              <span>{providers[id].label} 로그인</span>
+            </span>
+            {!enabled && <span className="rounded bg-white/90 px-2 py-1 text-sm font-semibold text-slate-700">준비 중</span>}
           </button>
         ))}
       </form>
