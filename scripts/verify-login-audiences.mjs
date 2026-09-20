@@ -65,5 +65,9 @@ for(const [provider,expected]of [['kakao','kakao'],['google','google'],['naver',
   const m=mock({env:{AUTH_GOOGLE_ENABLED:'true',AUTH_NAVER_ENABLED:'true'}});
   await assert.rejects(m.social.loginWithSocial({},form({provider,audience:'external'})),/REDIRECT https:\/\/db.example.invalid/);
   const call=m.calls.find(c=>typeof c==='object');check(provider+' uses fixed provider and callback',call.provider===expected && call.options.redirectTo==='https://life.example.invalid/auth/callback?next=%2Fmypage%2Finstructor');
+  if (provider === 'google') {
+    check('Google requests identity and email without profile access', call.options.queryParams.scope === 'openid email' && !call.options.scopes);
+    check('Google does not combine previously granted profile scopes', call.options.queryParams.include_granted_scopes === 'false');
+  }
 }
 console.log(`${passed} login audience and provider checks passed; no network, accounts or mail.`);
