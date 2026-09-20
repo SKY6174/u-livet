@@ -170,9 +170,18 @@ export function MfaPanel({
               </select>
             </label>
           )}
-          <label className="block font-medium" htmlFor="mfa-code">
-            인증 앱의 6자리 코드
-          </label>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+            <label className="shrink-0 font-medium" htmlFor="mfa-code">
+              인증 앱의 6자리 코드
+            </label>
+            <p
+              id="mfa-code-help"
+              className="text-sm leading-6 text-slate-600 sm:text-right"
+            >
+              인증 앱의 숫자는 일정 시간마다 바뀝니다. 현재 보이는 숫자를 입력해
+              주세요.
+            </p>
+          </div>
           <input
             id="mfa-code"
             name="code"
@@ -190,10 +199,6 @@ export function MfaPanel({
             aria-describedby="mfa-code-help"
             disabled={pending}
           />
-          <p id="mfa-code-help" className="leading-7 text-slate-600">
-            인증 앱의 숫자는 일정 시간마다 바뀝니다. 현재 보이는 숫자를 입력해
-            주세요.
-          </p>
           <button
             className="btn-primary w-full text-base"
             disabled={pending}

@@ -90,6 +90,7 @@ const { safeReturnTo } = load('src/lib/auth/session.ts', { 'next/navigation': { 
 function pageHarness(status = fresh) {
   let reads = 0;
   const page = load('src/app/auth/security/page.tsx', { 'next/link': { default: 'a' }, 'next/navigation': { redirect },
+    '@/components/common/support-contact': { SupportContact: 'aside' },
     '@/lib/auth/mfa': { getSecurityContext: async () => status ? { email: 'synthetic@example.invalid', status } : null },
     '@/lib/auth/session': { safeReturnTo }, '@/components/auth/mfa-panel': { MfaPanel: 'section' },
     '@/app/auth/actions': { signOut() {} }, '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ auth: { mfa: {
