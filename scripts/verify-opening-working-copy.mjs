@@ -19,8 +19,9 @@ const org = '10000000-0000-4000-8000-000000000001';
 const role = { role: 'COURSE_MANAGER', org_id: org };
 const identity = { roles: [role] };
 const UUID = /^[0-9a-f-]{36}$/i;
-let me = identity, calls = [], result = { data: { revision: 1, updated_at: '2026-09-21T00:00:00Z' }, error: null }, networkError = false;
+let me = identity, calls = [], revalidated = [], result = { data: { revision: 1, updated_at: '2026-09-21T00:00:00Z' }, error: null }, networkError = false;
 const dependencies = {
+  'next/cache': { revalidatePath: path => revalidated.push(path) },
   'server-only': {}, '@/lib/course-opening/working-copy': model, './working-copy': model,
   '@/lib/auth/mfa-message': { MFA_REAUTH_MESSAGE: 'MFA required' }, '@/lib/portal/data': { UUID },
   '@/lib/auth/session': { getSessionIdentity: async () => me, requireIdentity: async () => { if (!me) throw Error('LOGIN'); return me; } },
@@ -46,11 +47,13 @@ await check('one whitelisted save RPC carries blank values and no supplied perso
   const r=await save({},form({ person_id:'spoofed', title:'편집 내용' })); assert.equal(r.revision,1); assert(r.ok);
   assert.equal(calls.length,1); assert.equal(calls[0].name,'life_save_opening_working_copy');
   assert.deepEqual(calls[0].args,{ o:org,source:'P01',payload:{...blank,title:'편집 내용'},expected_revision:0 });
+  assert.deepEqual(revalidated, ['/admin/course-plan/opening']);
 });
 await check('MFA, conflict and connection failures have actionable messages', async () => {
   result={error:{message:'MFA_REAUTH_REQUIRED'}}; assert.equal((await save({},form())).message,'MFA required');
   result={error:{message:'REVISION_CHANGED'}}; assert.match((await save({},form())).message,/다른 창/);
   networkError=true; assert.match((await save({},form())).message,/입력 내용은 유지/); networkError=false;
+  assert.equal(revalidated.length, 1);
 });
 await check('loader distinguishes an empty DB from failed or malformed reads', async () => {
   result={data:null,error:null}; assert.deepEqual(await get(org,'P01'),{copy:null,unavailable:false});

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ACADEMIES, formatSourceNumber } from "@/lib/course-plan/model";
+import type { OpeningCopyOverview } from "@/lib/course-opening/working-copy-overview";
 import {
   COVERAGE_OPTIONS, filterOpeningCourses,
   type OpeningCourse, type OpeningFilters, type OpeningPlan,
@@ -117,14 +118,31 @@ function OpeningDetails({ course: c, source }: { course: OpeningCourse; source: 
   );
 }
 
-export function CourseOpeningView({ plan, filters }: { plan: OpeningPlan; filters: OpeningFilters }) {
-  const courses = filterOpeningCourses(plan.courses, filters);
+export function CourseOpeningView({ plan, filters, workingCopies = { items: [], unavailable: true } }: { plan: OpeningPlan; filters: OpeningFilters; workingCopies?: OpeningCopyOverview }) {
+  const summaries = new Map(workingCopies.items.map(copy => [copy.source_id, copy]));
+  const savedCount = plan.courses.filter(course => summaries.has(course.sourceId)).length;
+  const courses = filterOpeningCourses(plan.courses, filters).filter(course => workingCopies.unavailable || !filters.savedOnly || summaries.has(course.sourceId));
+  const retryQuery = new URLSearchParams({ q: filters.q, academy: filters.academy, affiliation: filters.affiliation, coverage: filters.coverage, ...(filters.savedOnly ? { drafts: "saved" } : {}) });
   const additional = plan.courses.filter((course) => !course.existingCourseId);
   return (
     <div className="page-shell">
       <p className="eyebrow">2026 RISE · 운영계획서 검토</p>
       <h1 className="page-title">평생직업교육과정 개설 준비</h1>
       <p className="mt-3 max-w-3xl text-slate-600">운영계획서의 교육내용·인력·일정을 확인하고, 모집 전에 확정할 조건을 검토하세요. 모든 값은 계획 기준이며 개설 승인이나 모집 공고가 아닙니다.</p>
+      <section id="draft-overview" aria-label="내 개설 준비 임시저장 현황" className="mt-6 rounded-xl border border-teal-100 bg-teal-50 p-5">
+        {workingCopies.unavailable ? <>
+          <h2 className="font-bold">임시저장 현황을 불러오지 못했습니다</h2>
+          <p className="mt-2 text-sm">원문 계획서는 계속 확인할 수 있습니다.{filters.savedOnly && " 임시저장 필터는 적용하지 않았습니다."}</p>
+          <a className="mt-3 inline-block py-2 text-sm font-semibold text-teal-800 underline" href={`${BASE_PATH}?${retryQuery}#draft-overview`}>저장 현황 다시 불러오기</a>
+        </> : <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-bold">내 임시저장 <span className="text-teal-800">{savedCount}개</span> / 전체 {plan.totals.courses}개 계획서</h2>
+            <Link className="py-2 text-sm font-semibold text-teal-800 underline" href={`${BASE_PATH}?drafts=saved#opening-results`}>내 임시저장 모두 보기</Link>
+          </div>
+          <p className="mt-2 text-sm">본인 계정에 저장한 준비 내용입니다. 실제 기수 등록·모집 공개 여부와 별도입니다.</p>
+          {savedCount === 0 && <p className="mt-2 text-sm text-slate-600">아래 과정의 등록 양식을 불러와 미정 항목을 비워둔 채 임시저장할 수 있습니다.</p>}
+        </>}
+      </section>
       <section aria-label="운영계획서 전체 합계" className="my-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[["제공된 과정", `${plan.totals.courses}개`], ["계획 정원", `${plan.totals.capacity}명`], ["계획 교육시수", `${plan.totals.teachingHours}시간`], ["근거 문서", `${plan.sourceCount}개 · ${plan.sourcePageCount}쪽`]].map(([label, value]) => (
           <div key={label} className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5">
@@ -162,9 +180,10 @@ export function CourseOpeningView({ plan, filters }: { plan: OpeningPlan; filter
         <label className="field">아카데미<select name="academy" defaultValue={filters.academy}><option value="">전체 아카데미</option>{ACADEMIES.map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
         <label className="field">강사 구분 (보조강사 포함)<select name="affiliation" defaultValue={filters.affiliation}><option value="">전체 구분</option><option value="INTERNAL">교내</option><option value="EXTERNAL">교외</option><option value="UNCONFIRMED">확인 필요</option></select></label>
         <label className="field">자료 대조<select name="coverage" defaultValue={filters.coverage}><option value="">전체 자료</option>{Object.entries(COVERAGE_OPTIONS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+        <label className="field">내 준비 내용<select name="drafts" defaultValue={filters.savedOnly ? "saved" : ""}><option value="">전체 계획서</option><option value="saved">내 임시저장만</option></select></label>
         <div className="flex items-center gap-3"><button className="btn-primary" type="submit">검색</button><Link className="min-h-11 py-3 text-sm text-slate-600 underline" href={BASE_PATH}>초기화</Link></div>
       </form>
-      <p className="mb-4 text-sm text-slate-600">검색 결과 <strong className="text-slate-900">{courses.length}개 과정</strong> / 전체 {plan.totals.courses}개</p>
+      <p id="opening-results" className="mb-4 scroll-mt-6 text-sm text-slate-600">검색 결과 <strong className="text-slate-900">{courses.length}개 과정</strong> / 전체 {plan.totals.courses}개</p>
       <div className="space-y-5">
         {courses.map((course) => <article key={course.sourceId} id={course.sourceId} className="panel scroll-mt-6">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
@@ -180,13 +199,17 @@ export function CourseOpeningView({ plan, filters }: { plan: OpeningPlan; filter
           </dl>
           {course.existingCourseId && <Link className="mt-3 inline-block py-2 text-sm text-teal-800 underline" href={`/admin/course-plan#${course.existingCourseId}`}>기존 현황표 비교</Link>}
           <div className="mt-4">
-            <Link className="btn-secondary" href={`/admin/courses?plan=${course.sourceId}#offering-draft`}>등록 양식에 불러오기<span className="sr-only"> · {course.title}</span></Link>
+            <p className="mb-3 text-sm text-slate-600">{workingCopies.unavailable ? "저장 여부 확인 불가" : summaries.has(course.sourceId) ? <>
+              <span className="mr-2 inline-block rounded bg-teal-50 px-2 py-1 font-semibold text-teal-800">내 임시저장</span>
+              최근 저장 <time dateTime={summaries.get(course.sourceId)!.updated_at}>{new Date(summaries.get(course.sourceId)!.updated_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</time> (한국시간)
+            </> : "본인이 임시저장한 준비 내용이 없습니다."}</p>
+            <Link className="btn-secondary" href={`/admin/courses?plan=${course.sourceId}#offering-draft`}>{workingCopies.unavailable ? "등록 양식 확인" : summaries.has(course.sourceId) ? "이어서 준비하기" : "등록 양식에 불러오기"}<span className="sr-only"> · {course.title}</span></Link>
             <p className="mt-2 text-sm text-slate-500">본인 계정에 임시저장한 준비 내용이 있으면 함께 불러옵니다. 미정 항목은 비워둔 채 임시저장할 수 있습니다.</p>
           </div>
           <OpeningDetails course={course} source={plan.sources.find((source) => source.id === course.sourceId)} />
         </article>)}
         {!courses.length && <section className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-          <h2 className="text-lg font-semibold">{filters.academy === "스마트테크" ? "스마트테크 운영계획서가 제공되지 않았습니다" : "조건에 맞는 과정이 없습니다"}</h2>
+          <h2 className="text-lg font-semibold">{filters.academy === "스마트테크" ? "스마트테크 운영계획서가 제공되지 않았습니다" : filters.savedOnly && !workingCopies.unavailable ? "조건에 맞는 임시저장 과정이 없습니다" : "조건에 맞는 과정이 없습니다"}</h2>
           <p className="mt-2 text-sm text-slate-600">다른 검색 조건을 선택하거나 전체 과정을 확인하세요.</p>
           <Link className="btn-secondary mt-5" href={BASE_PATH}>전체 과정 보기</Link>
         </section>}

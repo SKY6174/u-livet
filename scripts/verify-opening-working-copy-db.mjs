@@ -27,6 +27,7 @@ async function account(label, role) {
 const blank = Object.fromEntries(['year','title','academy','location','mode','selection_method','capacity','apply_from','apply_until','starts_on','ends_on','summary','curriculum'].map(k => [k, '']));
 const args = (payload = blank, revision = 0, source = 'P01', o = org) => ({ o, source, payload, expected_revision: revision });
 const get = (a, source = 'P01', o = org) => a.c.rpc('life_opening_working_copy', { o, source });
+const overview = (a, o = org) => a.c.rpc('life_opening_working_copy_summaries', { o });
 const save = (a, ...p) => a.c.rpc('life_save_opening_working_copy', args(...p));
 const denied = (r, message) => { assert(r.error); if (message) assert.equal(r.error.message, message); };
 const count = () => sql('select count(*) from public.life_offerings;');
@@ -34,6 +35,7 @@ try {
   const a = await account('manager', 'COURSE_MANAGER'), b = await account('other-manager', 'COURSE_MANAGER'), learner = await account('learner'), teacher = await account('teacher', 'INSTRUCTOR');
   const before = count();
   assert.equal(ok(await get(a)), null);
+  assert.deepEqual(ok(await overview(a)), []);
   assert.equal(ok(await save(a)).revision, 1);
   assert.deepEqual(ok(await get(a)).payload, blank);
   assert.equal(count(), before);
@@ -44,6 +46,10 @@ try {
   assert.equal(ok(await get(b)).payload.title, 'Separate author');
   assert.equal(ok(await get(a, 'P02')), null);
   for (const actor of [learner, teacher]) { denied(await get(actor), 'FORBIDDEN'); denied(await save(actor), 'FORBIDDEN'); }
+  for (const actor of [learner, teacher]) denied(await overview(actor), 'FORBIDDEN');
+  denied(await overview(a, randomUUID()), 'FORBIDDEN');
+  denied(await anon.rpc('life_opening_working_copy_summaries', { o: org }));
+  denied(await admin.rpc('life_opening_working_copy_summaries', { o: org }));
   denied(await get(a, 'P01', randomUUID()), 'FORBIDDEN');
   denied(await save(a, blank, 1, 'P01', randomUUID()), 'FORBIDDEN');
   denied(await anon.rpc('life_opening_working_copy', { o: org, source: 'P01' }));
@@ -71,6 +77,19 @@ try {
   assert.equal(audit.length, 2); assert(audit.every(r => Object.keys(r).sort().join(',') === 'revision,source_id'));
   assert.equal(count(), before);
   pass('audit contains only plan/version metadata and offering count is unchanged');
+  for (let n=2;n<=16;n++) ok(await save(a, { ...blank, curriculum:'Private draft content '.repeat(400) }, 0, `P${String(n).padStart(2,'0')}`));
+  const summaries=ok(await overview(a));
+  assert.equal(summaries.length,16);
+  assert.equal(summaries[0].revision,2);
+  assert.deepEqual(summaries.map(r=>r.source_id),Array.from({length:16},(_,i)=>`P${String(i+1).padStart(2,'0')}`));
+  assert(summaries.every(r=>Object.keys(r).sort().join(',')==='revision,source_id,updated_at'));
+  assert.equal(ok(await overview(b)).length,1);
+  assert.equal(count(),before);
+  pass('single summary RPC covers all 16 plans, isolates the author and never returns payloads');
+  const samples=[];
+  for(let i=0;i<6;i++){const start=performance.now();assert.equal(ok(await overview(a)).length,16);samples.push(Math.round((performance.now()-start)*10)/10);}
+  const warm=samples.slice(1).sort((a,b)=>a-b);
+  console.log(JSON.stringify({localOverview:{plans:16,requestsPerRead:1,bytes:Buffer.byteLength(JSON.stringify(summaries)),firstMs:samples[0],warmMedianMs:warm[2],samplesMs:samples}}));
   // Make only this local synthetic MFA session stale; keep current AAL2 for reads.
   const session = ok(await a.c.auth.getSession()).session;
   const claims = JSON.parse(Buffer.from(session.access_token.split('.')[1], 'base64url'));
@@ -80,6 +99,7 @@ try {
   pass('recent MFA is required for writing and a rejected write preserves the saved version');
   sql(`delete from public.life_role_assignments where person_id='${b.person}' and role='COURSE_MANAGER';`);
   denied(await get(b), 'FORBIDDEN'); denied(await save(b, blank, 1), 'FORBIDDEN');
+  denied(await overview(b), 'FORBIDDEN');
   pass('revoked course-management role immediately loses draft access');
 } finally { for (const c of clients) await c.auth.signOut(); }
 console.log(`${checks} local working-copy DB checks passed; no remote writes.`);

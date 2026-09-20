@@ -8,6 +8,7 @@ export const COVERAGE_OPTIONS = {
 } as const;
 export type OpeningFilters = CourseFilters & {
   coverage: keyof typeof COVERAGE_OPTIONS | "";
+  savedOnly: boolean;
 };
 
 export function normalizeOpeningFilters(params: Record<string, string | string[] | undefined>): OpeningFilters {
@@ -15,6 +16,7 @@ export function normalizeOpeningFilters(params: Record<string, string | string[]
   return {
     ...normalizeFilters(params),
     coverage: coverage === "additional" || coverage === "matched" ? coverage : "",
+    savedOnly: params.drafts === "saved",
   };
 }
 
