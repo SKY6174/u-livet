@@ -38,7 +38,7 @@ export default async function CourseOverview({
       <CourseHeader offering={o} active="overview" operator={c.operator} />
       <section className="mb-6 flex flex-wrap items-center justify-between gap-5 rounded-2xl bg-teal-900 p-6 text-white">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-teal-200">
+          <p className="text-xs font-semibold uppercase tracking-label-compact text-teal-200">
             다음 할 일
           </p>
           <h2 className="mt-2 text-xl font-bold">{next.label}</h2>

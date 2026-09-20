@@ -7,6 +7,9 @@
    ============================================================================== */
 
 :root {
+  /* Shared tracking for current and future menu/page labels. */
+  --tracking-label: 0.05em;
+  --tracking-label-compact: 0.025em;
   --font-sans:
     "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto,
     sans-serif;
@@ -46,6 +49,15 @@ body {
   }
 }
 
+@layer utilities {
+  .tracking-label {
+    letter-spacing: var(--tracking-label);
+  }
+  .tracking-label-compact {
+    letter-spacing: var(--tracking-label-compact);
+  }
+}
+
 @layer components {
   .page-shell {
     @apply mx-auto max-w-7xl px-5 py-12;
@@ -54,7 +66,7 @@ body {
     @apply mb-4 text-3xl font-bold leading-tight tracking-tight md:text-4xl;
   }
   .eyebrow {
-    @apply mb-3 text-xs font-bold uppercase tracking-widest text-teal-800;
+    @apply mb-3 text-xs font-bold uppercase tracking-label text-teal-800;
   }
   .section-title {
     @apply mb-5 text-xl font-bold;

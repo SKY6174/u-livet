@@ -107,7 +107,7 @@ export default function Terms() {
           {STEPS.map(({ title, description, icon: Icon, href, action }, index) => (
             <li key={title} className="flex flex-col p-6 lg:p-7">
               <div className="mb-5 flex items-center justify-between">
-                <span className="text-sm font-bold tracking-widest text-teal-800">
+                <span className="text-sm font-bold tracking-label text-teal-800">
                   <span className="sr-only">단계 </span>0{index + 1}
                 </span>
                 <Icon size={26} className="text-teal-700" strokeWidth={1.6} aria-hidden="true" />
