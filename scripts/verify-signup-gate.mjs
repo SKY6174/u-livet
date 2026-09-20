@@ -39,6 +39,7 @@ function actions({ enabled = false, mail = true, policy = true } = {}) {
     '@/lib/auth/session': { safeReturnTo: () => '/mypage' },
     '@/lib/auth/social': { getSignupPolicy: async () => { calls.push('policies'); return policy ? { id: POLICY } : undefined; } },
     '@/lib/auth/registration': registration,
+    '@/lib/auth/login-audience': load('src/lib/auth/login-audience.ts'),
     '@/lib/auth/abuse': { guardAuthRequest: async () => { calls.push('guard'); return { allowed: true }; }, authProviderError: () => null },
     '@/lib/auth/email-config': { authEmailEnabled: () => mail, AUTH_EMAIL_PENDING: 'MAIL_PENDING' },
     '@/lib/auth/signup-config': { publicSignupEnabled: () => enabled, PUBLIC_SIGNUP_PENDING: 'SIGNUP_CLOSED' },

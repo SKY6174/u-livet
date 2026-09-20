@@ -10,24 +10,36 @@ import { getSignupPolicy, socialDestination } from "@/lib/auth/social";
 import { publicSignupEnabled, PUBLIC_SIGNUP_PENDING } from "@/lib/auth/signup-config";
 import { MOBILE_GUIDANCE, normalizeMobilePhone, socialReturnTo } from "@/lib/auth/registration";
 import type { ActionState } from "@/lib/portal/types";
+import { loginAudience } from "@/lib/auth/login-audience";
+import { socialProvider, socialProviderEnabled } from "@/lib/auth/social-providers";
 
 export async function loginWithKakao(_: ActionState, form: FormData): Promise<ActionState> {
+  form.set("provider", "kakao");
+  return loginWithSocial(_, form);
+}
+
+export async function loginWithSocial(_: ActionState, form: FormData): Promise<ActionState> {
   if (isReviewOnly()) return { message: REVIEW_MESSAGE };
+  const provider = socialProvider(form.get("provider"));
+  const audience = loginAudience(form.get("audience")) ?? "learner";
+  if (!provider || !socialProviderEnabled(provider)) return { message: "이 간편 로그인은 준비 중입니다. 카카오 또는 이메일로 이용해 주세요." };
+  if (audience === "office" || audience === "internal") return { message: "사업단·교내 강사는 이메일과 비밀번호로 로그인해 주세요." };
   let url: string;
   try {
-    const guard = await guardAuthRequest("login", "kakao", form, "oauth");
+    const guard = await guardAuthRequest("login", provider, form, "oauth");
     if (!guard.allowed) return guard.state;
     const callback = new URL("/auth/callback", recoveryOrigin());
-    callback.searchParams.set("next", socialReturnTo(form.get("next")));
+    const next = socialReturnTo(form.get("next"));
+    callback.searchParams.set("next", audience === "external" && next === "/mypage" ? "/mypage/instructor" : next);
     const client = await createServerSupabaseClient();
     // Override the provider's default profile/photo scopes: signup collects a
     // name directly and only needs the Kakao account identity and email.
-    const result = await client.auth.signInWithOAuth({ provider: "kakao", options: { redirectTo: callback.toString(), skipBrowserRedirect: true, queryParams: { scope: "account_email" } } });
-    if (result.error || !result.data.url) return { message: "카카오 로그인에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." };
+    const result = await client.auth.signInWithOAuth({ provider: provider === "naver" ? "custom:naver" : provider, options: { redirectTo: callback.toString(), skipBrowserRedirect: true, ...(provider === "kakao" ? { queryParams: { scope: "account_email" } } : {}) } });
+    if (result.error || !result.data.url) return { message: "간편 로그인에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." };
     const destination = new URL(result.data.url);
     if (destination.origin !== new URL(getSupabaseConfig()!.url).origin || destination.pathname !== "/auth/v1/authorize") throw new Error("INVALID_OAUTH_URL");
     url = destination.toString();
-  } catch { return { message: "카카오 로그인에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." }; }
+  } catch { return { message: "간편 로그인에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." }; }
   redirect(url);
 }
 
@@ -42,7 +54,7 @@ export async function completeKakaoSignup(_: ActionState, form: FormData): Promi
   try {
     const client = await createServerSupabaseClient();
     const { data, error } = await client.auth.getUser();
-    if (error || !data.user) return { message: "카카오 로그인을 다시 진행해 주세요." };
+    if (error || !data.user) return { message: "간편 로그인을 다시 진행해 주세요." };
     const policy = await getSignupPolicy();
     if (!policy || policy.id !== form.get("privacy_policy_id") || form.get("privacy_accepted") !== "on") return { message: "현재 개인정보 수집·이용 안내를 확인하고 동의해 주세요." };
     const result = await client.rpc("life_complete_registration", { p_name: name, p_phone: phone, p_policy: policy.id, p_accepted: true });

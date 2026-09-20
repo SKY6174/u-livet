@@ -20,9 +20,9 @@ export default async function CompleteSignup({ searchParams }: { searchParams: P
     <div className="mx-auto max-w-lg px-5 py-16">
       <p className="eyebrow">U-LIFE ACCOUNT</p>
       <h1 className="page-title">가입을 마무리해 주세요</h1>
-      <p className="mb-8 text-base leading-7 text-slate-600">카카오 로그인이 완료되었습니다. 아래 정보를 입력하면 수강생으로 이용할 수 있습니다.</p>
+      <p className="mb-8 text-base leading-7 text-slate-600">간편 로그인이 완료되었습니다. 이름·휴대폰 번호와 개인정보 동의를 확인해 주세요. 신규 회원은 기본 회원으로 등록되며, 강사 업무는 사업단의 자격 확인 후 이용할 수 있습니다.</p>
       <div className="panel">
-        {policy ? <ActionForm action={completeKakaoSignup} label="동의하고 수강생 가입 완료" resetOnSuccess={false}>
+        {policy ? <ActionForm action={completeKakaoSignup} label="동의하고 가입 완료" resetOnSuccess={false}>
           <input type="hidden" name="next" value={next} />
           <label className="field text-base">이름 (필수)<input name="name" autoComplete="name" maxLength={100} required /></label>
           <PhoneField />

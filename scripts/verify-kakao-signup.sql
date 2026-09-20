@@ -54,8 +54,8 @@ begin
  perform set_config('request.jwt.claims','{}',true);
  insert into public.life_role_assignments(person_id,org_id,role) values(p,org,'INSTRUCTOR');
  perform pg_temp.jwt(u,s,'oauth');
- perform pg_temp.check_it(public.life_identity() is null,'instructor OAuth session is blocked');
- perform pg_temp.check_it(public.life_registration_status()->>'state'='EMAIL_LOGIN_REQUIRED','staff guided to email login');
+ perform pg_temp.check_it(public.life_identity() is not null,'approved external instructor OAuth session is allowed');
+ perform pg_temp.check_it(public.life_registration_status()->>'state'='COMPLETE','external instructor registration retained');
  perform set_config('request.jwt.claims','{}',true);
  delete from public.life_role_assignments where person_id=p;
  -- Email accounts still require native password policy and session freshness.

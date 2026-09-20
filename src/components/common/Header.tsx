@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useRole } from "@/lib/auth/roleContext";
 import { signOut } from "@/app/auth/actions";
+import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
 export default function Header() {
   const identity = useRole();
   const [open, setOpen] = useState(false);
@@ -24,7 +25,10 @@ export default function Header() {
   const userLabel = identity ? (
     <span className="inline-flex items-center gap-2 whitespace-nowrap">
       <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
-        {roleLabel}
+        {identity.office_position && (roleLabel === "관리자" || roleLabel === "운영자")
+          ? `사업단 · ${OFFICE_POSITIONS[identity.office_position]}`
+          : teacher && identity.instructor_kind && roleLabel === "강사"
+            ? `강사(${identity.instructor_kind === "INTERNAL" ? "교내" : "교외"})` : roleLabel}
       </span>
       <span>{identity.name} 님</span>
     </span>

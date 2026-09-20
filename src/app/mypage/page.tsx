@@ -24,6 +24,7 @@ export default async function MyPage() {
         신청부터 학습까지, 현재 상태를 한눈에 확인하세요.
       </PageIntro>
       <div className="mb-8 flex flex-wrap gap-3">
+        {me.roles.some(r => r.role === "SYSTEM_ADMIN") && <Link className="btn-secondary" href="/admin/accounts">사업단 직책·강사 구분 관리</Link>}
         <Link className="btn-secondary" href="/auth/security">
           계정 보안·추가 인증
         </Link>

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { safeReturnTo } from "@/lib/auth/session";
+import { accountDestination, audienceError, isSchoolEmail, loginAudience, type LoginContext } from "@/lib/auth/login-audience";
 import { getSignupPolicy } from "@/lib/auth/social";
 import { normalizeMobilePhone, MOBILE_GUIDANCE } from "@/lib/auth/registration";
 import type { ActionState } from "@/lib/portal/types";
@@ -23,6 +24,8 @@ export async function authenticate(
 ): Promise<ActionState> {
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
+  const audience = loginAudience(form.get("audience")) ?? "learner";
+  if (audience === "internal" && !isSchoolEmail(email)) return { message: "교내 강사는 학교 이메일(@uc.ac.kr)로 로그인해 주세요." };
   let destination = safeReturnTo(form.get("next"));
   if (
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
@@ -77,6 +80,14 @@ export async function authenticate(
           "계정 보안 상태를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.",
       };
     }
+    const context = await client.rpc("life_login_context");
+    if (context.error || !context.data) {
+      await client.auth.signOut();
+      return { message: "계정 구분을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요." };
+    }
+    const mismatch = audienceError(audience, (context.data as LoginContext).audience);
+    if (mismatch) { await client.auth.signOut(); return { message: mismatch }; }
+    destination = accountDestination(context.data as LoginContext, destination);
     if (security.data.mfa_required && !security.data.mfa_verified) {
       destination = `/auth/security?next=${encodeURIComponent(destination.startsWith("/auth") ? "/mypage" : destination)}`;
     } else if (!(await client.rpc("life_identity")).data) {
