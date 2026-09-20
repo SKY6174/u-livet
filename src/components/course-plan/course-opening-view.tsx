@@ -181,7 +181,7 @@ export function CourseOpeningView({ plan, filters }: { plan: OpeningPlan; filter
           {course.existingCourseId && <Link className="mt-3 inline-block py-2 text-sm text-teal-800 underline" href={`/admin/course-plan#${course.existingCourseId}`}>기존 현황표 비교</Link>}
           <div className="mt-4">
             <Link className="btn-secondary" href={`/admin/courses?plan=${course.sourceId}#offering-draft`}>등록 양식에 불러오기<span className="sr-only"> · {course.title}</span></Link>
-            <p className="mt-2 text-sm text-slate-500">기본정보를 편집할 수 있습니다. 모집기간·최종 일정은 등록 양식에서 확인해 입력하세요.</p>
+            <p className="mt-2 text-sm text-slate-500">본인 계정에 임시저장한 준비 내용이 있으면 함께 불러옵니다. 미정 항목은 비워둔 채 임시저장할 수 있습니다.</p>
           </div>
           <OpeningDetails course={course} source={plan.sources.find((source) => source.id === course.sourceId)} />
         </article>)}

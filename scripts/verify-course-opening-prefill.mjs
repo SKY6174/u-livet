@@ -24,6 +24,7 @@ const openingModel = load("src/lib/course-opening/model.ts", { "@/lib/course-pla
 const Link = ({ children, ...props }) => React.createElement("a", props, children);
 const createOffering = () => { throw new Error("Rendering must not save an offering"); };
 const { OfferingDraftForm } = load("src/components/course-plan/offering-draft-form.tsx", {
+  "./working-copy-form": { WorkingCopyForm: ({ children }) => React.createElement("form", {}, children) },
   "next/link": Link,
   "@/app/actions": { createOffering },
   "@/lib/course-opening/prefill": prefill,
@@ -114,6 +115,7 @@ await check("Admin route checks identity and role before loading a plan, and han
     "next/link": Link,
     "next/navigation": { notFound: () => { throw new Error("NOT_FOUND"); } },
     "@/lib/auth/session": { requireIdentity },
+    "@/lib/course-opening/working-copy-server": { getOpeningWorkingCopy: async () => ({ copy: null, unavailable: false }) },
     "@/lib/course-opening/server": { getCourseOpeningPlan: async () => { reads++; return plan; } },
     "@/lib/course-opening/prefill": prefill,
     "@/components/course-plan/offering-draft-form": { OfferingDraftForm },

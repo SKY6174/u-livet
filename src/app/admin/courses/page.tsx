@@ -8,6 +8,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { OfferingDraftForm } from "@/components/course-plan/offering-draft-form";
 import { getCourseOpeningPlan } from "@/lib/course-opening/server";
+import { getOpeningWorkingCopy } from "@/lib/course-opening/working-copy-server";
 import { findOpeningCourse } from "@/lib/course-opening/prefill";
 export default async function CourseOperations({
   searchParams,
@@ -25,12 +26,13 @@ export default async function CourseOperations({
   const orgs = me.roles
     .filter((r) => r.role === "COURSE_MANAGER")
     .map((r) => r.org_id);
-  const [{ courses, unavailable }, { data: years }] = await Promise.all([
+  const [{ courses, unavailable }, { data: years }, workingCopy] = await Promise.all([
     getCourseWorkspaces(),
     (await createServerSupabaseClient())
       .from("life_project_years")
       .select("*")
       .in("org_id", orgs),
+    plan ? getOpeningWorkingCopy(orgs[0], plan.sourceId) : Promise.resolve({ copy: null, unavailable: false }),
   ]);
   return (
     <div className="page-shell">
@@ -69,14 +71,19 @@ export default async function CourseOperations({
         <summary className="mb-5 cursor-pointer text-lg font-bold">
           새 과정 등록
         </summary>
-        <OfferingDraftForm
-          key={plan?.sourceId ?? "manual"}
+        {workingCopy.unavailable ? <section id="offering-draft" className="panel space-y-4">
+          <h2 className="font-bold">개설 준비 임시저장본을 불러오지 못했습니다</h2>
+          <p>연결 상태를 확인한 뒤 다시 불러와 주세요. 저장본 확인 후 편집할 수 있습니다.</p>
+          <a className="btn-secondary" href={`/admin/courses?plan=${plan?.sourceId}#offering-draft`}>다시 불러오기</a>
+        </section> : <OfferingDraftForm
+          key={`${orgs[0]}:${plan?.sourceId ?? "manual"}`}
           orgId={orgs[0] ?? ""}
           years={(years ?? [])
             .filter((year) => year.org_id === orgs[0])
             .map((year) => ({ id: year.id, label: year.label }))}
           plan={plan}
-        />
+          copy={workingCopy.copy}
+        />}
       </details>
     </div>
   );
