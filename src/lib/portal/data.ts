@@ -115,3 +115,24 @@ export async function getPolicies(kind?: string, id?: string | null) {
     return [];
   }
 }
+
+export async function getLatestPrivacyPolicy(): Promise<Policy | null> {
+  try {
+    const now = new Date().toISOString();
+    const { data, error } = await (await createServerSupabaseClient())
+      .from("life_policy_versions")
+      .select("id,org_id,kind,title,version,body,effective_from,effective_until")
+      .eq("kind", "ACCOUNT_PRIVACY")
+      .eq("status", "APPROVED")
+      .lte("effective_from", now)
+      .or(`effective_until.is.null,effective_until.gt.${now}`)
+      .order("effective_from", { ascending: false })
+      .order("approved_at", { ascending: false })
+      .order("id", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return error ? null : (data as Policy | null);
+  } catch {
+    return null;
+  }
+}

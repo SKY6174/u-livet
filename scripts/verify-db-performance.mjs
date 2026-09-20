@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import vm from 'node:vm';
 import ts from 'typescript';
 import { createClient } from '@supabase/supabase-js';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 // Exercise the installed Supabase query builder without touching a remote DB.
 const require = createRequire(import.meta.url);
@@ -20,6 +21,7 @@ let passed = 0;
 async function test(name, fn) { await fn(); passed++; console.log(`PASS ${name}`); }
 const requests = [];
 let fail = false;
+let privacyRows = [];
 const fixtures = ['DRAFT', 'CLOSED', 'PUBLISHED', 'PUBLISHED', 'PUBLISHED', 'PUBLISHED'].map((status, i) => ({
   id: `10000000-0000-4000-8000-${String(i).padStart(12, '0')}`, status,
   org_id: `20000000-0000-4000-8000-${String(i % 2).padStart(12, '0')}`,
@@ -33,7 +35,21 @@ const client = createClient('https://synthetic.example', 'synthetic-public-key',
     const url = new URL(input); requests.push(url);
     assert.equal(options.method, 'GET');
     if (fail) return new Response(JSON.stringify({ code: '42501', message: 'denied' }), { status: 403 });
-    if (url.pathname.endsWith('/life_policy_versions')) return new Response('[]', { status: 200 });
+    if (url.pathname.endsWith('/life_policy_versions')) {
+      const p = url.searchParams;
+      if (p.get('limit') !== '1') return new Response('[]', { status: 200 });
+      assert.equal(p.get('kind'), 'eq.ACCOUNT_PRIVACY');
+      assert.equal(p.get('status'), 'eq.APPROVED');
+      assert.equal(p.get('order'), 'effective_from.desc,approved_at.desc,id.asc');
+      assert(p.get('effective_from').startsWith('lte.'));
+      const now = p.get('effective_from').slice(4);
+      assert.equal(p.get('or'), `(effective_until.is.null,effective_until.gt.${now})`);
+      const rows = privacyRows.filter(row => row.kind === 'ACCOUNT_PRIVACY' && row.status === 'APPROVED' &&
+        row.effective_from <= now && (!row.effective_until || row.effective_until > now))
+        .sort((a, b) => b.effective_from.localeCompare(a.effective_from) ||
+          b.approved_at.localeCompare(a.approved_at) || a.id.localeCompare(b.id));
+      return new Response(JSON.stringify(rows.slice(0, 1)), { status: 200 });
+    }
     let rows = [...fixtures];
     for (const column of ['id', 'org_id']) {
       const scope = url.searchParams.get(column);
@@ -118,11 +134,42 @@ await test('missing or invalid linked policy performs no database request', asyn
   for (const id of [null, '', 'invalid']) assert.equal((await data.getPolicies(undefined, id)).length, 0);
   assert.equal(requests.length, before);
 });
+await test('privacy selects one current approved notice without hardcoded version names', async () => {
+  const date = offset => new Date(Date.now() + offset * 86400000).toISOString();
+  const current = { id: 'a', kind: 'ACCOUNT_PRIVACY', status: 'APPROVED', version: 'FUTURE-RELEASE-v12',
+    title: '개인정보처리 안내', body: '현재 승인 원문', effective_from: date(-2), effective_until: null, approved_at: date(-3) };
+  privacyRows = [
+    { ...current, id: 'draft', status: 'DRAFT', effective_from: date(-1) },
+    { ...current, id: 'future', effective_from: date(1) },
+    { ...current, id: 'expired', effective_from: date(-1), effective_until: date(-0.5) },
+    { ...current, id: 'other', kind: 'INSTRUCTOR_PRIVACY', effective_from: date(-1) },
+    { ...current, id: 'old', version: 'OLD', effective_from: date(-5) },
+    { ...current, id: 'earlier-approval', approved_at: date(-4) },
+    { ...current, id: 'b' }, current,
+  ];
+  assert.equal((await data.getLatestPrivacyPolicy()).id, current.id);
+  const Privacy = load('src/app/privacy/page.tsx', {
+    '@/lib/portal/data': data,
+    '@/components/portal/ui': { PageIntro: () => null, Empty: () => '준비 중' },
+    '@/components/common/support-contact': { SupportContact: () => null },
+  });
+  assert.equal(Privacy.dynamic, 'force-dynamic');
+  const html = renderToStaticMarkup(await Privacy.default());
+  assert.equal((html.match(/<article\b/g) ?? []).length, 1);
+  assert(html.includes(current.version));
+  assert(!html.includes('OLD'));
+  privacyRows = [];
+  assert.equal(await data.getLatestPrivacyPolicy(), null);
+  assert(renderToStaticMarkup(await Privacy.default()).includes('준비 중'));
+  fail = true;
+  try { assert.equal(await data.getLatestPrivacyPolicy(), null); } finally { fail = false; }
+});
 await test('unconfigured DB produces the existing failure state', async () => {
   const broken = load('src/lib/portal/data.ts', {
     '@/lib/supabase/server': { createServerSupabaseClient: async () => { throw new Error('NOT_CONFIGURED'); } },
   });
   assert.equal((await broken.getCourseCards()).unavailable, true);
+  assert.equal(await broken.getLatestPrivacyPolicy(), null);
 });
 
 // Barrier: sequential awaits deadlock this test; all independent reads must start.
