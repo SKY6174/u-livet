@@ -36,10 +36,10 @@ export default function Header() {
     </span>
   ) : null;
   const links = [
-    ["교육과정", "/courses"],
+    ["앵커사업 소개", "/about"],
     ["수강안내", "/terms"],
-    ["사업소개", "/about"],
-    ...(!isLoginPage ? [["나의 공간", "/mypage"]] : []),
+    ["교육과정 소개", "/courses"],
+    ...(identity && !isLoginPage ? [["나의 공간", "/mypage"]] : []),
     ...(performance ? [["연차 평가", "/performance"]] : []),
     ...(finance ? [["수납·환불", "/finance"]] : []),
     ...(teacher ? [["강사 공간", "/instructor"]] : []),
