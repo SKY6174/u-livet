@@ -104,12 +104,13 @@ await check("All 16 review cards link to their own registration form without a w
     "next/link": Link, "@/lib/course-plan/model": oldModel, "@/lib/course-opening/model": openingModel,
   });
   const html = renderToStaticMarkup(React.createElement(CourseOpeningView, { plan, filters: openingModel.normalizeOpeningFilters({}) }));
-  for (const course of plan.courses) assert.ok(html.includes(`/admin?plan=${course.sourceId}#offering-draft`));
+  for (const course of plan.courses) assert.ok(html.includes(`/admin/courses?plan=${course.sourceId}#offering-draft`));
   assert.ok(!html.includes('method="post"'));
 });
 await check("Admin route checks identity and role before loading a plan, and handles invalid IDs", async () => {
   let reads = 0;
-  const makePage = (requireIdentity) => load("src/app/admin/page.tsx", {
+  const makePage = (requireIdentity) => load("src/app/admin/courses/page.tsx", {
+    "@/lib/auth/workspace-navigation": { courseOperationLinks: [] },
     "next/link": Link,
     "next/navigation": { notFound: () => { throw new Error("NOT_FOUND"); } },
     "@/lib/auth/session": { requireIdentity },

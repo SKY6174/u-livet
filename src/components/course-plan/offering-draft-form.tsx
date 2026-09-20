@@ -12,7 +12,7 @@ function PlanReference({ plan }: { plan: OpeningCourse }) {
       <p className="mt-3 text-sm leading-relaxed text-teal-950">계획서의 기본정보를 불러왔습니다. 아직 저장되지 않았으며 내용을 수정할 수 있습니다. 사업연도·모집기간·최종 교육일정·운영방식·선발방식을 확인해 입력하세요.</p>
       <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
         <Link className="py-2 text-teal-800 underline" href={`/admin/course-plan/opening#${plan.sourceId}`}>전체 계획서 확인</Link>
-        <Link className="py-2 text-teal-800 underline" href="/admin#offering-draft">불러오기 해제 · 직접 입력</Link>
+        <Link className="py-2 text-teal-800 underline" href="/admin/courses?create=1#offering-draft">불러오기 해제 · 직접 입력</Link>
       </div>
       <details className="mt-3 border-t border-teal-200 pt-3">
         <summary className="min-h-11 cursor-pointer py-2 font-semibold text-teal-950">원문 일정·수강료·확인 사항 보기</summary>

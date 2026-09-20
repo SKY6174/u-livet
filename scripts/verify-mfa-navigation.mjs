@@ -25,6 +25,7 @@ const panelFile = 'src/components/auth/mfa-panel.tsx';
 const routeCalls = [];
 const router = { refresh: () => routeCalls.push('refresh'), replace: path => routeCalls.push(path) };
 const codeInputFile = 'src/components/auth/mfa-code-input.tsx';
+const navigation = load('src/lib/auth/workspace-navigation.ts', { './login-audience': load('src/lib/auth/login-audience.ts', {}) });
 const { MfaCodeInput } = load(codeInputFile, {});
 const factorImports = load('src/lib/auth/mfa-factor.ts', {});
 const managementFile = 'src/components/auth/mfa-management.tsx';
@@ -270,6 +271,7 @@ for (const [label, roles, expected] of [
   const query = { select() { return this; }, eq(column, id) { assert.equal(column, 'person_id'); assert.equal(id, 'self'); return this; },
     order: async () => ({ data: [], error: null }) };
   const MyPage = load('src/app/mypage/page.tsx', {
+    '@/lib/auth/workspace-navigation': navigation,
     'next/link': { default: 'a' }, '@/lib/auth/session': { requireIdentity: async () => ({ id: 'self', name: 'Synthetic', roles: roles.map(role => ({ role })) }) },
     '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ from: () => query }) },
     '@/lib/portal/data': { getWorkspaceOfferings: async () => ({ offerings: [], unavailable: false }) },

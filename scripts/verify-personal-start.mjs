@@ -20,6 +20,7 @@ function load(file, modules) {
 }
 const registration = load('src/lib/auth/registration.ts', {});
 const audiences = load('src/lib/auth/login-audience.ts', {});
+const navigation = load('src/lib/auth/workspace-navigation.ts', { './login-audience': audiences });
 const Link = ({ children, ...props }) => React.createElement('a', props, children);
 let currentIdentity = null;
 let security = null;
@@ -35,7 +36,7 @@ const session = load('src/lib/auth/session.ts', {
 });
 const Home = load('src/app/page.tsx', {
   'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'lucide-react': icons,
-  '@/lib/auth/session': session,
+  '@/lib/auth/session': session, '@/lib/auth/workspace-navigation': navigation,
   '@/lib/portal/data': { getCourseCards: async () => { courseReads++; return { offerings: [], unavailable: false }; } },
   '@/components/portal/ui': { CourseCard: () => null, Empty: ({ title }) => React.createElement('p', null, title) },
 }).default;
@@ -60,17 +61,18 @@ security = null;
 for (const [roles, expected, hidden] of [
   [[], ['나의 강의실', '신청 현황', '수강이력·수료 현황'], ['/instructor', '/admin']],
   [['INSTRUCTOR'], ['강사 공간', '강사 이력·등록 심사'], ['/admin', '/finance']],
-  [['SYSTEM_ADMIN'], ['계정 관리'], ['/instructor', 'href="/admin"', '/finance']],
+  [['SYSTEM_ADMIN'], ['계정 관리', '사업단 관리 시작하기'], ['/instructor', '/finance']],
   [['COURSE_MANAGER'], ['과정 운영'], ['/admin/accounts', '/finance']],
-  [['FINANCE'], ['수납·환불 관리'], ['/admin/accounts', '/instructor']],
-  [['CERTIFIER'], ['증명 발급 관리'], ['/admin/accounts', '/finance']],
-  [['PERFORMANCE'], ['성과 관리'], ['/admin/accounts', '/finance']],
-  [['SYSTEM_ADMIN', 'COURSE_MANAGER', 'INSTRUCTOR'], ['계정 관리', '과정 운영', '강사 공간'], ['/finance']],
+  [['FINANCE'], ['수납·환불'], ['/admin/accounts', '/instructor']],
+  [['CERTIFIER'], ['증명 관리'], ['/admin/accounts', '/finance']],
+  [['PERFORMANCE'], ['연차 평가·성과'], ['/admin/accounts', '/finance']],
+  [['SYSTEM_ADMIN', 'COURSE_MANAGER', 'INSTRUCTOR'], ['사업단 관리 시작하기', '과정 운영', '강사 공간'], ['/finance']],
 ]) {
   currentIdentity = { id: 'synthetic', name: '검증 회원', roles: roles.map(role => ({ role, org_id: 'synthetic-org' })) };
   const html = renderToStaticMarkup(await Home());
   assert.ok(html.includes('검증 회원 님, 반갑습니다.'));
-  assert.ok(html.includes('지금의 배움이,') && html.includes('내일의 일로.'));
+  const kind = navigation.workspaceKind(currentIdentity);
+  assert.ok(html.includes(kind === 'office' ? '사업단 업무를,' : kind === 'instructor' ? '나의 강의와,' : '지금의 배움이,'));
   for (const item of expected) assert.ok(html.includes(item), item);
   for (const item of hidden) assert.ok(!html.includes(item), `unexpected ${item}`);
   pass('personal home shows only granted work links: ' + (roles.join(',') || 'learner'));

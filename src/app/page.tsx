@@ -5,36 +5,43 @@ import {
   BookOpen,
   ClipboardCheck,
   GraduationCap,
-  Settings,
-  Wallet,
-  Award,
-  BarChart3,
 } from "lucide-react";
 import { requireIdentity } from "@/lib/auth/session";
+import { hasRole, officeSections, workspaceKind } from "@/lib/auth/workspace-navigation";
 import { getCourseCards } from "@/lib/portal/data";
 import { CourseCard, Empty } from "@/components/portal/ui";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 export default async function Home() {
   const me = await requireIdentity("/");
   const { offerings: courses, unavailable } = await getCourseCards(true);
-  const hasRole = (role: string) => me.roles.some(item => item.role === role);
-  const workLinks = [
-    { role: "SYSTEM_ADMIN", href: "/admin/accounts", title: "계정 관리", description: "사업단 직책과 강사 구분 관리", icon: Settings },
-    { role: "COURSE_MANAGER", href: "/admin", title: "과정 운영", description: "교육과정과 수강 신청 관리", icon: ClipboardCheck },
-    { role: "FINANCE", href: "/finance", title: "수납·환불 관리", description: "수납과 환불 업무 확인", icon: Wallet },
-    { role: "CERTIFIER", href: "/credentials", title: "증명 발급 관리", description: "증명 신청과 발급 업무 확인", icon: Award },
-    { role: "PERFORMANCE", href: "/performance", title: "성과 관리", description: "사업 성과와 연차 보고 확인", icon: BarChart3 },
-    { role: "INSTRUCTOR", href: "/instructor", title: "강사 공간", description: "담당 과정의 학습과 평가 관리", icon: GraduationCap },
-  ].filter(item => hasRole(item.role));
-  const shortcuts = workLinks.length ? [
-    ...workLinks,
-    ...(hasRole("INSTRUCTOR") ? [{ href: "/mypage/instructor", title: "강사 이력·등록 심사", description: "나의 이력과 심사 진행 상태 확인", icon: ClipboardCheck }] : []),
-    { href: "/mypage", title: "나의 공간", description: "나의 신청 현황과 계정 정보 확인", icon: BookOpen },
-  ] : [
+  const kind = workspaceKind(me);
+  const teacherLinks = [
+    { href: "/instructor", title: "강사 공간", description: "담당 과정의 강의·출결·평가 운영", icon: GraduationCap },
+    { href: "/mypage/instructor", title: "강사 이력·등록 심사", description: "나의 이력과 심사 진행 상태 확인", icon: ClipboardCheck },
+    { href: "/instructor/records", title: "강의실적·경력증명", description: "강의실적 제출과 경력 기록 확인", icon: BookOpen },
+  ];
+  const shortcuts = kind === "office" ? [
+    ...officeSections(me).flatMap(section => section.links).slice(0, 3).map(link => ({ href: link.href, title: link.label, description: link.description, icon: ClipboardCheck })),
+    ...(hasRole(me, "INSTRUCTOR") ? [teacherLinks[0]] : []),
+    { href: "/mypage", title: "내 정보·계정 보안", description: "개인 정보와 연결된 인증 앱 관리", icon: BookOpen },
+  ] : kind === "instructor" ? teacherLinks : [
     { href: "/mypage", title: "나의 강의실", description: "학습자료와 제출할 과제 확인", icon: BookOpen },
     { href: "/mypage", title: "신청 현황", description: "접수·심사·수강 확정 상태 확인", icon: ClipboardCheck },
     { href: "/mypage/history", title: "수강이력·수료 현황", description: "나의 배움과 수료 기록 확인", icon: GraduationCap },
   ];
+  const welcome = kind === "office" ? {
+    title: "사업단 업무를,", accent: "한곳에서.",
+    description: "과정 운영부터 결과 보고·수료·증명까지 담당 업무를 확인하세요.",
+    href: "/admin", action: "사업단 관리 시작하기",
+  } : kind === "instructor" ? {
+    title: "나의 강의와,", accent: "수강생을 한눈에.",
+    description: "담당 과정의 강의자료·출결·평가와 강의실적을 관리하세요.",
+    href: "/instructor", action: "담당 과정 운영하기",
+  } : {
+    title: "지금의 배움이,", accent: "내일의 일로.",
+    description: "새로운 기술을 익히고, 다음 경력을 준비하세요. 과정 신청부터 학습까지 한곳에서 함께합니다.",
+    href: "/courses", action: "나에게 맞는 과정 찾기",
+  };
   return (
     <>
       <section className="relative overflow-hidden bg-uc-navy text-white">
@@ -49,20 +56,18 @@ export default async function Home() {
             </p>
             <p className="mb-4 break-words text-lg text-teal-100">{me.name} 님, 반갑습니다.</p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl">
-              지금의 배움이,
+              {welcome.title}
               <br />
-              <span className="text-teal-200">내일의 일로.</span>
+              <span className="text-teal-200">{welcome.accent}</span>
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-slate-200">
-              새로운 기술을 익히고, 다음 경력을 준비하세요.
-              <br />
-              과정 신청부터 학습까지 한곳에서 함께합니다.
+              {welcome.description}
             </p>
             <Link
-              href="/courses"
+              href={welcome.href}
               className="mt-8 inline-flex items-center gap-8 rounded-xl bg-white px-6 py-4 font-bold text-uc-navy"
             >
-              나에게 맞는 과정 찾기
+              {welcome.action}
               <ArrowUpRight className="h-5 w-5" />
             </Link>
           </div>
@@ -109,7 +114,7 @@ export default async function Home() {
           </Empty>
         )}
       </section>
-      <section className="mx-auto max-w-7xl px-5">
+      {kind === "learner" && <section className="mx-auto max-w-7xl px-5">
         <div className="grid gap-6 rounded-2xl bg-teal-50 p-8 md:grid-cols-3">
           {[
             [
@@ -120,7 +125,7 @@ export default async function Home() {
             [
               "02",
               "신청과 확인",
-              "모집 기준을 확인하고 나의 공간에서 접수 상태를 살펴보세요.",
+              "모집 기준을 확인하고 나의 학습에서 접수 상태를 살펴보세요.",
             ],
             [
               "03",
@@ -135,7 +140,7 @@ export default async function Home() {
             </div>
           ))}
         </div>
-      </section>
+      </section>}
     </>
   );
 }

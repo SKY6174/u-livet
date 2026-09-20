@@ -6,51 +6,21 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useRole } from "@/lib/auth/roleContext";
 import { signOut } from "@/app/auth/actions";
-import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
+import { memberLabel, primaryLinks, primaryActive } from "@/lib/auth/workspace-navigation";
 export default function Header() {
   const identity = useRole();
-  const isLoginPage = usePathname() === "/auth/login";
+  const pathname = usePathname();
+  const isLoginPage = pathname === "/auth/login";
   const [open, setOpen] = useState(false);
-  const manager = identity?.roles.some((r) => r.role === "COURSE_MANAGER");
-  const reviewer = identity?.roles.some((r) => r.role === "CERTIFIER");
-  const finance = identity?.roles.some((r) => r.role === "FINANCE");
-  const performance = identity?.roles.some((r) => r.role === "PERFORMANCE");
-  const teacher = identity?.roles.some((r) => r.role === "INSTRUCTOR");
-  // Display category only; each menu and server action keeps its own role check.
-  const roleLabel = identity?.roles.some((r) => r.role === "SYSTEM_ADMIN")
-    ? "관리자"
-    : manager || reviewer || finance || performance
-      ? "운영자"
-      : teacher
-        ? "강사"
-        : "수강생";
   const userLabel = identity ? (
     <span className="inline-flex items-center gap-2 whitespace-nowrap">
       <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
-        {identity.office_position && (roleLabel === "관리자" || roleLabel === "운영자")
-          ? `사업단 · ${OFFICE_POSITIONS[identity.office_position]}`
-          : teacher && identity.instructor_kind && roleLabel === "강사"
-            ? `강사(${identity.instructor_kind === "INTERNAL" ? "교내" : "교외"})` : roleLabel}
+        {memberLabel(identity)}
       </span>
       <span>{identity.name} 님</span>
     </span>
   ) : null;
-  const links = [
-    ["앵커사업 소개", "/about"],
-    ["수강안내", "/terms"],
-    ["교육과정 소개", "/courses"],
-    ...(identity && !isLoginPage ? [["나의 공간", "/mypage"]] : []),
-    ...(performance ? [["연차 평가", "/performance"]] : []),
-    ...(finance ? [["수납·환불", "/finance"]] : []),
-    ...(teacher ? [["강사 공간", "/instructor"]] : []),
-    ...(manager ? [["사업단 관리", "/admin"]] : []),
-    ...(manager || reviewer
-      ? [
-          ["수료 검토", "/completion"],
-          ["증명 관리", "/credentials"],
-        ]
-      : []),
-  ];
+  const links = primaryLinks(identity, isLoginPage);
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <a
@@ -82,11 +52,12 @@ export default function Header() {
           </span>
         </Link>
         <nav aria-label="주 메뉴" className="hidden flex-wrap items-center justify-center gap-x-6 gap-y-3 lg:flex">
-          {links.map(([label, href]) => (
+          {links.map(({ label, href }) => (
             <Link
               key={href}
               href={href}
-              className="whitespace-nowrap text-sm font-semibold hover:text-teal-800"
+              aria-current={primaryActive(pathname, href) ? "page" : undefined}
+              className={`whitespace-nowrap text-sm font-semibold hover:text-teal-800 ${primaryActive(pathname, href) ? "text-teal-800" : ""}`}
             >
               {label}
             </Link>
@@ -122,12 +93,13 @@ export default function Header() {
           aria-label="모바일 메뉴"
           className="grid gap-1 border-t p-4 lg:hidden"
         >
-          {links.map(([label, href]) => (
+          {links.map(({ label, href }) => (
             <Link
               onClick={() => setOpen(false)}
               key={href}
               href={href}
-              className="rounded p-3 hover:bg-slate-50"
+              aria-current={primaryActive(pathname, href) ? "page" : undefined}
+              className={`rounded p-3 hover:bg-slate-50 ${primaryActive(pathname, href) ? "font-bold text-teal-800" : ""}`}
             >
               {label}
             </Link>

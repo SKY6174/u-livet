@@ -16,11 +16,11 @@ export function CourseHeader({
   return (
     <header className="mb-8">
       <Link
-        href="/admin"
+        href={active === "reports" ? "/admin/reports" : "/admin/courses"}
         className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-teal-800"
       >
         <ArrowLeft size={16} />
-        전체 과정
+        {active === "reports" ? "전체 결과 보고" : "전체 과정"}
       </Link>
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div className="min-w-0 flex-1">
