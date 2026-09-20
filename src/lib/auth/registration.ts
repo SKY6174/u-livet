@@ -1,3 +1,15 @@
+/** Display formatting only: invalid or oversized input stays available for validation. */
+export function formatMobilePhone(value: string): string {
+  const compact = value.trim().replace(/[\s()-]/g, "");
+  const digits = compact.startsWith("+82") ? `0${compact.slice(3).replace(/^0/, "")}` : compact;
+  if (!/^\d{0,11}$/.test(digits)) return value;
+  if (digits.length <= 3) return digits;
+
+  const middleLength = digits.startsWith("010") || digits.length === 11 ? 4 : 3;
+  const middleEnd = 3 + middleLength;
+  return [digits.slice(0, 3), digits.slice(3, middleEnd), digits.slice(middleEnd)].filter(Boolean).join("-");
+}
+
 /** Normalization is formatting only: it does not verify ownership of a number. */
 export function normalizeMobilePhone(value: unknown): string | null {
   if (typeof value !== "string" || value.length > 30) return null;
