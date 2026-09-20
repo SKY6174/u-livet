@@ -51,7 +51,7 @@ export function CourseCard({ offering: o }: { offering: CourseSummary }) {
           {o.academy}
         </span>
         <span className={open ? "text-teal-800" : "text-slate-500"}>
-          {open ? "접수 중" : o.status === "DRAFT" ? "준비 중" : "일정 확인"}
+          {o.status === "ARCHIVED" ? "운영 완료" : open ? "접수 중" : o.status === "DRAFT" ? "준비 중" : "일정 확인"}
         </span>
       </div>
       <h2 className="text-xl font-bold leading-snug group-hover:text-teal-800">

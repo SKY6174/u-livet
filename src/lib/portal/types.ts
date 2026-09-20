@@ -50,6 +50,10 @@ export type WorkspaceOffering = Pick<
   Offering,
   "id" | "org_id" | "name" | "status" | "capacity" | "year_label" | "starts_on" | "ends_on"
 >;
+export type CourseIntroduction = CourseSummary & Pick<
+  Offering,
+  "curriculum" | "location" | "selection_method" | "year_label" | "completion_policy_id"
+>;
 export type Policy = {
   id: string;
   org_id: string;

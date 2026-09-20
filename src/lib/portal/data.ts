@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { CourseSummary, Offering, Policy, WorkspaceOffering } from "./types";
+import type { CourseIntroduction, CourseSummary, Offering, Policy, WorkspaceOffering } from "./types";
 export const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const modeLabel = { ONLINE: "온라인", OFFLINE: "대면", BLENDED: "혼합" };
@@ -27,10 +27,13 @@ export function dateTime(value: string | null) {
 }
 export async function getCourseCards(featured = false) {
   try {
-    let query = (await createServerSupabaseClient())
-      .from("life_catalog")
+    const db = await createServerSupabaseClient();
+    let query = (featured
+      ? db.from("life_catalog")
+      : db.rpc("life_course_introductions", {}, { get: true }))
       .select(
-        "id,name,academy,summary,mode,capacity,tuition,status,apply_from,apply_until,starts_on,ends_on",
+        // PostgREST table-returning RPC ordering needs the sort field selected.
+        "id,name,academy,summary,mode,capacity,tuition,status,apply_from,apply_until,starts_on,ends_on,created_at",
       )
       .order("created_at", { ascending: false })
       .order("id", { ascending: true });
@@ -41,6 +44,17 @@ export async function getCourseCards(featured = false) {
     return { offerings: (data ?? []) as CourseSummary[], unavailable: !!error };
   } catch {
     return { offerings: [] as CourseSummary[], unavailable: true };
+  }
+}
+export async function getCourseIntroduction(id: string) {
+  if (!UUID.test(id)) return null;
+  try {
+    const { data, error } = await (await createServerSupabaseClient())
+      .rpc("life_course_introductions", { f: id }, { get: true })
+      .maybeSingle();
+    return error ? null : (data as CourseIntroduction | null);
+  } catch {
+    return null;
   }
 }
 export async function getOfferings() {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  getOffering,
+  getCourseIntroduction,
   getPolicies,
   dateTime,
   modeLabel,
@@ -13,14 +13,14 @@ export default async function OfferingPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const params = await props.params;
-  const o = await getOffering(params.id);
+  const o = await getCourseIntroduction(params.id);
   if (!o) notFound();
   const db = await createServerSupabaseClient();
   const [policies, { data: financeData }, { data: instructorData }] =
     await Promise.all([
       getPolicies(undefined, o.completion_policy_id),
-      db.rpc("life_offering_finance", { f: o.id }),
-      db.rpc("life_public_instructors", { f: o.id }),
+      o.status === "ARCHIVED" ? { data: null } : db.rpc("life_offering_finance", { f: o.id }),
+      o.status === "ARCHIVED" ? { data: [] } : db.rpc("life_public_instructors", { f: o.id }),
     ]);
   const completion = policies.find((p) => p.id === o.completion_policy_id);
   const finance = financeData as FinanceConfig | null;
@@ -42,6 +42,9 @@ export default async function OfferingPage(props: {
       <PageIntro eyebrow={`${o.academy} · ${o.year_label}`} title={o.name}>
         {o.summary}
       </PageIntro>
+      {o.status === "ARCHIVED" && (
+        <p className="notice mb-6">운영이 완료된 과정입니다. 교육내용을 소개하며 현재 수강신청을 받지 않습니다.</p>
+      )}
       <div className="grid items-start gap-8 lg:grid-cols-[1fr_330px]">
         <div className="space-y-6">
           <section className="panel">
@@ -79,7 +82,7 @@ export default async function OfferingPage(props: {
               ["교육기간", `${o.starts_on} ~ ${o.ends_on}`],
               [
                 "접수기간",
-                `${dateTime(o.apply_from)} ~ ${dateTime(o.apply_until)}`,
+                o.status === "ARCHIVED" ? "접수 종료" : `${dateTime(o.apply_from)} ~ ${dateTime(o.apply_until)}`,
               ],
               ["운영방식", modeLabel[o.mode]],
               ["교육장소", o.location],
@@ -119,7 +122,7 @@ export default async function OfferingPage(props: {
               수강신청 안내 확인
             </Link>
           ) : (
-            <p className="notice">현재 접수 기간이 아닙니다.</p>
+            <p className="notice">{o.status === "ARCHIVED" ? "운영이 완료된 과정입니다." : "현재 접수 기간이 아닙니다."}</p>
           )}
         </aside>
       </div>

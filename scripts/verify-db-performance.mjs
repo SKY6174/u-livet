@@ -22,6 +22,7 @@ async function test(name, fn) { await fn(); passed++; console.log(`PASS ${name}`
 const requests = [];
 let fail = false;
 let privacyRows = [];
+let extraRows = [];
 const fixtures = ['DRAFT', 'CLOSED', 'PUBLISHED', 'PUBLISHED', 'PUBLISHED', 'PUBLISHED'].map((status, i) => ({
   id: `10000000-0000-4000-8000-${String(i).padStart(12, '0')}`, status,
   org_id: `20000000-0000-4000-8000-${String(i % 2).padStart(12, '0')}`,
@@ -50,7 +51,13 @@ const client = createClient('https://synthetic.example', 'synthetic-public-key',
           b.approved_at.localeCompare(a.approved_at) || a.id.localeCompare(b.id));
       return new Response(JSON.stringify(rows.slice(0, 1)), { status: 200 });
     }
-    let rows = [...fixtures];
+    let rows = [...fixtures, ...extraRows];
+    if (url.pathname.endsWith('/rpc/life_course_introductions')) {
+      rows = rows.filter(r => ['PUBLISHED', 'CLOSED'].includes(r.status) ||
+        (r.status === 'ARCHIVED' && r.public_introduction));
+      const id = url.searchParams.get('f');
+      if (id) rows = rows.filter(r => r.id === id);
+    }
     for (const column of ['id', 'org_id']) {
       const scope = url.searchParams.get(column);
       if (scope) rows = rows.filter(row => scope.slice(4, -1).split(',').includes(row[column]));
@@ -61,7 +68,7 @@ const client = createClient('https://synthetic.example', 'synthetic-public-key',
     const limit = url.searchParams.get('limit');
     if (limit) rows = rows.slice(0, Number(limit));
     const columns = url.searchParams.get('select');
-    if (columns !== '*') rows = rows.map(row => Object.fromEntries(columns.split(',').map(k => [k, row[k]])));
+    if (columns && columns !== '*') rows = rows.map(row => Object.fromEntries(columns.split(',').map(k => [k, row[k]])));
     return new Response(JSON.stringify(rows), { status: 200 });
   } },
 });
@@ -81,8 +88,30 @@ await test('home fetch returns newest three published courses without long curri
 await test('public catalog includes closed courses but excludes drafts at the DB request', async () => {
   const result = await data.getCourseCards();
   assert.equal(result.offerings.length, 5);
+  assert.equal(requests.at(-1).pathname, '/rest/v1/rpc/life_course_introductions');
+  assert(requests.at(-1).searchParams.get('select').split(',').includes('created_at'));
   assert.equal(requests.at(-1).searchParams.get('status'), 'neq.DRAFT');
   assert(result.offerings.some(r => r.status === 'CLOSED'));
+});
+await test('public archive cards and direct detail load without private catalog access', async () => {
+  const archive = { ...fixtures[0], id: '30000000-0000-4000-8000-000000000001',
+    status: 'ARCHIVED', public_introduction: true, apply_from: null, apply_until: null, tuition: null };
+  const hidden = { ...archive, id: '30000000-0000-4000-8000-000000000002', public_introduction: false };
+  const draft = { ...archive, id: '30000000-0000-4000-8000-000000000003', status: 'DRAFT' };
+  extraRows = [archive, hidden, draft];
+  try {
+    const result = await data.getCourseCards();
+    assert(result.offerings.some(r => r.id === archive.id));
+    assert(!result.offerings.some(r => [hidden.id, draft.id].includes(r.id)));
+    assert.equal((await data.getCourseIntroduction(archive.id)).id, archive.id);
+    assert.equal(await data.getCourseIntroduction(hidden.id), null);
+    assert.equal(await data.getCourseIntroduction(draft.id), null);
+    const before = requests.length;
+    assert.equal(await data.getCourseIntroduction('invalid'), null);
+    assert.equal(requests.length, before);
+    fail = true;
+    assert.equal(await data.getCourseIntroduction(archive.id), null);
+  } finally { extraRows = []; fail = false; }
 });
 await test('staff catalog retains the full record contract', async () => {
   const result = await data.getOfferings();
@@ -184,7 +213,7 @@ for (const apply of [false, true]) {
       'next/link': () => null,
       'next/navigation': { notFound: () => { throw new Error('Unexpected 404'); } },
       '@/lib/auth/session': { requireIdentity: async () => ({ id: 'synthetic' }) },
-      '@/lib/portal/data': { ...data, getOffering: async () => fixtures[2], getPolicies: () => wait([]) },
+      '@/lib/portal/data': { ...data, getOffering: async () => fixtures[2], getCourseIntroduction: async () => fixtures[2], getPolicies: () => wait([]) },
       '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: () => wait({ data: null }) }) },
       '@/components/portal/ui': { PageIntro: () => null },
       '@/components/portal/action-form': { ActionForm: () => null },
@@ -198,4 +227,25 @@ for (const apply of [false, true]) {
     } finally { clearTimeout(timer); }
   });
 }
+await test('archived card and detail show completed status without application or private RPCs', async () => {
+  const archive = { ...fixtures[0], status: 'ARCHIVED', apply_from: null, apply_until: null,
+    tuition: null, completion_policy_id: null };
+  const React = require('react');
+  const Link = ({ children, ...props }) => React.createElement('a', props, children);
+  const ui = load('src/components/portal/ui.tsx', {
+    'next/link': { default: Link }, '@/lib/portal/data': data,
+  });
+  const card = renderToStaticMarkup(React.createElement(ui.CourseCard, { offering: archive }));
+  assert(card.includes('운영 완료') && !card.includes('접수 중'));
+  const Detail = load('src/app/offerings/[id]/page.tsx', {
+    'next/link': { default: Link },
+    'next/navigation': { notFound: () => { throw new Error('Unexpected 404'); } },
+    '@/lib/portal/data': { ...data, getCourseIntroduction: async () => archive, getPolicies: async () => [] },
+    '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: () => { throw new Error('Archive queried private auxiliary data'); } }) },
+    '@/components/portal/ui': ui,
+  }).default;
+  const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: archive.id }) }));
+  assert(html.includes('운영이 완료된 과정입니다.'));
+  assert(!html.includes('/apply') && !html.includes('/reports'));
+});
 console.log(`${passed} DB performance regression checks passed.`);
