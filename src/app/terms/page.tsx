@@ -73,9 +73,7 @@ export default function Terms() {
     <div className="page-shell">
       <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="[&>div]:mb-0">
-          <PageIntro eyebrow="LEARNING GUIDE" title="수강안내">
-            <p className="text-lg">과정 선택부터 강의실 입장까지, 순서대로 함께해요.</p>
-          </PageIntro>
+          <PageIntro eyebrow="LEARNING GUIDE" title="수강안내" />
         </div>
         <div className="flex flex-wrap gap-3">
           <Link href="/courses" className="btn-primary gap-2">
@@ -90,7 +88,6 @@ export default function Terms() {
       <section aria-labelledby="preparation-title" className="mb-10 flex flex-col gap-4 rounded-2xl border border-teal-100 bg-teal-50 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 id="preparation-title" className="font-bold text-teal-900">신청 전, 다섯 가지만 확인하세요</h2>
-          <p className="mt-1 text-slate-600">각 과정의 상세 화면에서 확인할 수 있어요.</p>
         </div>
         <ul className="flex flex-wrap gap-x-5 gap-y-2 text-teal-900">
           {["교육대상", "일정", "장소", "수강료", "수료기준"].map((item) => (
