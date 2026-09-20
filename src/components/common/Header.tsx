@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useRole } from "@/lib/auth/roleContext";
@@ -8,6 +9,7 @@ import { signOut } from "@/app/auth/actions";
 import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
 export default function Header() {
   const identity = useRole();
+  const isLoginPage = usePathname() === "/auth/login";
   const [open, setOpen] = useState(false);
   const manager = identity?.roles.some((r) => r.role === "COURSE_MANAGER");
   const reviewer = identity?.roles.some((r) => r.role === "CERTIFIER");
@@ -37,7 +39,7 @@ export default function Header() {
     ["교육과정", "/courses"],
     ["수강안내", "/terms"],
     ["사업소개", "/about"],
-    ["나의 공간", "/mypage"],
+    ...(!isLoginPage ? [["나의 공간", "/mypage"]] : []),
     ...(performance ? [["연차 평가", "/performance"]] : []),
     ...(finance ? [["수납·환불", "/finance"]] : []),
     ...(teacher ? [["강사 공간", "/instructor"]] : []),
@@ -98,11 +100,11 @@ export default function Header() {
                 <button className="text-slate-600 underline">로그아웃</button>
               </form>
             </>
-          ) : (
+          ) : !isLoginPage ? (
             <Link href="/auth/login" className="btn-primary">
               로그인
             </Link>
-          )}
+          ) : null}
         </div>
         <button
           className="rounded-lg border p-2 lg:hidden"
@@ -137,7 +139,7 @@ export default function Header() {
                 <button className="p-3">로그아웃</button>
               </form>
             </>
-          ) : (
+          ) : !isLoginPage ? (
             <Link
               onClick={() => setOpen(false)}
               href="/auth/login"
@@ -145,7 +147,7 @@ export default function Header() {
             >
               로그인
             </Link>
-          )}
+          ) : null}
         </nav>
       )}
     </header>
