@@ -50,6 +50,7 @@ export default async function Instructor() {
               </p>
               <div className="mt-5 flex flex-wrap gap-4 text-teal-800">
                 <Link href={`/instructor/offerings/${o.id}`}>강의 운영 →</Link>
+                <Link href={`/instructor/offerings/${o.id}/attendance`}>출석부 생성·관리 →</Link>
                 <Link href={`/quality/${o.id}`}>과정 평가·개선 →</Link>
               </div>
             </article>

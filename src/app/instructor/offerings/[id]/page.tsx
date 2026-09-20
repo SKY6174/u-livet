@@ -64,6 +64,7 @@ export default async function Teaching(props: {
       >
         출결·시험 {"관리"} →
       </Link>
+      <Link className="btn-primary mb-6 mr-3" href={`/instructor/offerings/${o.id}/attendance`}>출석부 생성·관리 →</Link>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <section className="space-y-6">
           <div className="panel">

@@ -114,12 +114,10 @@ export default async function MyPage() {
                     </Link>
                   )}
                   {a.status === "ACCEPTED" && (
-                    <Link
-                      className="btn-primary block"
-                      href={`/learning/${a.offering_id}`}
-                    >
-                      강의실 입장 →
-                    </Link>
+                    <>
+                      <Link className="btn-primary block" href={`/learning/${a.offering_id}`}>강의실 입장 →</Link>
+                      <Link className="btn-secondary block" href={`/learning/${a.offering_id}/attendance`}>나의 출석 확인 →</Link>
+                    </>
                   )}
                   {[
                     "SUBMITTED",

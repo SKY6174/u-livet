@@ -1,13 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getOffering, dateTime } from "@/lib/portal/data";
-import type {
-  ClassSession,
-  Attendance,
-  ExamRoom,
-} from "@/lib/portal/evaluation";
+import { dateTime } from "@/lib/portal/data";
+import type { ExamRoom } from "@/lib/portal/evaluation";
+import { getAttendanceBook } from "@/lib/attendance/data";
+import { attendanceIndex, attendanceState } from "@/lib/attendance/model";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import { startQuiz, answerQuiz } from "@/app/evaluation-actions";
@@ -17,37 +13,11 @@ export default async function Evaluation({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const me = await requireIdentity(`/learning/${id}/evaluation`);
-  const o = await getOffering(id);
-  if (!o) notFound();
-  const db = await createServerSupabaseClient();
-  const enrolled = await db
-    .from("life_enrollments")
-    .select("id")
-    .eq("offering_id", id)
-    .eq("person_id", me.id)
-    .eq("status", "ACTIVE")
-    .maybeSingle();
-  if (!enrolled.data) notFound();
-  const [sessions, attendance, exams] = await Promise.all([
-    db
-      .from("life_class_sessions")
-      .select("*")
-      .eq("offering_id", id)
-      .order("starts_at"),
-    db
-      .from("life_attendance")
-      .select("*,life_class_sessions!inner(offering_id)")
-      .eq("life_class_sessions.offering_id", id)
-      .eq("person_id", me.id),
-    db.rpc("life_exam_room", { f: id }),
-  ]);
-  if ([sessions, attendance, exams].some((x) => x.error))
-    return (
-      <div className="page-shell">
-        <Empty title="학습 현황을 불러오지 못했습니다" />
-      </div>
-    );
+  const { book } = await getAttendanceBook(id, "learner");
+  if (!book) return <div className="page-shell"><Empty title="학습 현황을 불러오지 못했습니다" /></div>;
+  const exams = await (await createServerSupabaseClient()).rpc("life_exam_room", { f: id });
+  if (exams.error) return <div className="page-shell"><Empty title="시험 정보를 불러오지 못했습니다" /></div>;
+  const recorded = attendanceIndex(book.attendance);
   const room = exams.data as ExamRoom;
   return (
     <div className="page-shell">
@@ -58,17 +28,16 @@ export default async function Evaluation({
         공식 출결은 강사가 확인한 출석시간으로 기록됩니다. 시험 중에는 임시저장
         후 다시 접속할 수 있습니다.
       </PageIntro>
+      <Link className="btn-primary mb-6 mr-3" href={`/learning/${id}/attendance`}>나의 출석 요약·상세 →</Link>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <section>
           <h2 className="section-title">나의 출결</h2>
           <div className="space-y-4">
-            {!(sessions.data ?? []).length && (
+            {!book.sessions.length && (
               <Empty title="수업 일정이 준비 중입니다" />
             )}
-            {(sessions.data as ClassSession[]).map((s) => {
-              const a = (attendance.data as Attendance[]).find(
-                (a) => a.session_id === s.id,
-              );
+            {book.sessions.map((s) => {
+              const a = recorded.get(`${s.id}:${book.viewer_id}`);
               const minutes = Math.round(
                 (Date.parse(s.ends_at) - Date.parse(s.starts_at)) / 60000,
               );
@@ -88,7 +57,7 @@ export default async function Evaluation({
                       출석 인정 {a.credited_minutes} / {minutes}분 · {a.reason}
                     </p>
                   ) : (
-                    <p>출결 미기록</p>
+                    <p>{attendanceState(s, a, Date.parse(book.generated_at))}</p>
                   )}
                 </article>
               );

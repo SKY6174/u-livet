@@ -1,14 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getOffering, dateTime } from "@/lib/portal/data";
-import type {
-  ClassSession,
-  Attendance,
-  ExamRoom,
-} from "@/lib/portal/evaluation";
-import type { RosterRow } from "@/lib/portal/types";
+import { dateTime } from "@/lib/portal/data";
+import type { ExamRoom } from "@/lib/portal/evaluation";
+import { getAttendanceBook } from "@/lib/attendance/data";
+import { attendanceIndex } from "@/lib/attendance/model";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import { QuizEditor } from "@/components/portal/quiz-editor";
@@ -23,46 +18,12 @@ export default async function TeachingEvaluation({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const me = await requireIdentity("/instructor");
-  const o = await getOffering(id);
-  if (!o) notFound();
-  const db = await createServerSupabaseClient();
-  const assigned = await db
-    .from("life_offering_instructors")
-    .select("valid_until")
-    .eq("offering_id", id)
-    .eq("person_id", me.id)
-    .maybeSingle();
-  if (
-    !assigned.data ||
-    (assigned.data.valid_until &&
-      Date.parse(assigned.data.valid_until) <= Date.now())
-  )
-    notFound();
-  const exams = await db.rpc("life_exam_room", { f: id });
-  const roster = await db.rpc("life_roster", { f: id });
-  if (exams.error || roster.error) notFound();
-  const [sessions, attendance] = await Promise.all([
-    db
-      .from("life_class_sessions")
-      .select("*")
-      .eq("offering_id", id)
-      .order("starts_at"),
-    db
-      .from("life_attendance")
-      .select("*,life_class_sessions!inner(offering_id)")
-      .eq("life_class_sessions.offering_id", id),
-  ]);
-  if (sessions.error || attendance.error)
-    return (
-      <div className="page-shell">
-        <Empty title="출결 정보를 불러오지 못했습니다" />
-      </div>
-    );
-  const classes = sessions.data as ClassSession[];
-  const members = (roster.data as RosterRow[]).filter(
-    (r) => r.status === "ACCEPTED",
-  );
+  const { book } = await getAttendanceBook(id, "instructor");
+  if (!book) return <div className="page-shell"><Empty title="출결 정보를 불러오지 못했습니다" /></div>;
+  const exams = await (await createServerSupabaseClient()).rpc("life_exam_room", { f: id });
+  if (exams.error) return <div className="page-shell"><Empty title="시험 정보를 불러오지 못했습니다" /></div>;
+  const o = book.offering, classes = book.sessions, members = book.members;
+  const recorded = attendanceIndex(book.attendance);
   const room = exams.data as ExamRoom;
   return (
     <div className="page-shell">
@@ -85,6 +46,7 @@ export default async function TeachingEvaluation({
           실제 강의실적 제출 →
         </Link>
       </div>
+      <Link className="btn-primary mb-6 mr-3" href={`/instructor/offerings/${id}/attendance`}>전체 출석부·일괄 기록 →</Link>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <section className="space-y-5">
           <h2 className="section-title">수업 일정과 출결</h2>
@@ -151,10 +113,7 @@ export default async function TeachingEvaluation({
                       </p>
                     )}
                     {members.map((m) => {
-                      const a = (attendance.data as Attendance[]).find(
-                        (a) =>
-                          a.session_id === s.id && a.person_id === m.person_id,
-                      );
+                      const a = recorded.get(`${s.id}:${m.person_id}`);
                       return (
                         <div key={m.person_id} className="border-t pt-4">
                           <h4 className="mb-3 font-semibold">
@@ -164,7 +123,7 @@ export default async function TeachingEvaluation({
                           <ActionForm
                             action={recordAttendance}
                             label={a ? "출결 정정" : "출결 저장"}
-                            disabled={!ended}
+                            disabled={!ended || m.person_id === book.viewer_id}
                           >
                             <input type="hidden" name="session" value={s.id} />
                             <input

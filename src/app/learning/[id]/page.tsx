@@ -60,6 +60,7 @@ export default async function Classroom(props: {
       >
         출결·시험 {"확인"} →
       </Link>
+      <Link className="btn-primary mb-6 mr-3" href={`/learning/${o.id}/attendance`}>나의 출석 확인 →</Link>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <section>
           <h2 className="section-title">학습자료</h2>
