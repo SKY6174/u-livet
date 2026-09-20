@@ -30,7 +30,7 @@ export async function loginWithSocial(_: ActionState, form: FormData): Promise<A
     if (!guard.allowed) return guard.state;
     const callback = new URL("/auth/callback", recoveryOrigin());
     const next = socialReturnTo(form.get("next"));
-    callback.searchParams.set("next", audience === "external" && next === "/mypage" ? "/mypage/instructor" : next);
+    callback.searchParams.set("next", next);
     const client = await createServerSupabaseClient();
     // Supabase adds options.scopes to its defaults. Replace the provider scope
     // instead: signup collects a name directly and does not need profile photos.

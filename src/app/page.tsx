@@ -5,12 +5,36 @@ import {
   BookOpen,
   ClipboardCheck,
   GraduationCap,
+  Settings,
+  Wallet,
+  Award,
+  BarChart3,
 } from "lucide-react";
+import { requireIdentity } from "@/lib/auth/session";
 import { getCourseCards } from "@/lib/portal/data";
 import { CourseCard, Empty } from "@/components/portal/ui";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 export default async function Home() {
+  const me = await requireIdentity("/");
   const { offerings: courses, unavailable } = await getCourseCards(true);
+  const hasRole = (role: string) => me.roles.some(item => item.role === role);
+  const workLinks = [
+    { role: "SYSTEM_ADMIN", href: "/admin/accounts", title: "계정 관리", description: "사업단 직책과 강사 구분 관리", icon: Settings },
+    { role: "COURSE_MANAGER", href: "/admin", title: "과정 운영", description: "교육과정과 수강 신청 관리", icon: ClipboardCheck },
+    { role: "FINANCE", href: "/finance", title: "수납·환불 관리", description: "수납과 환불 업무 확인", icon: Wallet },
+    { role: "CERTIFIER", href: "/credentials", title: "증명 발급 관리", description: "증명 신청과 발급 업무 확인", icon: Award },
+    { role: "PERFORMANCE", href: "/performance", title: "성과 관리", description: "사업 성과와 연차 보고 확인", icon: BarChart3 },
+    { role: "INSTRUCTOR", href: "/instructor", title: "강사 공간", description: "담당 과정의 학습과 평가 관리", icon: GraduationCap },
+  ].filter(item => hasRole(item.role));
+  const shortcuts = workLinks.length ? [
+    ...workLinks,
+    ...(hasRole("INSTRUCTOR") ? [{ href: "/mypage/instructor", title: "강사 이력·등록 심사", description: "나의 이력과 심사 진행 상태 확인", icon: ClipboardCheck }] : []),
+    { href: "/mypage", title: "나의 공간", description: "나의 신청 현황과 계정 정보 확인", icon: BookOpen },
+  ] : [
+    { href: "/mypage", title: "나의 강의실", description: "학습자료와 제출할 과제 확인", icon: BookOpen },
+    { href: "/mypage", title: "신청 현황", description: "접수·심사·수강 확정 상태 확인", icon: ClipboardCheck },
+    { href: "/mypage/history", title: "수강이력·수료 현황", description: "나의 배움과 수료 기록 확인", icon: GraduationCap },
+  ];
   return (
     <>
       <section className="relative overflow-hidden bg-uc-navy text-white">
@@ -23,6 +47,7 @@ export default async function Home() {
             <p className="mb-6 text-sm font-semibold tracking-widest text-teal-200">
               U-LIFE · LIFELONG LEARNING
             </p>
+            <p className="mb-4 break-words text-lg text-teal-100">{me.name} 님, 반갑습니다.</p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl">
               지금의 배움이,
               <br />
@@ -42,45 +67,17 @@ export default async function Home() {
             </Link>
           </div>
           <div className="self-center space-y-3">
-            <Link
-              href="/mypage"
-              className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6"
-            >
-              <BookOpen className="h-7 w-7 text-teal-200" />
-              <div>
-                <strong className="block text-lg">나의 강의실</strong>
-                <span className="text-sm text-slate-200">
-                  학습자료와 제출할 과제 확인
-                </span>
-              </div>
-              <span className="ml-auto">→</span>
-            </Link>
-            <Link
-              href="/mypage"
-              className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6"
-            >
-              <ClipboardCheck className="h-7 w-7 text-teal-200" />
-              <div>
-                <strong className="block text-lg">신청 현황</strong>
-                <span className="text-sm text-slate-200">
-                  접수·심사·수강 확정 상태 확인
-                </span>
-              </div>
-              <span className="ml-auto">→</span>
-            </Link>
-            <Link
-              href="/instructor"
-              className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6"
-            >
-              <GraduationCap className="h-7 w-7 text-teal-200" />
-              <div>
-                <strong className="block text-lg">강사 공간</strong>
-                <span className="text-sm text-slate-200">
-                  담당 과정의 학습과 평가 관리
-                </span>
-              </div>
-              <span className="ml-auto">→</span>
-            </Link>
+            {shortcuts.map(({ href, title, description, icon: Icon }) => (
+              <Link key={title} href={href}
+                className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-200">
+                <Icon className="h-7 w-7 shrink-0 text-teal-200" aria-hidden="true" />
+                <div>
+                  <strong className="block text-lg">{title}</strong>
+                  <span className="text-sm text-slate-200">{description}</span>
+                </div>
+                <span className="ml-auto" aria-hidden="true">→</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

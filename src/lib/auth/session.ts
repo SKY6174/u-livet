@@ -41,6 +41,6 @@ export function safeReturnTo(value: unknown): string {
     typeof value !== "string" ||
     !/^\/(?!\/)[a-zA-Z0-9/_?=&%.-]*$/.test(value)
   )
-    return "/mypage";
+    return "/";
   return value;
 }

@@ -27,14 +27,3 @@ export function audienceError(requested: LoginAudience, actual: LoginAudience) {
   if (requested === "external" && (actual === "office" || actual === "internal")) return "사업단·교내 강사는 해당 로그인 화면에서 학교 또는 등록 이메일로 이용해 주세요.";
   return null;
 }
-export function accountDestination(context: LoginContext, next: string) {
-  if (next !== "/mypage") return next;
-  if (context.audience === "office") {
-    if (context.roles.includes("COURSE_MANAGER")) return "/admin";
-    if (context.roles.includes("SYSTEM_ADMIN")) return "/admin/accounts";
-    if (context.roles.includes("FINANCE")) return "/finance";
-    if (context.roles.includes("CERTIFIER")) return "/credentials";
-    if (context.roles.includes("PERFORMANCE")) return "/performance";
-  }
-  return context.audience === "internal" || context.audience === "external" ? "/instructor" : next;
-}

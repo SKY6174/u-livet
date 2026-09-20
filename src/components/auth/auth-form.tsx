@@ -16,7 +16,7 @@ import {
 } from "@/lib/auth/signup-config";
 export function AuthForm({
   signup = false,
-  next = "/mypage",
+  next = "/",
   policy,
   audience = "learner",
 }: {

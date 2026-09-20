@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { safeReturnTo } from "@/lib/auth/session";
-import { accountDestination, audienceError, isSchoolEmail, loginAudience, type LoginContext } from "@/lib/auth/login-audience";
+import { audienceError, isSchoolEmail, loginAudience, type LoginContext } from "@/lib/auth/login-audience";
 import { getSignupPolicy } from "@/lib/auth/social";
 import { normalizeMobilePhone, MOBILE_GUIDANCE } from "@/lib/auth/registration";
 import type { ActionState } from "@/lib/portal/types";
@@ -87,9 +87,8 @@ export async function authenticate(
     }
     const mismatch = audienceError(audience, (context.data as LoginContext).audience);
     if (mismatch) { await client.auth.signOut(); return { message: mismatch }; }
-    destination = accountDestination(context.data as LoginContext, destination);
     if (security.data.mfa_required && !security.data.mfa_verified) {
-      destination = `/auth/security?next=${encodeURIComponent(destination.startsWith("/auth") ? "/mypage" : destination)}`;
+      destination = `/auth/security?next=${encodeURIComponent(destination.startsWith("/auth") ? "/" : destination)}`;
     } else if (!(await client.rpc("life_identity")).data) {
       await client.auth.signOut();
       return {

@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth/auth-form";
-import { safeReturnTo } from "@/lib/auth/session";
+import { getSessionIdentity, safeReturnTo } from "@/lib/auth/session";
+import { socialReturnTo } from "@/lib/auth/registration";
 import { socialLoginError } from "@/lib/auth/registration";
 import { LOGIN_AUDIENCES, loginAudience } from "@/lib/auth/login-audience";
 export default async function Login(props: {
@@ -9,6 +11,7 @@ export default async function Login(props: {
   const searchParams = await props.searchParams;
   const audience = loginAudience(searchParams.audience);
   const next = safeReturnTo(searchParams.next);
+  if (await getSessionIdentity()) redirect(socialReturnTo(next));
   return (
     <div className="mx-auto max-w-2xl px-5 py-12 sm:py-16">
       <p className="eyebrow">U-LIFE ACCOUNT</p>

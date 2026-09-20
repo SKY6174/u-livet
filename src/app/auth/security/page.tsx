@@ -17,7 +17,7 @@ export default async function SecurityPage({
   const params = await searchParams;
   const returnToWork = typeof params.next === "string" && params.next.length > 0;
   const rawNext = safeReturnTo(params.next);
-  const next = rawNext.startsWith("/auth") ? "/mypage" : rawNext;
+  const next = rawNext.startsWith("/auth") ? "/" : rawNext;
   const context = await getSecurityContext();
   if (!context)
     redirect(

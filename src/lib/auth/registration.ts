@@ -23,13 +23,13 @@ export const MOBILE_NOTICE = "현재 휴대폰 인증은 진행하지 않습니�
 export type RegistrationState = "SIGNED_OUT" | "EMAIL_LOGIN_REQUIRED" | "UNAVAILABLE" | "COMPLETE" | "CLOSED" | "PENDING";
 
 export function socialReturnTo(value: unknown): string {
-  if (typeof value !== "string" || !/^\/(?!\/)[a-zA-Z0-9/_?=&%.-]*$/.test(value)) return "/mypage";
+  if (typeof value !== "string" || !/^\/(?!\/)[a-zA-Z0-9/_?=&%.-]*$/.test(value)) return "/";
   // Decode only the path to reject encoded slash/backslash and dot-segment redirects.
   try {
     const path = decodeURIComponent(value.split("?")[0]);
-    if (path.startsWith("//") || path.includes("\\") || /[\r\n\u0000]/.test(path) || path.split("/").some(p => p === "." || p === "..") || /^\/auth(?:\/|$)/.test(path)) return "/mypage";
+    if (path.startsWith("//") || path.includes("\\") || /[\r\n\u0000]/.test(path) || path.split("/").some(p => p === "." || p === "..") || /^\/auth(?:\/|$)/.test(path)) return "/";
     return value;
-  } catch { return "/mypage"; }
+  } catch { return "/"; }
 }
 export function socialLoginError(value: unknown) {
   switch (value) {

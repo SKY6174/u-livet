@@ -97,7 +97,7 @@ function pageHarness(status = fresh) {
     } } }) } }).default;
   return { run: next => page({ searchParams: Promise.resolve({ next }) }), reads: () => reads };
 }
-for (const [next, destination] of [['/admin?view=system', '/admin?view=system'], ['https://example.invalid', '/mypage'], ['//example.invalid', '/mypage'], ['/auth/security?next=/admin', '/mypage']]) {
+for (const [next, destination] of [['/', '/'], ['/admin?view=system', '/admin?view=system'], ['https://example.invalid', '/'], ['//example.invalid', '/'], ['/auth/security?next=/admin', '/']]) {
   await test('verified return URL is normalized safely: ' + next, async () => {
     const p = pageHarness();
     await assert.rejects(p.run(next), error => error.destination === destination);

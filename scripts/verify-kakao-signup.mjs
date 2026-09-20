@@ -14,7 +14,7 @@ const audiences=load('src/lib/auth/login-audience.ts');
 const providers=load('src/lib/auth/social-providers.ts',{'server-only':{}});
 for(const n of ['010-1234-5678','01012345678','+82 10 1234 5678'])check('mobile normalized '+n,reg.normalizeMobilePhone(n)==='+821012345678');
 for(const n of [null,'','010123','0212345678','010<script>','010123456789','+1 555 1234567'])check('invalid or absent phone rejected',reg.normalizeMobilePhone(n)===null);
-for(const n of ['https://example.invalid','//example.invalid','/%2fexample.invalid','/foo/../auth/callback','/auth/security?next=/admin','/%5cexample.invalid','/%0a','/%'])check('unsafe OAuth return path rejected',reg.socialReturnTo(n)==='/mypage');
+for(const n of ['https://example.invalid','//example.invalid','/%2fexample.invalid','/foo/../auth/callback','/auth/security?next=/admin','/%5cexample.invalid','/%0a','/%'])check('unsafe OAuth return path rejected',reg.socialReturnTo(n)==='/');
 check('legitimate work path retained',reg.socialReturnTo('/courses/123/apply?view=1')==='/courses/123/apply?view=1');
 check('untrusted provider error text suppressed',reg.socialLoginError('<script>')===null);
 function mock({state='PENDING',enabled=true,guard=true,user=true,policy=true,rpcError=false,mfa=false}={}) {
@@ -39,13 +39,16 @@ function mock({state='PENDING',enabled=true,guard=true,user=true,policy=true,rpc
 function form(values={}) {const f=new FormData();for(const[k,v]of Object.entries({name:'Synthetic',phone:'010-1234-5678',privacy_policy_id:'policy-1',privacy_accepted:'on',next:'/courses',...values}))f.set(k,v);return f;}
 {
  const m=mock();await assert.rejects(m.actions.loginWithKakao({},form({next:'//evil.invalid'})),/REDIRECT https:\/\/db.example.invalid/);
- const input=m.calls.find(c=>c[0]==='oauth')[1];check('Kakao PKCE uses fixed site origin and safe return path',input.provider==='kakao' && input.options.redirectTo==='https://uc-life.example.invalid/auth/callback?next=%2Fmypage');
+ const input=m.calls.find(c=>c[0]==='oauth')[1];check('Kakao PKCE uses fixed site origin and safe return path',input.provider==='kakao' && input.options.redirectTo==='https://uc-life.example.invalid/auth/callback?next=%2F');
  check('OAuth rate limit uses separate flow',m.calls.find(c=>c[0]==='guard')[4]==='oauth');
  check('unneeded nickname and photo scopes are omitted',input.options.queryParams.scope==='account_email');
 }
 {const m=mock({guard:false});check('rate limit prevents OAuth start',(await m.actions.loginWithKakao({},form())).message==='LIMIT'&&!m.calls.some(c=>c[0]==='oauth'));}
 for(const [state,expected]of [['PENDING','/auth/complete-signup'],['EMAIL_LOGIN_REQUIRED','social_error=staff'],['CLOSED','social_error=closed'],['UNAVAILABLE','social_error=unavailable'],['COMPLETE','/courses']]){const m=mock({state});check('callback destination for '+state,(await m.social.socialDestination('/courses')).includes(expected));}
 {const m=mock({state:'COMPLETE',mfa:true});check('OAuth learner retains configured MFA',(await m.social.socialDestination('/courses')).startsWith('/auth/security?next='));}
+for (const [options, expected] of [[{state:'COMPLETE'},'/'],[{state:'COMPLETE',mfa:true},'/auth/security?next=%2F'],[{state:'PENDING'},'/auth/complete-signup?next=%2F']]) {
+ const m=mock(options);check('default OAuth destination retains signup and security gates',await m.social.socialDestination(undefined)===expected);
+}
 for(const [options,values]of [[{enabled:false},{}],[{}, {phone:''}],[{}, {privacy_accepted:''}],[{user:false},{}],[{policy:false},{}]]) {const m=mock(options);const r=await m.actions.completeKakaoSignup({},form(values));check('incomplete signup rejected before DB write',!!r.message&&!m.calls.some(c=>c[0]==='life_complete_registration'));}
 {const m=mock({rpcError:true});check('DB failure does not report successful signup',!(await m.actions.completeKakaoSignup({},form())).ok);}
 {
