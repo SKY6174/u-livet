@@ -7,3 +7,7 @@
 - 로고는 alt="" 및 aria-hidden으로 중복 낭독을 막고 실제 버튼 텍스트를 유지한다.
 - 기존 로그인 검증과 lint/typecheck, 320px/390px/desktop 렌더링 및 키보드 초점을 확인한다. 추가 DB/인증 설정은 없다.
 - 공식 출처: https://developers.google.com/identity/branding-guidelines / https://developers.kakao.com/docs/ko/kakaologin/design-guide / https://developers.naver.com/docs/login/bi/bi.md
+
+## 브라우저 탭 아이콘 (2026-09-20)
+- 기존 울산과학대학교 PNG를 사이트 메타데이터의 icon으로 지정한다. 브라우저의 기본 `/favicon.ico` 요청도 동일한 PNG로 내부 rewrite하여 404를 방지한다.
+- 원본 로고 파일은 수정하지 않는다. 실제 배포에서 아이콘의 HTTP 200·image/png 응답과 로그인 페이지의 icon 링크를 확인한다.

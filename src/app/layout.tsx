@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "U-LIFE | 앵커사업 평생직업교육",
   description:
     "교육과정 신청부터 학습과 경력까지, 울산과학대학교 앵커사업 평생직업교육.",
+  icons: {
+    icon: { url: "/images/ulsan-college-logo.png", type: "image/png" },
+  },
 };
 export const dynamic = "force-dynamic";
 export default async function RootLayout({

@@ -9,6 +9,14 @@
 // ==============================================================================
 
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: "/favicon.ico",
+        destination: "/images/ulsan-college-logo.png",
+      },
+    ];
+  },
   // 서버 PDF 생성에서 사용하는 한글 글꼴을 배포 산출물에 포함한다.
   outputFileTracingIncludes: {
     "/*": ["./assets/fonts/NanumGothic-Regular.ttf"],
