@@ -82,7 +82,7 @@ await check("Prefilled form is editable while all seven undecided required value
       assert.ok(!input(html, name).includes("value="), name);
     }
     for (const name of ["fee", "tuition", "instructor", "sourceId"]) assert.equal(input(html, name), "");
-    assert.ok(html.includes("아직 저장되지 않았으며"));
+    assert.ok(html.includes("계획서의 기본정보를 불러왔습니다"));
     assert.ok(html.includes(`/admin/course-plan/opening#${course.sourceId}`));
     assert.ok(html.includes("기수 초안은 무료로 등록됩니다"));
   }

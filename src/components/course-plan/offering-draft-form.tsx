@@ -11,7 +11,7 @@ function PlanReference({ plan, restored }: { plan: OpeningCourse; restored: bool
   return (
     <section aria-label="불러온 운영계획서" className="mb-6 rounded-xl border border-teal-200 bg-teal-50 p-5">
       <h2 className="break-words text-lg font-bold text-teal-950">{plan.sourceId} · {plan.title}</h2>
-      <p className="mt-3 text-sm leading-relaxed text-teal-950">{restored ? "본인이 임시저장한 입력을 불러왔습니다. 실제 기수로 등록되기 전이며 내용을 수정할 수 있습니다." : "계획서의 기본정보를 불러왔습니다. 아직 저장되지 않았으며 내용을 수정할 수 있습니다."} 사업연도·모집기간·최종 교육일정·운영방식·선발방식을 확인해 입력하세요.</p>
+      <p className="mt-3 text-sm leading-relaxed text-teal-950">{restored ? "본인이 임시저장한 입력을 불러왔습니다. 내용을 확인하고 수정하세요." : "계획서의 기본정보를 불러왔습니다. 내용을 확인하고 수정하세요."} 사업연도·모집기간·최종 교육일정·운영방식·선발방식을 확인해 입력하세요.</p>
       <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
         <Link className="py-2 text-teal-800 underline" href={`/admin/course-plan/opening#${plan.sourceId}`}>전체 계획서 확인</Link>
         <Link className="py-2 text-teal-800 underline" href="/admin/courses?create=1#offering-draft">불러오기 해제 · 직접 입력</Link>
