@@ -10,4 +10,6 @@ Supabase의 기존 자료를 읽는 집계 RPC를 추가했다. 상태를 별도
 
 기존 3개 보관 과정은 그대로 유지했다. [과정 관리](https://uc-life.org/admin)에서 송경영 관리자의 운영진 권한으로 검토할 수 있다.
 
+[PR #10](https://github.com/SKY6174/uc-life/pull/10) 병합과 운영 배포를 완료했다. 운영 revision은 `572615094fe5adef5ad6d54a72e051dd759120c0`이며 API version·health 및 비로그인 접근 경계를 확인했다. 다음은 운영진이 실제 과정에서 준비 현황과 출력 구성을 검토하는 단계다.
+
 [설계](../../02-design/features/anchor-course-workspace.design.md) · [검증](../../03-analysis/anchor-course-workspace.analysis.md)
