@@ -62,16 +62,9 @@ export function AuthForm({
       </div>
     );
   }
-  return (
-    <div className="[&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
-      {!reviewOnly && (audience === "learner" || audience === "external") && <SocialLogin next={next} audience={audience} options={socialProviderOptions()} />}
-      {audience === "internal" && <div className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">
-        <p className="font-semibold">학교 이메일(@uc.ac.kr)로 이용해 주세요.</p>
-        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LIFE 전용 비밀번호가 필요합니다. 처음 이용하시면 사업단의 교내 강사 등록·초대 후, 이메일의 안내에 따라 비밀번호를 설정해 주세요.</p>
-        <Link href="/auth/forgot-password" className="mt-3 flex min-h-11 items-center font-semibold underline">초대받은 계정의 비밀번호 설정·재설정</Link>
-        <p className="mt-2 text-sm">계정 등록 문의: 앵커사업단 052-230-0410</p>
-      </div>}
-      {audience === "office" && <p className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">등록된 사업단 이메일로 로그인하세요. 단장·센터장·연구원 직책과 업무 권한은 로그인 후 계정 정보에 따라 자동으로 표시됩니다.</p>}
+  const showSocialLogin = !reviewOnly && (audience === "learner" || audience === "external");
+  const collapsibleEmail = showSocialLogin && !signup;
+  const emailForm = (
       <ActionForm
         action={signup ? register : authenticate}
         label={signup ? "가입 신청" : "로그인"}
@@ -156,6 +149,19 @@ export function AuthForm({
           {signup ? "로그인으로 이동" : "처음이신가요? 회원가입"}
         </Link>}
       </ActionForm>
+  );
+  return (
+    <div className="[&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
+      {showSocialLogin && <SocialLogin next={next} audience={audience} options={socialProviderOptions()}
+        emailForm={collapsibleEmail ? emailForm : undefined} />}
+      {audience === "internal" && <div className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">
+        <p className="font-semibold">학교 이메일(@uc.ac.kr)로 이용해 주세요.</p>
+        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LIFE 전용 비밀번호가 필요합니다. 처음 이용하시면 사업단의 교내 강사 등록·초대 후, 이메일의 안내에 따라 비밀번호를 설정해 주세요.</p>
+        <Link href="/auth/forgot-password" className="mt-3 flex min-h-11 items-center font-semibold underline">초대받은 계정의 비밀번호 설정·재설정</Link>
+        <p className="mt-2 text-sm">계정 등록 문의: 앵커사업단 052-230-0410</p>
+      </div>}
+      {audience === "office" && <p className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">등록된 사업단 이메일로 로그인하세요. 단장·센터장·연구원 직책과 업무 권한은 로그인 후 계정 정보에 따라 자동으로 표시됩니다.</p>}
+      {!collapsibleEmail && emailForm}
     </div>
   );
 }
