@@ -80,12 +80,10 @@ export default function About() {
         </div>
         <div className="grid gap-6 md:grid-cols-2">
           {PROJECTS.map((project, index) => (
-            <article key={project.id} id={project.id} aria-labelledby={`${project.id}-title`} className="flex scroll-mt-40 flex-col overflow-hidden rounded-2xl bg-[#0b162b] text-white">
-              <div className="relative">
-                <Image src={`/images/anchor/${project.id}.jpg`} alt={project.imageAlt} width={850} height={540} sizes="(min-width: 1280px) 608px, (min-width: 768px) 48vw, 100vw" className="h-auto w-full" />
-                <span className="absolute left-5 top-5 rounded-full bg-slate-950/85 px-3 py-1.5 text-sm font-semibold text-white">0{index + 1} · {project.theme}</span>
-              </div>
-              <div className="flex flex-1 flex-col border-t-4 p-6 sm:p-8" style={{ borderColor: project.color }}>
+            <article key={project.id} id={project.id} aria-labelledby={`${project.id}-title`} className="relative isolate flex min-h-[28rem] scroll-mt-40 flex-col gap-8 overflow-hidden rounded-2xl bg-[#0b162b] text-white">
+              <Image src={`/images/anchor/${project.id}.jpg`} alt={project.imageAlt} fill sizes="(min-width: 1280px) 608px, (min-width: 768px) 48vw, 100vw" className="object-cover" />
+              <span className="relative m-5 self-start rounded-full bg-slate-950/85 px-3 py-1.5 text-sm font-semibold text-white">0{index + 1} · {project.theme}</span>
+              <div className="relative mt-auto flex flex-col border-t-4 bg-[#0b162b]/70 p-5 sm:p-6" style={{ borderColor: project.color }}>
                 <h3 id={`${project.id}-title`} className="text-2xl font-bold tracking-tight sm:text-3xl">
                   <span className="font-normal text-slate-200">Dynamic </span><span style={{ color: project.color }}>{project.name}</span>
                 </h3>
