@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SupportContact } from "./support-contact";
 import anchorFooterLogo from "../../../public/images/anchor-footer-white.png";
 
 const FOOTER_LINK_CLASS =
@@ -38,6 +39,9 @@ export default function Footer() {
           <Link className={FOOTER_LINK_CLASS} href="/terms">수강안내</Link>
           <Link className={FOOTER_LINK_CLASS} href="/verify">증명서 진위확인</Link>
         </nav>
+      </div>
+      <div className="mx-auto max-w-7xl border-t border-white/20 px-5 py-5">
+        <SupportContact className="text-teal-50 [&_a:focus-visible]:outline-white" />
       </div>
     </footer>
   );

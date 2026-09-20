@@ -1,10 +1,13 @@
 import { getPolicies } from "@/lib/portal/data";
 import { Empty, PageIntro } from "@/components/portal/ui";
+import { SupportContact } from "@/components/common/support-contact";
+import { currentContactPolicies } from "@/lib/portal/contact-policy-versions";
 export default async function Privacy() {
-  const policies = await getPolicies("ACCOUNT_PRIVACY");
+  const policies = currentContactPolicies(await getPolicies("ACCOUNT_PRIVACY"));
   return (
     <div className="mx-auto max-w-4xl px-5 py-12">
       <PageIntro eyebrow="PRIVACY" title="개인정보처리 안내" />
+      <SupportContact className="mb-6 rounded-xl bg-teal-50 p-5 text-teal-900" />
       {policies.length ? (
         policies.map((p) => (
           <article key={p.id} className="panel mb-5">

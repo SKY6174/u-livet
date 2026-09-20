@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SupportContact } from "@/components/common/support-contact";
 import { redirect } from "next/navigation";
 import { getSecurityContext } from "@/lib/auth/mfa";
 import { safeReturnTo } from "@/lib/auth/session";
@@ -79,6 +80,7 @@ export default async function SecurityPage({
         <p className="mt-2">
           한 기기 분실에 대비해 다른 기기의 인증 앱을 미리 추가할 수 있습니다.
         </p>
+        <SupportContact className="mt-3 text-teal-900" />
       </aside>
       <form action={signOut} className="mt-6">
         <button className="btn-secondary">로그아웃</button>

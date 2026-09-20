@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SupportContact } from "@/components/common/support-contact";
 import { ActionForm } from "@/components/portal/action-form";
 import { requestPasswordReset } from "../recovery-actions";
 import { getBotProtection } from "@/lib/auth/bot-config";
@@ -51,6 +52,7 @@ export default function ForgotPassword() {
           메일을 받은 뒤 15분 안에 진행해 주세요. 등록한 이메일을 사용할 수
           없다면 사업단에 계정 복구를 문의해 주세요.
         </p>
+        <SupportContact className="text-teal-900" />
         <Link
           className="flex min-h-11 items-center text-base underline"
           href="/auth/login"

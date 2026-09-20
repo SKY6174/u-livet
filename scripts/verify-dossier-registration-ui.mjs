@@ -20,13 +20,20 @@ const modules = {
   "@/lib/portal/data": {},
   "@/lib/instructors/types": {},
 };
-const exports = {};
-vm.runInNewContext(ts.transpileModule(readFileSync("src/components/portal/instructor-detail.tsx", "utf8"), {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
-}).outputText, { exports, require: name => {
-  assert.ok(name in modules, `Unexpected import: ${name}`);
-  return modules[name];
-} });
+function load(file) {
+  const exports = {};
+  vm.runInNewContext(ts.transpileModule(readFileSync(file, "utf8"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
+  }).outputText, { exports, require: name => {
+    assert.ok(name in modules, `Unexpected import: ${name}`);
+    return modules[name];
+  } });
+  return exports;
+}
+modules["@/lib/portal/contact"] = load("src/lib/portal/contact.ts");
+modules["@/lib/portal/contact-policy-versions"] = load("src/lib/portal/contact-policy-versions.ts");
+modules["@/components/common/support-contact"] = load("src/components/common/support-contact.tsx");
+const exports = load("src/components/portal/instructor-detail.tsx");
 const policy = (kind, org_id = "org-a", id = kind) => ({ id, org_id, kind, title: kind, version: "TEST", body: "검증용 안내 본문" });
 const privacy = policy("INSTRUCTOR_PRIVACY");
 const review = policy("INSTRUCTOR_REVIEW");
@@ -43,7 +50,9 @@ for (const [label, policies, missing] of [
   assert.ok(html.includes('role="status"'));
   assert.ok(!/<form|<select|type="checkbox"|type="submit"/.test(html));
   for (const item of missing) assert.ok(html.includes(item));
-  assert.ok(html.includes("tel:0522300410"));
+  assert.ok(html.includes("tel:0522300427"));
+  assert.ok(html.includes("mailto:yhlee4@uc.ac.kr"));
+  assert.ok(html.includes("이연향 연구원"));
   console.log("PASS blocked state: " + label); checks++;
 }
 const ready = render([privacy, review]);
@@ -59,4 +68,15 @@ const multiple = render([privacy, policy("INSTRUCTOR_PRIVACY", "org-a", "new-ver
 assert.match(multiple, /<option value="" disabled="" selected="">/);
 assert.ok(render([privacy, review], "새 버전 작성").includes("새 버전 작성"));
 console.log("PASS multiple versions require selection; correction uses same gate"); checks++;
+const oldPrivacy = { ...privacy, version: "INSTRUCTOR-PRIVACY-2026-09-20-v1" };
+const currentPrivacy = { ...privacy, id: "contact-update", version: "INSTRUCTOR-PRIVACY-2026-09-20-v2" };
+const updated = render([oldPrivacy, currentPrivacy, review]);
+assert.match(updated, /<option value="contact-update" selected="">/);
+assert.ok(!updated.includes(oldPrivacy.version));
+const { currentContactPolicies } = modules["@/lib/portal/contact-policy-versions"];
+assert.equal(currentContactPolicies([oldPrivacy, { ...currentPrivacy, org_id: "org-b" }]).length, 2);
+assert.equal(currentContactPolicies([oldPrivacy]).length, 1);
+assert.equal(currentContactPolicies([{ ...oldPrivacy, version: "constructor" }]).length, 1);
+assert.equal(oldPrivacy.version, "INSTRUCTOR-PRIVACY-2026-09-20-v1");
+console.log("PASS contact revision supersedes only the same organization's original; original evidence preserved"); checks++;
 console.log(`${checks} dossier registration UI checks passed; no network or user data.`);

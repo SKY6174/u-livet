@@ -1,4 +1,6 @@
 import { ActionForm } from "@/components/portal/action-form";
+import { SupportContact } from "@/components/common/support-contact";
+import { currentContactPolicies } from "@/lib/portal/contact-policy-versions";
 import { DossierEditor } from "@/components/portal/instructor-forms";
 import {
   startDossier,
@@ -16,7 +18,7 @@ import {
   type ReviewEvent,
 } from "@/lib/instructors/types";
 export function PolicyChoice({
-  policies,
+  policies: suppliedPolicies,
   name,
   label,
 }: {
@@ -24,6 +26,7 @@ export function PolicyChoice({
   name: string;
   label: string;
 }) {
+  const policies = currentContactPolicies(suppliedPolicies);
   return (
     <div className="space-y-3">
       <label className="field">
@@ -80,9 +83,7 @@ export function DossierStartForm({
           {!hasReview && <li>강사 이력 심사 기준</li>}
         </ul>
         <p className="mt-3">입력 오류가 아닙니다. 지금은 동의하거나 제출할 수 없습니다.</p>
-        <a href="tel:0522300410" className="mt-3 inline-flex min-h-11 items-center font-semibold text-teal-900 underline">
-          앵커사업단 문의: 052-230-0410
-        </a>
+        <SupportContact className="mt-3 text-teal-900" />
       </div>
     );
   }
