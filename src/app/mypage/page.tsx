@@ -6,6 +6,7 @@ import type { Application } from "@/lib/portal/types";
 import { ActionForm } from "@/components/portal/action-form";
 import { decideApplication } from "@/app/actions";
 import { Empty, PageIntro } from "@/components/portal/ui";
+import { AccountSecurity } from "@/components/auth/account-security";
 export default async function MyPage() {
   const me = await requireIdentity();
   const db = await createServerSupabaseClient();
@@ -53,6 +54,7 @@ export default async function MyPage() {
       <Link className="btn-secondary mb-8 inline-block" href="/mypage/payments">
         나의 납부·환불
       </Link>
+      {me.roles.some((role) => role.role !== "INSTRUCTOR") && <AccountSecurity />}
       <h2 className="section-title">신청 현황과 강의실</h2>
       {error || unavailable ? (
         <Empty title="신청 현황을 불러오지 못했습니다">

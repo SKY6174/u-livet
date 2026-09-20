@@ -2,12 +2,13 @@ import Link from "next/link";
 import { SupportContact } from "@/components/common/support-contact";
 import { redirect } from "next/navigation";
 import { getSecurityContext } from "@/lib/auth/mfa";
+import { formatMfaFactors } from "@/lib/auth/mfa-factor";
 import { safeReturnTo } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { MfaPanel } from "@/components/auth/mfa-panel";
 import { signOut } from "@/app/auth/actions";
 export const metadata = {
-  title: "추가 인증 · U-LIFE",
+  title: "추가인증(2중 인증) · U-LIFE",
   robots: { index: false, follow: false },
 };
 export default async function SecurityPage({
@@ -36,8 +37,8 @@ export default async function SecurityPage({
   ).auth.mfa.listFactors();
   return (
     <div className="page-shell max-w-2xl">
-      <h1 className="break-keep text-3xl font-bold">인증 앱으로 한 번 더 확인해요</h1>
-      <p className="mb-5 mt-4 break-all text-base text-slate-600">{context.email}</p>
+      <h1 className="break-keep text-3xl font-bold">추가인증(2중 인증)</h1>
+      <p className="mb-2 mt-4 break-all text-right text-base text-slate-600">{context.email}</p>
       {context.status.needs_reset ? (
         <div className="panel">
           <p>새 보안 기준에 맞게 비밀번호를 먼저 설정해 주세요.</p>
@@ -54,15 +55,7 @@ export default async function SecurityPage({
           status={context.status}
           next={next}
           returnToWork={returnToWork}
-          factors={(data?.all ?? [])
-            .filter((f) => f.factor_type === "totp")
-            .map((f) => ({
-              id: f.id,
-              name: f.friendly_name?.startsWith("U-LIFE ")
-                ? `인증 앱 · ${new Date(f.created_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
-                : f.friendly_name ?? "인증 앱",
-              verified: f.status === "verified",
-            }))}
+          factors={formatMfaFactors(data?.all ?? [])}
         />
       )}
       <details className="mt-8 rounded-xl bg-slate-100 text-base leading-7">

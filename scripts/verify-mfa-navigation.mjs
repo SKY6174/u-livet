@@ -26,17 +26,26 @@ const routeCalls = [];
 const router = { refresh: () => routeCalls.push('refresh'), replace: path => routeCalls.push(path) };
 const codeInputFile = 'src/components/auth/mfa-code-input.tsx';
 const { MfaCodeInput } = load(codeInputFile, {});
+const factorImports = load('src/lib/auth/mfa-factor.ts', {});
+const managementFile = 'src/components/auth/mfa-management.tsx';
+const managementImports = { 'next/link': { default: 'a' }, 'next/navigation': { useRouter: () => router }, '@/app/auth/mfa-actions': {} };
+const { MfaManagement } = load(managementFile, managementImports);
 const panelImports = { 'next/image': { default: 'img' }, 'next/link': { default: 'a' },
+  '@/components/auth/mfa-management': { MfaManagement },
   '@/components/auth/mfa-code-input': { MfaCodeInput },
   'next/navigation': { useRouter: () => router }, '@/app/auth/mfa-actions': {} };
 const { MfaPanel } = load(panelFile, panelImports);
 const html = status => renderToStaticMarkup(React.createElement(MfaPanel, { status, factors, next: '/admin', returnToWork: false }));
-await test('fresh MFA hides the duplicate code form and retains authenticator management', () => {
+await test('fresh staff MFA hides the duplicate code form and moves management out of verification', () => {
   const output = html(fresh);
   assert(!output.includes('id="mfa-code"'));
   assert(output.includes('추가 인증된 로그인입니다.'));
   assert(output.includes('다른 인증 앱 추가'));
-  assert(output.includes('연결된 인증 앱 관리'));
+  assert(!output.includes('연결된 인증 앱 관리'));
+});
+await test('non-staff can still manage their optional authenticators on the security page', () => {
+  assert(html({ ...fresh, staff_required: false }).includes('연결된 인증 앱 관리'));
+  assert(!html({ ...fresh, mfa_verified: false, recent: false }).includes('계속하려면 추가 인증이 필요합니다.'));
 });
 for (const [label, status] of [
   ['unverified session', { ...fresh, mfa_verified: false, recent: false }],
@@ -79,12 +88,40 @@ await test('enrolling another authenticator shows its confirmation even with fre
   await h.flush();
   assert(elements(h.render(fresh)).some(e => e.props?.id === 'mfa-code'));
 });
-await test('removing an authenticator never invokes the verification return path', async () => {
+function managementHarness(status, factorList, response = { ok: true, message: 'removed' }, pending = false) {
+  const tasks = [], calls = [], states = [];
+  let cursor = 0;
+  const hooks = { useState(initial) { const i = cursor++; if (!(i in states)) states[i] = initial; return [states[i], next => { states[i] = next; }]; },
+    useTransition: () => [pending, run => tasks.push(run())] };
+  const { MfaManagement: Manage } = load(managementFile, { ...managementImports, react: hooks,
+    '@/app/auth/mfa-actions': { removeMfa: async id => { calls.push(id); return response; } } });
+  return { render: () => { cursor = 0; return Manage({ status, factors: factorList }); }, flush: () => Promise.all(tasks.splice(0)), calls };
+}
+const twoFactors = [...factors, { id: 'second', name: 'Second app', verified: true }];
+for (const [label, status, factorList, pending, allowed] of [
+  ['last staff factor', fresh, factors, false, false],
+  ['expired recent authentication', { ...fresh, recent: false }, twoFactors, false, false],
+  ['pending removal', fresh, twoFactors, true, false],
+  ['fresh staff with two factors', fresh, twoFactors, false, true],
+  ['non-staff last factor', { ...fresh, staff_required: false }, factors, false, true],
+]) await test('management preserves removal guard: ' + label, async () => {
   routeCalls.length = 0;
-  const h = panelHarness(true);
-  elements(h.render(fresh)).find(e => e.type === 'button' && e.props.children === '이 인증 앱 연결 해제').props.onClick();
+  const h = managementHarness(status, factorList, undefined, pending);
+  const button = elements(h.render()).find(e => e.type === 'button');
+  assert.equal(button.props.disabled, !allowed);
+  button.props.onClick();
   await h.flush();
-  assert.deepEqual(routeCalls, ['refresh']);
+  assert.equal(h.calls.length, allowed ? 1 : 0);
+  assert.deepEqual(routeCalls, allowed ? ['refresh'] : []);
+});
+await test('server rejection remains visible and cannot remove an authenticator optimistically', async () => {
+  routeCalls.length = 0;
+  const h = managementHarness(fresh, twoFactors, { message: 'server rejected' });
+  elements(h.render()).find(e => e.type === 'button').props.onClick();
+  await h.flush();
+  assert.equal(elements(h.render()).find(e => e.props?.role === 'alert').props.children, 'server rejected');
+  assert.equal(elements(h.render()).filter(e => e.type === 'li').length, 2);
+  assert.deepEqual(routeCalls, []);
 });
 
 await test('switching authenticators clears the code entered for the previous app', () => {
@@ -151,6 +188,7 @@ const { safeReturnTo } = load('src/lib/auth/session.ts', { 'next/navigation': { 
 function pageHarness(status = fresh) {
   let reads = 0;
   const page = load('src/app/auth/security/page.tsx', { 'next/link': { default: 'a' }, 'next/navigation': { redirect },
+    '@/lib/auth/mfa-factor': factorImports,
     '@/components/common/support-contact': { SupportContact: 'aside' },
     '@/lib/auth/mfa': { getSecurityContext: async () => status ? { email: 'synthetic@example.invalid', status } : null },
     '@/lib/auth/session': { safeReturnTo }, '@/components/auth/mfa-panel': { MfaPanel: 'section' },
@@ -194,5 +232,51 @@ for (const [label, finalStatus, nativeError, success] of [
     '@/lib/portal/data': { UUID: /^[0-9a-f-]{36}$/ }, '@/lib/auth/mfa-message': { MFA_REAUTH_MESSAGE: 'reauth' } });
   assert.equal((await verifyMfa(factorId, '123456')).ok === true, success);
   assert.equal(revalidated, success);
+});
+for (const [label, context, failure] of [
+  ['staff own account', { status: fresh }, false],
+  ['factor lookup failure', { status: fresh }, true],
+  ['non-staff hidden', { status: { ...fresh, staff_required: false } }, false],
+  ['missing session fails closed', null, false],
+]) await test('my-page security lookup: ' + label, async () => {
+  let reads = 0;
+  const { AccountSecurity } = load('src/components/auth/account-security.tsx', {
+    'next/link': { default: 'a' }, '@/lib/auth/mfa': { getSecurityContext: async () => context },
+    '@/lib/auth/mfa-factor': factorImports, '@/components/auth/mfa-management': { MfaManagement },
+    '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ auth: { mfa: {
+      listFactors: async (...args) => {
+        assert.equal(args.length, 0); reads++;
+        return { error: failure ? Error('lookup') : null, data: { all: [
+          { id: factorId, friendly_name: 'Own authenticator', factor_type: 'totp', status: 'verified', created_at: '2026-09-19T03:41:12Z' },
+        ] } };
+      },
+    } } }) },
+  });
+  const tree = await AccountSecurity();
+  if (context && !context.status.staff_required) { assert.equal(tree, null); assert.equal(reads, 0); return; }
+  const output = renderToStaticMarkup(tree);
+  assert.equal(reads, context ? 1 : 0);
+  if (!context || failure) {
+    assert(output.includes('role="alert"')); assert(!output.includes('이 인증 앱 연결 해제'));
+  } else {
+    assert(output.includes('Own authenticator')); assert(output.includes('연결된 인증 앱 관리'));
+    assert(output.includes('disabled=""'));
+  }
+});
+for (const [label, roles, expected] of [
+  ['learner', [], false], ['instructor', ['INSTRUCTOR'], false],
+  ['administrator', ['SYSTEM_ADMIN'], true], ['operator', ['COURSE_MANAGER'], true],
+]) await test('my-page renders security management only for staff: ' + label, async () => {
+  const query = { select() { return this; }, eq(column, id) { assert.equal(column, 'person_id'); assert.equal(id, 'self'); return this; },
+    order: async () => ({ data: [], error: null }) };
+  const MyPage = load('src/app/mypage/page.tsx', {
+    'next/link': { default: 'a' }, '@/lib/auth/session': { requireIdentity: async () => ({ id: 'self', name: 'Synthetic', roles: roles.map(role => ({ role })) }) },
+    '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ from: () => query }) },
+    '@/lib/portal/data': { getWorkspaceOfferings: async () => ({ offerings: [], unavailable: false }) },
+    '@/components/portal/action-form': { ActionForm: 'form' }, '@/app/actions': {},
+    '@/components/portal/ui': { Empty: 'section', PageIntro: 'section' },
+    '@/components/auth/account-security': { AccountSecurity: 'account-security' },
+  }).default;
+  assert.equal(elements(await MyPage()).some(element => element.type === 'account-security'), expected);
 });
 console.log(`${checks} MFA navigation regressions passed; no network, real accounts, or mail.`);

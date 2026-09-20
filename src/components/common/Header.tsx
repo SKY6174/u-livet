@@ -64,7 +64,7 @@ export default function Header() {
           울산과학대학교 앵커사업단 · 평생직업교육
         </div>
       </div>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/images/ulsan-college-logo.png"
@@ -81,18 +81,18 @@ export default function Header() {
             </span>
           </span>
         </Link>
-        <nav aria-label="주 메뉴" className="hidden items-center gap-6 lg:flex">
+        <nav aria-label="주 메뉴" className="hidden flex-wrap items-center justify-center gap-x-6 gap-y-3 lg:flex">
           {links.map(([label, href]) => (
             <Link
               key={href}
               href={href}
-              className="text-sm font-semibold hover:text-teal-800"
+              className="whitespace-nowrap text-sm font-semibold hover:text-teal-800"
             >
               {label}
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-4 text-sm lg:flex">
+        <div className="hidden flex-wrap items-center justify-end gap-4 text-sm lg:flex">
           {identity ? (
             <>
               {userLabel}

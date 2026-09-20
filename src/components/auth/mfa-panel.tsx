@@ -11,7 +11,8 @@ import {
 } from "@/app/auth/mfa-actions";
 import type { SecurityStatus } from "@/lib/auth/mfa";
 import { MfaCodeInput } from "@/components/auth/mfa-code-input";
-type Factor = { id: string; name: string; verified: boolean };
+import { MfaManagement } from "@/components/auth/mfa-management";
+import type { MfaFactor } from "@/lib/auth/mfa-factor";
 export function MfaPanel({
   status,
   factors,
@@ -19,7 +20,7 @@ export function MfaPanel({
   returnToWork = false,
 }: {
   status: SecurityStatus;
-  factors: Factor[];
+  factors: MfaFactor[];
   next: string;
   returnToWork?: boolean;
 }) {
@@ -67,24 +68,26 @@ export function MfaPanel({
   };
   return (
     <section className="panel space-y-6 text-base">
-      <div className="rounded-xl bg-teal-50 p-4 leading-7">
-        <p className="font-semibold">
-          {status.mfa_verified
-            ? "추가 인증된 로그인입니다."
-            : status.mfa_required
-              ? "계속하려면 추가 인증이 필요합니다."
-              : "추가 인증은 선택 사항입니다."}
-        </p>
-        {status.staff_required && (
-          <p>
-            관리자 계정의 저장·승인은 최근 {status.fresh_minutes}분 안에 추가
-            인증한 경우만 가능합니다.
-          </p>
-        )}
-        {status.mfa_verified && !status.recent && (
-          <p>저장하기 전에 아래 코드로 다시 확인해 주세요.</p>
-        )}
-      </div>
+      {(status.staff_required || status.mfa_verified || !status.mfa_required) && (
+        <div className="rounded-xl bg-teal-50 p-4 leading-7">
+          {(status.mfa_verified || !status.mfa_required) && (
+            <p className="font-semibold">
+              {status.mfa_verified
+                ? "추가 인증된 로그인입니다."
+                : "추가 인증은 선택 사항입니다."}
+            </p>
+          )}
+          {status.staff_required && (
+            <p>
+              관리자 계정의 저장·승인은 최근 {status.fresh_minutes}분 안에 추가
+              인증한 경우만 가능합니다.
+            </p>
+          )}
+          {status.mfa_verified && !status.recent && (
+            <p>저장하기 전에 아래 코드로 다시 확인해 주세요.</p>
+          )}
+        </div>
+      )}
       {!enrollment && verified.length > 0 && (
         <div className="flex flex-wrap items-center gap-3">
           <label className="shrink-0 text-lg font-bold" htmlFor="mfa-factor">
@@ -248,36 +251,10 @@ export function MfaPanel({
           작업 화면으로 이동
         </Link>
       )}
-      {!enrollment && verified.length > 0 && (
-        <details className="border-t pt-5">
-          <summary className="min-h-11 cursor-pointer">
-            연결된 인증 앱 관리
-          </summary>
-          <ul className="space-y-4">
-            {verified.map((f) => (
-              <li key={f.id} className="space-y-2">
-                <p>{f.name}</p>
-                <button
-                  className="btn-secondary"
-                  disabled={
-                    pending ||
-                    !status.recent ||
-                    (status.staff_required && verified.length <= 1)
-                  }
-                  onClick={() => run(() => removeMfa(f.id), "remove")}
-                >
-                  이 인증 앱 연결 해제
-                </button>
-              </li>
-            ))}
-          </ul>
-          {status.staff_required && (
-            <p className="mt-4 leading-7">
-              관리자는 마지막 인증 앱을 해제할 수 없습니다. 교체할 인증 앱을
-              먼저 추가해 주세요.
-            </p>
-          )}
-        </details>
+      {!enrollment && verified.length > 0 && !status.staff_required && (
+        <div className="border-t pt-5">
+          <MfaManagement status={status} factors={verified} />
+        </div>
       )}
     </section>
   );
