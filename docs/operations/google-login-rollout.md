@@ -10,7 +10,19 @@
 - Production: 정책 `1b3e61b8-4599-4b0c-9fc4-eaeaebde4446`, 승인 등록·효력 시작 `2026-09-20T12:44:29.738854Z` (21:44:29 KST).
 - 두 환경 모두 APPROVED, 본문 해시 일치, 가입 설정이 v3를 선택함을 확인했다. 승인 등록 시각은 사용자의 응답 직후 DB에 등록한 시각이다.
 - 각 DB의 실제 SYSTEM_ADMIN 역할을 가진 승인자를 확인한 트랜잭션으로 새 정책을 등록하고 가입 포인터만 바꿨다. 이전 APPROVED 정책, 동의 이벤트, 연락처, 역할은 수정하지 않았다.
-- 운영 `AUTH_GOOGLE_ENABLED=true`를 설정했다. 운영 main 배포와 최종 화면 검증 결과는 후속 확인 기록에 남긴다.
+- 운영 `AUTH_GOOGLE_ENABLED=true`를 설정하고 아래 배포에서 활성화를 확인했다.
+
+## 운영 개방 검증
+
+- 운영 코드/문안 커밋 `b81acae788bb68c1284cf4c845d679a614592e14`, 배포 `dpl_4DU19289Nw14kLxs5ktT4RrkR9Tt` READY (빌드 49초). uc-life.org의 `/api/version`에서 production 및 같은 커밋을 확인했다.
+- Preview 커밋 `2f530c32537c9cf5c242ca2e6ae3fd1cd454ef6f`, 배포 `dpl_9jePWxbc5pwhJTs5CF3Ht9LbDkru` READY (빌드 48초). staging.uc-life.org의 버전도 일치했다. 두 브랜치의 src/scripts/package 파일 및 확정 문안은 동일하다.
+- 두 주소의 `/privacy`, `/auth/signup`에서 v3 문안을 확인했다. 초안 표시가 없고 가입 동의 체크박스는 미선택 상태다.
+- 운영 수강생과 교외 강사 모두 활성화된 Google 버튼으로 실제 Google U-LIFE 계정 선택 화면에 도달했다. 두 요청 모두 scope=`openid email`, include_granted_scopes=`false`, callback=`https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback`이다.
+- 사업단/교내 강사 화면에는 Google 버튼이 없으며 기존 이메일 로그인을 유지한다. 회귀 검증 78건과 lint/typecheck는 배포된 소스에 대해 앞서 통과했다.
+- 운영 테스트는 계정 선택 화면까지다. 등록된 운영 테스트용 Google 계정이 없으므로 실제 신규 계정 생성·이용자 동의·운영 callback 완료를 대신하지 않았다. 동일 소스의 Preview 수강생·교외 강사 실제 로그인 완료 결과는 아래 기록을 참조한다.
+- 적용 직후 기존 동의 이벤트의 건수와 id/정책/동의값 지문은 Preview 8건, Production 2건으로 전후 동일했다. v1/v2 본문 해시도 변경되지 않았다.
+- 새 운영 배포의 오류 수준 로그를 최근 15분 범위로 조회했으며 결과는 0건이었다. 지속 모니터링이나 전체 과거 오류 부재를 의미하지 않는다.
+- 이 검증 기록을 추가한 후속 커밋은 문서만 변경한다.
 
 ## 확인한 상태
 
