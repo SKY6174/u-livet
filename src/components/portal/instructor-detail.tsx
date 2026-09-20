@@ -28,7 +28,7 @@ export function PolicyChoice({
     <div className="space-y-3">
       <label className="field">
         {label}
-        <select name={name} required defaultValue="">
+        <select name={name} required defaultValue={policies.length === 1 ? policies[0].id : ""}>
           <option value="" disabled>
             승인된 기준 선택
           </option>
@@ -40,7 +40,7 @@ export function PolicyChoice({
         </select>
       </label>
       {policies.map((p) => (
-        <details key={p.id} className="text-sm">
+        <details key={p.id} open={policies.length === 1} className="text-sm">
           <summary className="cursor-pointer font-semibold">
             {p.title} · {p.version} 원문
           </summary>
@@ -56,6 +56,45 @@ export function PolicyChoice({
         </p>
       )}
     </div>
+  );
+}
+export function DossierStartForm({
+  orgId,
+  policies,
+  label = "이력 초안 만들기",
+}: {
+  orgId: string;
+  policies: InstructorPolicy[];
+  label?: string;
+}) {
+  const ownPolicies = policies.filter((policy) => policy.org_id === orgId);
+  const privacyPolicies = ownPolicies.filter((policy) => policy.kind === "INSTRUCTOR_PRIVACY");
+  const hasReview = ownPolicies.some((policy) => policy.kind === "INSTRUCTOR_REVIEW");
+  if (!privacyPolicies.length || !hasReview) {
+    return (
+      <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-base leading-7">
+        <h3 className="font-bold">사업단의 강사 등록 안내가 준비 중입니다</h3>
+        <p className="mt-2">다음 항목이 등록되면 이력 작성을 시작할 수 있습니다.</p>
+        <ul className="mt-2 list-disc pl-6">
+          {!privacyPolicies.length && <li>강사 이력 개인정보 수집·이용 안내</li>}
+          {!hasReview && <li>강사 이력 심사 기준</li>}
+        </ul>
+        <p className="mt-3">입력 오류가 아닙니다. 지금은 동의하거나 제출할 수 없습니다.</p>
+        <a href="tel:0522300410" className="mt-3 inline-flex min-h-11 items-center font-semibold text-teal-900 underline">
+          앵커사업단 문의: 052-230-0410
+        </a>
+      </div>
+    );
+  }
+  return (
+    <ActionForm action={startDossier} label={label}>
+      <input type="hidden" name="o" value={orgId} />
+      <PolicyChoice policies={privacyPolicies} name="privacy" label="강사 이력 개인정보 안내" />
+      <label className="flex min-h-11 items-start gap-3 text-base leading-7">
+        <input className="mt-1 h-5 w-5 shrink-0" type="checkbox" name="confirmed" required />
+        수집 항목·목적·보유기간과 권리 안내를 확인하고 동의합니다.
+      </label>
+    </ActionForm>
   );
 }
 export function ReviewHistory({ events }: { events: ReviewEvent[] }) {
@@ -251,24 +290,11 @@ export function DossierDetail({
             이력 보완·정정 새 버전 작성
           </summary>
           <div className="mt-4">
-            <ActionForm action={startDossier} label="새 버전 작성">
-              <input type="hidden" name="o" value={d.org_id} />
-              <PolicyChoice
-                policies={ownPolicies.filter(
-                  (p) => p.kind === "INSTRUCTOR_PRIVACY",
-                )}
-                name="privacy"
-                label="이력 개인정보 안내"
-              />
-              <label className="flex items-start gap-3 text-sm">
-                <input type="checkbox" name="confirmed" required />
-                이력 수집·이용 안내를 확인하고 동의합니다.
-              </label>
-              <p className="notice">
+              <p className="notice mb-4">
                 새 버전을 만들면 기존 공개 소개가 숨겨지고 재심사합니다. 이전
                 이력·결정은 보존됩니다.
               </p>
-            </ActionForm>
+            <DossierStartForm orgId={d.org_id} policies={ownPolicies} label="새 버전 작성" />
           </div>
         </details>
       )}

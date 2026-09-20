@@ -3,12 +3,10 @@ import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
-import { ActionForm } from "@/components/portal/action-form";
 import {
   DossierDetail,
-  PolicyChoice,
+  DossierStartForm,
 } from "@/components/portal/instructor-detail";
-import { startDossier } from "@/app/instructor-development-actions";
 import type { Dossier, InstructorOptions } from "@/lib/instructors/types";
 export default async function InstructorProfile({
   searchParams,
@@ -77,23 +75,10 @@ export default async function InstructorProfile({
         <section className="panel">
           <h2 className="section-title">강사 이력 등록 시작</h2>
           <p className="notice mb-5">
-            심사 기준 등록 후 사용할 수 있습니다. 이력 심사와 실제 위촉·배정은
+            이력 심사와 실제 위촉·배정은
             별도이며, 지급 계좌·신분증은 이곳에서 수집하지 않습니다.
           </p>
-          <ActionForm action={startDossier} label="이력 초안 만들기">
-            <input type="hidden" name="o" value={org.id} />
-            <PolicyChoice
-              policies={options.policies.filter(
-                (p) => p.org_id === org.id && p.kind === "INSTRUCTOR_PRIVACY",
-              )}
-              name="privacy"
-              label="강사 이력 개인정보 안내"
-            />
-            <label className="flex items-start gap-3 text-sm">
-              <input type="checkbox" name="confirmed" required />
-              수집 항목·목적·보유기간과 권리 안내를 확인하고 동의합니다.
-            </label>
-          </ActionForm>
+          <DossierStartForm orgId={org.id} policies={options.policies} />
         </section>
       ) : (
         <Empty title="등록된 기관이 없습니다" />
