@@ -75,7 +75,7 @@ export function PasswordField({
             maxLength={PASSWORD_MAX_LENGTH}
             required
             style={{ paddingRight: "7rem" }}
-            aria-describedby={`${id}-hint${signup ? ` ${id}-rules` : ""}`}
+            aria-describedby={signup ? `${id}-hint ${id}-rules` : undefined}
             onChange={(event) => update(event.currentTarget)}
             onFocus={(event) => update(event.currentTarget)}
           />
@@ -96,11 +96,11 @@ export function PasswordField({
           </button>
         </div>
       </div>
-      <p id={`${id}-hint`} className="text-base leading-relaxed text-slate-600">
-        {signup
-          ? "영문 대문자와 소문자를 각각 넣어 주세요. 공백은 특수문자에 포함되지 않습니다."
-          : "보이기를 누르면 입력한 글자를 확인할 수 있습니다."}
-      </p>
+      {signup && (
+        <p id={`${id}-hint`} className="text-base leading-relaxed text-slate-600">
+          영문 대문자와 소문자를 각각 넣어 주세요. 공백은 특수문자에 포함되지 않습니다.
+        </p>
+      )}
       {signup && (
         <div className="rounded-xl bg-slate-50 p-4">
           <p className="mb-3 font-semibold text-slate-800">

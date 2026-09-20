@@ -94,11 +94,11 @@ export function AuthForm({
             required
           />
         </label>
-        <p className="text-base text-slate-600">
-          {signup
-            ? "자주 확인하는 이메일을 입력해 주세요. 강사·관리자도 이메일을 아이디로 사용합니다."
-            : "회원가입할 때 사용한 이메일을 입력해 주세요."}
-        </p>
+        {signup && (
+          <p className="text-base text-slate-600">
+            자주 확인하는 이메일을 입력해 주세요. 강사·관리자도 이메일을 아이디로 사용합니다.
+          </p>
+        )}
         <PasswordField signup={signup} />
         {!signup && (
           <Link
@@ -137,11 +137,11 @@ export function AuthForm({
             </label>
           </div>
         )}
-        <p className="text-base text-slate-600">
-          {signup
-            ? "강사·관리자 권한은 사업단의 확인 후 부여됩니다."
-            : "가입한 계정으로 로그인하면 승인된 역할에 맞는 메뉴가 표시됩니다."}
-        </p>
+        {signup && (
+          <p className="text-base text-slate-600">
+            강사·관리자 권한은 사업단의 확인 후 부여됩니다.
+          </p>
+        )}
         {(signup || audience === "learner" || audience === "external") && <Link
           className="flex min-h-11 items-center text-base underline"
           href={signup ? "/auth/login" : "/auth/signup"}
@@ -160,7 +160,6 @@ export function AuthForm({
         <Link href="/auth/forgot-password" className="mt-3 flex min-h-11 items-center font-semibold underline">초대받은 계정의 비밀번호 설정·재설정</Link>
         <p className="mt-2 text-sm">계정 등록 문의: 앵커사업단 052-230-0410</p>
       </div>}
-      {audience === "office" && <p className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">등록된 사업단 이메일로 로그인하세요. 단장·센터장·연구원 직책과 업무 권한은 로그인 후 계정 정보에 따라 자동으로 표시됩니다.</p>}
       {!collapsibleEmail && emailForm}
     </div>
   );
