@@ -32,9 +32,17 @@ export async function loginWithSocial(_: ActionState, form: FormData): Promise<A
     const next = socialReturnTo(form.get("next"));
     callback.searchParams.set("next", audience === "external" && next === "/mypage" ? "/mypage/instructor" : next);
     const client = await createServerSupabaseClient();
-    // Override the provider's default profile/photo scopes: signup collects a
-    // name directly and only needs the Kakao account identity and email.
-    const result = await client.auth.signInWithOAuth({ provider: provider === "naver" ? "custom:naver" : provider, options: { redirectTo: callback.toString(), skipBrowserRedirect: true, ...(provider === "kakao" ? { queryParams: { scope: "account_email" } } : {}) } });
+    // Supabase adds options.scopes to its defaults. Replace the provider scope
+    // instead: signup collects a name directly and does not need profile photos.
+    const queryParams: Record<string, string> | undefined = provider === "kakao"
+      ? { scope: "account_email" }
+      : provider === "google"
+        ? { scope: "openid email", include_granted_scopes: "false" }
+        : undefined;
+    const result = await client.auth.signInWithOAuth({
+      provider: provider === "naver" ? "custom:naver" : provider,
+      options: { redirectTo: callback.toString(), skipBrowserRedirect: true, queryParams },
+    });
     if (result.error || !result.data.url) return { message: "간편 로그인에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." };
     const destination = new URL(result.data.url);
     if (destination.origin !== new URL(getSupabaseConfig()!.url).origin || destination.pathname !== "/auth/v1/authorize") throw new Error("INVALID_OAUTH_URL");
