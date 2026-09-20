@@ -2,6 +2,8 @@ export type Identity = {
   id: string;
   name: string;
   roles: { role: string; org_id: string }[];
+  office_position?: "DIRECTOR" | "CENTER_HEAD" | "RESEARCHER" | null;
+  instructor_kind?: "INTERNAL" | "EXTERNAL" | null;
 };
 export type Offering = {
   id: string;

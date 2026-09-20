@@ -33,11 +33,11 @@ export function socialReturnTo(value: unknown): string {
 }
 export function socialLoginError(value: unknown) {
   switch (value) {
-    case "cancelled": return "카카오 로그인이 취소되었습니다. 원하실 때 다시 시작해 주세요.";
-    case "staff": return "강사·운영자·관리자 계정은 이메일과 비밀번호로 로그인해 주세요.";
+    case "cancelled": return "간편 로그인이 취소되었습니다. 원하실 때 다시 시작해 주세요.";
+    case "staff": return "사업단·교내 강사 계정은 이메일과 비밀번호로 로그인해 주세요. 교외 강사는 사업단에 강사 구분 확인을 요청해 주세요.";
     case "closed": return "현재 신규 회원가입을 준비하고 있습니다. 잠시 후 다시 이용해 주세요.";
     case "unavailable": return "계정 이용 상태를 확인하지 못했습니다. 사업단에 문의해 주세요.";
-    case "callback": return "카카오 로그인을 완료하지 못했습니다. 이 화면에서 다시 시작해 주세요.";
+    case "callback": return "간편 로그인을 완료하지 못했습니다. 이용 대상을 선택해 다시 시작해 주세요.";
     default: return null;
   }
 }
