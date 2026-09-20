@@ -15,7 +15,25 @@ export async function GET(request: Request) {
     else if (!isReviewOnly() && !params.has("error") && code && code.length <= 2048) {
       const client = await createServerSupabaseClient();
       const result = await client.auth.exchangeCodeForSession(code);
-      if (!result.error && result.data.user) destination = await socialDestination(params.get("next"));
+      if (!result.error && result.data.user) {
+        const user = result.data.user;
+        const hasGoogle = user.identities?.some(identity => identity.provider === "google");
+        // Narrower OAuth scopes do not remove metadata from earlier logins.
+        if (hasGoogle && (user.user_metadata.picture != null || user.user_metadata.avatar_url != null)) {
+          try {
+            const cleaned = await client.auth.updateUser({ data: { picture: null, avatar_url: null } });
+            if (cleaned.error || !cleaned.data.user || cleaned.data.user.user_metadata.picture != null || cleaned.data.user.user_metadata.avatar_url != null) {
+              throw new Error("PROFILE_CLEANUP_FAILED");
+            }
+            const refreshed = await client.auth.refreshSession();
+            if (refreshed.error || !refreshed.data.session) throw new Error("SESSION_REFRESH_FAILED");
+          } catch {
+            await client.auth.signOut({ scope: "local" });
+            throw new Error("PROFILE_CLEANUP_FAILED");
+          }
+        }
+        destination = await socialDestination(params.get("next"));
+      }
     }
   } catch { /* Sanitize provider errors: never display or log codes/tokens. */ }
   const response = NextResponse.redirect(new URL(destination, origin));
