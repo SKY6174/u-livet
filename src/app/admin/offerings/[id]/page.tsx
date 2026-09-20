@@ -9,6 +9,7 @@ import {
 import { getManagedCourse } from "@/lib/course-workspace/data";
 import { nextCourseAction } from "@/lib/course-workspace/progress";
 import { CourseHeader } from "@/components/course-workspace/course-header";
+import { AttendanceReadiness } from "@/components/course-workspace/attendance-readiness";
 import { DocumentStatus } from "@/components/course-workspace/document-status";
 import { Empty } from "@/components/portal/ui";
 import { dateTime } from "@/lib/portal/data";
@@ -152,62 +153,7 @@ export default async function CourseOverview({
         </div>
       </section>
       <div className="mb-8 grid gap-5 lg:grid-cols-2">
-        <section className="panel scroll-mt-6" id="attendance">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">수업·출결 현황</h2>
-            <span className="text-xs font-semibold text-teal-700">
-              강사 입력
-            </span>
-          </div>
-          <p className="mt-3 text-sm leading-relaxed text-slate-500">
-            강사가 강의 운영 메뉴에서 입력한 출결이 출석부와 수료 판정에
-            연결됩니다.
-          </p>
-          {!c.scheduled_sessions || !c.enrolled ? (
-            <p className="notice mt-4">
-              {c.source
-                ? "개인별 학습자·회차 자료가 등록되지 않았습니다. 원본 출석부가 있다면 보고서에 첨부해 보관하세요."
-                : "학습자 등록과 수업 일정이 준비되면 출결 현황이 표시됩니다."}
-            </p>
-          ) : (
-            <dl className="mt-5 grid grid-cols-3 gap-3 text-sm">
-              <div>
-                <dt className="text-slate-500">종료 수업</dt>
-                <dd className="mt-1 text-xl font-bold">{c.ended_sessions}회</dd>
-              </div>
-              <div>
-                <dt className="text-slate-500">입력된 출결</dt>
-                <dd className="mt-1 text-xl font-bold">
-                  {c.attendance_recorded}건
-                </dd>
-              </div>
-              <div>
-                <dt className="text-slate-500">미입력</dt>
-                <dd
-                  className={`mt-1 text-xl font-bold ${c.missing_attendance ? "text-amber-800" : "text-teal-800"}`}
-                >
-                  {c.missing_attendance}건
-                </dd>
-              </div>
-            </dl>
-          )}
-          <div className="mt-5 flex flex-wrap gap-4 text-sm font-semibold">
-            <Link
-              href={`${base}/reports/print?document=attendance`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-teal-800"
-            >
-              출석부 확인 →
-            </Link>
-            <Link
-              href={`${base}/${c.status === "ARCHIVED" ? "reports#attachments" : "manage#instructors"}`}
-              className="text-slate-600"
-            >
-              {c.status === "ARCHIVED" ? "원본 자료 연결" : "담당 강사 확인"} →
-            </Link>
-          </div>
-        </section>
+        <AttendanceReadiness course={c} />
         <section className="panel">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-bold">보고서·정산 현황</h2>

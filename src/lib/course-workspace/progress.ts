@@ -108,7 +108,32 @@ export function documentReadiness(c: CourseWorkspace): DocumentReadiness[] {
   return DOCUMENTS.map(([kind, title], i) => ({ ...rows[i], kind, title }));
 }
 
-export function nextCourseAction(c: CourseWorkspace) {
+export function attendancePreparation(c: CourseWorkspace) {
+  if (c.status === "ARCHIVED") return [];
+  const manage = `/admin/offerings/${c.id}/manage`;
+  return [
+    {
+      label: "담당 강사", ready: c.instructors > 0, value: `${c.instructors}명 배정`,
+      detail: "배정된 강사가 본인 계정에서 일정과 출결을 입력합니다.",
+      href: `${manage}#instructors`, action: "강사 배정 확인",
+    },
+    {
+      label: "수강 확정 명단", ready: c.enrolled > 0, value: `${c.enrolled}명 확정`,
+      detail: "신청·선발 및 필요한 납부 절차를 마친 수강생이 출석부에 표시됩니다.",
+      href: `${manage}#applications`, action: "신청·선발 확인",
+    },
+    {
+      label: "수업 일정", ready: c.scheduled_sessions > 0, value: `${c.scheduled_sessions}회 등록`,
+      detail: "담당 강사가 강사 공간 → 담당 과정 → 출석부에서 실제 교육 구간별로 등록합니다.",
+      href: `${manage}#instructors`, action: "담당 강사 확인",
+    },
+  ];
+}
+
+export function nextCourseAction(
+  c: CourseWorkspace,
+  today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" }),
+) {
   const base = `/admin/offerings/${c.id}`;
   if (c.status === "ARCHIVED")
     return {
@@ -134,6 +159,18 @@ export function nextCourseAction(c: CourseWorkspace) {
       href: `${base}/manage#instructors`,
       detail: "출결과 강의실적을 입력할 강사를 배정하세요.",
     };
+  if (!c.enrolled)
+    return {
+      label: "수강 확정 명단 준비",
+      href: `${base}/manage#applications`,
+      detail: "신청·선발 및 필요한 납부 절차를 마친 수강생이 출석부에 표시됩니다.",
+    };
+  if (!c.scheduled_sessions)
+    return {
+      label: "수업 일정 등록 확인",
+      href: `${base}#attendance`,
+      detail: "담당 강사가 출석부에 최종 시간표를 등록하면 회차별 기록을 시작할 수 있습니다.",
+    };
   if (c.missing_attendance)
     return {
       label: "출결 미입력 확인",
@@ -142,8 +179,8 @@ export function nextCourseAction(c: CourseWorkspace) {
     };
   if (
     c.completion_pending &&
-    c.ends_on <
-      new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" })
+    c.ended_sessions >= c.scheduled_sessions &&
+    c.ends_on < today
   )
     return {
       label: "수료 검토하기",
@@ -155,6 +192,12 @@ export function nextCourseAction(c: CourseWorkspace) {
       label: "강의실적 승인",
       href: `${base}/reports#teaching`,
       detail: `${c.teaching_pending}건의 강의실적이 승인 대기 중입니다.`,
+    };
+  if (c.ended_sessions < c.scheduled_sessions)
+    return {
+      label: "수업 진행·출결 확인",
+      href: `${base}#attendance`,
+      detail: `등록된 ${c.scheduled_sessions}회 중 ${c.ended_sessions}회가 종료됐습니다. 종료된 수업부터 출결을 확인하세요.`,
     };
   return {
     label: c.report_revision ? "보고서 검토·출력" : "결과보고서 작성",

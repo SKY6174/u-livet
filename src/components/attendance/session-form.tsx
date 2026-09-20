@@ -5,6 +5,7 @@ export function SessionForm({ book }: { book: AttendanceBook }) {
   return <details className="panel mb-6">
     <summary className="cursor-pointer font-semibold text-teal-800">출석부 생성 · 수업/보강 일정 추가</summary>
     <p className="my-4 text-sm text-slate-600">수업을 등록하면 수강 확정 명단으로 출석부가 구성됩니다. 출석 인정은 수업 종료 후 별도로 기록합니다.</p>
+    <p className="notice mb-4">시작부터 종료까지가 교육시간으로 계산됩니다. 점심·휴게시간이 있다면 제외한 교육 구간별로 나누어 등록하세요. 예: 오전 10~13시, 오후 14~17시.</p>
     <ActionForm action={scheduleClass} label="수업 등록·출석부 생성">
       <input type="hidden" name="offering" value={book.offering.id} />
       <label className="field">수업명<input name="title" maxLength={200} required placeholder="예: 1차시 · 기초 실습" /></label>
