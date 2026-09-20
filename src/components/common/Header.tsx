@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
@@ -59,9 +60,14 @@ export default function Header() {
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-800 font-bold text-white">
-            U
-          </span>
+          <Image
+            src="/images/ulsan-college-logo.png"
+            alt="울산과학대학교"
+            width={154}
+            height={140}
+            className="h-14 w-auto shrink-0"
+            priority
+          />
           <span>
             <strong className="block text-xl tracking-tight">U-LIFE</strong>
             <span className="block text-xs text-slate-500">
