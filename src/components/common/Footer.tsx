@@ -10,12 +10,18 @@ export default function Footer() {
     <footer className="isolate mt-16 border-t border-[#105e59] bg-[#105e59] text-white">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-10 text-sm lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
-          <Image
-            src={anchorFooterLogo}
-            alt="ANCHOR · 지역사회와 함께하는 든든한 버팀목"
-            sizes="240px"
-            className="h-auto w-60 max-w-full shrink-0 mix-blend-screen"
-          />
+          <div className="relative w-60 max-w-full shrink-0">
+            <Image
+              src={anchorFooterLogo}
+              alt="ANCHOR"
+              sizes="240px"
+              className="h-auto w-full mix-blend-screen"
+            />
+            {/* Match the source slogan's bounds; keep the anchor artwork visible. */}
+            <p className="absolute left-0 top-[64.8%] flex h-[17%] w-[61%] items-center whitespace-nowrap bg-[#105e59] pl-[2.1%] text-[10px] font-extrabold leading-none text-white">
+              지역과 함께하는 든든한 전문대학
+            </p>
+          </div>
           <div>
             <p className="text-base font-semibold sm:text-lg">
               울산과학대학교 앵커사업단
