@@ -21,8 +21,8 @@ export default async function Login(props: {
         {LOGIN_AUDIENCES.map(item => (
           <Link key={item.id} href={`/auth/login?audience=${item.id}&next=${encodeURIComponent(next)}`}
             aria-current={audience === item.id ? "page" : undefined}
-            className={`flex min-h-24 flex-col justify-center rounded-xl border-2 px-3 py-4 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-700 ${audience === item.id ? "border-teal-800 bg-teal-800 text-white" : "border-slate-200 bg-white text-slate-800 hover:border-teal-600"}`}>
-            <span className="text-lg font-bold">{item.label}</span>
+            className={`flex min-h-24 flex-col justify-center rounded-xl border-2 px-2 py-4 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-700 ${audience === item.id ? "border-teal-800 bg-teal-800 text-white" : "border-slate-200 bg-white text-slate-800 hover:border-teal-600"}`}>
+            <span className="whitespace-nowrap text-base font-bold min-[360px]:text-lg">{item.label}</span>
             <span className={`mt-2 text-xs leading-5 ${audience === item.id ? "text-teal-50" : "text-slate-600"}`}>{item.description}</span>
           </Link>
         ))}
