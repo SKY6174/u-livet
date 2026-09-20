@@ -10,6 +10,7 @@ import {
   type MfaResult,
 } from "@/app/auth/mfa-actions";
 import type { SecurityStatus } from "@/lib/auth/mfa";
+import { MfaCodeInput } from "@/components/auth/mfa-code-input";
 type Factor = { id: string; name: string; verified: boolean };
 export function MfaPanel({
   status,
@@ -84,6 +85,37 @@ export function MfaPanel({
           <p>저장하기 전에 아래 코드로 다시 확인해 주세요.</p>
         )}
       </div>
+      {!enrollment && verified.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="shrink-0 text-lg font-bold" htmlFor="mfa-factor">
+            확인할 인증 앱
+          </label>
+          <select
+            id="mfa-factor"
+            className="min-h-11 min-w-0 flex-1 basis-40 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            value={factorId}
+            disabled={pending}
+            onChange={(e) => {
+              setSelected(e.target.value);
+              setCode("");
+            }}
+          >
+            {verified.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+          <button
+            className="btn-secondary ml-auto shrink-0"
+            disabled={pending || !status.recent}
+            type="button"
+            onClick={() => run(enrollMfa, "enroll")}
+          >
+            다른 인증 앱 추가
+          </button>
+        </div>
+      )}
       {enrollment && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">인증 앱 연결 순서</h2>
@@ -153,25 +185,8 @@ export function MfaPanel({
             run(() => verifyMfa(factorId, code), "verify");
           }}
         >
-          {!enrollment && (
-            <label className="block">
-              확인할 인증 앱
-              <select
-                className="min-h-12 rounded-lg border border-slate-300 bg-white px-3 py-3 text-slate-900 mt-2 w-full"
-                value={factorId}
-                disabled={pending}
-                onChange={(e) => setSelected(e.target.value)}
-              >
-                {verified.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-            <label className="shrink-0 font-medium" htmlFor="mfa-code">
+            <label className="shrink-0 text-lg font-bold" htmlFor="mfa-code">
               인증 앱의 6자리 코드
             </label>
             <p
@@ -182,21 +197,11 @@ export function MfaPanel({
               주세요.
             </p>
           </div>
-          <input
+          <MfaCodeInput
             id="mfa-code"
-            name="code"
-            className="min-h-12 rounded-lg border border-slate-300 bg-white px-3 py-3 text-slate-900 w-full text-xl tracking-widest"
-            type="text"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            pattern="[0-9]{6}"
-            maxLength={6}
-            required
             value={code}
-            onChange={(e) =>
-              setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-            }
-            aria-describedby="mfa-code-help"
+            onChange={setCode}
+            describedBy="mfa-code-help"
             disabled={pending}
           />
           <button
@@ -218,14 +223,14 @@ export function MfaPanel({
           {result.message}
         </p>
       )}
-      {!enrollment && (
+      {!enrollment && verified.length === 0 && (
         <button
           className="btn-secondary w-full"
-          disabled={pending || (verified.length > 0 && !status.recent)}
+          disabled={pending}
           type="button"
           onClick={() => run(enrollMfa, "enroll")}
         >
-          {verified.length ? "다른 인증 앱 추가" : "인증 앱 연결하기"}
+          인증 앱 연결하기
         </button>
       )}
       {enrollment && (

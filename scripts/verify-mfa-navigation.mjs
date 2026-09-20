@@ -24,7 +24,10 @@ const factors = [{ id: factorId, name: 'Test authenticator', verified: true }];
 const panelFile = 'src/components/auth/mfa-panel.tsx';
 const routeCalls = [];
 const router = { refresh: () => routeCalls.push('refresh'), replace: path => routeCalls.push(path) };
+const codeInputFile = 'src/components/auth/mfa-code-input.tsx';
+const { MfaCodeInput } = load(codeInputFile, {});
 const panelImports = { 'next/image': { default: 'img' }, 'next/link': { default: 'a' },
+  '@/components/auth/mfa-code-input': { MfaCodeInput },
   'next/navigation': { useRouter: () => router }, '@/app/auth/mfa-actions': {} };
 const { MfaPanel } = load(panelFile, panelImports);
 const html = status => renderToStaticMarkup(React.createElement(MfaPanel, { status, factors, next: '/admin', returnToWork: false }));
@@ -41,7 +44,7 @@ for (const [label, status] of [
 ]) await test(label + ' still displays the code form', () => assert(html(status).includes('id="mfa-code"')));
 
 // Execute handlers from the real component; retain hook state between renders.
-function panelHarness(returnToWork, response = { ok: true, message: 'verified' }) {
+function panelHarness(returnToWork, response = { ok: true, message: 'verified' }, factorList = factors) {
   let cursor = 0;
   const states = [], tasks = [], calls = [];
   const hooks = { useState(initial) { const i = cursor++; if (!(i in states)) states[i] = initial; return [states[i], value => { states[i] = value; }]; },
@@ -50,7 +53,7 @@ function panelHarness(returnToWork, response = { ok: true, message: 'verified' }
     enrollMfa: async () => ({ enrollment: { id: factorId, qr: 'data:image/svg+xml,test', secret: 'SYNTHETIC' }, message: 'enroll' }),
     removeMfa: async () => ({ ok: true, message: 'removed' }) };
   const { MfaPanel: Panel } = load(panelFile, { ...panelImports, react: hooks, '@/app/auth/mfa-actions': actions });
-  return { render: (status = { ...fresh, mfa_verified: false, recent: false }) => { cursor = 0; return Panel({ status, factors, next: '/admin', returnToWork }); },
+  return { render: (status = { ...fresh, mfa_verified: false, recent: false }) => { cursor = 0; return Panel({ status, factors: factorList, next: '/admin', returnToWork }); },
     flush: () => Promise.all(tasks.splice(0)), calls };
 }
 function elements(node) {
@@ -64,7 +67,7 @@ for (const [label, returnToWork, response, expected] of [
 ]) await test(label, async () => {
   routeCalls.length = 0;
   const h = panelHarness(returnToWork, response);
-  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange({ target: { value: '123456' } });
+  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange('123456');
   elements(h.render()).find(e => e.type === 'form').props.onSubmit({ preventDefault() {} });
   await h.flush();
   assert.deepEqual(h.calls, [['verify', factorId, '123456']]);
@@ -82,6 +85,64 @@ await test('removing an authenticator never invokes the verification return path
   elements(h.render(fresh)).find(e => e.type === 'button' && e.props.children === '이 인증 앱 연결 해제').props.onClick();
   await h.flush();
   assert.deepEqual(routeCalls, ['refresh']);
+});
+
+await test('switching authenticators clears the code entered for the previous app', () => {
+  const h = panelHarness(false, undefined, [...factors, { id: 'second', name: 'Second app', verified: true }]);
+  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange('012345');
+  elements(h.render()).find(e => e.props?.id === 'mfa-factor').props.onChange({ target: { value: 'second' } });
+  assert.equal(elements(h.render()).find(e => e.props?.id === 'mfa-code').props.value, '');
+  assert.equal(elements(h.render()).find(e => e.props?.id === 'mfa-factor').props.value, 'second');
+});
+await test('relocated add-app action still requires recent authentication', () => {
+  const h = panelHarness(false);
+  const addButton = status => elements(h.render(status)).find(e => e.type === 'button' && e.props.children === '다른 인증 앱 추가');
+  assert.equal(addButton({ ...fresh, recent: false }).props.disabled, true);
+  assert.equal(addButton(fresh).props.disabled, false);
+  const firstSetup = elements(panelHarness(false, undefined, []).render()).find(e => e.type === 'button' && e.props.children === '인증 앱 연결하기');
+  assert.equal(firstSetup.props.disabled, false);
+});
+
+function codeHarness(initial = '') {
+  let value = initial, cursor = 0;
+  const states = [];
+  const hooks = { useState(initialState) { const i = cursor++; if (!(i in states)) states[i] = initialState; return [states[i], next => { states[i] = next; }]; } };
+  const { MfaCodeInput: Input } = load(codeInputFile, { react: hooks });
+  const input = { value, selectionStart: value.length, selectionEnd: value.length,
+    setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; } };
+  return { input, value: () => value, render: () => { cursor = 0; return Input({ id: 'mfa-code', value, onChange: next => { value = next; }, disabled: false, describedBy: 'mfa-code-help' }); } };
+}
+await test('six visual slots retain one accessible native input and leading zeroes', () => {
+  const output = renderToStaticMarkup(React.createElement(MfaCodeInput, { id: 'mfa-code', value: '012345', onChange() {}, disabled: false, describedBy: 'mfa-code-help' }));
+  assert.equal((output.match(/<input/g) ?? []).length, 1);
+  assert.equal((output.match(/<span/g) ?? []).length, 6);
+  assert(output.includes('autoComplete="one-time-code"'));
+  assert(output.includes('aria-describedby="mfa-code-help"'));
+  assert(output.includes('value="012345"'));
+});
+await test('typing and autofill retain only six digits, including leading zeroes', () => {
+  const h = codeHarness();
+  h.input.value = '0a1234567';
+  h.input.selectionStart = h.input.value.length;
+  elements(h.render()).find(e => e.type === 'input').props.onChange({ currentTarget: h.input });
+  assert.equal(h.value(), '012345');
+  assert.equal(h.input.selectionStart, 6);
+});
+await test('formatted paste replaces all slots without losing digits at spaces', () => {
+  const h = codeHarness('999999');
+  let prevented = false;
+  elements(h.render()).find(e => e.type === 'input').props.onPaste({ currentTarget: h.input,
+    clipboardData: { getData: () => '012 345' }, preventDefault: () => { prevented = true; } });
+  assert(prevented);
+  assert.equal(h.value(), '012345');
+});
+await test('short paste replaces the selected digit without altering the other slots', () => {
+  const h = codeHarness('012345');
+  h.input.setSelectionRange(2, 3);
+  elements(h.render()).find(e => e.type === 'input').props.onPaste({ currentTarget: h.input,
+    clipboardData: { getData: () => '9' }, preventDefault() {} });
+  assert.equal(h.value(), '019345');
+  assert.equal(h.input.selectionStart, 3);
 });
 
 const redirect = path => { const error = Error('REDIRECT'); error.destination = path; throw error; };
