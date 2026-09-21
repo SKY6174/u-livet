@@ -1,12 +1,14 @@
 "use client";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { normalizeSheet, validWorkbook, type WorkbookInput, type WorkbookSummary } from "@/lib/course-budget/model";
 import { readBudgetWorkbook, saveBudgetWorkbook } from "@/app/admin/courses/budget-actions";
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
 
-export function ExecutionPanel({ org, workbooks }: { org: string; workbooks: WorkbookSummary[] }) {
+export type ExecutionSource = { input: WorkbookInput | null; saved: boolean; busy: boolean; message: string };
+
+export function ExecutionPanel({ org, workbooks, onSourceChange }: { org: string; workbooks: WorkbookSummary[]; onSourceChange?: (source: ExecutionSource) => void }) {
   const router = useRouter();
   const request = useRef(0);
   const [sheets, setSheets] = useState<{ sheet: string; data: unknown[][] }[]>([]);
@@ -16,9 +18,11 @@ export function ExecutionPanel({ org, workbooks }: { org: string; workbooks: Wor
   const [message, setMessage] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
+  const [selectedWorkbook, setSelectedWorkbook] = useState("");
+  useEffect(() => { onSourceChange?.({ input, saved, busy, message }); }, [input, saved, busy, message, onSourceChange]);
   async function upload(file?: File) {
     const token = ++request.current;
-    setInput(null); setSheets([]); setSaved(false); setMessage(""); setQuery(""); setPage(0);
+    setSelectedWorkbook(""); setInput(null); setSheets([]); setSaved(false); setMessage(""); setQuery(""); setPage(0);
     if (!file) { setBusy(false); return; }
     if (!/\.xlsx$/i.test(file.name) || file.size > 5 * 1024 * 1024 || file.name.length > 200) { setBusy(false); setMessage("5MB 이하의 .xlsx 파일을 선택해 주세요. .xls 파일은 .xlsx로 저장한 뒤 선택하세요."); return; }
     setBusy(true);
@@ -42,10 +46,10 @@ export function ExecutionPanel({ org, workbooks }: { org: string; workbooks: Wor
     try { setInput({ ...input, sheet_name: name, header_row: 0, rows: normalizeSheet(sheet.data) }); }
     catch (e) { setInput({ ...input, sheet_name: name, header_row: 0, rows: [] }); setMessage(e instanceof Error ? e.message : "시트를 읽지 못했습니다."); }
   }
-  async function load(id: string) {
+  const load = useCallback(async (id: string) => {
     if (!id) return;
     const token = ++request.current;
-    setBusy(true); setMessage(""); setInput(null); setSheets([]); setSaved(false); setPage(0); setQuery("");
+    setSelectedWorkbook(id); setBusy(true); setMessage(""); setInput(null); setSheets([]); setSaved(false); setPage(0); setQuery("");
     try {
       const result = await readBudgetWorkbook(org, id);
       if (token !== request.current) return;
@@ -53,7 +57,13 @@ export function ExecutionPanel({ org, workbooks }: { org: string; workbooks: Wor
       else setMessage(result.message ?? "자료를 불러오지 못했습니다.");
     } catch { if (token === request.current) setMessage("자료를 불러오지 못했습니다. 다시 시도해 주세요."); }
     finally { if (token === request.current) setBusy(false); }
-  }
+  }, [org]);
+  const latestWorkbook = workbooks[0]?.id;
+  useEffect(() => {
+    const pending = request;
+    if (latestWorkbook) void load(latestWorkbook);
+    return () => { pending.current++; };
+  }, [latestWorkbook, load]);
   async function save() {
     if (!input || !validWorkbook(input)) return;
     setBusy(true); setMessage("");
@@ -64,11 +74,11 @@ export function ExecutionPanel({ org, workbooks }: { org: string; workbooks: Wor
   const width = input ? Math.max(0, ...input.rows.map(r => r.length)) : 0;
   const rows = input?.rows.map((cells, index) => ({ cells, index })).filter(r => r.index > input.header_row && r.cells.some(c => c.trim()) && (!query || r.cells.join(" ").toLocaleLowerCase().includes(query.toLocaleLowerCase()))) ?? [];
   const pages = Math.max(1, Math.ceil(rows.length / 50));
-  return <section className="space-y-5" aria-label="예산 집행현황">
-    <div><h2 className="text-xl font-bold">2026 예산 집행현황</h2><p className="mt-2 text-sm leading-6 text-slate-500">엑셀 파일의 시트와 제목 행을 선택해 집행내역을 확인하세요. 양식 확정 전에는 원본 열 구성을 그대로 표시하며, 확인한 내역을 저장하면 다른 관리자와 공유됩니다.</p></div>
+  return <section className="space-y-5" aria-label="집행 엑셀 자료">
+    <div><h3 className="font-bold">집행내역 원본 확인</h3><p className="mt-2 text-sm leading-6 text-slate-500">엑셀 파일의 시트와 제목 행을 선택해 집행내역을 확인하세요. 과정명과 항목명이 일치하는 내역은 위 비교 표에 함께 표시됩니다. 확인한 내역을 저장하면 다른 관리자와 공유됩니다.</p></div>
     <div className="grid gap-5 rounded-2xl border bg-white p-5 md:grid-cols-2">
       <label className="space-y-3"><span className="flex items-center gap-2 text-sm font-bold"><Upload size={18} />집행내역 엑셀 선택</span><input disabled={busy} type="file" accept=".xlsx" onChange={e => void upload(e.target.files?.[0])} className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-4 file:py-2 file:font-semibold file:text-teal-800" /><span className="block text-xs text-slate-500">.xlsx · 최대 5MB · 시트당 2,000행 / 40열</span></label>
-      <label className="text-sm font-bold">저장한 자료<select className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm mt-3 font-normal" disabled={busy || !workbooks.length} defaultValue="" onChange={e => void load(e.target.value)}><option value="">{workbooks.length ? "파일·시트를 선택하세요" : "아직 저장한 집행내역이 없습니다"}</option>{workbooks.map(w => <option key={w.id} value={w.id}>{w.file_name} · {w.sheet_name} · {new Date(w.created_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}</option>)}</select><span className="mt-2 block text-xs font-normal text-slate-500">최근 저장한 자료 50건 · 이전 자료도 보존됩니다.</span></label>
+      <label className="text-sm font-bold">저장한 자료<select className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm mt-3 font-normal" disabled={busy || !workbooks.length} value={selectedWorkbook} onChange={e => void load(e.target.value)}><option value="">{workbooks.length ? "파일·시트를 선택하세요" : "아직 저장한 집행내역이 없습니다"}</option>{workbooks.map(w => <option key={w.id} value={w.id}>{w.file_name} · {w.sheet_name} · {new Date(w.created_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}</option>)}</select><span className="mt-2 block text-xs font-normal text-slate-500">최근 저장한 자료 50건 · 이전 자료도 보존됩니다.</span></label>
     </div>
     {busy && <p role="status" className="text-sm text-teal-800">처리 중입니다…</p>}
     {message && <p role="status" className="text-sm font-semibold text-teal-900">{message}</p>}

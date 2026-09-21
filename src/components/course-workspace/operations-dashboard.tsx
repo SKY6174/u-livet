@@ -2,11 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CalendarDays, LayoutGrid, List, Search } from "lucide-react";
-import dynamic from "next/dynamic";
 import { budgetTotal, won, type OperationCourse, type WorkbookSummary } from "@/lib/course-budget/model";
 import { BudgetPanel } from "./budget-panel";
 
-const ExecutionPanel = dynamic(() => import("./execution-panel").then(m => m.ExecutionPanel), { loading: () => <p role="status">엑셀 조회 화면을 준비하고 있습니다…</p> });
 const status = (c: OperationCourse) => c.workspace?.status ?? "DRAFT";
 const stateLabel = (c: OperationCourse) => ({ DRAFT: "개설 준비", ARCHIVED: "운영 완료·보관", PUBLISHED: "모집 공개", CLOSED: "모집 종료" })[status(c)] ?? "개설 준비";
 function CourseActions({ course: c, manager, org }: { course: OperationCourse; manager: boolean; org: string }) {
@@ -29,7 +27,7 @@ export function OperationsDashboard({ courses, workbooks, org, manager }: { cour
       {[["2026 전체 과정", `${courses.length}개`], ["개설 준비", `${courses.filter(c => status(c) === "DRAFT").length}개`], ["운영 완료·보관", `${courses.filter(c => status(c) === "ARCHIVED").length}개`], ["편성 예산", `${won(courses.reduce((sum, c) => sum + budgetTotal(c.budget), 0))}원`]].map(([label, value]) => <div key={label} className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-xs text-slate-500">{label}</p><p className={`mt-2 font-bold tabular-nums ${label === "편성 예산" ? "whitespace-nowrap text-base sm:text-xl" : "text-xl sm:text-2xl"}`}>{value}</p></div>)}
     </div>
     <div role="group" aria-label="과정 관리 화면" className="flex flex-wrap gap-2 border-b border-slate-200 pb-4">
-      {[["courses", "과정 목록"], ["budget", "예산 현황"], ["execution", "예산 집행현황"]].map(([value, label]) => <button key={value} type="button" aria-pressed={tab === value} onClick={() => setTab(value)} className={`rounded-xl px-5 py-3 text-sm font-bold ${tab === value ? "bg-teal-800 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-teal-50"}`}>{label}</button>)}
+      {[["courses", "과정 목록"], ["budget", "예산 및 집행현황"]].map(([value, label]) => <button key={value} type="button" aria-pressed={tab === value} onClick={() => setTab(value)} className={`rounded-xl px-5 py-3 text-sm font-bold ${tab === value ? "bg-teal-800 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-teal-50"}`}>{label}</button>)}
     </div>
     {tab === "courses" && <>
       <div className="flex flex-wrap items-center gap-3">
@@ -51,7 +49,6 @@ export function OperationsDashboard({ courses, workbooks, org, manager }: { cour
         <div className="mt-auto border-t pt-4"><CourseActions course={c} manager={manager} org={org} /></div>
       </article>)}</div> : <div role="region" aria-label="2026 과정 리스트" tabIndex={0} className="relative overflow-x-auto rounded-2xl border bg-white"><table className="w-full min-w-[1400px] text-left text-sm"><caption className="sr-only">2026년 과정 운영 관리 목록</caption><thead className="bg-slate-50 text-xs text-slate-500"><tr>{["순번", "프로그램 ID", "세부 프로그램", "정원 / 시수", "모집 / 수료", "강사 · 운영계획", "보조강사 / 보조인력", "교육일정 · 장소", "상태 / 관리"].map(t => <th key={t} scope="col" className="whitespace-nowrap p-4">{t}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">{visible.map(c => <tr key={c.id} className="hover:bg-teal-50/40"><td className="p-4 text-slate-400">{c.sort_order}</td><td className="whitespace-nowrap p-4 font-mono text-xs">{c.budget.program_id || "미입력"}</td><th scope="row" className="min-w-56 p-4 font-semibold"><span className="mb-1 block text-xs font-normal text-teal-700">{c.academy}</span>{c.name}</th><td className="whitespace-nowrap p-4">{c.capacity}명 / {c.teaching_hours}시간</td><td className="whitespace-nowrap p-4">{c.workspace ? `${c.workspace.source?.enrolled ?? c.workspace.enrolled} / ${c.workspace.source?.completed ?? c.workspace.completed}명` : "미등록"}</td><td className="min-w-48 p-4 text-xs leading-6">{c.teachers}</td><td className="min-w-40 p-4 text-xs leading-6">{c.assistants}<br />{c.support_staff}</td><td className="min-w-56 p-4 text-xs leading-6">{c.period_label}<br />{c.time_label}<br />{c.location}</td><td className="min-w-44 p-4"><p className="mb-2 text-xs text-slate-500">{stateLabel(c)}</p><CourseActions course={c} manager={manager} org={org} /></td></tr>)}</tbody></table></div>}
     </>}
-    {tab === "budget" && <BudgetPanel courses={courses} org={org} />}
-    {tab === "execution" && <ExecutionPanel workbooks={workbooks} org={org} />}
+    {tab === "budget" && <BudgetPanel courses={courses} org={org} workbooks={workbooks} />}
   </section>;
 }
