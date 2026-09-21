@@ -81,7 +81,7 @@ await test('desktop and expanded mobile header share exactly the same authorized
     me = member(...roles);
     const output = renderToStaticMarkup(React.createElement(Header));
     for (const { label, href } of nav.primaryLinks(me)) {
-      assert.equal((output.match(new RegExp('href="' + href + '"', 'g')) ?? []).length, 2, label);
+      assert.equal((output.match(new RegExp('href="' + href + '"', 'g')) ?? []).length, href === '/admin' ? 4 : 2, label);
     }
     const submenuHrefs = nav.officeSections(me).flatMap(section => section.links.map(link => link.href));
     for (const href of submenuHrefs) {
@@ -93,8 +93,8 @@ await test('desktop and expanded mobile header share exactly the same authorized
   }
 });
 const Admin = load('src/app/admin/page.tsx', common).default;
-const AdminLayout = load('src/app/admin/layout.tsx', { ...common, '@/components/navigation/office-nav': { OfficeNav: () => null } }).default;
-const section = load('src/components/navigation/office-section.tsx', { ...common, './office-nav': { OfficeNav: () => null } });
+const AdminLayout = load('src/app/admin/layout.tsx', common).default;
+const section = load('src/components/navigation/office-section.tsx', common);
 await test('office hub rejects guests/learners/teachers and permits each actual office role', async () => {
   for (const identity of [null, member(), member('INSTRUCTOR'), { ...member(), office_position: 'DIRECTOR' }]) {
     me = identity;

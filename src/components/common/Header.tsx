@@ -3,12 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useRole } from "@/lib/auth/roleContext";
 import { signOut } from "@/app/auth/actions";
 import {
   isOfficeMember,
   memberLabel,
+  officeActiveHref,
   officeSections,
   primaryLinks,
   primaryActive,
@@ -28,7 +29,7 @@ const primaryLinkClass = (active: boolean) =>
   }`;
 
 const submenuLinkClass = (active: boolean) =>
-  `block rounded-lg px-3 py-2.5 transition-colors ${
+  `flex min-h-11 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
     active
       ? "bg-teal-50 text-teal-900"
       : "text-slate-700 hover:bg-slate-50 hover:text-teal-900"
@@ -40,6 +41,8 @@ export default function Header() {
   const isLoginPage = pathname === "/auth/login";
   const [open, setOpen] = useState(false);
   const [openAdminMenu, setOpenAdminMenu] = useState(false);
+  const [openMobileAdminMenu, setOpenMobileAdminMenu] = useState(false);
+  const [previewHref, setPreviewHref] = useState<string | null>(null);
   const adminMenuRef = useRef<HTMLDivElement>(null);
   const userLabel = identity ? (
     <span className="inline-flex items-center gap-2 whitespace-nowrap">
@@ -54,6 +57,10 @@ export default function Header() {
     ? [OFFICE_HOME_LINK, ...officeSections(identity).flatMap((section) => section.links)]
     : [];
   const adminActive = primaryActive(pathname, "/admin");
+  const activeAdminHref = adminActive ? officeActiveHref(pathname) : null;
+  const previewLink = adminLinks.find((link) => link.href === previewHref)
+    ?? adminLinks.find((link) => link.href === activeAdminHref)
+    ?? OFFICE_HOME_LINK;
 
   const renderPrimaryLink = ({ label, href }: { label: string; href: string }) => {
     if (href !== "/admin" || adminLinks.length === 0) {
@@ -75,55 +82,81 @@ export default function Header() {
         key={href}
         ref={adminMenuRef}
         className="relative"
-        onMouseEnter={() => setOpenAdminMenu(true)}
-        onMouseLeave={() => setOpenAdminMenu(false)}
-        onFocus={() => setOpenAdminMenu(true)}
+        onMouseEnter={() => {
+          setPreviewHref(null);
+          setOpenAdminMenu(true);
+        }}
+        onMouseLeave={(event) => {
+          if (!event.currentTarget.contains(document.activeElement)) setOpenAdminMenu(false);
+        }}
         onBlur={(event) => {
           if (!event.relatedTarget || !event.currentTarget.contains(event.relatedTarget as Node)) {
             setOpenAdminMenu(false);
           }
         }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            adminMenuRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+            setOpenAdminMenu(false);
+          }
+        }}
       >
-        <button
-          type="button"
-          aria-current={adminActive ? "page" : undefined}
-          aria-expanded={openAdminMenu}
-          aria-controls="desktop-admin-submenu"
-          className={primaryLinkClass(adminActive)}
-          onClick={() => setOpenAdminMenu((current) => !current)}
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              setOpenAdminMenu(false);
-              adminMenuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
-            }
-          }}
-        >
-          {label}
-          <ChevronDown aria-hidden="true" className={`h-4 w-4 transition-transform ${openAdminMenu ? "rotate-180" : ""}`} />
-        </button>
+        <div className={`flex items-center rounded-lg ${adminActive ? "bg-teal-50 ring-1 ring-teal-200" : "hover:bg-teal-50"}`}>
+          <Link
+            href={href}
+            aria-current={adminActive ? (pathname === href ? "page" : "true") : undefined}
+            className={`inline-flex min-h-11 items-center rounded-lg pl-3 pr-1 text-sm font-semibold ${adminActive ? "text-teal-900" : "text-slate-800"}`}
+            onFocus={() => {
+              setPreviewHref(null);
+              setOpenAdminMenu(true);
+            }}
+            onClick={() => setOpenAdminMenu(false)}
+          >
+            {label}
+          </Link>
+          <button
+            type="button"
+            aria-label="사업단 관리 하위 메뉴"
+            aria-expanded={openAdminMenu}
+            aria-controls="desktop-admin-submenu"
+            className="inline-flex min-h-11 w-8 items-center justify-center rounded-lg text-slate-600 hover:text-teal-900"
+            onClick={() => setOpenAdminMenu((current) => !current)}
+          >
+            <ChevronDown aria-hidden="true" className={`h-4 w-4 motion-safe:transition-transform ${openAdminMenu ? "rotate-180" : ""}`} />
+          </button>
+        </div>
         <div
           id="desktop-admin-submenu"
           aria-hidden={!openAdminMenu}
-          className={`absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 transition ${openAdminMenu ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+          className={`absolute left-1/2 top-full z-50 w-[32rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
         >
-          <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl ring-1 ring-slate-900/5">
-            <p className="px-3 pb-1 pt-2 text-xs font-bold tracking-wide text-slate-500">사업단 업무</p>
-            {adminLinks.map((link) => {
-              const active = primaryActive(pathname, link.href);
-              return (
+          <div className="grid grid-cols-[13rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
+            <div className="space-y-1 p-2">
+              {adminLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   tabIndex={openAdminMenu ? 0 : -1}
-                  aria-current={active ? "page" : undefined}
-                  className={submenuLinkClass(active)}
+                  aria-current={activeAdminHref === link.href ? "page" : undefined}
+                  className={submenuLinkClass(previewLink.href === link.href)}
+                  onMouseEnter={() => setPreviewHref(link.href)}
+                  onFocus={() => setPreviewHref(link.href)}
                   onClick={() => setOpenAdminMenu(false)}
                 >
-                  <span className="block text-sm font-semibold">{link.label}</span>
-                  <span className="mt-0.5 block text-xs leading-5 text-slate-500">{link.description}</span>
+                  <span>{link.label}<span className="sr-only"> — {link.description}</span></span>
+                  <ChevronRight aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 ${previewLink.href === link.href ? "opacity-100" : "opacity-0"}`} />
                 </Link>
-              );
-            })}
+              ))}
+            </div>
+            <div aria-hidden="true" className="flex flex-col border-l border-teal-100/70 bg-gradient-to-br from-teal-50 to-slate-50 p-6">
+              <span className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-teal-800 shadow-sm ring-1 ring-teal-100"><ArrowUpRight className="h-5 w-5" /></span>
+              <p className="text-xs font-semibold text-teal-700">사업단 업무</p>
+              <p className="mb-3 mt-2 text-xl font-bold tracking-tight text-slate-900">{previewLink.label}</p>
+              <p className="text-sm leading-7 text-slate-600">{previewLink.description}</p>
+              <span className="mt-auto pt-6 text-xs font-medium text-teal-700">U-LIFE · OFFICE WORKSPACE</span>
+            </div>
           </div>
         </div>
       </div>
@@ -182,7 +215,10 @@ export default function Header() {
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
-          onClick={() => setOpen(!open)}
+          onClick={() => {
+            setOpen(!open);
+            setOpenMobileAdminMenu(false);
+          }}
         >
           {open ? <X /> : <Menu />}
         </button>
@@ -191,7 +227,7 @@ export default function Header() {
         <nav
           id="mobile-menu"
           aria-label="모바일 메뉴"
-          className="grid gap-1 border-t p-4 lg:hidden"
+          className="grid max-h-[calc(100dvh-8rem)] gap-1 overflow-y-auto border-t p-4 lg:hidden"
         >
           {links.map(({ label, href }) => {
             if (href !== "/admin" || adminLinks.length === 0) {
@@ -210,20 +246,27 @@ export default function Header() {
             }
             return (
               <div key={href} className="rounded-lg border border-slate-200 bg-white">
-                <button
-                  type="button"
-                  aria-expanded={openAdminMenu}
-                  aria-controls="mobile-admin-submenu"
-                  className={`flex min-h-12 w-full items-center justify-between rounded-lg px-3 text-left ${adminActive ? "bg-teal-50 font-bold text-teal-900" : "text-slate-800"}`}
-                  onClick={() => setOpenAdminMenu((current) => !current)}
-                >
-                  {label}
-                  <ChevronDown aria-hidden="true" className={`h-5 w-5 transition-transform ${openAdminMenu ? "rotate-180" : ""}`} />
-                </button>
-                {openAdminMenu && (
+                <div className={`flex items-center rounded-lg ${adminActive ? "bg-teal-50 font-bold text-teal-900" : "text-slate-800"}`}>
+                  <Link href={href} className="flex min-h-12 flex-1 items-center rounded-lg px-3"
+                    aria-current={adminActive ? (pathname === href ? "page" : "true") : undefined}
+                    onClick={() => { setOpen(false); setOpenMobileAdminMenu(false); }}>
+                    {label}
+                  </Link>
+                  <button
+                    type="button"
+                    aria-label="사업단 관리 하위 메뉴"
+                    aria-expanded={openMobileAdminMenu}
+                    aria-controls="mobile-admin-submenu"
+                    className="flex min-h-12 w-12 items-center justify-center rounded-lg"
+                    onClick={() => setOpenMobileAdminMenu((current) => !current)}
+                  >
+                    <ChevronDown aria-hidden="true" className={`h-5 w-5 motion-safe:transition-transform ${openMobileAdminMenu ? "rotate-180" : ""}`} />
+                  </button>
+                </div>
+                {openMobileAdminMenu && (
                   <div id="mobile-admin-submenu" className="border-t border-slate-100 px-2 py-2">
                     {adminLinks.map((link) => {
-                      const active = primaryActive(pathname, link.href);
+                      const active = activeAdminHref === link.href;
                       return (
                         <Link
                           key={link.href}
@@ -231,12 +274,12 @@ export default function Header() {
                           aria-current={active ? "page" : undefined}
                           className={submenuLinkClass(active)}
                           onClick={() => {
-                            setOpenAdminMenu(false);
+                            setOpenMobileAdminMenu(false);
                             setOpen(false);
                           }}
                         >
-                          <span className="block text-sm font-semibold">{link.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-slate-500">{link.description}</span>
+                          <span>{link.label}<span className="sr-only"> — {link.description}</span></span>
+                          <ChevronRight aria-hidden="true" className="h-4 w-4 text-slate-400" />
                         </Link>
                       );
                     })}
