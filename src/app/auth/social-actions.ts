@@ -51,6 +51,19 @@ export async function loginWithSocial(_: ActionState, form: FormData): Promise<A
   redirect(url);
 }
 
+export async function returnToExistingLogin(_: ActionState, form: FormData): Promise<ActionState> {
+  const next = socialReturnTo(form.get("next"));
+  try {
+    const client = await createServerSupabaseClient();
+    const { error } = await client.auth.signOut({ scope: "local" });
+    if (error) return { message: "인증을 종료하지 못했습니다. 잠시 후 다시 시도해 주세요." };
+  } catch {
+    return { message: "인증 서비스에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." };
+  }
+  revalidatePath("/", "layout");
+  redirect(`/auth/login?next=${encodeURIComponent(next)}`);
+}
+
 export async function completeKakaoSignup(_: ActionState, form: FormData): Promise<ActionState> {
   if (isReviewOnly()) return { message: REVIEW_MESSAGE };
   if (!publicSignupEnabled()) return { message: PUBLIC_SIGNUP_PENDING };
