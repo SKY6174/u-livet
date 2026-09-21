@@ -8,6 +8,6 @@
 
 신규 회귀14개, DB assertion20개, 기존 공개 소개 권한 회귀, 실제16개 상세/404, 브라우저, lint/typecheck/build 통과. 양쪽 DB의16개 레코드 및 쓰기차단을 익명 REST로 검증했고 보안 advisor 경고가 없다.
 
-원문 하단합계와 세부행 합계의 차이는 [검증 기록](../../03-analysis/anchor-course-catalog-views.analysis.md)에 기록했다. 화면은 개별 과정 값을 사용한다.
+원문 하단합계와 세부행 합계의 차이는 [검증 기록](anchor-course-catalog-views.analysis.md)에 기록했다. 화면은 개별 과정 값을 사용한다.
 
-[설계](../../02-design/features/anchor-course-catalog-views.design.md) · [공개 데이터](../../operations/2026-public-course-guides.json)
+[설계](anchor-course-catalog-views.design.md) · [공개 데이터](../../../operations/2026-public-course-guides.json)
