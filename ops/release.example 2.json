@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "target": "production",
+  "siteOrigin": "",
+  "supabaseProjectRef": "",
+  "sourceDigest": "",
+  "migrationDigest": "",
+  "checks": {
+    "environment-isolation": {
+      "label": "Vercel 도메인·Preview/Production 분리",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "native-password-policy": {
+      "label": "확정 비밀번호 규칙의 native Auth 강제",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "hosted-auth-compatibility": {
+      "label": "운영 Supabase의 Auth schema·감사 이벤트 호환성",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "smtp-recovery": {
+      "label": "승인 SMTP·메일 인증·15분 복구 링크",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "native-captcha": {
+      "label": "운영 CAPTCHA 키와 직접 API 검증",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "mfa-access-recovery": {
+      "label": "MFA·권한 위임·분실 복구 담당자",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "database-security": {
+      "label": "Migration·RLS·이관·직접 API 권한",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "privacy-consent": {
+      "label": "승인 개인정보 문안·동의·보유기간",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "unconfirmed-policies": {
+      "label": "환불·감면·강사 심사 미확정 기능 제한",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "proxy-rate-limits": {
+      "label": "신뢰 프록시·WAF·공개 API 한도",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "retention-jobs": {
+      "label": "인증 제한 기록 정리·실패 감시",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "backup-restore": {
+      "label": "백업·별도 파일·실제 복원·RPO/RTO",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "release-smoke": {
+      "label": "대상 런타임·브라우저·접근성·PDF·의존성 검사",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "monitoring-costs": {
+      "label": "상태·실패율·비용·담당자 알림",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    },
+    "release-rollback": {
+      "label": "운영 게시 승인·이전 build와 현재 DB 호환성",
+      "status": "pending",
+      "owner": "",
+      "checkedAt": "",
+      "evidence": ""
+    }
+  }
+}

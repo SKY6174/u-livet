@@ -1,0 +1,14 @@
+{
+  "site_url": null,
+  "password_min_length": null,
+  "password_required_characters": null,
+  "external_email_enabled": null,
+  "mailer_autoconfirm": null,
+  "mailer_otp_exp": null,
+  "smtp_host": null,
+  "smtp_max_frequency": null,
+  "security_captcha_enabled": null,
+  "security_captcha_provider": null,
+  "mfa_totp_enroll_enabled": null,
+  "mfa_totp_verify_enabled": null
+}
