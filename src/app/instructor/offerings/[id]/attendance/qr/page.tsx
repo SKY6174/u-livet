@@ -74,7 +74,7 @@ export default async function InstructorQrAttendancePage({
           offering={book.offering}
           sessions={sessions}
           activeSession={activeSession}
-          enrolledCount={book.enrolled.length}
+          enrolledCount={book.members.length}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import QRCode from "qrcode";
@@ -16,12 +16,13 @@ import {
   Sparkles, 
   ExternalLink 
 } from "lucide-react";
-import type { OfferingSummary, SessionRow } from "@/lib/attendance/model";
+import type { AttendanceBook } from "@/lib/attendance/model";
+import type { ClassSession } from "@/lib/portal/evaluation";
 
 interface QrPresenterProps {
-  offering: OfferingSummary;
-  sessions: SessionRow[];
-  activeSession: SessionRow;
+  offering: AttendanceBook["offering"];
+  sessions: ClassSession[];
+  activeSession: ClassSession;
   enrolledCount: number;
 }
 
@@ -48,7 +49,7 @@ export function QrPresenter({
   const checkinUrl = `${origin}/learning/${offering.id}/attendance/checkin?session=${activeSession.id}&t=${token}`;
 
   // QR 코드 생성 함수 (랜덤 토큰으로 부정 출석 방지)
-  const generateQr = async () => {
+  const generateQr = useCallback(async () => {
     try {
       const randomToken = Math.random().toString(36).substring(2, 10);
       setToken(randomToken);
@@ -67,12 +68,12 @@ export function QrPresenter({
     } catch (err) {
       console.error("QR Code 생성 실패:", err);
     }
-  };
+  }, [origin, offering.id, activeSession.id]);
 
   // 세션이 변경되거나 컴포넌트 마운트 시 QR 코드 새로 생성
   useEffect(() => {
     generateQr();
-  }, [activeSession.id, origin]);
+  }, [generateQr]);
 
   // 1분(60초)마다 자동으로 토큰을 갱신하여 캡처 공유 방지 (보안 강화)
   useEffect(() => {
@@ -80,7 +81,7 @@ export function QrPresenter({
       generateQr();
     }, 60000);
     return () => clearInterval(timer);
-  }, [activeSession.id, origin]);
+  }, [generateQr]);
 
   // 전체화면 토글 핸들러
   const toggleFullscreen = () => {

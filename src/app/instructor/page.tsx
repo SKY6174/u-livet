@@ -174,7 +174,7 @@ export default async function InstructorRoom() {
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
-              <span className="text-xs text-slate-500">담당 강좌별 '과정 평가·개선' 메뉴에서 확인</span>
+              <span className="text-xs text-slate-500">담당 강좌별 &apos;과정 평가·개선&apos; 메뉴에서 확인</span>
             </div>
           </div>
 
