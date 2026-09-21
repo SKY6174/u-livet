@@ -10,9 +10,10 @@ export type Member = {
   id: string; name: string; email: string | null; office_position: OfficePosition | null;
   instructor_kind: "INTERNAL" | "EXTERNAL" | null; office_phone: string | null;
   mobile_phone: string | null; instructor_phone: string | null; birth_date: string | null;
+  is_manual?: boolean; can_manage?: boolean; current_courses?: { id: string; name: string }[];
   notes: string; revision: number; is_office: boolean; is_instructor: boolean; is_learner: boolean;
 };
-export type MemberDirectory = { items: Member[]; total: number; page: number; page_size: number; counts: Record<MemberGroup, number> };
+export type MemberDirectory = { current_year?: number; items: Member[]; total: number; page: number; page_size: number; counts: Record<MemberGroup, number> };
 export type MemberHistory = { items: { id: string; name: string; starts_on: string; ends_on: string; status: string }[]; total: number; page: number; page_size: number };
 export const HISTORY_STATUS: Record<string, string> = {
   TEACHING: "강의 배정", TEACHING_ENDED: "배정 종료", ENROLLED: "수강 확정", WITHDRAWN: "수강 철회",
@@ -48,4 +49,17 @@ export function memberInput(form: FormData) {
     p_kind: get("instructor_kind") || null, p_office_phone: office ? normalizeContact(office) : null,
     p_mobile_phone: mobile ? normalizeMobilePhone(mobile) : null, p_instructor_phone: instructor ? normalizeContact(instructor) : null,
     p_birth_date: birth || null, p_notes: notes, p_revision: Number(revision) };
+}
+
+export function newMemberInput(form: FormData) {
+  const copy = new FormData();
+  form.forEach((value, key) => copy.set(key, value));
+  copy.set("revision", "0");
+  const parsed = memberInput(copy);
+  const email = String(form.get("email") ?? "").trim().toLowerCase();
+  if (!parsed || email.length > 254 || !/^[^@\s]+@[^@\s.]+(?:\.[^@\s.]+)+$/.test(email)) return null;
+  return { p_request: String(form.get("request_id") ?? ""), p_org: String(form.get("org_id") ?? ""),
+    p_group: parsed.p_group, p_name: parsed.p_name, p_email: email, p_position: parsed.p_position,
+    p_kind: parsed.p_kind, p_office_phone: parsed.p_office_phone, p_mobile_phone: parsed.p_mobile_phone,
+    p_instructor_phone: parsed.p_instructor_phone, p_birth_date: parsed.p_birth_date, p_notes: parsed.p_notes };
 }

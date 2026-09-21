@@ -2,6 +2,8 @@ export type Identity = {
   id: string;
   name: string;
   roles: { role: string; org_id: string }[];
+  member_entry_orgs?: { org_id: string; org_name: string; is_super_admin: boolean }[];
+  is_super_admin?: boolean;
   office_position?: "DIRECTOR" | "CENTER_HEAD" | "RESEARCHER" | null;
   instructor_kind?: "INTERNAL" | "EXTERNAL" | null;
 };

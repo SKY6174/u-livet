@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Search, UsersRound } from "lucide-react";
+import { Plus, Search, ShieldCheck, UsersRound } from "lucide-react";
 import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { getMembers, memberAdmin } from "@/lib/members/data";
 import { MEMBER_GROUPS, memberGroup, memberPage, displayPhone, type MemberGroup } from "@/lib/members/model";
 
 export default async function Members({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await memberAdmin();
+  const me = await memberAdmin();
   const params = await searchParams;
   const group = memberGroup(params.group);
   const query = typeof params.q === "string" ? params.q.trim().slice(0, 100) : "";
@@ -18,9 +18,14 @@ export default async function Members({ searchParams }: { searchParams: Promise<
   const pages = Math.max(1, Math.ceil((data?.total ?? 0) / 20));
   if (data && page > pages) redirect(href(pages));
   const phoneHeading = group === "instructor" ? "연락처" : "핸드폰 전화번호";
-  const columns = ["순번", ...(group === "office" ? ["직책"] : group === "instructor" ? ["교내/교외"] : []), "성명", group === "learner" ? "이메일" : "이메일(아이디)", ...(group === "office" ? ["사무실 전화번호"] : []), phoneHeading, ...(group === "learner" ? ["생년월일", "수강이력"] : group === "instructor" ? ["강의이력"] : []), "비고", "관리"];
+  const columns = ["순번", ...(group === "office" ? ["직책"] : group === "instructor" ? ["교내/교외"] : []), "성명", group === "learner" ? "이메일" : "이메일(아이디)", ...(group === "office" ? ["사무실 전화번호"] : []), phoneHeading, ...(group === "learner" ? ["생년월일", "올해 수강과목", "수강이력"] : group === "instructor" ? ["강의이력"] : []), "비고", "관리"];
   return <div className="page-shell">
     <PageIntro eyebrow="MEMBERS" title="구성원 관리">사업단·강사·수강생의 정보와 활동 이력을 관리합니다.</PageIntro>
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <span className="inline-flex items-center gap-2 text-sm text-slate-500"><ShieldCheck aria-hidden="true" className="h-4 w-4 text-teal-700" />{me.is_super_admin ? "최고 관리자 · " + me.name : "구성원 명부"}</span>
+      {!!me.member_entry_orgs?.length && <Link className="btn-primary gap-2" href={`/admin/accounts/new?group=${group}`}><Plus aria-hidden="true" className="h-4 w-4" />구성원 수동 등록</Link>}
+    </div>
+    {params.created === "1" && <p role="status" className="mb-5 rounded-xl bg-teal-50 p-4 text-sm text-teal-900">구성원을 등록하고 DB에 저장했습니다.</p>}
     {params.saved === "1" && <p role="status" className="mb-5 rounded-xl bg-teal-50 p-4 text-sm text-teal-900">구성원 정보를 저장했습니다.</p>}
     {params.deleted === "1" && <p role="status" className="mb-5 rounded-xl bg-teal-50 p-4 text-sm text-teal-900">구성원을 삭제했습니다. 서비스 이용은 중지되고 기존 이력은 보존됩니다.</p>}
     <nav aria-label="구성원 구분" className="mb-6 flex flex-wrap gap-2">
@@ -50,14 +55,15 @@ export default async function Members({ searchParams }: { searchParams: Promise<
                 <td className="px-4 py-5 tabular-nums text-slate-400">{(page - 1) * 20 + index + 1}</td>
                 {group === "office" && <td className="whitespace-nowrap px-4 py-5">{member.office_position ? OFFICE_POSITIONS[member.office_position] : "미등록"}</td>}
                 {group === "instructor" && <td className="whitespace-nowrap px-4 py-5"><span className="rounded-md bg-teal-50 px-2 py-1 text-xs font-semibold text-teal-800">{member.instructor_kind === "INTERNAL" ? "교내" : member.instructor_kind === "EXTERNAL" ? "교외" : "미등록"}</span></td>}
-                <th scope="row" className="whitespace-nowrap px-4 py-5 font-semibold">{member.name}</th>
+                <th scope="row" className="whitespace-nowrap px-4 py-5 font-semibold">{member.name}{member.is_manual && <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">수동 등록</span>}</th>
                 <td className="max-w-64 break-all px-4 py-5 text-slate-600">{member.email || "—"}</td>
                 {group === "office" && <td className="whitespace-nowrap px-4 py-5 tabular-nums">{displayPhone(member.office_phone)}</td>}
                 <td className="whitespace-nowrap px-4 py-5 tabular-nums">{displayPhone(group === "instructor" ? member.instructor_phone : member.mobile_phone)}</td>
                 {group === "learner" && <td className="whitespace-nowrap px-4 py-5 tabular-nums">{member.birth_date || "—"}</td>}
+                {group === "learner" && <td className="min-w-44 max-w-64 px-4 py-5">{member.current_courses?.length ? <ul className="space-y-1.5">{member.current_courses.map(course => <li key={course.id} className="rounded-md bg-teal-50 px-2.5 py-1.5 text-xs font-medium leading-5 text-teal-900">{course.name}</li>)}</ul> : <span className="text-slate-400">—</span>}</td>}
                 {group !== "office" && <td className="px-4 py-5"><Link aria-label={`${member.name} ${group === "instructor" ? "강의" : "수강"}이력 보기`} className="whitespace-nowrap font-semibold text-teal-800 underline underline-offset-4" href={`${detail}&view=history`}>이력 보기</Link></td>}
                 <td className="min-w-28 max-w-52 break-words px-4 py-5 text-slate-500"><span className="line-clamp-2" title={member.notes}>{member.notes || "—"}</span></td>
-                <td className="px-4 py-5"><div className="flex items-center gap-2"><Link href={detail} aria-label={`${member.name} 수정`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg border border-slate-200 px-3 font-medium hover:border-teal-400">수정</Link><Link href={`${detail}&view=delete`} aria-label={`${member.name} 삭제`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg px-2 text-rose-700 hover:bg-rose-50">삭제</Link></div></td>
+                <td className="px-4 py-5">{member.can_manage !== false && me.roles.some(role => role.role === "SYSTEM_ADMIN") ? <div className="flex items-center gap-2"><Link href={detail} aria-label={`${member.name} 수정`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg border border-slate-200 px-3 font-medium hover:border-teal-400">수정</Link><Link href={`${detail}&view=delete`} aria-label={`${member.name} 삭제`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg px-2 text-rose-700 hover:bg-rose-50">삭제</Link></div> : <span className="text-slate-400">—</span>}</td>
               </tr>;
             })}</tbody>
           </table>
@@ -67,6 +73,7 @@ export default async function Members({ searchParams }: { searchParams: Promise<
         </nav>
       </>}
     </div>
+    {group === "learner" && <p className="mt-3 text-xs leading-6 text-slate-500">올해 수강과목은 {data?.current_year ?? "올해"}년 운영 기간에 해당하는 수강 확정 과정입니다. 수강이력에서는 과거 연도를 포함한 전체 기록을 확인할 수 있습니다.</p>}
     {group === "instructor" && <p className="mt-3 text-xs text-slate-500">연락처는 수강생 Q&amp;A 응대가 가능한 번호입니다.</p>}
   </div>;
 }

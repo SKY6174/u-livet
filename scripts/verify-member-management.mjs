@@ -34,7 +34,7 @@ const mocks = {
   '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async (name, args) => { rpcCalls.push({ name, args }); return { error: rpcError }; } }) },
   '@/lib/portal/data': { UUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i },
   '@/lib/auth/mfa-message': { MFA_REAUTH_MESSAGE: '추가 인증 필요' }, '@/lib/members/model': model,
-  '@/lib/members/data': { memberAdmin: async () => { if (!allowed) throw Error('FORBIDDEN'); return { id: '20000000-0000-4000-8000-000000000099' }; } },
+  '@/lib/members/data': { memberAdmin: async () => { if (!allowed) throw Error('FORBIDDEN'); return { id: '20000000-0000-4000-8000-000000000099', roles: [{role:'SYSTEM_ADMIN'}] }; } },
 };
 const actions = load('src/app/admin/accounts/actions.ts', mocks);
 await test('server action denies unauthorized writes before RPC', async () => { allowed = false; await assert.rejects(actions.saveMember({}, form()), /FORBIDDEN/); assert.equal(rpcCalls.length, 0); allowed = true; });

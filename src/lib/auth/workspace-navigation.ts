@@ -1,16 +1,17 @@
 import type { Identity } from "@/lib/portal/types";
 import { OFFICE_POSITIONS } from "./login-audience";
 
-type Member = Pick<Identity, "roles" | "office_position" | "instructor_kind">;
+type Member = Pick<Identity, "roles" | "office_position" | "instructor_kind" | "member_entry_orgs" | "is_super_admin">;
 export type WorkspaceLink = { label: string; href: string; description: string };
 const OFFICE_ROLES = ["SYSTEM_ADMIN", "COURSE_MANAGER", "CERTIFIER", "FINANCE", "PERFORMANCE"];
 export const hasRole = (member: Member, ...roles: string[]) =>
   member.roles.some((entry) => roles.includes(entry.role));
-export const isOfficeMember = (member: Member) => hasRole(member, ...OFFICE_ROLES);
+export const isOfficeMember = (member: Member) => hasRole(member, ...OFFICE_ROLES) || !!member.member_entry_orgs?.length;
 export const workspaceKind = (member: Member) =>
   isOfficeMember(member) ? "office" : hasRole(member, "INSTRUCTOR") ? "instructor" : "learner";
 
 export function memberLabel(member: Member) {
+  if (member.is_super_admin) return "최고 관리자";
   if (isOfficeMember(member)) return member.office_position
     ? `관리자 · ${OFFICE_POSITIONS[member.office_position]}` : "관리자";
   if (hasRole(member, "INSTRUCTOR")) return member.instructor_kind
@@ -36,7 +37,7 @@ export function officeSections(member: Member) {
     { title: "사업단 지원", links: [
       ...(hasRole(member, "FINANCE") ? [{ label: "수납·환불", href: "/finance", description: "교육비 수납과 환불 처리 내역을 확인합니다." }] : []),
       ...(hasRole(member, "COURSE_MANAGER", "PERFORMANCE") ? [{ label: "연차 평가·성과", href: "/performance", description: "사업연도별 운영 통계와 성과 보고를 관리합니다." }] : []),
-      ...(hasRole(member, "SYSTEM_ADMIN") ? [{ label: "구성원 관리", href: "/admin/accounts", description: "사업단·강사·수강생의 정보와 활동 이력을 관리합니다." }] : []),
+      ...((hasRole(member, "SYSTEM_ADMIN") || !!member.member_entry_orgs?.length) ? [{ label: "구성원 관리", href: "/admin/accounts", description: "사업단·강사·수강생의 정보와 활동 이력을 관리합니다." }] : []),
     ] },
   ].filter((section) => section.links.length);
 }

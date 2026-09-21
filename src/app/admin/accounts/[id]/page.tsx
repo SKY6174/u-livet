@@ -22,6 +22,8 @@ export default async function MemberDetail({ params, searchParams }: {
   if (error || !data) return <div className="page-shell"><Empty title="구성원 정보를 불러오지 못했습니다" /><Link href={`/admin/accounts?group=${group}`} className="btn-secondary mt-4">목록으로</Link></div>;
   const member = data.items[0];
   if (!member) notFound();
+  const canManage = member.can_manage !== false && me.roles.some(role => role.role === "SYSTEM_ADMIN");
+  if (view !== "history" && !canManage) notFound();
   const page = memberPage(query.page);
   const history = view === "history" ? await getMemberHistory(id, group, page) : null;
   const back = `/admin/accounts?group=${group}`;
@@ -34,16 +36,16 @@ export default async function MemberDetail({ params, searchParams }: {
     <Link href={back} className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500"><ArrowLeft aria-hidden="true" className="h-4 w-4" />{MEMBER_GROUPS[group]} 목록</Link>
     <PageIntro eyebrow="MEMBERS" title={`${member.name} · ${view === "delete" ? "구성원 삭제" : view === "history" ? historyName : "구성원 수정"}`}>{member.email || "이메일 미등록"}</PageIntro>
     <nav aria-label="구성원 관리" className="mb-6 flex flex-wrap gap-2">
-      <Link className={view === "edit" ? "btn-primary gap-2" : "btn-secondary gap-2"} href={detail} aria-current={view === "edit" ? "page" : undefined}><Pencil aria-hidden="true" className="h-4 w-4" />정보 수정</Link>
+      {canManage && <Link className={view === "edit" ? "btn-primary gap-2" : "btn-secondary gap-2"} href={detail} aria-current={view === "edit" ? "page" : undefined}><Pencil aria-hidden="true" className="h-4 w-4" />정보 수정</Link>}
       {group !== "office" && <Link className={view === "history" ? "btn-primary gap-2" : "btn-secondary gap-2"} href={`${detail}&view=history`} aria-current={view === "history" ? "page" : undefined}><History aria-hidden="true" className="h-4 w-4" />{historyName}</Link>}
-      <Link className="btn-secondary gap-2 text-rose-700" href={`${detail}&view=delete`} aria-current={view === "delete" ? "page" : undefined}><Trash2 aria-hidden="true" className="h-4 w-4" />삭제</Link>
+      {canManage && <Link className="btn-secondary gap-2 text-rose-700" href={`${detail}&view=delete`} aria-current={view === "delete" ? "page" : undefined}><Trash2 aria-hidden="true" className="h-4 w-4" />삭제</Link>}
     </nav>
     {view === "edit" && <section className="panel max-w-3xl">
       <ActionForm action={saveMember} label="변경사항 저장" resetOnSuccess={false}>
         <input type="hidden" name="person_id" value={id} /><input type="hidden" name="group" value={group} /><input type="hidden" name="revision" value={member.revision} />
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="field">성명<input name="name" defaultValue={member.name} required maxLength={100} autoComplete="off" /></label>
-          <label className="field">이메일(아이디)<input value={member.email || ""} readOnly className="bg-slate-50 text-slate-500" /><span className="text-xs font-normal text-slate-500">인증된 로그인 아이디로, 이 화면에서는 변경되지 않습니다.</span></label>
+          <label className="field">이메일(아이디)<input value={member.email || ""} readOnly className="bg-slate-50 text-slate-500" /><span className="text-xs font-normal text-slate-500">{member.is_manual ? "수동 등록된 이메일입니다. 로그인 계정은 별도로 가입해야 합니다." : "인증된 로그인 아이디로, 이 화면에서는 변경되지 않습니다."}</span></label>
           {group === "office" && <>
             <label className="field">직책<select name="office_position" defaultValue={member.office_position || ""}><option value="">미등록</option>{Object.entries(OFFICE_POSITIONS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
             <label className="field">사무실 전화번호<input name="office_phone" type="tel" defaultValue={member.office_phone ? displayPhone(member.office_phone) : ""} placeholder="052-230-0000" maxLength={30} /></label>
