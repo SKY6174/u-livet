@@ -11,7 +11,7 @@ export default async function MyPage() {
   const kind = workspaceKind(me);
 
   // 강사 계정은 통합된 'My Room'(/instructor)으로 안내합니다.
-  if (hasRole(me, "INSTRUCTOR") && kind === "instructor") {
+  if (hasRole(me, "INSTRUCTOR")) {
     redirect("/instructor");
   }
 

@@ -111,7 +111,7 @@ await test('office hub rejects guests/learners/teachers and permits each actual 
 await test('every pre-existing course subtree retains a manager gate when the hub is widened', async () => {
   const redirectOnly = ['finance', 'performance', 'kpi'];
   for (const dir of readdirSync('src/app/admin', { withFileTypes: true }).filter(dir => dir.isDirectory())) {
-    if (dir.name === 'accounts') continue; // page has its own SYSTEM_ADMIN gate
+    if (['accounts', 'course-requests'].includes(dir.name)) continue; // page has its own SYSTEM_ADMIN gate
     if (redirectOnly.includes(dir.name)) continue; // no data; destination layout gates it
     const gate = load(`src/app/admin/${dir.name}/layout.tsx`, { '@/components/navigation/office-section': section }).default;
     for (const roles of [[], ['INSTRUCTOR'], ['SYSTEM_ADMIN'], ['CERTIFIER'], ['FINANCE'], ['PERFORMANCE']]) {
@@ -141,25 +141,23 @@ await test('legacy registration links keep plan/create intent and discard unrela
 });
 let appReads = 0;
 const MyPage = load('src/app/mypage/page.tsx', { ...common,
-  '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ from: table => {
-    assert.equal(table, 'life_applications'); appReads++;
-    return { select() { return this; }, eq(column, value) { assert.equal(column, 'person_id'); assert.equal(value, 'self'); return this; }, order: async () => ({ data: [{ id: 'a', offering_id: 'course', status: 'ACCEPTED' }] }) };
-  } }) },
-  '@/lib/portal/data': { getWorkspaceOfferings: async () => ({ offerings: [{ id: 'course', name: '나의 수업' }] }), statusLabel: { ACCEPTED: '수강 확정' }, dateTime: () => '2026-09-21' },
+  '@/lib/student-learning/data': { getStudentLearning: async () => { appReads++; return {}; } },
+  '@/components/student-learning/dashboard': { StudentDashboard: () => React.createElement('p', null, '학생 대시보드') },
   '@/components/auth/account-security': { AccountSecurity: () => React.createElement('section', null, '연결된 인증 앱 관리') },
-  '@/components/portal/action-form': { ActionForm: ({ children, label }) => React.createElement('form', null, children, label) }, '@/app/actions': {},
 }).default;
-await test('personal page separates office, instructor and learner queries and actions', async () => {
-  for (const [roles, kind] of [[['COURSE_MANAGER'], 'office'], [['SYSTEM_ADMIN'], 'office'], [['INSTRUCTOR'], 'instructor'], [[], 'learner']]) {
+await test('My Room unifies instructor and dual-role accounts without querying learner data', async () => {
+  for(const roles of [['INSTRUCTOR'], ['COURSE_MANAGER','INSTRUCTOR']]) {
     me = member(...roles); const before = appReads;
-    const output = renderToStaticMarkup(await MyPage());
-    assert.equal(appReads - before, kind === 'learner' ? 1 : 0);
-    assert.equal(output.includes('연결된 인증 앱 관리'), kind === 'office');
-    assert.equal(output.includes('href="/mypage/instructor"'), kind === 'instructor');
-    assert.equal(output.includes('href="/learning/course"'), kind === 'learner');
-    assert.equal(output.includes('신청 취소'), kind === 'learner');
-    assert.equal(output.includes('href="/mypage/badges"'), kind === 'learner');
+    await assert.rejects(MyPage(), error => error.destination === '/instructor');
+    assert.equal(appReads,before);
+    const links = nav.primaryLinks(me);
+    assert.equal(links.filter(link => link.label === 'My Room').length,1);
+    assert(!links.some(link => link.href === '/mypage'));
   }
+  for(const pathname of ['/instructor/records','/mypage/instructor','/mypage/notifications','/mypage/certificates','/auth/security','/development','/quality/any']) assert(nav.primaryActive(pathname,'/instructor'));
+  assert(!nav.primaryActive('/instructor-other','/instructor'));
+  me=member('COURSE_MANAGER'); assert(renderToStaticMarkup(await MyPage()).includes('연결된 인증 앱 관리'));
+  const before=appReads; me=member(); assert(renderToStaticMarkup(await MyPage()).includes('학생 대시보드')); assert.equal(appReads,before+1);
 });
 let cursor = 0;
 const states = [];

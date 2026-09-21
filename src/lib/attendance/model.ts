@@ -6,6 +6,8 @@ export type AttendanceBook = {
   members: { person_id: string; name: string }[];
   sessions: ClassSession[];
   attendance: Attendance[];
+  qr_checkins?: import("./qr").QrCheckin[];
+  qr_unavailable?: boolean;
 };
 export const sessionMinutes = (session: ClassSession) =>
   (Date.parse(session.ends_at) - Date.parse(session.starts_at)) / 60000;

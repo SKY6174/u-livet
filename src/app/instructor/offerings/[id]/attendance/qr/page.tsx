@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAttendanceBook } from "@/lib/attendance/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { QrPresenter } from "@/components/attendance/qr-presenter";
@@ -40,7 +39,7 @@ export default async function InstructorQrAttendancePage({
   let activeSession = sessions.find((s) => s.id === selectedSessionId);
   if (!activeSession && sessions.length > 0) {
     // 진행 중이거나 아직 끝나지 않은 첫 번째 세션 또는 첫 번째 세션
-    activeSession = sessions.find((s) => Date.parse(s.ends_at) > now) ?? sessions[0];
+    activeSession = sessions.find((s) => s.status === "SCHEDULED" && Date.parse(s.starts_at) <= now && Date.parse(s.ends_at) > now) ?? sessions.find((s) => s.status === "SCHEDULED" && Date.parse(s.ends_at) > now) ?? sessions[0];
   }
 
   return (
@@ -58,7 +57,7 @@ export default async function InstructorQrAttendancePage({
         eyebrow="SMART QR ATTENDANCE" 
         title="스마트 실시간 QR 출석 체크"
       >
-        강의실 빔 프로젝터나 대형 모니터 화면에 이 화면을 띄워주세요. 수강생이 스마트폰 카메라로 QR 코드를 스캔하면 즉시 출석이 자동 인정됩니다.
+        강의실 화면에 QR을 띄워 수강생의 입실 시각을 확인합니다. 수업 종료 후 출석부에서 실제 출석시간을 확정하세요.
       </PageIntro>
 
       {!sessions.length ? (
@@ -70,7 +69,7 @@ export default async function InstructorQrAttendancePage({
           차시 목록에서 수업을 선택해 주세요.
         </Empty>
       ) : (
-        <QrPresenter 
+        <QrPresenter key={activeSession.id}
           offering={book.offering}
           sessions={sessions}
           activeSession={activeSession}

@@ -18,5 +18,13 @@ export const getAttendanceBook = cache(async (id: string, audience: "instructor"
     } catch { return { data: null, error: { message: "CONNECTION_FAILED" } }; }
   })();
   if (result.error?.message === "FORBIDDEN") notFound();
-  return { book: result.error ? null : result.data as AttendanceBook | null, unavailable: !!result.error || !result.data };
+  const book = result.error ? null : result.data as AttendanceBook | null;
+  if (book) {
+    try {
+      const qr = await (await createServerSupabaseClient()).rpc("life_qr_checkins", { f: id });
+      book.qr_checkins = qr.error ? [] : qr.data ?? [];
+      book.qr_unavailable = !!qr.error;
+    } catch { book.qr_checkins = []; book.qr_unavailable = true; }
+  }
+  return { book, unavailable: !!result.error || !result.data };
 });

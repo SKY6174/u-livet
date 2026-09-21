@@ -46,9 +46,10 @@ export default async function Records() {
         <Empty title="강의실적을 불러오지 못했습니다" />
       </div>
     );
-  const logs = (records.data ?? []) as TeachingRecord[];
+  const logs = ((records.data ?? []) as TeachingRecord[]).filter(record => record.person_id === me.id);
   return (
     <div className="page-shell">
+      <Link className="text-sm text-teal-800" href="/instructor">← My Room</Link>
       <PageIntro eyebrow="TEACHING RECORD" title="실제 강의실적">
         완료된 수업의 실제 강의시간과 내용을 제출하세요. 과정담당이 별도로
         확인한 실적만 경력증명에 반영됩니다.
@@ -56,6 +57,16 @@ export default async function Records() {
       <Link className="btn-secondary mb-6" href="/mypage/certificates">
         강의경력증명 신청 →
       </Link>
+      <section className="mb-8" aria-label="나의 전체 강의이력">
+        <h2 className="section-title">나의 전체 강의이력</h2>
+        <p className="mb-4 text-sm text-slate-600">담당 배정이 끝난 강좌도 제출한 강의실적을 확인할 수 있습니다. 현재 승인된 본인 실적 {logs.filter(log => log.current).reduce((sum, log) => sum + log.minutes, 0).toLocaleString("ko-KR")}분</p>
+        {logs.length ? <div className="grid gap-4 md:grid-cols-2">{logs.map(log => <article className="panel" key={log.id}>
+          <span className="badge">{log.current ? "승인 완료" : "승인·재검토 필요"}</span>
+          <h3 className="mt-3 font-bold">{log.course_name}</h3><p className="mt-2">{log.session_title} · {log.minutes}분</p>
+          <p className="mt-2 text-sm text-slate-600">{dateTime(log.starts_at)} ~ {dateTime(log.ends_at)}</p>
+        </article>)}</div> : <Empty title="제출한 강의이력이 없습니다" />}
+      </section>
+      <h2 className="section-title">완료 수업 실적 제출·정정</h2>
       <div className="space-y-5">
         {(sessions.data as (ClassSession & { offering_id: string })[]).map(
           (s) => {

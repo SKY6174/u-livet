@@ -75,5 +75,6 @@ export function primaryLinks(member: Member | null, loginPage = false) {
 }
 export function primaryActive(path: string, href: string) {
   if (href === "/admin") return ["/admin", "/completion", "/credentials", "/finance", "/performance"].some((base) => within(path, base));
+  if (href === "/instructor") return ["/instructor", "/development", "/mypage", "/auth/security", "/quality"].some(base => within(path, base));
   return within(path, href);
 }

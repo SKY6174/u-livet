@@ -55,6 +55,7 @@ export default async function Teaching(props: {
   const tasks = (assignments.data ?? []) as Assignment[];
   return (
     <div className="page-shell">
+      <Link className="text-sm text-teal-800" href="/instructor">← My Room</Link>
       <PageIntro eyebrow="TEACHING ROOM" title={o.name}>
         배정된 수강생의 학습과 과제를 확인하세요.
       </PageIntro>
@@ -65,6 +66,9 @@ export default async function Teaching(props: {
         출결·시험 {"관리"} →
       </Link>
       <Link className="btn-primary mb-6 mr-3" href={`/instructor/offerings/${o.id}/attendance`}>출석부 생성·관리 →</Link>
+      <Link className="btn-secondary mb-6 mr-3" href={`/instructor/offerings/${o.id}/completion`}>이수 확인 →</Link>
+      <Link className="btn-secondary mb-6" href={`/quality/${o.id}`}>만족도 조사 →</Link>
+      <p className="notice mb-6">교내·외 강사는 수업 일정·학습자료·평가를 준비하고 사업단(센터)과 함께 홍보합니다. 수강 확정 인원을 확인한 뒤 최종 개설 여부를 사업단에 확인해 주세요.</p>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <section className="space-y-6">
           <div className="panel">

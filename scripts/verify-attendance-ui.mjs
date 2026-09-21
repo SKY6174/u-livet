@@ -49,12 +49,12 @@ let identity = true, requests = [], response = { data: book, error: null };
 const notFound = () => { throw Error('NOT_FOUND'); };
 const data = load('src/lib/attendance/data.ts', { ...common, react: { cache: fn => fn }, 'next/navigation': { notFound },
   '@/lib/auth/session': { requireIdentity: async () => { if (!identity) throw Error('LOGIN_REQUIRED'); } },
-  '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async (name, args) => { requests.push({ name, args }); if (response instanceof Error) throw response; return response; } }) },
+  '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async (name, args) => { requests.push({ name, args }); if (response instanceof Error) throw response; return name === "life_qr_checkins" ? { data: [], error: null } : response; } }) },
 });
-await test('book loader makes one scoped RPC and never accepts a learner person identifier', async () => {
+await test('book loader scopes attendance and QR reads without accepting a learner person identifier', async () => {
   for (const [audience, name] of [['instructor', 'life_teaching_attendance'], ['learner', 'life_my_attendance']]) {
     requests = []; assert.equal((await data.getAttendanceBook(uuid, audience)).book, book);
-    assert.deepEqual(requests, [{ name, args: { f: uuid } }]);
+    assert.deepEqual(requests, [{ name, args: { f: uuid } }, { name: "life_qr_checkins", args: { f: uuid } }]);
   }
   requests = []; identity = false; await assert.rejects(data.getAttendanceBook(uuid, 'instructor'), /LOGIN_REQUIRED/); assert.equal(requests.length, 0);
   identity = true; await assert.rejects(data.getAttendanceBook('invalid', 'learner'), /NOT_FOUND/); assert.equal(requests.length, 0);

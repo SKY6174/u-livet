@@ -16,7 +16,7 @@ export default async function Home() {
   const { offerings: courses, unavailable } = await getCourseCards(true);
   const kind = workspaceKind(me);
   const teacherLinks = [
-    { href: "/instructor", title: "강사 공간", description: "담당 과정의 강의·출결·평가 운영", icon: GraduationCap },
+    { href: "/instructor", title: "My Room", description: "내 정보와 과정 개발·강의·출결·이력 관리", icon: GraduationCap },
     { href: "/mypage/instructor", title: "강사 이력·등록 심사", description: "나의 이력과 심사 진행 상태 확인", icon: ClipboardCheck },
     { href: "/instructor/records", title: "강의실적·경력증명", description: "강의실적 제출과 경력 기록 확인", icon: BookOpen },
   ];
@@ -36,7 +36,7 @@ export default async function Home() {
   } : kind === "instructor" ? {
     title: "나의 강의와,", accent: "수강생을 한눈에.",
     description: "담당 과정의 강의자료·출결·평가와 강의실적을 관리하세요.",
-    href: "/instructor", action: "담당 과정 운영하기",
+    href: "/instructor", action: "My Room으로 이동",
   } : {
     title: "지금의 배움이,", accent: "내일의 일로.",
     description: "새로운 기술을 익히고, 다음 경력을 준비하세요. 과정 신청부터 학습까지 한곳에서 함께합니다.",

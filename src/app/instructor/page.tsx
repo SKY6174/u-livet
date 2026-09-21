@@ -4,12 +4,11 @@ import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getWorkspaceOfferings } from "@/lib/portal/data";
 import { Empty, PageIntro } from "@/components/portal/ui";
+import { AccountSecurity } from "@/components/auth/account-security";
 import { memberLabel } from "@/lib/auth/workspace-navigation";
 import { 
   BookOpen, 
-  CheckCircle2, 
   ClipboardCheck, 
-  FileText, 
   GraduationCap, 
   QrCode, 
   ShieldCheck, 
@@ -38,13 +37,14 @@ export default async function InstructorRoom() {
     error ? [] : assigned,
   );
 
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
   const isExternal = me.instructor_kind === "EXTERNAL";
 
   return (
     <div className="page-shell">
       {/* 1. 상단 타이틀 안내 */}
       <PageIntro eyebrow="MY ROOM" title={`${me.name} 님의 My Room`}>
-        수업 설계부터 강사진 배정, 강좌 개설·운영, 스마트 실시간 QR 출결, 평가 및 강의이력 관리까지 한 곳에서 통합 관리합니다.
+        내 정보와 강사 업무를 한곳에서 관리합니다. 과정 개발부터 운영 준비, 출결·이수 확인과 강의이력까지 순서대로 확인하세요.
       </PageIntro>
 
       {/* 2. 내 계정 정보 카드 (기존 '내 정보' 카드 디자인 100% 유지) */}
@@ -76,11 +76,12 @@ export default async function InstructorRoom() {
         </div>
       </section>
 
+      <AccountSecurity />
       {/* 3. 강사 전주기 라이프사이클 (10대 프로세스 워크플로우 허브) */}
       <section className="mb-10" aria-label="강사 라이프사이클 업무 가이드">
         <h2 className="section-title flex items-center gap-2">
           <GraduationCap className="h-6 w-6 text-teal-800" />
-          강사 전주기 업무 로드맵 (Teaching Lifecycle)
+          나의 강사 업무 순서
         </h2>
         <p className="mb-6 text-sm text-slate-600">
           울산과학대학교 평생직업교육 플랫폼에서 강사가 수행하는 전주기 업무 단계입니다.
@@ -115,7 +116,7 @@ export default async function InstructorRoom() {
               </div>
               <h3 className="mt-2 text-lg font-bold text-slate-900">RCC센터 자격 점검 & 배정</h3>
               <p className="mt-2 text-xs leading-5 text-slate-600">
-                외부 교원은 매년 강사(교외) 조건을 만족하는지 RCC센터의 점검을 통과한 후 강사진에 최종 할당됩니다.
+                교외 강사는 매년 이력·자격 자료를 갱신하고 RCC센터의 조건 충족 점검을 받습니다. 점검 이후 담당자가 강좌의 강사진에 배정합니다.
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
@@ -134,7 +135,7 @@ export default async function InstructorRoom() {
               </div>
               <h3 className="mt-2 text-lg font-bold text-slate-900">운영 준비, 홍보 & 개설 확정</h3>
               <p className="mt-2 text-xs leading-5 text-slate-600">
-                사업단 및 교내·외 강사진이 함께 홍보를 추진하며, 학생 모집 인원에 따라 강좌 개설 여부가 확정됩니다.
+                교내·외 강사는 개발된 강좌의 수업 일정·학습자료·평가를 준비합니다. 사업단(센터)과 함께 홍보하고 수강 확정 인원을 확인하여 최종 개설 여부를 사업단에 확인합니다.
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
@@ -153,7 +154,7 @@ export default async function InstructorRoom() {
               </div>
               <h3 className="mt-2 text-lg font-bold text-slate-900">수업 운영 & 실시간 QR 출결</h3>
               <p className="mt-2 text-xs leading-5 text-slate-600">
-                충실한 수업과 학생 관리를 수행합니다. 매 시간 수기 출석부 대신 화면에 실시간 QR 코드를 제시하여 출석을 체크합니다.
+                개설 후 종강까지 수업·과제와 수강생을 관리합니다. 매 수업 QR로 입실 시각을 확인하고, 종료 후 실제 출석시간을 확정합니다.
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
@@ -170,11 +171,11 @@ export default async function InstructorRoom() {
               </div>
               <h3 className="mt-2 text-lg font-bold text-slate-900">이수 확인 & 만족도 평가</h3>
               <p className="mt-2 text-xs leading-5 text-slate-600">
-                수강생의 출석·과제 요건 충족을 확인하고, 강좌 종료 후 강의 만족도 조사를 실시하여 품질을 제고합니다.
+                강좌별 이수 현황에서 출결·과제·시험 기준에 따른 수료 결과를 확인합니다. 매 종강 후 개설된 만족도 조사를 수강생에게 안내하고 결과를 다음 수업에 반영합니다.
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
-              <span className="text-xs text-slate-500">담당 강좌별 &apos;과정 평가·개선&apos; 메뉴에서 확인</span>
+              <span className="text-xs text-slate-500">아래 담당 강좌의 이수 확인·만족도 조사에서 진행</span>
             </div>
           </div>
 
@@ -187,7 +188,7 @@ export default async function InstructorRoom() {
               </div>
               <h3 className="mt-2 text-lg font-bold text-slate-900">강의이력 & 경력증명서 발급</h3>
               <p className="mt-2 text-xs leading-5 text-slate-600">
-                본인의 실제 강의실적을 정리·제출하고, 사업단(산학협력단)의 공식 직인이 날인된 강의경력증명서를 발급받습니다.
+                본인의 강의이력과 실제 강의시간을 확인·제출합니다. 사업단(또는 산학협력단)은 승인된 실적을 정리하여 등록된 발급기관·서식으로 강의경력증명서를 발급합니다.
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
@@ -213,7 +214,7 @@ export default async function InstructorRoom() {
           <Empty title="담당 과정을 불러오지 못했습니다" />
         ) : !own.length ? (
           <Empty title="현재 배정된 교육과정이 없습니다">
-            사업단 및 RCC센터에서 강사진 배정 및 개설이 확정되면 이곳에 표시됩니다.
+            사업단 및 RCC센터에서 강사진 배정을 완료하면 이곳에 표시됩니다. 교외 강사는 연간 자격 점검을 먼저 확인해 주세요.
           </Empty>
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
@@ -221,13 +222,14 @@ export default async function InstructorRoom() {
               <article key={o.id} className="panel flex flex-col justify-between border-2 hover:border-teal-600 transition-colors">
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="badge">운영 중</span>
-                    <span className="text-xs text-slate-500 font-mono">기수 ID: {o.id.slice(0, 8)}</span>
+                    <span className="badge">{o.status === "DRAFT" ? "개설 준비" : o.status === "ARCHIVED" ? "보관" : o.ends_on < today ? "교육 기간 종료" : o.starts_on <= today ? "교육 기간 중" : o.status === "PUBLISHED" ? "모집 공개" : "접수 마감"}</span>
+                    <span className="text-xs text-slate-500">정원 {o.capacity}명</span>
                   </div>
                   <h3 className="mt-3 text-xl font-bold text-slate-900">{o.name}</h3>
                   <p className="mt-2 text-sm text-slate-600">
-                    📅 교육 기간: {o.starts_on} ~ {o.ends_on}
+                    교육 기간: {o.starts_on} ~ {o.ends_on}
                   </p>
+                  <p className="mt-3 text-sm text-slate-600">강의 운영에서 수강 확정 인원을 확인하세요. 모집 공개나 강사 배정만으로 개설이 확정되지는 않으며, 최종 운영 여부는 사업단에 확인해 주세요.</p>
                 </div>
 
                 <div className="mt-6 pt-5 border-t border-slate-200">
@@ -237,16 +239,16 @@ export default async function InstructorRoom() {
                     className="btn-primary w-full flex items-center justify-center gap-2 mb-3 bg-teal-800 hover:bg-teal-900 text-white font-bold py-3"
                   >
                     <QrCode className="h-5 w-5" />
-                    <span>실시간 스마트 QR 출석 화면 띄우기</span>
+                    <span>QR 입실 확인 화면</span>
                   </Link>
 
                   {/* 세부 메뉴 링크들 */}
-                  <div className="grid grid-cols-3 gap-2 text-center text-xs font-semibold">
+                  <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold">
                     <Link 
                       href={`/instructor/offerings/${o.id}`}
                       className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-2.5 text-slate-800 hover:bg-teal-50 hover:text-teal-900 transition-colors"
                     >
-                      강의 운영 →
+                      운영 준비·수강생 →
                     </Link>
                     <Link 
                       href={`/instructor/offerings/${o.id}/attendance`}
@@ -254,11 +256,12 @@ export default async function InstructorRoom() {
                     >
                       출석부 관리 →
                     </Link>
-                    <Link 
+                    <Link href={`/instructor/offerings/${o.id}/completion`} className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-2.5 text-slate-800 hover:bg-teal-50 hover:text-teal-900">이수 확인 →</Link>
+                    <Link
                       href={`/quality/${o.id}`}
                       className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-2.5 text-slate-800 hover:bg-teal-50 hover:text-teal-900 transition-colors"
                     >
-                      만족도 평가 →
+                      만족도 조사 →
                     </Link>
                   </div>
                 </div>

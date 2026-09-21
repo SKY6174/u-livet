@@ -36,6 +36,7 @@ export function AttendanceEditor({ book }: { book: AttendanceBook }) {
       {book.sessions.map(s => <option key={s.id} value={s.id}>{s.title}{s.status === "CANCELLED" ? " · 휴강" : ""}</option>)}
     </select></label>
     {locked && !pending && <p className="notice mb-5">{session.status === "CANCELLED" ? "휴강한 수업입니다. 보강 수업을 등록해 주세요." : "수업 종료 후 출결을 기록할 수 있습니다. 종료 후 새로고침해 주세요."}</p>}
+    {book.qr_unavailable && <p className="notice mb-5">QR 입실 기록을 불러오지 못했습니다. 수강생에게 직접 확인한 뒤 출결을 기록해 주세요.</p>}
     <form onSubmit={event => {
       event.preventDefault();
       if (locked) return;
@@ -58,9 +59,11 @@ export function AttendanceEditor({ book }: { book: AttendanceBook }) {
       <p className="text-sm text-slate-600">선택한 수강생만 저장합니다. 결석은 0분, 지각·조퇴는 실제 인정시간을 입력하세요. 전원 선택은 저장 전 초안이며 기존 기록을 덮어쓰지 않습니다.</p>
       <div className="space-y-4">{book.members.map(member => {
         const prior = index.get(`${sessionId}:${member.person_id}`), row = rows[member.person_id], self = member.person_id === book.viewer_id;
+        const checkin = book.qr_checkins?.find(q => q.session_id === sessionId && q.person_id === member.person_id);
         return <fieldset key={member.person_id} disabled={locked || self} className="rounded-xl border border-slate-200 p-4">
           <legend className="px-2 font-semibold"><label className="inline-flex items-center gap-2"><input type="checkbox" disabled={locked || self} checked={!!row} onChange={e => change(member.person_id, e.target.checked ? { minutes: prior ? String(prior.credited_minutes) : "", reason: "", expected_revision: prior?.revision ?? 0 } : null)} />{member.name}</label></legend>
           <p className="mb-3 text-sm text-slate-500">{self ? "본인 출석 기록 불가" : prior ? `현재 ${formatMinutes(prior.credited_minutes)}분 · ${prior.reason}` : "아직 기록되지 않았습니다."}</p>
+          {checkin && <p className="mb-3 text-sm font-semibold text-teal-800">QR 입실 확인: {new Date(checkin.checked_in_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })} · 실제 인정시간을 확인해 주세요.</p>}
           {row && row.expected_revision !== (prior?.revision ?? 0) && <div className="notice mb-3">
             <p>다른 작업에서 기록이 변경되었습니다. 위의 현재 기록을 확인해 주세요.</p>
             <button type="button" className="mt-2 text-sm font-bold underline" onClick={() => change(member.person_id, { ...row, expected_revision: prior?.revision ?? 0 })}>현재 기록을 확인했으며 입력 내용으로 정정</button>
