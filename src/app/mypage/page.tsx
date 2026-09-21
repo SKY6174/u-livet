@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { hasRole, memberLabel, workspaceKind } from "@/lib/auth/workspace-navigation";
 import { requireIdentity } from "@/lib/auth/session";
@@ -8,6 +9,12 @@ import { StudentDashboard } from "@/components/student-learning/dashboard";
 export default async function MyPage() {
   const me = await requireIdentity();
   const kind = workspaceKind(me);
+
+  // 강사 계정은 통합된 'My Room'(/instructor)으로 안내합니다.
+  if (hasRole(me, "INSTRUCTOR") && kind === "instructor") {
+    redirect("/instructor");
+  }
+
   if (kind !== "learner") return (
     <div className="page-shell">
       <PageIntro eyebrow="MY ACCOUNT" title={`${me.name} 님의 내 정보`}>
@@ -25,11 +32,9 @@ export default async function MyPage() {
       {kind === "office" && <AccountSecurity />}
       {kind === "office" && <Link className="btn-primary" href="/admin">사업단 관리로 이동 →</Link>}
       {hasRole(me, "INSTRUCTOR") && <section className="mt-8" aria-label="나의 강사 정보">
-        <h2 className="section-title">나의 강사 정보</h2>
+        <h2 className="section-title">통합 My Room 바로가기</h2>
         <div className="flex flex-wrap gap-3">
-          <Link className="btn-secondary" href="/mypage/instructor">강사 이력·등록 심사</Link>
-          <Link className="btn-secondary" href="/instructor/records">강의실적·경력증명</Link>
-          <Link className="btn-primary" href="/instructor">강사 공간으로 이동 →</Link>
+          <Link className="btn-primary" href="/instructor">My Room으로 이동 →</Link>
         </div>
       </section>}
     </div>

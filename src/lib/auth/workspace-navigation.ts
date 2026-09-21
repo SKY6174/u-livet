@@ -65,8 +65,12 @@ export function primaryLinks(member: Member | null, loginPage = false) {
   ];
   if (!member || loginPage) return links;
   if (isOfficeMember(member)) links.push({ label: "사업단 관리", href: "/admin" });
-  if (hasRole(member, "INSTRUCTOR")) links.push({ label: "강사 공간", href: "/instructor" });
-  links.push({ label: workspaceKind(member) === "learner" ? "나의 학습" : "내 정보", href: "/mypage" });
+  // 강사 권한 계정은 '강사 공간'과 '내 정보'를 일원화된 'My Room'으로 제공합니다.
+  if (hasRole(member, "INSTRUCTOR")) {
+    links.push({ label: "My Room", href: "/instructor" });
+  } else {
+    links.push({ label: workspaceKind(member) === "learner" ? "나의 학습" : "내 정보", href: "/mypage" });
+  }
   return links;
 }
 export function primaryActive(path: string, href: string) {
