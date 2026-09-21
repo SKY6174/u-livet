@@ -24,7 +24,7 @@ export function officeSections(member: Member) {
   const manager = hasRole(member, "COURSE_MANAGER");
   const certifier = hasRole(member, "COURSE_MANAGER", "CERTIFIER");
   return [
-    { title: "과정 운영", links: manager ? [
+    { title: "과정 운영", links: hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
       { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
     ] : [] },
     { title: "결과 보고·수료", links: [

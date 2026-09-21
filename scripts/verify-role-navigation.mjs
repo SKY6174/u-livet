@@ -34,7 +34,7 @@ common['@/components/portal/ui'] = {
 };
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
-  [['SYSTEM_ADMIN'], ['/admin/accounts'], 'office'],
+  [['SYSTEM_ADMIN'], ['/admin/courses', '/admin/accounts'], 'office'],
   [['COURSE_MANAGER'], ['/admin/courses', '/admin/reports', '/completion', '/credentials', '/performance'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
