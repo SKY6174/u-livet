@@ -34,14 +34,14 @@ export default function Footer() {
             </p>
           </div>
         </div>
-        <nav className="flex shrink-0 flex-wrap gap-x-5 gap-y-3" aria-label="서비스 안내">
-          <Link className={FOOTER_LINK_CLASS} href="/privacy">개인정보처리방침</Link>
-          <Link className={FOOTER_LINK_CLASS} href="/terms">수강안내</Link>
-          <Link className={FOOTER_LINK_CLASS} href="/verify">증명서 진위확인</Link>
-        </nav>
-      </div>
-      <div className="mx-auto max-w-7xl border-t border-white/20 px-5 py-5">
-        <SupportContact className="text-teal-50 [&_a:focus-visible]:outline-white" />
+        <div className="flex min-w-0 shrink-0 flex-col items-start gap-2 lg:items-end">
+          <nav className="flex flex-wrap gap-x-5 gap-y-3" aria-label="서비스 안내">
+            <Link className={FOOTER_LINK_CLASS} href="/privacy">개인정보처리방침</Link>
+            <Link className={FOOTER_LINK_CLASS} href="/terms">수강안내</Link>
+            <Link className={FOOTER_LINK_CLASS} href="/verify">증명서 진위확인</Link>
+          </nav>
+          <SupportContact compact className="text-teal-50 [&_a:focus-visible]:outline-white" />
+        </div>
       </div>
     </footer>
   );

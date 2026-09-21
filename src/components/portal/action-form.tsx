@@ -36,6 +36,7 @@ export function ActionForm({
   disabled,
   botProtection,
   resetOnSuccess = true,
+  className = "space-y-4",
 }: {
   action: (state: ActionState, form: FormData) => Promise<ActionState>;
   children?: React.ReactNode;
@@ -43,6 +44,7 @@ export function ActionForm({
   disabled?: boolean;
   botProtection?: BotProtection;
   resetOnSuccess?: boolean;
+  className?: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const pathname = usePathname();
@@ -73,7 +75,7 @@ export function ActionForm({
     <form
       ref={formRef}
       action={formAction}
-      className="space-y-4"
+      className={className}
       onSubmit={(event) => {
         event.preventDefault();
         if (pending || blocked) return;

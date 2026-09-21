@@ -1,6 +1,19 @@
 import { SUPPORT_CONTACT } from "@/lib/portal/contact";
 
-export function SupportContact({ className = "" }: { className?: string }) {
+export function SupportContact({ className = "", compact = false }: { className?: string; compact?: boolean }) {
+  if (compact) {
+    return (
+      <p className={`text-sm leading-6 ${className}`}>
+        문의 : {SUPPORT_CONTACT.name} {SUPPORT_CONTACT.title}(
+        <a href={SUPPORT_CONTACT.phoneHref} className="underline underline-offset-4">
+          {SUPPORT_CONTACT.phone}
+        </a>, {" "}
+        <a href={SUPPORT_CONTACT.emailHref} className="break-all underline underline-offset-4">
+          {SUPPORT_CONTACT.email}
+        </a>)
+      </p>
+    );
+  }
   return (
     <div className={`text-sm leading-6 ${className}`}>
       <p>문의 담당: {SUPPORT_CONTACT.name} {SUPPORT_CONTACT.title}</p>
