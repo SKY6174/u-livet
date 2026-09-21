@@ -42,39 +42,39 @@ export default async function InstructorRoom() {
 
   return (
     <div className="page-shell">
-      {/* 1. 상단 타이틀 안내 */}
-      <PageIntro eyebrow="MY ROOM" title={`${me.name}님 전용 공간`}>
-        내 정보와 강사 업무를 한곳에서 관리합니다. 과정 개발부터 운영 준비, 출결·이수 확인과 강의이력까지 순서대로 확인하세요.
-      </PageIntro>
+      {/* 1. 제목과 내 계정 정보를 한 줄에 배치 */}
+      <div className="mb-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,32rem)] lg:items-start">
+        <PageIntro eyebrow="MY ROOM" title={`${me.name}님 전용 공간`} />
 
-      {/* 2. 내 계정 정보 카드 (기존 '내 정보' 카드 디자인 100% 유지) */}
-      <section className="panel mb-8 max-w-3xl" aria-label="강사 계정 정보">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="badge">{memberLabel(me)}</span>
-          {isExternal && (
-            <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200">
-              RCC센터 연간 자격 점검 대상
-            </span>
-          )}
-        </div>
-        <h2 className="mt-4 text-2xl font-bold text-slate-900">{me.name}</h2>
-        <p className="mt-1 break-all text-base text-slate-600">{me.email}</p>
-        
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="btn-secondary text-sm" href="/mypage/notifications">
-            연락처·수신 설정
-          </Link>
-          <Link className="btn-secondary text-sm" href="/auth/security">
-            계정 보안·추가 인증
-          </Link>
-          <Link className="btn-secondary text-sm" href="/mypage/instructor">
-            강사 이력·등록 심사
-          </Link>
-          <Link className="btn-secondary text-sm" href="/instructor/records">
-            강의실적·경력증명
-          </Link>
-        </div>
-      </section>
+        {/* 2. 내 계정 정보 카드 (기존 '내 정보' 카드 디자인 100% 유지) */}
+        <section className="panel h-fit w-full" aria-label="강사 계정 정보">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="badge">{memberLabel(me)}</span>
+            {isExternal && (
+              <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
+                RCC센터 연간 자격 점검 대상
+              </span>
+            )}
+          </div>
+          <h2 className="mt-4 text-2xl font-bold text-slate-900">{me.name}</h2>
+          <p className="mt-1 break-all text-base text-slate-600">{me.email}</p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link className="btn-secondary text-sm" href="/mypage/notifications">
+              연락처·수신 설정
+            </Link>
+            <Link className="btn-secondary text-sm" href="/auth/security">
+              계정 보안·추가 인증
+            </Link>
+            <Link className="btn-secondary text-sm" href="/mypage/instructor">
+              강사 이력·등록 심사
+            </Link>
+            <Link className="btn-secondary text-sm" href="/instructor/records">
+              강의실적·경력증명
+            </Link>
+          </div>
+        </section>
+      </div>
 
       <AccountSecurity />
       {/* 3. 강사 전주기 라이프사이클 (10대 프로세스 워크플로우 허브) */}
