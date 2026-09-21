@@ -36,7 +36,7 @@ export function officeSections(member: Member) {
     { title: "사업단 지원", links: [
       ...(hasRole(member, "FINANCE") ? [{ label: "수납·환불", href: "/finance", description: "교육비 수납과 환불 처리 내역을 확인합니다." }] : []),
       ...(hasRole(member, "COURSE_MANAGER", "PERFORMANCE") ? [{ label: "연차 평가·성과", href: "/performance", description: "사업연도별 운영 통계와 성과 보고를 관리합니다." }] : []),
-      ...(hasRole(member, "SYSTEM_ADMIN") ? [{ label: "계정 관리", href: "/admin/accounts", description: "사업단 직책과 교내·교외 강사 구분을 관리합니다." }] : []),
+      ...(hasRole(member, "SYSTEM_ADMIN") ? [{ label: "구성원 관리", href: "/admin/accounts", description: "사업단·강사·수강생의 정보와 활동 이력을 관리합니다." }] : []),
     ] },
   ].filter((section) => section.links.length);
 }
