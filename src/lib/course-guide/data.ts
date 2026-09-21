@@ -1,0 +1,29 @@
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCourseCards } from "@/lib/portal/data";
+import { mergeCatalog, type CourseGuide } from "./model";
+
+const GUIDE_FIELDS = "id,year,sort_order,name,academy,summary,curriculum,mode,capacity,teaching_hours,period_label,schedule_history,time_label,location,certificate,offering_id";
+async function getGuides() {
+  try {
+    const { data, error } = await (await createServerSupabaseClient())
+      .from("life_course_guides").select(GUIDE_FIELDS).eq("published", true)
+      .order("year", { ascending: false }).order("sort_order");
+    return { guides: (data ?? []) as CourseGuide[], unavailable: !!error };
+  } catch {
+    return { guides: [] as CourseGuide[], unavailable: true };
+  }
+}
+export async function getCourseCatalog() {
+  const [guides, offerings] = await Promise.all([getGuides(), getCourseCards()]);
+  return {
+    courses: mergeCatalog(guides.guides, offerings.offerings),
+    unavailable: guides.unavailable || offerings.unavailable,
+  };
+}
+export async function getCourseGuide(id: string) {
+  if (id.length > 100 || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) return null;
+  const { data, error } = await (await createServerSupabaseClient())
+    .from("life_course_guides").select(GUIDE_FIELDS).eq("published", true).eq("id", id).maybeSingle();
+  if (error) throw new Error("교육과정 안내를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+  return data as CourseGuide | null;
+}
