@@ -66,12 +66,12 @@ begin
  ep:=(public.life_identity()->>'id')::uuid;
  perform pg_temp.check_it(ep is not null and public.life_identity()->'roles'='[]'::jsonb,'email signup preserves learner identity only');
  perform pg_temp.check_it((select phone_verified_at is null from life_private.learner_contacts where user_id=e),'email phone also unverified');
- -- A native verified-email auto-link must finish Kakao consent first.
+ -- Auth-linked email members reuse their completed registration.
  insert into auth.identities(user_id,provider_id,provider,identity_data) values(e,e::text,'kakao',jsonb_build_object('sub',e));
  insert into auth.sessions(id,user_id,created_at,aal) values(other_s,e,clock_timestamp(),'aal1');
  insert into auth.mfa_amr_claims(id,session_id,authentication_method,created_at,updated_at) values(gen_random_uuid(),other_s,'oauth',now(),now());
  perform pg_temp.jwt(e,other_s,'oauth');
- perform pg_temp.check_it(public.life_identity() is null,'automatically linked email requires Kakao completion');
+ perform pg_temp.check_it(public.life_registration_status()->>'state'='COMPLETE' and public.life_identity() is not null,'automatically linked email uses its completed signup');
  perform public.life_complete_registration('Different display name','+821011112222',pol,true);
  perform pg_temp.check_it((public.life_identity()->>'id')::uuid=ep and public.life_identity()->>'name'='[TEST] Email learner','linking retains original person and name');
  perform set_config('request.jwt.claims','{}',true);

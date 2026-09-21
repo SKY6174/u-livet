@@ -1,5 +1,7 @@
 # 간편 인증 후 회원가입·로그인 선택 설계
 
+> 2026-09-21 후속 사용자 결정으로 선택 화면을 제거했다. 현재 설계는 [가입 여부 자동 분기](anchor-social-auto-routing.design.md)를 따른다. 아래는 이전 설계 기록이다.
+
 2026-09-21 · [계획](../../01-plan/features/anchor-social-entry-choice.plan.md)
 
 ## 상태와 화면
