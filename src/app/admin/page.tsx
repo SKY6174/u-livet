@@ -43,6 +43,7 @@ export default async function Admin({ searchParams }: {
           <Layers3 aria-hidden="true" className="h-3.5 w-3.5 text-teal-700" />업무 홈
         </span>
       </div>
+      {hasRole(me, "COURSE_MANAGER") && <Link className="btn-secondary mb-6" href="/admin/course-requests">수강생 희망 과목 제안·검토 →</Link>}
       <div className="space-y-8">
         {officeSections(me).map(({ title, links }, sectionIndex) => (
           <section key={title} aria-labelledby={`workspace-section-${sectionIndex}`}>

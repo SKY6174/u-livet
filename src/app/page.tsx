@@ -25,7 +25,7 @@ export default async function Home() {
     ...(hasRole(me, "INSTRUCTOR") ? [teacherLinks[0]] : []),
     { href: "/mypage", title: "내 정보·계정 보안", description: "개인 정보와 연결된 인증 앱 관리", icon: BookOpen },
   ] : kind === "instructor" ? teacherLinks : [
-    { href: "/mypage", title: "나의 강의실", description: "학습자료와 제출할 과제 확인", icon: BookOpen },
+    { href: "/mypage", title: "나의 강의실", description: "수업 일정·학습자료·출석을 한눈에 확인", icon: BookOpen },
     { href: "/mypage", title: "신청 현황", description: "접수·심사·수강 확정 상태 확인", icon: ClipboardCheck },
     { href: "/mypage/history", title: "수강이력·수료 현황", description: "나의 배움과 수료 기록 확인", icon: GraduationCap },
   ];
