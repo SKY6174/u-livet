@@ -64,3 +64,22 @@ const history=renderToStaticMarkup(await Records());
 assert(history.includes('배정 종료된 본인 강좌'));assert(!history.includes('다른 강사 비공개 이력'));assert(history.includes('60분'));
 console.log('PASS historical teaching survives assignment expiration and excludes other teachers in mixed-role responses');
 console.log('6 QR, navigation and history checks passed.');
+assert.equal(qr.parseKoreanDateTime('2026-09-22T08:30'),'2026-09-21T23:30:00.000Z');
+assert.equal(qr.koreanDateTimeInput('2026-09-21T23:30:00.000Z'),'2026-09-22T08:30');
+for(const bad of ['', '2026-02-30T08:30','2026-09-22T24:30','2026-09-22','2026-09-22T08:30Z'])
+ assert.equal(qr.parseKoreanDateTime(bad),null);
+const previous={id:session,starts_at:'2026-09-21T17:23:30.885487+00:00',ends_at:'2026-09-21T19:23:30.885487+00:00'};
+calls=[];invalidations=[];
+for(const [start,end] of [['bad','2026-09-22T10:30'],['2026-09-22T10:30','2026-09-22T08:30'],['2026-09-22T08:30','2026-09-24T08:30']])
+ assert(!(await issue.rescheduleQrTestClass(id,previous,start,end)).session);
+identity=false;assert(!(await issue.rescheduleQrTestClass(id,previous,'2026-09-22T08:30','2026-09-22T10:30')).session);identity=true;
+assert.equal(calls.length,0);
+const receipt={id:session,starts_at:'2026-09-21T23:30:00+00:00',ends_at:'2026-09-22T01:30:00+00:00'};
+response={data:receipt,error:null};
+assert((await issue.rescheduleQrTestClass(id,previous,'2026-09-22T08:30','2026-09-22T10:30')).session);
+assert.deepEqual(calls[0],{name:'life_reschedule_qr_test_class',args:{f:id,s:session,p_starts_at:'2026-09-21T23:30:00.000Z',p_ends_at:'2026-09-22T01:30:00.000Z',p_expected_starts_at:previous.starts_at,p_expected_ends_at:previous.ends_at}});
+assert.equal(invalidations.length,4);
+for(const result of [{data:null,error:{message:'TEST_CLASS_FORBIDDEN'}},{data:null,error:{message:'SESSION_TIME_CHANGED'}},{data:null,error:null},{data:{...receipt,id},error:null},Error('offline')]) {
+ response=result;invalidations=[];assert(!(await issue.rescheduleQrTestClass(id,previous,'2026-09-22T08:30','2026-09-22T10:30')).session);assert.equal(invalidations.length,0);
+}
+console.log('PASS Korean time conversion, invalid dates, authenticated rescheduling, receipt validation and failure handling');

@@ -4,6 +4,7 @@ import { requireIdentity } from "@/lib/auth/session";
 import { getAttendanceBook } from "@/lib/attendance/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { QrPresenter } from "@/components/attendance/qr-presenter";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export default async function InstructorQrAttendancePage({
   params,
@@ -34,6 +35,8 @@ export default async function InstructorQrAttendancePage({
   // 현재 진행 중이거나 가장 가까운 세션 찾기
   const now = Date.now();
   const sessions = book.sessions ?? [];
+  const { data: canEditTestTime, error: testTimeError } = await (await createServerSupabaseClient())
+    .rpc("life_can_edit_qr_test_time", { f: id });
   
   // 선택된 세션이 있거나, 없으면 가장 현재 시간에 가까운 세션을 기본 선택
   let activeSession = sessions.find((s) => s.id === selectedSessionId);
@@ -74,6 +77,7 @@ export default async function InstructorQrAttendancePage({
           sessions={sessions}
           activeSession={activeSession}
           enrolledCount={book.members.length}
+          canEditTestTime={!testTimeError && canEditTestTime === true}
         />
       )}
     </div>

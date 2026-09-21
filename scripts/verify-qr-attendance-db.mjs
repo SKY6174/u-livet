@@ -71,5 +71,48 @@ assert.equal(sql("select has_table_privilege('authenticated','life_private.qr_at
 pass('private QR data cannot be read or written directly by authenticated callers');
 // Fresh in-progress class retained for UI checks in the local synthetic environment.
 const uiSession=ok(await teacher.c.rpc('life_schedule_class',{f:offering,title:'브라우저 QR 수업',starts_at:iso(-60000),ends_at:iso(3600000),replaces:null}));
+let current=ok(await teacher.c.rpc('life_teaching_attendance',{f:offering})).sessions.find(s=>s.id===uiSession);
+const reschedule=(overrides={})=>({f:offering,s:uiSession,p_starts_at:iso(-60000),p_ends_at:iso(7200000),
+  p_expected_starts_at:current.starts_at,p_expected_ends_at:current.ends_at,...overrides});
+assert.equal(ok(await teacher.c.rpc('life_can_edit_qr_test_time',{f:offering})),false);
+await denied(teacher,'life_reschedule_qr_test_class',reschedule(),'TEST_CLASS_FORBIDDEN');
+sql(`insert into life_private.qr_test_offerings values('${offering}');`);
+assert.equal(ok(await teacher.c.rpc('life_can_edit_qr_test_time',{f:offering})),true);
+for(const actor of [learner,outsider,manager,{c:create()}]) await denied(actor,'life_reschedule_qr_test_class',reschedule());
+assert.equal(ok(await learner.c.rpc('life_can_edit_qr_test_time',{f:offering})),false);
+await denied(teacher,'life_reschedule_qr_test_class',reschedule({s:randomUUID()}),'TEST_CLASS_FORBIDDEN');
+sql(`update public.life_offering_instructors set valid_until=now()-interval '1 day' where offering_id='${offering}';`);
+await denied(teacher,'life_reschedule_qr_test_class',reschedule(),'TEST_CLASS_FORBIDDEN');
+sql(`update public.life_offering_instructors set valid_until=null where offering_id='${offering}';`);
+pass('time editing requires explicit test registration and current instructor assignment');
+for(const bad of [{p_starts_at:null},{p_ends_at:'infinity'},{p_ends_at:iso(-3600000)},{p_ends_at:iso(25*3600000)}])
+  await denied(teacher,'life_reschedule_qr_test_class',reschedule(bad),'INVALID_SESSION_TIME');
+await denied(teacher,'life_reschedule_qr_test_class',reschedule({p_expected_starts_at:iso(-3600000)}),'SESSION_TIME_CHANGED');
+const cancelled=ok(await teacher.c.rpc('life_teaching_attendance',{f:offering})).sessions.find(s=>s.id===session);
+await denied(teacher,'life_reschedule_qr_test_class',reschedule({s:session,p_expected_starts_at:cancelled.starts_at,p_expected_ends_at:cancelled.ends_at}),'SESSION_TIME_LOCKED');
+sql(`update public.life_offerings set academic_sealed=true where id='${offering}';`);
+await denied(teacher,'life_reschedule_qr_test_class',reschedule(),'SESSION_TIME_LOCKED');
+sql(`update public.life_offerings set academic_sealed=false where id='${offering}'; insert into public.life_attendance(session_id,person_id,credited_minutes,reason,recorded_by) values('${uiSession}','${learner.person}',0,'Test lock','${teacher.person}');`);
+await denied(teacher,'life_reschedule_qr_test_class',reschedule(),'SESSION_TIME_LOCKED');
+sql(`delete from public.life_attendance where session_id='${uiSession}'; insert into public.life_teaching_logs(session_id,person_id,minutes,notes) values('${uiSession}','${teacher.person}',60,'Test lock');`);
+await denied(teacher,'life_reschedule_qr_test_class',reschedule(),'SESSION_TIME_LOCKED');
+sql(`delete from public.life_teaching_logs where session_id='${uiSession}';`);
+pass('invalid times, stale edits, cancelled or sealed classes and recorded academic work are protected');
+const beforeEdit=ok(await teacher.c.rpc('life_issue_attendance_qr',{f:offering,s:uiSession}));
+const preserved=ok(await learner.c.rpc('life_qr_checkin',{f:offering,s:uiSession,t:beforeEdit.token}));
+const firstArgs=reschedule();
+current=ok(await teacher.c.rpc('life_reschedule_qr_test_class',firstArgs));
+assert.equal(current.id,uiSession);
+await denied(teacher,'life_reschedule_qr_test_class',firstArgs,'SESSION_TIME_CHANGED');
+await denied(learner,'life_qr_checkin',{f:offering,s:uiSession,t:beforeEdit.token},'QR_EXPIRED');
+const afterEdit=ok(await teacher.c.rpc('life_issue_attendance_qr',{f:offering,s:uiSession}));
+assert.equal(ok(await learner.c.rpc('life_qr_checkin',{f:offering,s:uiSession,t:afterEdit.token})).checked_in_at,preserved.checked_in_at);
+const futureStart=iso(3*86400000), futureEnd=iso(3*86400000+3600000);
+current=ok(await teacher.c.rpc('life_reschedule_qr_test_class',reschedule({p_starts_at:futureStart,p_ends_at:futureEnd})));
+assert.equal(sql(`select ends_on from public.life_offerings where id='${offering}'`),new Date(Date.parse(futureEnd)+9*3600000).toISOString().slice(0,10));
+current=ok(await teacher.c.rpc('life_reschedule_qr_test_class',reschedule()));
+assert.equal(sql("select has_table_privilege('authenticated','life_private.qr_test_offerings','insert') or has_table_privilege('authenticated','life_private.qr_test_offerings','select');"),'f');
+assert.equal(sql(`select count(*) from public.life_audit_events where entity_id='${uiSession}' and action='QR_TEST_SESSION_RESCHEDULED';`),'3');
+pass('edits revoke old QR, preserve first check-in, support QR restart, extend test dates and audit changes');
 writeFileSync('/tmp/uc-life-qr-ui.json',JSON.stringify({offering,session:uiSession,teacher:{email:teacher.email,password:teacher.password},learner:{email:learner.email,password:learner.password},teacherPerson:teacher.person,learnerPerson:learner.person}),{mode:0o600});
 console.log(`${checks} QR database checks passed; synthetic local accounts only.`);
