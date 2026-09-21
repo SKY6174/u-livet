@@ -43,7 +43,7 @@ export default async function InstructorRoom() {
   return (
     <div className="page-shell">
       {/* 1. 상단 타이틀 안내 */}
-      <PageIntro eyebrow="MY ROOM" title={`${me.name} 님의 My Room`}>
+      <PageIntro eyebrow="MY ROOM" title={`${me.name}님 전용 공간`}>
         내 정보와 강사 업무를 한곳에서 관리합니다. 과정 개발부터 운영 준비, 출결·이수 확인과 강의이력까지 순서대로 확인하세요.
       </PageIntro>
 
