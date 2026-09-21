@@ -2,16 +2,45 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { useRole } from "@/lib/auth/roleContext";
 import { signOut } from "@/app/auth/actions";
-import { memberLabel, primaryLinks, primaryActive } from "@/lib/auth/workspace-navigation";
+import {
+  isOfficeMember,
+  memberLabel,
+  officeSections,
+  primaryLinks,
+  primaryActive,
+} from "@/lib/auth/workspace-navigation";
+
+const OFFICE_HOME_LINK = {
+  label: "업무 홈",
+  href: "/admin",
+  description: "사업단 운영 현황과 주요 업무를 확인합니다.",
+};
+
+const primaryLinkClass = (active: boolean) =>
+  `inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-lg px-3 text-sm font-semibold transition-colors ${
+    active
+      ? "bg-teal-50 font-bold text-teal-900 ring-1 ring-teal-200"
+      : "text-slate-800 hover:bg-teal-50 hover:text-teal-900"
+  }`;
+
+const submenuLinkClass = (active: boolean) =>
+  `block rounded-lg px-3 py-2.5 transition-colors ${
+    active
+      ? "bg-teal-50 text-teal-900"
+      : "text-slate-700 hover:bg-slate-50 hover:text-teal-900"
+  }`;
+
 export default function Header() {
   const identity = useRole();
   const pathname = usePathname();
   const isLoginPage = pathname === "/auth/login";
   const [open, setOpen] = useState(false);
+  const [openAdminMenu, setOpenAdminMenu] = useState(false);
+  const adminMenuRef = useRef<HTMLDivElement>(null);
   const userLabel = identity ? (
     <span className="inline-flex items-center gap-2 whitespace-nowrap">
       <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
@@ -21,6 +50,86 @@ export default function Header() {
     </span>
   ) : null;
   const links = primaryLinks(identity, isLoginPage);
+  const adminLinks = identity && isOfficeMember(identity)
+    ? [OFFICE_HOME_LINK, ...officeSections(identity).flatMap((section) => section.links)]
+    : [];
+  const adminActive = primaryActive(pathname, "/admin");
+
+  const renderPrimaryLink = ({ label, href }: { label: string; href: string }) => {
+    if (href !== "/admin" || adminLinks.length === 0) {
+      const active = primaryActive(pathname, href);
+      return (
+        <Link
+          key={href}
+          href={href}
+          aria-current={active ? "page" : undefined}
+          className={primaryLinkClass(active)}
+        >
+          {label}
+        </Link>
+      );
+    }
+
+    return (
+      <div
+        key={href}
+        ref={adminMenuRef}
+        className="relative"
+        onMouseEnter={() => setOpenAdminMenu(true)}
+        onMouseLeave={() => setOpenAdminMenu(false)}
+        onFocus={() => setOpenAdminMenu(true)}
+        onBlur={(event) => {
+          if (!event.relatedTarget || !event.currentTarget.contains(event.relatedTarget as Node)) {
+            setOpenAdminMenu(false);
+          }
+        }}
+      >
+        <button
+          type="button"
+          aria-current={adminActive ? "page" : undefined}
+          aria-expanded={openAdminMenu}
+          aria-controls="desktop-admin-submenu"
+          className={primaryLinkClass(adminActive)}
+          onClick={() => setOpenAdminMenu((current) => !current)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setOpenAdminMenu(false);
+              adminMenuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+            }
+          }}
+        >
+          {label}
+          <ChevronDown aria-hidden="true" className={`h-4 w-4 transition-transform ${openAdminMenu ? "rotate-180" : ""}`} />
+        </button>
+        <div
+          id="desktop-admin-submenu"
+          aria-hidden={!openAdminMenu}
+          className={`absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3 transition ${openAdminMenu ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+        >
+          <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl ring-1 ring-slate-900/5">
+            <p className="px-3 pb-1 pt-2 text-xs font-bold tracking-wide text-slate-500">사업단 업무</p>
+            {adminLinks.map((link) => {
+              const active = primaryActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  tabIndex={openAdminMenu ? 0 : -1}
+                  aria-current={active ? "page" : undefined}
+                  className={submenuLinkClass(active)}
+                  onClick={() => setOpenAdminMenu(false)}
+                >
+                  <span className="block text-sm font-semibold">{link.label}</span>
+                  <span className="mt-0.5 block text-xs leading-5 text-slate-500">{link.description}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <a
@@ -51,17 +160,8 @@ export default function Header() {
             </span>
           </span>
         </Link>
-        <nav aria-label="주 메뉴" className="hidden flex-wrap items-center justify-center gap-x-6 gap-y-3 lg:flex">
-          {links.map(({ label, href }) => (
-            <Link
-              key={href}
-              href={href}
-              aria-current={primaryActive(pathname, href) ? "page" : undefined}
-              className={`whitespace-nowrap text-sm font-semibold hover:text-teal-800 ${primaryActive(pathname, href) ? "text-teal-800" : ""}`}
-            >
-              {label}
-            </Link>
-          ))}
+        <nav aria-label="주 메뉴" className="hidden flex-wrap items-center justify-center gap-x-3 gap-y-3 lg:flex">
+          {links.map(renderPrimaryLink)}
         </nav>
         <div className="hidden flex-wrap items-center justify-end gap-4 text-sm lg:flex">
           {identity ? (
@@ -93,17 +193,58 @@ export default function Header() {
           aria-label="모바일 메뉴"
           className="grid gap-1 border-t p-4 lg:hidden"
         >
-          {links.map(({ label, href }) => (
-            <Link
-              onClick={() => setOpen(false)}
-              key={href}
-              href={href}
-              aria-current={primaryActive(pathname, href) ? "page" : undefined}
-              className={`rounded p-3 hover:bg-slate-50 ${primaryActive(pathname, href) ? "font-bold text-teal-800" : ""}`}
-            >
-              {label}
-            </Link>
-          ))}
+          {links.map(({ label, href }) => {
+            if (href !== "/admin" || adminLinks.length === 0) {
+              const active = primaryActive(pathname, href);
+              return (
+                <Link
+                  onClick={() => setOpen(false)}
+                  key={href}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={`rounded-lg p-3 hover:bg-slate-50 ${active ? "bg-teal-50 font-bold text-teal-900" : ""}`}
+                >
+                  {label}
+                </Link>
+              );
+            }
+            return (
+              <div key={href} className="rounded-lg border border-slate-200 bg-white">
+                <button
+                  type="button"
+                  aria-expanded={openAdminMenu}
+                  aria-controls="mobile-admin-submenu"
+                  className={`flex min-h-12 w-full items-center justify-between rounded-lg px-3 text-left ${adminActive ? "bg-teal-50 font-bold text-teal-900" : "text-slate-800"}`}
+                  onClick={() => setOpenAdminMenu((current) => !current)}
+                >
+                  {label}
+                  <ChevronDown aria-hidden="true" className={`h-5 w-5 transition-transform ${openAdminMenu ? "rotate-180" : ""}`} />
+                </button>
+                {openAdminMenu && (
+                  <div id="mobile-admin-submenu" className="border-t border-slate-100 px-2 py-2">
+                    {adminLinks.map((link) => {
+                      const active = primaryActive(pathname, link.href);
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          aria-current={active ? "page" : undefined}
+                          className={submenuLinkClass(active)}
+                          onClick={() => {
+                            setOpenAdminMenu(false);
+                            setOpen(false);
+                          }}
+                        >
+                          <span className="block text-sm font-semibold">{link.label}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-slate-500">{link.description}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
           {identity ? (
             <>
               <div className="px-3 pt-3 text-sm">{userLabel}</div>

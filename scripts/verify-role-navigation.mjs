@@ -83,7 +83,13 @@ await test('desktop and expanded mobile header share exactly the same authorized
     for (const { label, href } of nav.primaryLinks(me)) {
       assert.equal((output.match(new RegExp('href="' + href + '"', 'g')) ?? []).length, 2, label);
     }
-    assert(!output.includes('href="/completion"') && !output.includes('href="/credentials"'));
+    const submenuHrefs = nav.officeSections(me).flatMap(section => section.links.map(link => link.href));
+    for (const href of submenuHrefs) {
+      assert.equal((output.match(new RegExp('href="' + href + '"', 'g')) ?? []).length, 2, href);
+    }
+    for (const href of ['/completion', '/credentials', '/finance', '/performance']) {
+      if (!submenuHrefs.includes(href)) assert(!output.includes(`href="${href}"`), href);
+    }
   }
 });
 const Admin = load('src/app/admin/page.tsx', common).default;
