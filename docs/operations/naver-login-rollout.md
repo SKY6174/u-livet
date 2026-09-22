@@ -32,3 +32,12 @@
 ## 복구
 
 네이버 오류가 발생하면 운영 `AUTH_NAVER_ENABLED=false`로 재배포해 기존 로그인 수단을 제공한다. 사용자 계정·동의 기록·정책 문안은 삭제하거나 이전 내용으로 덮어쓰지 않는다. 네이버 Secret 변경은 이번 작업에 포함되지 않았다.
+
+## 운영 배포 확인
+
+- 코드 커밋 `5cbf9d069070d7ab3084a5696ddf021873c0f073`, 운영 배포 `dpl_5GTFUbJVd9kSZ1MjEtcgyzQGZcab` READY. `/api/version`에서 동일 revision 및 production을 확인했다.
+- 운영 수강생 로그인 페이지의 네이버 버튼이 활성화되어 실제 `nid.naver.com/oauth2.0/authorize`의 “Signing in to U-LIFE 로그인” 인증 화면으로 연결됐다. 아이디·비밀번호를 입력하거나 개인 계정 인증·동의를 수행하지 않았다.
+- 운영 어댑터는 헤더 없음과 실제 네이버에서 거부한 무효 Bearer 토큰 모두 401 `invalid_token`, `Cache-Control: private, no-store`를 반환했다.
+- `/privacy`와 `/auth/signup`에서 v5 문안이 표시되고 가입 동의 체크박스는 미선택이다. 사업단·교내 로그인에는 네이버 버튼이 없다.
+- 캡처: 로컬 `output/naver-review/01-ulife-login.png`, `02-naver-auth.png`. 첫 두 단계의 실제 화면이며 전체 가입·로그인 완료 자료를 대신하지 않는다.
+- 이 운영 확인을 기록한 후속 커밋은 문서만 변경한다.
