@@ -13,6 +13,11 @@ export type CourseBudget = BudgetAmounts & {
 export type OperationCourse = CourseGuide & {
   budget: CourseBudget; source_id: string | null;
   teachers: string; assistants: string; support_staff: string;
+  initial_instructor_name?: string | null;
+  initial_instructor_verified?: boolean;
+  initial_responsible_name?: string | null;
+  initial_responsible_basis?: "FIRST_INTERNAL" | "CENTER_DIRECTOR" | null;
+  initial_responsible_verified?: boolean;
   workspace: CourseWorkspace | null;
 };
 export type WorkbookSummary = {
