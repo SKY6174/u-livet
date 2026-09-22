@@ -71,9 +71,13 @@ export async function POST(
         { message: "원본은 PDF, 사진은 JPG 또는 PNG로 올려 주세요." },
         { status: 400 },
       );
-    const { error } = await (
-      await createServerSupabaseClient()
-    ).rpc("life_save_report_file", {
+    const db = await createServerSupabaseClient();
+    if (kind === "result") {
+      const { data: context, error: contextError } = await db.rpc("life_operation_context", { f: id });
+      if (contextError || !context?.manager || context.documents?.some((document: { kind: string; status: string }) => document.kind === "result" && document.status === "SUBMITTED"))
+        return NextResponse.json({ message: "제출 완료된 결과보고서의 원본은 교체할 수 없습니다." }, { status: 409 });
+    }
+    const { data: fileId, error } = await db.rpc("life_save_report_file", {
       f: id,
       kind,
       filename: file.name.replace(/[\r\n/\\]/g, "_").slice(0, 200),
@@ -91,7 +95,7 @@ export async function POST(
         },
         { status: 400 },
       );
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, fileId });
   } catch {
     return NextResponse.json(
       { message: "파일을 업로드하지 못했습니다. 다시 시도해 주세요." },

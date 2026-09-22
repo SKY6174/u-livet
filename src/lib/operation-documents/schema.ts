@@ -297,7 +297,7 @@ export const PHOTO_CAPTIONS = [
   "개강식",
   "수료식",
 ];
-export const MAX_OPERATION_PHOTOS = 12;
+export const MAX_OPERATION_PHOTOS = 30;
 export const sections = (kind: DocumentKind) =>
   kind === "plan" ? PLAN_SECTIONS : RESULT_SECTIONS;
 export const fields = (kind: DocumentKind) =>

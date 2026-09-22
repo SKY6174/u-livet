@@ -14,8 +14,11 @@ import {
 } from "lucide-react";
 import { AdvisorySignaturePad } from "@/features/instructor-documents/components/advisory/advisory-signature-pad";
 import { DocumentPreview } from "./document-preview";
+import { ResultPdfImport } from "./result-pdf-import";
 import {
   sections,
+  fields as documentFields,
+  tables as documentTables,
   documentLabel,
   ACADEMIES,
   MAX_OPERATION_PHOTOS,
@@ -29,6 +32,7 @@ import {
   blankRow,
   missingContent,
   validContent,
+  validField,
   validBudget,
   emptyBudget,
   STATUS_LABELS,
@@ -355,6 +359,39 @@ export function DocumentEditor({
           를 불러온 초안입니다. 내용과 시간은 실제 운영 내역에 맞게 확인해
           주세요.
         </p>
+      )}
+      {kind === "result" && manager && doc.status !== "SUBMITTED" && (
+        <ResultPdfImport
+          courseId={context.course.id}
+          disabled={busy}
+          content={content}
+          onApply={(proposal, photos, schedule) => {
+            const allowed = new Map(documentFields("result").map((field) => [field.key, field]));
+            const accepted = Object.fromEntries(Object.entries(proposal).filter(([key, value]) => {
+              const field = allowed.get(key);
+              return field && validField(value, field);
+            }));
+            const slots = PHOTO_CAPTIONS.length + MAX_OPERATION_PHOTOS - content.photos.length;
+            const columns = documentTables("result").find((table) => table.key === "schedule")!.columns;
+            const acceptedSchedule = schedule.filter((row) => columns.every((column) => validField(row[column.key], column)));
+            const next: Content = {
+              ...content,
+              fields: { ...content.fields, ...accepted },
+              tables: { ...content.tables, schedule: schedule.length ? acceptedSchedule : content.tables.schedule },
+              photos: [...content.photos, ...photos.slice(0, slots)],
+              signature: "",
+            };
+            if (!validContent(next, "result")) {
+              setError("가져올 내용이나 사진이 3MB 저장 한도를 넘었습니다. 사진을 줄인 뒤 다시 반영해 주세요.");
+              return false;
+            }
+            change(next);
+            setError("");
+            if (Object.keys(accepted).length !== Object.keys(proposal).length || photos.length > slots || acceptedSchedule.length !== schedule.length)
+              setMessage("일부 날짜·숫자 형식, 강의표 행 또는 사진 장수가 한도를 넘어 제외되었습니다. 원본과 비교해 주세요.");
+            return true;
+          }}
+        />
       )}
       <div className="sticky top-32 z-20 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white/95 p-3 shadow-sm">
         <div>
