@@ -47,9 +47,6 @@ export default async function BadgeOperations({
   const latest = b?.definitions[0];
   return (
     <div className="page-shell">
-      <Link className="text-sm text-teal-800 underline" href="/credentials">
-        ← 강의실적·증명 관리
-      </Link>
       <PageIntro eyebrow="BADGE OPERATIONS" title="디지털배지 관리">
         배지 정의를 별도로 승인하고 최신 수료 근거와 배지 발급 위임을
         확인합니다.

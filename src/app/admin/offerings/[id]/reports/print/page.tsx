@@ -39,7 +39,6 @@ export default async function PrintReport({
   return (
     <>
       <PrintToolbar
-        offering={id}
         document={document}
         reveal={query.reveal === "1"}
       />

@@ -27,12 +27,6 @@ export default async function TeachingEvaluation({
   const room = exams.data as ExamRoom;
   return (
     <div className="page-shell">
-      <Link
-        className="text-sm text-teal-800"
-        href={`/instructor/offerings/${id}`}
-      >
-        ← 강의 운영으로
-      </Link>
       <PageIntro eyebrow="TEACHING EVALUATION" title="출결·시험 관리">
         {o.name} · 모든 수업을 등록한 뒤 종료된 수업의 인정 출석시간과 근거를
         기록하세요.

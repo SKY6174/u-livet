@@ -44,12 +44,6 @@ export default async function Annual({
     t = b.facts.totals;
   return (
     <div className="page-shell">
-      <Link
-        href="/performance"
-        className="mb-6 inline-block text-sm text-teal-800 underline"
-      >
-        ← 사업연도 선택
-      </Link>
       <PageIntro eyebrow="ANNUAL REVIEW" title={b.year.label}>
         {b.year.starts_on} ~ {b.year.ends_on} · 조회 {dateTime(b.generated_at)}
       </PageIntro>

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -32,16 +31,6 @@ export default async function Quality({
     latest = b.reviews[0];
   return (
     <div className="page-shell">
-      <Link
-        className="text-sm text-teal-800 underline"
-        href={
-          b.manager || me.roles.some((r) => r.role === "PERFORMANCE")
-            ? "/performance/" + b.offering.year_id
-            : "/instructor"
-        }
-      >
-        ← {b.manager ? "사업연도 성과 관리" : "My Room"}
-      </Link>
       <PageIntro eyebrow="COURSE QUALITY" title={b.offering.name}>
         종강 {b.offering.ends_on} · 만족도와 강사 의견을 검토하고 다음 기수의
         개선을 확인합니다.

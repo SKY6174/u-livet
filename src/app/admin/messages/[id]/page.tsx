@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PageIntro, Empty } from "@/components/portal/ui";
@@ -28,12 +27,6 @@ export default async function MessageDetail({
     Date.parse(j.scheduled_at) < Date.now();
   return (
     <div className="page-shell">
-      <Link
-        href="/admin/messages"
-        className="mb-6 inline-block text-sm text-teal-800 underline"
-      >
-        ← 안내문자 목록
-      </Link>
       <PageIntro eyebrow="MESSAGE REVIEW" title={j.title}>
         {j.name} · {messageLabel(j.kind)} · {messageLabel(j.audience)}
       </PageIntro>

@@ -27,12 +27,6 @@ export default async function Report({
     r.snapshot.metrics.some((m) => m.observation?.recorded_by === me.id);
   return (
     <div className="page-shell">
-      <Link
-        className="text-sm text-teal-800 underline"
-        href={"/performance/" + r.year_id}
-      >
-        ← 사업연도 성과 관리
-      </Link>
       <PageIntro
         eyebrow="PERFORMANCE RECORD"
         title={`${r.snapshot.year.label} · 보고 v${r.version}`}

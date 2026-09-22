@@ -39,13 +39,7 @@ async function Review({
     return (
       <>
         <Link
-          className="btn-secondary mb-5"
-          href={`/admin/instructors?org=${org}&tab=review`}
-        >
-          ← 심사 목록
-        </Link>
-        <Link
-          className="btn-primary mb-5 ml-3"
+          className="btn-primary mb-5"
           href={`/admin/instructors/documents?person=${data.person_id}&org=${org}`}
         >
           비공개 서류 확인
@@ -149,9 +143,6 @@ export default async function InstructorPoolPage({
   if (result.error || !result.data)
     return (
       <div className="page-shell">
-        <Link href="/admin" className="text-blue-700">
-          ← 사업단 관리
-        </Link>
         <Empty title="강사 대장을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요." />
       </div>
     );

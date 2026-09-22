@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Award, BookOpen } from "lucide-react";
+import { ArrowUpRight, Award, BookOpen } from "lucide-react";
 import { getCourseGuide } from "@/lib/course-guide/data";
 import { getCourseIntroduction, modeLabel } from "@/lib/portal/data";
 import { PageIntro } from "@/components/portal/ui";
@@ -11,7 +11,6 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
   const offering = course.offering_id ? await getCourseIntroduction(course.offering_id) : null;
   return (
     <div className="page-shell">
-      <Link href="/courses" className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-teal-800"><ArrowLeft size={16} aria-hidden="true" />교육과정 목록</Link>
       <PageIntro eyebrow={`${course.year} · ${course.academy}`} title={course.name}>{course.summary}</PageIntro>
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">

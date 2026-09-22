@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
-import { ArrowLeft, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { ActionForm } from "@/components/portal/action-form";
 import { PageIntro } from "@/components/portal/ui";
 import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
@@ -13,7 +13,6 @@ export default async function NewMember({ searchParams }: { searchParams: Promis
   const group = memberGroup((await searchParams).group);
   const orgs = me.member_entry_orgs!;
   return <div className="page-shell max-w-5xl">
-    <Link className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500" href={`/admin/accounts?group=${group}`}><ArrowLeft className="h-4 w-4" aria-hidden="true" />구성원 목록</Link>
     <PageIntro eyebrow="NEW MEMBER" title="구성원 수동 등록">입력한 정보는 등록과 동시에 저장됩니다.</PageIntro>
     <nav aria-label="등록할 구성원 구분" className="mb-6 flex flex-wrap gap-2">{Object.entries(MEMBER_GROUPS).map(([key, label]) => <Link key={key} href={`/admin/accounts/new?group=${key}`} aria-current={key === group ? "page" : undefined} className={key === group ? "btn-primary" : "btn-secondary"}>{label}</Link>)}</nav>
     <section className="panel max-w-3xl">

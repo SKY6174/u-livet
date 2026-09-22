@@ -36,9 +36,6 @@ export default async function OfferingPage(props: {
     Date.now() < Date.parse(o.apply_until);
   return (
     <div className="page-shell">
-      <Link href="/courses" className="mb-6 inline-block text-sm text-teal-800">
-        ← 교육과정 목록
-      </Link>
       <PageIntro eyebrow={`${o.academy} · ${o.year_label}`} title={o.name}>
         {o.summary}
       </PageIntro>

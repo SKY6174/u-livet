@@ -21,9 +21,6 @@ export default async function Evaluation({
   const room = exams.data as ExamRoom;
   return (
     <div className="page-shell">
-      <Link href={`/learning/${id}`} className="text-sm text-teal-800">
-        ← 강의실로
-      </Link>
       <PageIntro eyebrow="ATTENDANCE & EXAMS" title="출결·시험">
         공식 출결은 강사가 확인한 출석시간으로 기록됩니다. 시험 중에는 임시저장
         후 다시 접속할 수 있습니다.

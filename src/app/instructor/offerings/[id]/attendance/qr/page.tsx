@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { getAttendanceBook } from "@/lib/attendance/data";
@@ -47,15 +46,6 @@ export default async function InstructorQrAttendancePage({
 
   return (
     <div className="page-shell max-w-5xl">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Link className="text-sm font-semibold text-teal-800 hover:underline" href={`/instructor/offerings/${id}/attendance`}>
-          ← 출석부 관리로 돌아가기
-        </Link>
-        <Link className="text-sm font-semibold text-teal-800 hover:underline" href="/instructor">
-          My Room 홈 →
-        </Link>
-      </div>
-
       <PageIntro 
         eyebrow="SMART QR ATTENDANCE" 
         title="스마트 실시간 QR 출석 체크"

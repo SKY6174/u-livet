@@ -37,9 +37,6 @@ export default async function InstructorProfile({
       : null;
   return (
     <div className="page-shell">
-      <Link href="/mypage" className="text-sm text-teal-800">
-        ← 나의 공간
-      </Link>
       <PageIntro eyebrow="MY TEACHING PROFILE" title="강사 이력·심사">
         전문분야와 이력을 제출하고 사업단 확인 결과를 확인하세요.
       </PageIntro>

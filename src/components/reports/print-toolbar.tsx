@@ -2,12 +2,10 @@
 import Link from "next/link";
 import { useState } from "react";
 export function PrintToolbar({
-  offering,
   document,
   reveal,
   preview = false,
 }: {
-  offering?: string;
   document: string;
   reveal: boolean;
   preview?: boolean;
@@ -41,12 +39,6 @@ export function PrintToolbar({
   }
   return (
     <nav className="no-print mx-auto flex max-w-7xl flex-wrap items-center gap-4 p-5">
-      <Link
-        className="btn-secondary"
-        href={preview ? "/admin" : `/admin/offerings/${offering}/reports`}
-      >
-        {preview ? "← 과정 운영 관리" : "← 과정 보고서 관리"}
-      </Link>
       <button className="btn-primary" onClick={download} disabled={busy}>
         {busy ? "출력 준비 중…" : "PDF 1.7 다운로드"}
       </button>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { statusLabel } from "@/lib/portal/data";
 import type { Offering } from "@/lib/portal/types";
 
@@ -15,13 +15,6 @@ export function CourseHeader({
   const base = `/admin/offerings/${o.id}`;
   return (
     <header className="mb-8">
-      <Link
-        href={active === "reports" ? "/admin/reports" : "/admin/courses"}
-        className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-teal-800"
-      >
-        <ArrowLeft size={16} />
-        {active === "reports" ? "전체 결과 보고" : "전체 과정"}
-      </Link>
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div className="min-w-0 flex-1">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold">

@@ -172,10 +172,7 @@ export function PoolDashboard({
   ];
   return (
     <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-8">
-      <Link href="/admin" className="text-sm font-medium text-slate-500">
-        ← 사업단 관리
-      </Link>
-      <header className="mt-5 flex flex-wrap items-center justify-between gap-6 rounded-3xl border border-blue-100 bg-gradient-to-br from-white via-white to-blue-50 p-6 shadow-sm md:p-8">
+      <header className="flex flex-wrap items-center justify-between gap-6 rounded-3xl border border-blue-100 bg-gradient-to-br from-white via-white to-blue-50 p-6 shadow-sm md:p-8">
         <div className="flex items-start gap-4">
           <div className="hidden rounded-2xl bg-blue-600 p-4 text-white sm:block">
             <Users size={28} />

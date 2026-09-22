@@ -28,12 +28,6 @@ export async function DevelopmentBoard({
     board = b?.data as DevelopmentBoardData | null;
   return (
     <div className="page-shell">
-      <Link
-        href={staff ? "/admin" : "/mypage/instructor"}
-        className="text-sm text-teal-800"
-      >
-        ← {staff ? "사업단 관리" : "강사 이력"}
-      </Link>
       <PageIntro
         eyebrow="COURSE DEVELOPMENT"
         title={staff ? "과정 개발·심의 관리" : "나의 과정 개발·제안"}

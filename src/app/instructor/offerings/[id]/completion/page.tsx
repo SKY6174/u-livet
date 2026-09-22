@@ -13,7 +13,6 @@ export default async function InstructorCompletion({ params }: { params: Promise
   const { data, error } = await (await createServerSupabaseClient()).rpc("life_instructor_completion", { f: id });
   if (error?.message === "FORBIDDEN") notFound();
   return <div className="page-shell">
-    <Link className="text-sm text-teal-800" href={`/instructor/offerings/${id}`}>← 강의 운영</Link>
     <PageIntro eyebrow="COMPLETION STATUS" title="수강생 이수 확인">출결·과제·시험을 확인하고, 사업단이 검토한 수료 결과를 확인합니다.</PageIntro>
     <p className="notice mb-6">강사는 출결과 평가 근거를 확인합니다. 최종 수료 승인과 증명서 발급은 사업단 담당자가 진행하며, QR 입실만으로 수료가 인정되지는 않습니다.</p>
     <div className="mb-6 flex flex-wrap gap-3"><Link className="btn-secondary" href={`/instructor/offerings/${id}/attendance`}>출석부 확인</Link><Link className="btn-secondary" href={`/instructor/offerings/${id}/evaluation`}>시험·평가 확인</Link><Link className="btn-secondary" href={`/quality/${id}`}>종강 만족도 조사</Link></div>

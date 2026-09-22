@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { dateTime } from "@/lib/portal/data";
@@ -14,9 +13,6 @@ export default async function Surveys() {
   const rows = (data ?? []) as MySurvey[];
   return (
     <div className="page-shell">
-      <Link className="text-sm text-teal-800 underline" href="/mypage">
-        ← 나의 공간
-      </Link>
       <PageIntro eyebrow="YOUR FEEDBACK" title="과정 만족도 조사">
         참여는 선택이며 수료·증명 발급에 영향을 주지 않습니다.
       </PageIntro>

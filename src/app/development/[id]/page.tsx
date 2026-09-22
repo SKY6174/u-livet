@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -23,12 +22,6 @@ export default async function Page({
   const d = a.data as Development;
   return (
     <div className="page-shell">
-      <Link
-        className="text-sm text-teal-800"
-        href={`${d.manager && !d.owner ? "/admin/development" : "/development"}?org=${d.org_id}`}
-      >
-        ← 과정 제안 목록
-      </Link>
       <PageIntro eyebrow="SYLLABUS & REVIEW" title="과정 계획·심의">
         제안 내용과 보완·승인·개설 이력을 함께 확인합니다.
       </PageIntro>

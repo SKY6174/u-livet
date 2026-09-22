@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
@@ -12,12 +11,6 @@ export default async function Notifications() {
   const settings = (data ?? []) as NotificationPreference[];
   return (
     <div className="page-shell">
-      <Link
-        href="/mypage"
-        className="mb-6 inline-block text-sm text-teal-800 underline"
-      >
-        ← 나의 공간
-      </Link>
       <PageIntro eyebrow="NOTIFICATION SETTINGS" title="연락처·홍보 수신 설정">
         홍보 수신은 선택 사항입니다. 동의하지 않거나 철회해도 수강 신청과 학습을
         이용할 수 있습니다.

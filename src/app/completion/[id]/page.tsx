@@ -69,12 +69,8 @@ export default async function CompletionReview({
   const rows = board.data as CompletionRow[];
   return (
     <div className="page-shell">
-      <Link className="text-sm text-teal-800" href="/completion">
-        ← 수료 검토 목록
-      </Link>
       {manager && (
         <div className="my-4 flex flex-wrap gap-4 text-sm font-semibold text-teal-800">
-          <Link href={`/admin/offerings/${id}`}>← 이 과정 운영 개요</Link>
           <Link href={`/admin/offerings/${id}/reports`}>
             결과보고서에 반영된 내용 확인 →
           </Link>

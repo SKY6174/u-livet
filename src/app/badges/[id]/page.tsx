@@ -28,12 +28,6 @@ export default async function Badge({
     a = b.artifact;
   return (
     <div className="page-shell">
-      <Link
-        className="text-sm text-teal-800 underline"
-        href={b.owner ? "/mypage/badges" : "/credentials/badges"}
-      >
-        ← {b.owner ? "나의 배지함" : "배지 관리"}
-      </Link>
       <PageIntro eyebrow="DIGITAL BADGE" title={a.badge.title}>
         발급 당시 기록과 현재 유효 상태를 함께 확인합니다.
       </PageIntro>

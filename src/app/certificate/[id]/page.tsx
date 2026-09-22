@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -27,9 +26,6 @@ export default async function Certificate({
   const s = c.snapshot;
   return (
     <div className="page-shell">
-      <Link className="text-sm text-teal-800" href="/mypage/certificates">
-        ← 나의 증명 이력
-      </Link>
       <PageIntro eyebrow="CERTIFICATE" title={s.template.title}>
         {c.number} · {certificateState[c.state]}
       </PageIntro>

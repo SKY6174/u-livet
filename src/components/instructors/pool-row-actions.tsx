@@ -223,7 +223,7 @@ export function PoolRowActions({
                 disabled={busy}
                 onClick={() => setMode(null)}
               >
-                돌아가기
+                취소
               </button>
               <button
                 className="rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-50"

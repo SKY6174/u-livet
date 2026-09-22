@@ -45,7 +45,6 @@ export function GuestDocumentPortal({ code }: { code: string }) {
         personId={session.member.id!}
         orgId={session.member.org_id!}
         name={session.member.name}
-        returnTo="/"
         initialSession={session}
         onGuestLogout={logout}
       />

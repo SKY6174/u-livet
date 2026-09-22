@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getAttendanceBook } from "@/lib/attendance/data";
 import { attendanceIndex, attendanceState, attendanceSummary, formatMinutes, sessionMinutes } from "@/lib/attendance/model";
 import { PageIntro, Empty } from "@/components/portal/ui";
@@ -10,7 +9,6 @@ export default async function MyAttendance({ params }: { params: Promise<{ id: s
   const index = attendanceIndex(book.attendance), now = Date.parse(book.generated_at);
   const summary = attendanceSummary(book.sessions, index, book.viewer_id, now);
   return <div className="page-shell">
-    <Link className="text-sm text-teal-800" href={`/learning/${id}`}>← 나의 강의실</Link>
     <PageIntro eyebrow="MY ATTENDANCE" title="나의 출석 확인">{book.offering.name} · 담당 강사가 기록한 본인의 출결입니다.</PageIntro>
     <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
       {[["종료된 수업", `${summary.ended}회`], ["출결 확인", `${summary.recorded}회 / 미입력 ${summary.missing}회`], ["인정시간", `${formatMinutes(summary.credited)} / ${formatMinutes(summary.total)}분`], ["진행 수업 출석률", summary.percent === null ? summary.missing ? "확인 중" : "종료 수업 없음" : `${summary.percent}%`]].map(([label, value]) => <div key={label} className="panel"><p className="text-sm text-slate-500">{label}</p><p className="mt-3 text-lg font-bold">{value}</p></div>)}

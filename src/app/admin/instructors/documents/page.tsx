@@ -3,7 +3,6 @@ import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
 import { DocumentPortal } from "@/components/instructor-documents/document-portal";
-import Link from "next/link";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { Empty, PageIntro } from "@/components/portal/ui";
 import { getManagedInstructorOrganizations } from "@/lib/instructors/organizations";
@@ -39,16 +38,6 @@ export default async function InstructorDocumentAdmin({
     const rows = (result?.data?.items ?? []) as DocumentRow[];
     return (
       <div className="page-shell">
-        <Link
-          href={
-            selected
-              ? `/admin/instructors?org=${selected.id}`
-              : "/admin/instructors"
-          }
-          className="text-sm text-teal-800"
-        >
-          ← 전문가 관리
-        </Link>
         <PageIntro eyebrow="INSTRUCTOR DOCUMENTS" title="강사 서류 제출 현황">
           담당 기관 강사의 비공개 서류를 확인하고 입력합니다.
         </PageIntro>
@@ -132,7 +121,6 @@ export default async function InstructorDocumentAdmin({
       personId={data.id}
       orgId={data.org_id}
       name={data.name}
-      returnTo={`/admin/instructors?org=${org}`}
     />
   );
 }

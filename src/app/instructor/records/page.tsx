@@ -49,7 +49,6 @@ export default async function Records() {
   const logs = ((records.data ?? []) as TeachingRecord[]).filter(record => record.person_id === me.id);
   return (
     <div className="page-shell">
-      <Link className="text-sm text-teal-800" href="/instructor">← My Room</Link>
       <PageIntro eyebrow="TEACHING RECORD" title="실제 강의실적">
         완료된 수업의 실제 강의시간과 내용을 제출하세요. 과정담당이 별도로
         확인한 실적만 경력증명에 반영됩니다.

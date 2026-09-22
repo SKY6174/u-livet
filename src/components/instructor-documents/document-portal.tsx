@@ -1,7 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, FileDown, ShieldCheck } from "lucide-react";
+import { FileDown, ShieldCheck } from "lucide-react";
 import { Pdf17CopyButton } from "@/components/pdf/pdf-17-copy-button";
 import {
   invoke,
@@ -36,7 +36,6 @@ export function DocumentPortal({
   personId,
   orgId,
   name,
-  returnTo,
   initialDocument = "IDENTITY_BANK",
   initialSession,
   onGuestLogout,
@@ -44,7 +43,6 @@ export function DocumentPortal({
   personId: string;
   orgId: string;
   name: string;
-  returnTo: string;
   initialDocument?: "IDENTITY_BANK" | "RESUME";
   initialSession?: DocumentSession;
   onGuestLogout?: () => void;
@@ -167,18 +165,6 @@ export function DocumentPortal({
               때만 갱신하세요.
             </p>
           </div>
-          {!initialSession && (
-            <button
-              className="btn-secondary"
-              onClick={() => {
-                window.close();
-                window.setTimeout(() => window.location.assign(returnTo), 100);
-              }}
-            >
-              <ArrowLeft size={18} />
-              대장으로 돌아가기
-            </button>
-          )}
         </div>
         <p className="mt-3 text-xs text-slate-500">
           AI 분석을 선택하면 첨부 자료가 문서 판독 서비스로 전송됩니다. 분석

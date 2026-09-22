@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, History, Pencil, Trash2 } from "lucide-react";
+import { History, Pencil, Trash2 } from "lucide-react";
 import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
 import { UUID } from "@/lib/portal/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import { getMembers, getMemberHistory, memberAdmin } from "@/lib/members/data";
-import { MEMBER_GROUPS, HISTORY_STATUS, memberGroup, memberPage, displayPhone } from "@/lib/members/model";
+import { HISTORY_STATUS, memberGroup, memberPage, displayPhone } from "@/lib/members/model";
 import { saveMember, deleteMember } from "../actions";
 
 export default async function MemberDetail({ params, searchParams }: {
@@ -19,21 +19,19 @@ export default async function MemberDetail({ params, searchParams }: {
   const group = memberGroup(query.group);
   const view = query.view === "delete" ? "delete" : query.view === "history" && group !== "office" ? "history" : "edit";
   const { data, error } = await getMembers(group, "", 1, id);
-  if (error || !data) return <div className="page-shell"><Empty title="구성원 정보를 불러오지 못했습니다" /><Link href={`/admin/accounts?group=${group}`} className="btn-secondary mt-4">목록으로</Link></div>;
+  if (error || !data) return <div className="page-shell"><Empty title="구성원 정보를 불러오지 못했습니다" /></div>;
   const member = data.items[0];
   if (!member) notFound();
   const canManage = member.can_manage !== false && me.roles.some(role => role.role === "SYSTEM_ADMIN");
   if (view !== "history" && !canManage) notFound();
   const page = memberPage(query.page);
   const history = view === "history" ? await getMemberHistory(id, group, page) : null;
-  const back = `/admin/accounts?group=${group}`;
   const detail = `/admin/accounts/${id}?group=${group}`;
   if (history?.data && page > Math.max(1, Math.ceil(history.data.total / 20))) {
     redirect(`${detail}&view=history&page=${Math.max(1, Math.ceil(history.data.total / 20))}`);
   }
   const historyName = group === "instructor" ? "강의이력" : "수강이력";
   return <div className="page-shell">
-    <Link href={back} className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500"><ArrowLeft aria-hidden="true" className="h-4 w-4" />{MEMBER_GROUPS[group]} 목록</Link>
     <PageIntro eyebrow="MEMBERS" title={`${member.name} · ${view === "delete" ? "구성원 삭제" : view === "history" ? historyName : "구성원 수정"}`}>{member.email || "이메일 미등록"}</PageIntro>
     <nav aria-label="구성원 관리" className="mb-6 flex flex-wrap gap-2">
       {canManage && <Link className={view === "edit" ? "btn-primary gap-2" : "btn-secondary gap-2"} href={detail} aria-current={view === "edit" ? "page" : undefined}><Pencil aria-hidden="true" className="h-4 w-4" />정보 수정</Link>}

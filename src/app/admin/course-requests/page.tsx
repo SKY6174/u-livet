@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { hasRole } from "@/lib/auth/workspace-navigation";
@@ -27,9 +26,6 @@ export default async function CourseRequests() {
   const requests = (data ?? []) as LearningRequest[];
   return (
     <div className="page-shell">
-      <Link className="text-sm text-teal-800" href="/admin">
-        ← 사업단 관리
-      </Link>
       <PageIntro eyebrow="LEARNER VOICE" title="희망 과목 제안·검토">
         수강생의 학습 수요를 확인하고 검토 결과를 안내합니다.
       </PageIntro>

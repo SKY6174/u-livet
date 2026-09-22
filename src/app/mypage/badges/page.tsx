@@ -21,9 +21,6 @@ export default async function Wallet() {
   const w = data as BadgeWallet;
   return (
     <div className="page-shell">
-      <Link href="/mypage/history" className="text-sm text-teal-800 underline">
-        ← 수강이력·수료 현황
-      </Link>
       <PageIntro eyebrow="MY ACHIEVEMENTS" title="나의 디지털배지">
         승인된 수료 성과를 배지로 보관하고 필요한 때에 공유하세요. 배지는 기본
         비공개입니다.
