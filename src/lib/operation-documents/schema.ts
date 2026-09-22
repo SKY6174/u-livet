@@ -2,7 +2,7 @@ export type DocumentKind = "plan" | "result";
 export type Field = {
   key: string;
   label: string;
-  type: "text" | "long" | "number" | "date";
+  type: "text" | "long" | "number" | "date" | "time";
   required?: boolean;
   max: number;
 };
@@ -49,12 +49,14 @@ export const COMMON = [
   f("endsOn", "교육 종료일", "date", true),
 ];
 export const SCHEDULE = [
-  f("date", "일시"),
+  f("date", "일자", "date"),
+  f("startTime", "시작시간", "time"),
+  f("endTime", "종료시간", "time"),
   f("topic", "강의주제 및 내용"),
-  f("instructor", "강사명"),
-  f("hours", "교육시간", "number"),
+  f("instructor", "주강사명"),
+  f("hours", "주강사 교육시간", "number"),
   f("assistant", "보조강사명"),
-  f("assistantHours", "보조 교육시간", "number"),
+  f("assistantHours", "보조강사 교육시간", "number"),
   f("location", "교육장소"),
 ];
 export const RECRUITMENT = [

@@ -44,6 +44,30 @@ vm.runInNewContext(
   ).outputText,
   { exports: model, require: () => schema, Intl, Date, TextEncoder },
 );
+const legacySchedule = model.normalizeScheduleRow(
+  {
+    date: "2026.07.14. (11:00~13:00)",
+    topic: "파크골프 이론",
+    instructor: "조경호",
+    hours: "2",
+    assistant: "",
+    assistantHours: "",
+    location: "G-110",
+  },
+  "result",
+);
+assert.equal(legacySchedule.date, "2026-07-14");
+assert.equal(legacySchedule.startTime, "11:00");
+assert.equal(legacySchedule.endTime, "13:00");
+assert.equal(
+  model.validField("24:00", {
+    key: "startTime",
+    label: "시작시간",
+    type: "time",
+    max: 500,
+  }),
+  false,
+);
 const sql = (q) =>
   execFileSync(
     "docker",
@@ -189,6 +213,8 @@ for (const field of schema.fields("plan"))
       ? "10"
       : field.type === "date"
         ? "2026-09-22"
+        : field.type === "time"
+          ? "09:00"
         : `${field.label} 검증자료`;
 content.fields.year = "2026";
 content.fields.title = "[검증] 평생직업교육 프로그램";
@@ -202,11 +228,16 @@ for (const table of schema.tables("plan"))
       Object.fromEntries(
         table.columns.map((col) => [
           col.key,
-          col.type === "number" ? "2" : `${col.label} 검증`,
+          col.type === "number"
+            ? "2"
+            : col.type === "date"
+              ? "2026-09-22"
+              : col.type === "time"
+                ? col.key === "endTime" ? "11:00" : "09:00"
+                : `${col.label} 검증`,
         ]),
       ),
     ];
-content.tables.schedule[0].date = "2026.09.22 09:00~11:00";
 for (const r of budget.rows) r.planned = "0";
 budget.rows.find((r) => r.category === "내부강사").planned = "100000";
 budget.rows.find((r) => r.category === "외부강사").planned = "200000";
@@ -347,16 +378,18 @@ ctx = ok(await teacher.c.rpc("life_operation_save", {
 const resultContent = model.emptyContent("result");
 for (const field of schema.fields("result"))
   resultContent.fields[field.key] = field.type === "number" ? "2" :
-    field.type === "date" ? "2026-09-22" : `${field.label} 검증자료`;
+    field.type === "date" ? "2026-09-22" :
+      field.type === "time" ? "09:00" : `${field.label} 검증자료`;
 resultContent.fields.year = "2026";
 resultContent.fields.startsOn = "2026-09-21";
 resultContent.fields.endsOn = "2026-09-23";
 for (const table of schema.tables("result"))
   if (table.min)
     resultContent.tables[table.key] = [Object.fromEntries(table.columns.map((col) => [
-      col.key, col.type === "number" ? "2" : `${col.label} 검증자료`,
+      col.key, col.type === "number" ? "2" :
+        col.type === "date" ? "2026-09-22" :
+          col.type === "time" ? (col.key === "endTime" ? "11:00" : "09:00") : `${col.label} 검증자료`,
     ]))];
-resultContent.tables.schedule[0].date = "2026.09.22 09:00~11:00";
 assert.equal(model.validContent(resultContent, "result"), true);
 ctx = ok(await teacher.c.rpc("life_operation_save", {
   f, k: "result", c: resultContent, b: null, expected_revision: 4,
@@ -444,6 +477,8 @@ for (const field of schema.fields("result"))
         ? "0"
         : field.type === "date"
           ? "2026-09-22"
+          : field.type === "time"
+            ? "09:00"
           : `${field.label} 확인 완료`;
 result.content.tables.schedule = content.tables.schedule.map((r) =>
   Object.fromEntries(

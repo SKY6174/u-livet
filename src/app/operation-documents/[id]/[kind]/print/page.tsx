@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getOperationContext } from "@/lib/operation-documents/data";
 import {
   initialDocument,
+  normalizeDocumentContent,
   type OperationDocument,
 } from "@/lib/operation-documents/model";
 import { documentLabel } from "@/lib/operation-documents/schema";
@@ -29,6 +30,7 @@ export default async function Print({
     ).rpc("life_operation_submission", { f: id, s: query.submission });
     if (error || !data || data.kind !== kind) notFound();
     doc = data as OperationDocument;
+    doc = { ...doc, content: normalizeDocumentContent(doc.content, kind) };
   }
   return (
     <>

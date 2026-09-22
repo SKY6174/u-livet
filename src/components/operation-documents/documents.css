@@ -199,19 +199,6 @@
   height: 9mm;
   padding: 1.1mm;
 }
-.op-schedule th:first-child {
-  width: 7mm;
-}
-.op-schedule th:nth-child(2) {
-  width: 26mm;
-}
-.op-schedule th:nth-child(3) {
-  width: 37mm;
-}
-.op-schedule th:nth-child(4),
-.op-schedule th:nth-child(5) {
-  width: 27mm;
-}
 .op-hours {
   text-align: right;
   font-weight: bold;

@@ -79,6 +79,66 @@ export const RESULT_STATUS_LABELS: typeof STATUS_LABELS = {
 };
 export const blankRow = (columns: Field[]) =>
   Object.fromEntries(columns.map((c) => [c.key, ""]));
+const pad = (value: string) => value.padStart(2, "0");
+export function normalizeScheduleRow(
+  row: Record<string, string>,
+  kind: DocumentKind,
+) {
+  const raw = row.date ?? "";
+  const dateMatch = raw.match(
+    /(\d{4})[.\/-]\s*(\d{1,2})[.\/-]\s*(\d{1,2})/,
+  );
+  const timeMatch = raw.match(
+    /(\d{1,2}):(\d{2})\s*[~～-]\s*(\d{1,2}):(\d{2})/,
+  );
+  const values: Record<string, string> = {
+    ...row,
+    date: dateMatch
+      ? `${dateMatch[1]}-${pad(dateMatch[2])}-${pad(dateMatch[3])}`
+      : raw,
+    startTime:
+      row.startTime ??
+      (timeMatch ? `${pad(timeMatch[1])}:${timeMatch[2]}` : ""),
+    endTime:
+      row.endTime ??
+      (timeMatch ? `${pad(timeMatch[3])}:${timeMatch[4]}` : ""),
+  };
+  const schedule = tables(kind).find((table) => table.key === "schedule")!;
+  return Object.fromEntries(
+    schedule.columns.map((column) => [column.key, values[column.key] ?? ""]),
+  );
+}
+export function normalizeDocumentContent(
+  content: Content,
+  kind: DocumentKind,
+): Content {
+  return {
+    ...content,
+    tables: {
+      ...content.tables,
+      schedule: (content.tables.schedule ?? []).map((row) =>
+        normalizeScheduleRow(row, kind),
+      ),
+    },
+  };
+}
+function sessionDateTime(value: string) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(value));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((item) => item.type === type)?.value ?? "";
+  return {
+    date: `${part("year")}-${part("month")}-${part("day")}`,
+    time: `${part("hour")}:${part("minute")}`,
+  };
+}
 export function emptyContent(kind: DocumentKind): Content {
   return {
     fields: Object.fromEntries(fields(kind).map((f) => [f.key, ""])),
@@ -106,7 +166,8 @@ export function emptyBudget(kind: DocumentKind): Budget {
 }
 export function initialDocument(context: DocumentContext, kind: DocumentKind) {
   const saved = context.documents.find((d) => d.kind === kind);
-  if (saved) return saved;
+  if (saved)
+    return { ...saved, content: normalizeDocumentContent(saved.content, kind) };
   const content = emptyContent(kind),
     budget = emptyBudget(kind),
     c = context.course;
@@ -138,9 +199,7 @@ export function initialDocument(context: DocumentContext, kind: DocumentKind) {
         if (plan.content.fields[key] !== undefined)
           content.fields[key] = plan.content.fields[key];
       content.tables.schedule = plan.content.tables.schedule.map((row) =>
-        Object.fromEntries(
-          tables("result")[0].columns.map((f) => [f.key, row[f.key] ?? ""]),
-        ),
+        normalizeScheduleRow(row, "result"),
       );
     }
     for (const key of [
@@ -195,21 +254,24 @@ export function initialDocument(context: DocumentContext, kind: DocumentKind) {
         : String(source.scholarshipAmount);
   }
   if (!content.tables.schedule.length)
-    content.tables.schedule = context.sessions.map((s) => ({
-      ...blankRow(tables(kind).find((t) => t.key === "schedule")!.columns),
-      date: new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        dateStyle: "short",
-        timeStyle: "short",
-      }).format(new Date(s.starts_at)),
-      topic: s.title,
-      hours: String(
-        Math.round((Date.parse(s.ends_at) - Date.parse(s.starts_at)) / 36000) /
-          100,
-      ),
-      instructor: content.fields.professor,
-      location: c.location,
-    }));
+    content.tables.schedule = context.sessions.map((s) => {
+      const starts = sessionDateTime(s.starts_at),
+        ends = sessionDateTime(s.ends_at);
+      return {
+        ...blankRow(tables(kind).find((t) => t.key === "schedule")!.columns),
+        date: starts.date,
+        startTime: starts.time,
+        endTime: ends.time,
+        topic: s.title,
+        hours: String(
+          Math.round(
+            (Date.parse(s.ends_at) - Date.parse(s.starts_at)) / 36000,
+          ) / 100,
+        ),
+        instructor: content.fields.professor,
+        location: c.location,
+      };
+    });
   return {
     kind,
     content,
@@ -241,6 +303,7 @@ export function validField(value: unknown, f: Field) {
       Number.isFinite(Date.parse(value)) &&
       new Date(value).toISOString().slice(0, 10) === value
     );
+  if (f.type === "time") return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
   return true;
 }
 export function validImage(value: unknown, limit = 400_000): value is string {
@@ -293,6 +356,12 @@ export function validContent(
             ) ||
             t.columns.some((f) => !validField(r[f.key], f)),
         ),
+    )
+  )
+    return false;
+  if (
+    (rows.schedule as Record<string, string>[]).some(
+      (row) => row.startTime && row.endTime && row.startTime >= row.endTime,
     )
   )
     return false;
@@ -381,13 +450,15 @@ export function missingContent(content: Content, kind: DocumentKind) {
     content.tables.schedule.some(
       (r) =>
         !r.date?.trim() ||
+        !r.startTime?.trim() ||
+        !r.endTime?.trim() ||
         !r.topic?.trim() ||
         !r.instructor?.trim() ||
         !r.hours ||
         !r.location?.trim(),
     )
   )
-    missing.push("강의계획의 일시·주제·강사·시간·장소");
+    missing.push("강의계획의 일자·시작·종료시간·주제·강사·시간·장소");
   if (
     kind === "plan" &&
     content.tables.instructors.some((r) => !r.name?.trim())

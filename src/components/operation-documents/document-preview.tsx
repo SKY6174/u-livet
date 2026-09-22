@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import {
   ACADEMIES,
   RECRUITMENT,
-  SCHEDULE,
   tables,
   documentLabel,
   type DocumentKind,
@@ -330,15 +329,7 @@ export function DocumentPreview({
       </div>,
     ));
   }
-  const schedule = tt.schedule ?? [],
-    columns =
-      kind === "plan"
-        ? [
-            ...SCHEDULE,
-            { key: "mode", label: "수업방식" },
-            { key: "holiday", label: "공휴일 수업여부 (보강 날짜)" },
-          ]
-        : SCHEDULE;
+  const schedule = tt.schedule ?? [];
   groups(schedule, 15).forEach((rows, group) =>
     pages.push(
       <div key={`schedule-${group}`}>
@@ -355,12 +346,21 @@ export function DocumentPreview({
           </p>
         )}
         <table className="op-table op-schedule">
+          <colgroup>
+            {(kind === "plan"
+              ? [4, 9, 11, 18, 8, 6, 8, 6, 12, 8, 10]
+              : [4, 11, 13, 24, 10, 7, 10, 7, 14]
+            ).map((width, index) => (
+              <col key={index} style={{ width: `${width}%` }} />
+            ))}
+          </colgroup>
           <thead>
             <tr>
               <th rowSpan={2}>회차</th>
-              <th rowSpan={2}>일시</th>
+              <th rowSpan={2}>일자</th>
+              <th rowSpan={2}>시간</th>
               <th rowSpan={2}>강의주제 및 내용</th>
-              <th colSpan={2}>강사</th>
+              <th colSpan={2}>주강사</th>
               <th colSpan={2}>보조강사</th>
               <th rowSpan={2}>교육장소</th>
               {kind === "plan" && (
@@ -385,13 +385,28 @@ export function DocumentPreview({
             {Array.from({ length: Math.max(15, rows.length) }, (_, i) => (
               <tr key={i}>
                 <td>{group * 15 + i + 1}</td>
-                {columns.map((c) => (
-                  <td key={c.key}>{rows[i]?.[c.key] || "\u00a0"}</td>
-                ))}
+                <td>{rows[i]?.date ? date(rows[i].date) : "\u00a0"}</td>
+                <td>
+                  {rows[i]?.startTime || rows[i]?.endTime
+                    ? `${rows[i]?.startTime || ""} ~ ${rows[i]?.endTime || ""}`
+                    : "\u00a0"}
+                </td>
+                <td>{rows[i]?.topic || "\u00a0"}</td>
+                <td>{rows[i]?.instructor || "\u00a0"}</td>
+                <td>{rows[i]?.hours || "\u00a0"}</td>
+                <td>{rows[i]?.assistant || "\u00a0"}</td>
+                <td>{rows[i]?.assistantHours || "\u00a0"}</td>
+                <td>{rows[i]?.location || "\u00a0"}</td>
+                {kind === "plan" && (
+                  <>
+                    <td>{rows[i]?.mode || "\u00a0"}</td>
+                    <td>{rows[i]?.holiday || "\u00a0"}</td>
+                  </>
+                )}
               </tr>
             ))}
             <tr>
-              <th colSpan={3}>합계</th>
+              <th colSpan={4}>합계</th>
               <td />
               <td>{sum(rows, "hours")}h</td>
               <td />

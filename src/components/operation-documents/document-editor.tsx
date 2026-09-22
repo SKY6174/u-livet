@@ -1037,7 +1037,13 @@ function Input({
       ) : (
         <input
           type={
-            f.type === "number" ? "number" : f.type === "date" ? "date" : "text"
+            f.type === "number"
+              ? "number"
+              : f.type === "date"
+                ? "date"
+                : f.type === "time"
+                  ? "time"
+                  : "text"
           }
           min={0}
           step={f.type === "number" ? ".01" : undefined}
@@ -1076,20 +1082,42 @@ function Rows({
               <Trash2 size={16} />
             </button>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div
+            className={`grid gap-3 sm:grid-cols-2 ${table.key === "schedule" ? "lg:grid-cols-6" : ""}`}
+          >
             {table.columns.map((f) => (
-              <Input
+              <div
                 key={f.key}
-                field={f}
-                value={row[f.key]}
-                onChange={(value) =>
-                  change(
-                    rows.map((r, j) =>
-                      i === j ? { ...r, [f.key]: value } : r,
-                    ),
-                  )
+                className={
+                  table.key !== "schedule"
+                    ? ""
+                    : f.key === "topic" || f.key === "location"
+                      ? "lg:col-span-6"
+                      : [
+                            "date",
+                            "startTime",
+                            "endTime",
+                            "instructor",
+                            "assistant",
+                          ].includes(f.key)
+                          ? "lg:col-span-2"
+                          : ["mode", "holiday"].includes(f.key)
+                            ? "lg:col-span-3"
+                            : "lg:col-span-1"
                 }
-              />
+              >
+                <Input
+                  field={f}
+                  value={row[f.key]}
+                  onChange={(value) =>
+                    change(
+                      rows.map((r, j) =>
+                        i === j ? { ...r, [f.key]: value } : r,
+                      ),
+                    )
+                  }
+                />
+              </div>
             ))}
           </div>
         </div>
