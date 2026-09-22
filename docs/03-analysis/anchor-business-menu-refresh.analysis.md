@@ -39,3 +39,13 @@
 ## Remaining gaps
 
 없음. Report 단계로 진행한다.
+
+## 2026-09-22 메뉴 닫기 포커스 회귀
+
+- 기존 하위 링크 클릭 핸들러는 활성 링크를 둔 채 `aria-hidden`을 설정했다. 수정 후 패널 내부 포커스를 먼저 펼침 버튼으로 옮기며, 닫힌 패널에는 `inert`를 적용한다([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/inert)).
+- 실제 Header와 MfaPanel을 React StrictMode로 렌더링했다. 합성 역할·라우터·인증 응답만 사용하는 localhost fixture에서 확인했다.
+- Escape 후 펼침 버튼 복귀, 닫힌 메뉴를 건너뛰는 Tab, 열린 메뉴 마지막 링크에서 Tab 이탈 시 외부 포커스 유지, 메뉴 재열기 통과.
+- 하위 링크 선택 직후 포커스가 펼침 버튼에 있고 이후 MFA 입력칸으로 이동함을 확인했다. 합성 코드 6자리 자동 제출 및 성공 화면 이동도 통과했다. 브라우저 콘솔 경고·오류 없음.
+- 역할별 메뉴 회귀 19개, MFA 회귀 50개, 전체 lint 통과.
+- 최초 전체 build는 기준 커밋 `7274df2`의 별도 강사 엑셀 기능 타입 오류(`pool-excel.tsx:22`, Sheet 배열과 행 배열 불일치)로 중단됐다. 이 파일은 다른 작업에서 수정 중이며 이번 메뉴 수정에 포함하지 않았다.
+- 해당 작업의 수정 커밋 `cdf2a0b`를 기준으로 다시 통합한 뒤 전체 production build, lint 및 69개 회귀 검사를 모두 통과했다. 메뉴 수정에 남은 설계 차이는 없다.
