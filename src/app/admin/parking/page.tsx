@@ -58,6 +58,8 @@ export default async function AdminParkingPage({
     : null;
   const data = await getAdminParkingContext(year, center);
   const orgs = data?.organizations ?? [];
+  const unassigned = data?.offerings.filter((o) => !o.center_code) ?? [];
+  const stockTotal = data?.stock.reduce((sum, item) => sum + item.balance, 0) ?? 0;
   const pending = data?.requests.filter((r) => r.status === "PENDING") ?? [];
   const issued = data?.requests.filter((r) => r.status === "APPROVED") ?? [];
   const header = <input type="hidden" name="year" value={year} />;
@@ -97,6 +99,60 @@ export default async function AdminParkingPage({
                 {params.error}
               </p>
             )}
+            <section className="panel" aria-labelledby="parking-readiness">
+              <h2 id="parking-readiness" className="text-lg font-bold">
+                운영 준비 현황 · {year}년
+              </h2>
+              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <h3 className="font-semibold">1. 과정 담당 센터</h3>
+                  <p className="mt-2 text-sm text-slate-700">
+                    {unassigned.length
+                      ? `${unassigned.length}개 과정 미지정`
+                      : "조회 연도 과정의 센터 지정 완료"}
+                  </p>
+                  {unassigned.length > 0 && (
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+                      {unassigned.map((o) => <li key={o.id}>{o.name}</li>)}
+                    </ul>
+                  )}
+                  <a className="mt-3 inline-block text-sm font-semibold text-teal-800 underline" href="#parking-center-assignment">
+                    센터 지정하기
+                  </a>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <h3 className="font-semibold">2. 실물 주차권 재고</h3>
+                  <p className="mt-2 text-sm text-slate-700">
+                    전체 잔여 {stockTotal.toLocaleString("ko-KR")}매
+                  </p>
+                  {stockTotal === 0 && (
+                    <p className="mt-2 text-sm text-amber-800">
+                      첫 승인 전에 실제 받은 주차권을 입고해 주세요.
+                    </p>
+                  )}
+                  <a className="mt-3 inline-block text-sm font-semibold text-teal-800 underline" href="#parking-stock-receipt">
+                    재고 입고하기
+                  </a>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <h3 className="font-semibold">3. 지정 승인자 계정</h3>
+                  <p className="mt-2 text-sm text-slate-700">
+                    각 담당자가 본인 로그인 계정을 만들고 해당 사업단의 과정 관리자 역할과 추가 인증을 갖춰야 승인할 수 있습니다.
+                  </p>
+                  <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                    {data.centers.map((c) => (
+                      <li key={c.code}>{c.code} · {c.reviewer_name} ({c.reviewer_email})</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-xs text-slate-500">
+                    구성원 명부 수동 등록만으로 로그인 계정은 생성되지 않습니다.
+                  </p>
+                  <Link className="mt-3 inline-block text-sm font-semibold text-teal-800 underline" href="/admin/accounts?group=office">
+                    구성원 관리 보기
+                  </Link>
+                </div>
+              </div>
+            </section>
             <div className="flex flex-wrap items-end justify-between gap-4">
               <form method="get" className="flex flex-wrap items-end gap-3">
                 <label className="text-sm font-semibold">
@@ -155,7 +211,7 @@ export default async function AdminParkingPage({
               className="grid gap-5 lg:grid-cols-2"
               aria-label="주차권 운영 설정"
             >
-              <div className="panel">
+              <div className="panel" id="parking-center-assignment">
                 <h2 className="text-lg font-bold">과정 담당 센터 지정</h2>
                 <p className="mt-1 text-sm text-slate-600">
                   아카데미와 센터는 별도 정보입니다. 과정을 선택해 지정해
@@ -209,7 +265,7 @@ export default async function AdminParkingPage({
                   </button>
                 </form>
               </div>
-              <div className="panel">
+              <div className="panel" id="parking-stock-receipt">
                 <h2 className="text-lg font-bold">주차권 재고 입고</h2>
                 <p className="mt-1 text-sm text-slate-600">
                   실물 주차권을 받은 수량을 등록합니다. 승인 시 여기서
