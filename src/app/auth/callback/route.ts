@@ -12,7 +12,9 @@ export async function GET(request: Request) {
   let destination = socialLoginRetry(params.get("next"), "callback");
   try {
     const code = params.get("code");
-    if (params.get("error") === "access_denied") destination = socialLoginRetry(params.get("next"), "cancelled");
+    if (params.has("error") && params.get("error_code") === "provider_email_needs_verification") {
+      destination = socialLoginRetry(params.get("next"), "email-verification");
+    } else if (params.get("error") === "access_denied") destination = socialLoginRetry(params.get("next"), "cancelled");
     else if (!isReviewOnly() && !params.has("error") && code && code.length <= 2048) {
       const client = await createServerSupabaseClient();
       const result = await client.auth.exchangeCodeForSession(code);

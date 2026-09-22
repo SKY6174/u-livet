@@ -47,6 +47,7 @@ export function socialLoginRetry(next: unknown, error: string): string {
 }
 export function socialLoginError(value: unknown) {
   switch (value) {
+    case "email-verification": return "이메일 확인이 필요합니다. 간편 로그인 계정에 등록된 이메일로 보낸 인증 메일에서 확인을 마친 뒤, 간편 로그인을 다시 진행해 주세요. 메일이 없으면 스팸함도 확인해 주세요.";
     case "cancelled": return "간편 로그인이 취소되었습니다. 원하실 때 다시 시작해 주세요.";
     case "staff": return "사업단·교내 강사 계정은 이메일과 비밀번호로 로그인해 주세요. 교외 강사는 사업단에 강사 구분 확인을 요청해 주세요.";
     case "closed": return "현재 신규 회원가입을 준비하고 있습니다. 잠시 후 다시 이용해 주세요.";
