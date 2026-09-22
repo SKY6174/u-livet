@@ -71,6 +71,10 @@ for(const [provider,expected]of [['kakao','kakao'],['google','google'],['naver',
   const m=mock({env:{AUTH_GOOGLE_ENABLED:'true',AUTH_NAVER_ENABLED:'true'}});
   await assert.rejects(m.social.loginWithSocial({},form({provider,audience:'external'})),/REDIRECT https:\/\/db.example.invalid/);
   const call=m.calls.find(c=>typeof c==='object');check(provider+' uses fixed provider and personal home callback',call.provider===expected && call.options.redirectTo==='https://life.example.invalid/auth/callback?next=%2F');
+  const qrNext='/learning/10000000-0000-4000-8000-000000000001/attendance/checkin?session=10000000-0000-4000-8000-000000000002&t='+'b'.repeat(64);
+  await assert.rejects(m.social.loginWithSocial({},form({provider,audience:'learner',next:qrNext})),/REDIRECT https:\/\/db.example.invalid/);
+  const qrCall=m.calls.filter(c=>typeof c==='object').at(-1);
+  check(provider+' preserves the learner QR destination through OAuth',new URL(qrCall.options.redirectTo).searchParams.get('next')===qrNext && qrCall.provider===expected);
   if (provider === 'google') {
     check('Google requests identity and email without profile access', call.options.queryParams.scope === 'openid email' && !call.options.scopes);
     check('Google does not combine previously granted profile scopes', call.options.queryParams.include_granted_scopes === 'false');

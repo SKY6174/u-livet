@@ -2,7 +2,7 @@ import "server-only";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getPolicies } from "@/lib/portal/data";
 import { publicSignupEnabled } from "./signup-config";
-import { socialReturnTo, type RegistrationState } from "./registration";
+import { socialReturnTo, socialLoginRetry, type RegistrationState } from "./registration";
 
 export async function getSignupPolicy() {
   if (!publicSignupEnabled()) return undefined;
@@ -22,12 +22,12 @@ export async function socialDestination(next: unknown): Promise<string> {
     const security = await client.rpc("life_security_status");
     if (!security.error && security.data?.active && !security.data?.needs_reset) {
       const context = await client.rpc("life_login_context");
-      if (context.error || !context.data) { await client.auth.signOut(); return "/auth/login?social_error=unavailable"; }
+      if (context.error || !context.data) { await client.auth.signOut(); return socialLoginRetry(target, "unavailable"); }
       if (security.data.mfa_required && !security.data.mfa_verified) return `/auth/security?next=${encodeURIComponent(target)}`;
       const identity = await client.rpc("life_identity");
       if (!identity.error && identity.data) return target;
     }
   }
   await client.auth.signOut();
-  return `/auth/login?social_error=${state === "EMAIL_LOGIN_REQUIRED" ? "staff" : state === "CLOSED" || state === "PENDING" ? "closed" : "unavailable"}`;
+  return socialLoginRetry(target, state === "EMAIL_LOGIN_REQUIRED" ? "staff" : state === "CLOSED" || state === "PENDING" ? "closed" : "unavailable");
 }

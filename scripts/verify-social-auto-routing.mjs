@@ -72,6 +72,7 @@ function fixture({ state = 'PENDING', signedIn = true, statusError = false, hasP
   const callback = load('src/app/auth/callback/route.ts', {
     'next/server': { NextResponse: { redirect: url => ({ url: url.toString(), headers: new Map() }) } },
     '@/lib/supabase/server': server, '@/lib/auth/social': social,
+    '@/lib/auth/registration': registration,
     '@/lib/auth/recovery': { recoveryOrigin: () => 'https://uc-life.example.invalid' },
     '@/lib/deployment/review-mode': { isReviewOnly: () => false },
   }).GET;
@@ -122,6 +123,24 @@ for (const [options, expected] of [
 }
 }
 console.log(`${passed} social auto-routing checks passed. Mocked sessions; no network or accounts.`);
+
+const qrNext = '/learning/10000000-0000-4000-8000-000000000001/attendance/checkin?session=10000000-0000-4000-8000-000000000002&t=' + 'b'.repeat(64);
+for (const [options, query, expected] of [
+  [{ state: 'COMPLETE' }, 'code=synthetic', qrNext],
+  [{ state: 'COMPLETE', mfa: true }, 'code=synthetic', '/auth/security?next=' + encodeURIComponent(qrNext)],
+  [{}, 'code=synthetic', '/auth/complete-signup?next=' + encodeURIComponent(qrNext)],
+  [{}, 'error=access_denied', registration.socialLoginRetry(qrNext, 'cancelled')],
+  [{ exchangeError: true }, 'code=synthetic', registration.socialLoginRetry(qrNext, 'callback')],
+  [{ state: 'UNAVAILABLE' }, 'code=synthetic', registration.socialLoginRetry(qrNext, 'unavailable')],
+  [{}, '', registration.socialLoginRetry(qrNext, 'callback')],
+]) {
+  const result = await fixture(options).callback(new Request('https://uc-life.example.invalid/auth/callback?' + query + '&next=' + encodeURIComponent(qrNext)));
+  check('QR return survives authentication, signup, MFA and retries: ' + query, result.url === 'https://uc-life.example.invalid' + expected);
+}
+for (const next of ['https://evil.invalid', '//evil.invalid', qrNext + '&t=' + 'c'.repeat(64)]) {
+  const result = await fixture().callback(new Request('https://uc-life.example.invalid/auth/callback?error=access_denied&next=' + encodeURIComponent(next)));
+  check('retry rejects unsafe or ambiguous QR context', result.url === 'https://uc-life.example.invalid/auth/login?social_error=cancelled');
+}
 
 // Optional localhost-only visual fixture using the actual server component and built CSS.
 if (process.argv.includes('--preview')) {

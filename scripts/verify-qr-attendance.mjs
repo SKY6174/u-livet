@@ -83,3 +83,25 @@ for(const result of [{data:null,error:{message:'TEST_CLASS_FORBIDDEN'}},{data:nu
  response=result;invalidations=[];assert(!(await issue.rescheduleQrTestClass(id,previous,'2026-09-22T08:30','2026-09-22T10:30')).session);assert.equal(invalidations.length,0);
 }
 console.log('PASS Korean time conversion, invalid dates, authenticated rescheduling, receipt validation and failure handling');
+
+const registration=load('src/lib/auth/registration.ts');
+const qrNext=`/learning/${id}/attendance/checkin?session=${session}&t=${token}`;
+assert.equal(registration.qrCheckinReturnTo(qrNext),qrNext);
+assert.equal(registration.qrCheckinReturnTo(`/learning/${id}/attendance/checkin?t=${token}&session=${session}`),`/learning/${id}/attendance/checkin?t=${token}&session=${session}`);
+for(const invalid of [null,'https://evil.invalid'+qrNext,'//evil.invalid'+qrNext,qrNext.replace('/attendance/','/../attendance/'),qrNext+'&audience=office',qrNext+'&t='+token,qrNext.replace(token,'short'),qrNext.replace(session,'bad'),'/learning/'+id])
+ assert.equal(registration.qrCheckinReturnTo(invalid),null);
+let signedIn=false,loginForm;
+const Login=load('src/app/auth/login/page.tsx',{
+ 'next/link':'a','next/navigation':{redirect:path=>{throw Error('REDIRECT '+path);}},
+ '@/lib/auth/session':{getSessionIdentity:async()=>signedIn?{name:'테스트'}:null,safeReturnTo:registration.socialReturnTo},
+ '@/lib/auth/registration':registration,'@/lib/auth/login-audience':load('src/lib/auth/login-audience.ts'),
+ '@/components/auth/auth-form':{AuthForm:props=>{loginForm=props;return React.createElement('form',{'aria-label':'간편 로그인'});}},
+}).default;
+for(const audience of [undefined,'office','external','learner']) {
+ const html=renderToStaticMarkup(await Login({searchParams:Promise.resolve({next:qrNext,audience})}));
+ assert(html.includes('QR 출석 간편 로그인'));assert(!html.includes('로그인 대상 선택'));assert(!html.includes('이용하실 대상을 선택'));
+ assert.equal(loginForm.audience,'learner');assert.equal(loginForm.next,qrNext);
+}
+assert(renderToStaticMarkup(await Login({searchParams:Promise.resolve({})})).includes('로그인 대상 선택'));
+signedIn=true;await assert.rejects(Login({searchParams:Promise.resolve({next:qrNext})}),e=>e.message==='REDIRECT '+qrNext);
+console.log('PASS QR opens learner login directly, preserves the token, rejects forged context and keeps ordinary login choices');

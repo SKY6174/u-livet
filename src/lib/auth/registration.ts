@@ -31,13 +31,27 @@ export function socialReturnTo(value: unknown): string {
     return value;
   } catch { return "/"; }
 }
+/** QR context selects the login UI only; attendance permissions stay server-side. */
+export function qrCheckinReturnTo(value: unknown): string | null {
+  const target = socialReturnTo(value);
+  const uuid = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+  if (!new RegExp(`^/learning/${uuid}/attendance/checkin\\?`, "i").test(target)) return null;
+  const params = new URL(target, "https://local.invalid").searchParams;
+  if (Array.from(params).length !== 2 || !new RegExp(`^${uuid}$`, "i").test(params.get("session") ?? "")
+    || !/^[0-9a-f]{64}$/.test(params.get("t") ?? "")) return null;
+  return target;
+}
+export function socialLoginRetry(next: unknown, error: string): string {
+  const target = qrCheckinReturnTo(next);
+  return `/auth/login?social_error=${encodeURIComponent(error)}${target ? `&next=${encodeURIComponent(target)}` : ""}`;
+}
 export function socialLoginError(value: unknown) {
   switch (value) {
     case "cancelled": return "간편 로그인이 취소되었습니다. 원하실 때 다시 시작해 주세요.";
     case "staff": return "사업단·교내 강사 계정은 이메일과 비밀번호로 로그인해 주세요. 교외 강사는 사업단에 강사 구분 확인을 요청해 주세요.";
     case "closed": return "현재 신규 회원가입을 준비하고 있습니다. 잠시 후 다시 이용해 주세요.";
     case "unavailable": return "계정 이용 상태를 확인하지 못했습니다. 사업단에 문의해 주세요.";
-    case "callback": return "간편 로그인을 완료하지 못했습니다. 이용 대상을 선택해 다시 시작해 주세요.";
+    case "callback": return "간편 로그인을 완료하지 못했습니다. 다시 시도해 주세요.";
     default: return null;
   }
 }
