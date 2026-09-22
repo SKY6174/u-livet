@@ -195,16 +195,17 @@ export async function renderConsentPdf(
     // Original form body bounds: x=28.32..566.92pt on a 595×842pt page.
     const left = 28.32, bodyWidth = 538.6;
     center(CONSENT_TITLES[type], 64, 19, true);
-    lines(
-      "울산과학대학교 지역성장 인재양성체계(앵커)사업단은 개인정보 보호법에 따라 평생직업교육과정 강사·보조강사의 개인정보 제공 및 활용에 대한 동의를 요청합니다.",
-      left, 108, bodyWidth, 10.5, 17,
-    );
-    text("1. 개인정보의 수집·이용 목적", left, 150, 12, true);
+    [
+      "울산과학대학교 지역성장 인재양성체계(앵커)사업단이 본인으로부터 취득한 개인정보는 「개인정보 보호법」 제 35조 제 1항,",
+      "제 2항, 제 36조 제 2항 또는 제 37조 제 1항 과 같은 법 시행령 제 41조 제 1항, 제 43조 제 1항 또는 제 44조 제 1항에 따라",
+      "동의를 얻어야합니다. 이에 다음과 같은 정보를 제공ㆍ활용 동의를 요청합니다.",
+    ].forEach((line, i) => text(line, left, 108 + i * 17, 10.5, false, bodyWidth));
+    text("1. 개인정보의 수집·이용 목적", left, 170, 12, true);
     lines(
       "강사·보조강사의 위촉과 본인 확인, 교육과정 운영, 강사료 등 수당 지급, 사업 운영·정산에 필요한 개인정보를 수집·이용합니다.",
-      left, 172, bodyWidth, 10, 16,
+      left, 193, bodyWidth, 10, 16,
     );
-    text("2. 수집하려는 개인정보의 항목", left, 217, 12, true);
+    text("2. 수집하려는 개인정보의 항목", left, 225, 12, true);
     const rows = [
       [
         "일반정보",
@@ -219,40 +220,41 @@ export async function renderConsentPdf(
         "전자우편(이메일) 주소 및 전화번호",
       ],
     ];
+    const rowHeight = 33;
     rows.forEach(([label, content], i) => {
-      const y = 240 + i * 51;
-      box(left, y, 85, 51, true);
-      box(left + 85, y, bodyWidth - 85, 51);
-      text(label, left + 10, 0, 10, true, 70, { centerTop: y + 25.5 });
+      const y = 249 + i * rowHeight;
+      box(left, y, 85, rowHeight, true);
+      box(left + 85, y, bodyWidth - 85, rowHeight);
+      text(label, left + 10, 0, 10, true, 70, { centerTop: y + rowHeight / 2 });
       const cellWidth = bodyWidth - 107;
       const contentLines = wrapLines(content, cellWidth, 10);
       contentLines.forEach((line, lineIndex) =>
         text(line, left + 95, 0, 10, false, cellWidth, {
-          centerTop: y + 25.5 + (lineIndex - (contentLines.length - 1) / 2) * 16,
+          centerTop: y + rowHeight / 2 + (lineIndex - (contentLines.length - 1) / 2) * 16,
         }),
       );
     });
-    text("3. 개인정보의 보유 및 이용기간", left, 410, 12, true);
+    text("3. 개인정보의 보유 및 이용기간", left, 380, 12, true);
     lines(
       "수집·이용 목적을 달성한 후에도 사업 관련 증빙자료로 5년간 보유하며, 보유 기간이 끝나면 복구할 수 없는 방법으로 파기합니다.",
-      left, 433, bodyWidth, 10, 17,
+      left, 403, bodyWidth, 10, 17,
     );
-    text("4. 제3자 제공 및 개인정보 동의 거부 시", left, 484, 12, true);
+    text("4. 제3자 제공 및 개인정보 동의 거부 시", left, 454, 12, true);
     lines(
       "원천징수 이행을 위해 관할 세무서에 성명, 주민등록번호, 주소 및 수당 지급 금액을 신고합니다. 개인정보 제공·활용에 대한 동의를 거부할 수 있으나, 본인 확인과 원천징수 신고에 필요한 정보가 없으면 강사 위촉 및 수당 지급 업무가 제한될 수 있습니다.",
-      left, 507, bodyWidth, 10, 16,
+      left, 477, bodyWidth, 10, 16,
     );
-    box(left, 560, bodyWidth, 86, true);
+    box(left, 530, bodyWidth, 86, true);
     text(
       "위 내용을 확인하고 개인정보 수집·이용 및 제3자 제공에",
       left + 12,
-      572,
+      542,
       10,
       true,
     );
-    text(checks(v.privacy_consent), 230, 592, 10);
-    text("고유식별정보(주민등록번호)의 처리에", left + 12, 618, 10, true);
-    text(checks(v.unique_id_consent), 290, 618, 9.5);
+    text(checks(v.privacy_consent), 230, 562, 10);
+    text("고유식별정보(주민등록번호)의 처리에", left + 12, 588, 10, true);
+    text(checks(v.unique_id_consent), 290, 588, 9.5);
     center(`${date[0]}년  ${date[1]}월  ${date[2]}일`, 670, 12);
     text(`동의자: ${v.name}`, 310, 703, 12, false, 150);
     text("(서명 또는 인)", 466, 706, 9);
