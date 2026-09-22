@@ -35,7 +35,7 @@ common['@/components/portal/ui'] = {
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
   [['SYSTEM_ADMIN'], ['/admin/courses', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/courses', '/admin/reports', '/completion', '/credentials', '/performance'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/courses', '/admin/instructors', '/admin/reports', '/completion', '/credentials', '/performance'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
@@ -64,6 +64,18 @@ await test('combined roles preserve independent workspaces without duplicate lin
   assert(primary.includes('/admin') && primary.includes('/instructor'));
   const hrefs = nav.officeSections(mixed).flatMap(section => section.links.map(link => link.href));
   assert.equal(new Set(hrefs).size, hrefs.length);
+});
+await test('expert management is an independent office menu with correct nested selection', () => {
+  const expert = nav.officeSections(member('COURSE_MANAGER')).flatMap(section => section.links).find(link => link.href === '/admin/instructors');
+  assert.equal(expert.label, '전문가 관리');
+  assert(!nav.courseOperationLinks.some(link => link.href === '/admin/instructors'));
+  for (const pathname of ['/admin/instructors', '/admin/instructors/documents']) {
+    assert.equal(nav.officeActiveHref(pathname), '/admin/instructors');
+    assert(nav.primaryActive(pathname, '/admin'));
+  }
+  for (const roles of [[], ['INSTRUCTOR'], ['SYSTEM_ADMIN'], ['FINANCE']]) {
+    assert(!nav.officeSections(member(...roles)).flatMap(section => section.links).some(link => link.href === '/admin/instructors'));
+  }
 });
 await test('nested report, completion and certificate routes stay under the office menu', () => {
   for (const [pathname, active] of [['/admin', '/admin'], ['/admin/course-plan/opening', '/admin/courses'], ['/admin/offerings/id', '/admin/courses'], ['/admin/offerings/id/reports/print', '/admin/reports'], ['/completion/id', '/completion'], ['/credentials/badges', '/credentials'], ['/admin/accounts', '/admin/accounts']]) {

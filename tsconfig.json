@@ -23,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "src/**/* 2.ts", "src/**/* 2.tsx", "src/**/* 3.ts", "src/**/* 3.tsx", "src/**/* 4.ts", "src/**/* 4.tsx", "src/**/* 5.ts", "src/**/* 5.tsx", "src/**/* 6.ts", "src/**/* 6.tsx", ".next-*/**", "tmp", "output"]
+  "exclude": ["node_modules", "src/**/* 2.ts", "src/**/* 2.tsx", "src/**/* 3.ts", "src/**/* 3.tsx", "src/**/* 4.ts", "src/**/* 4.tsx", "src/**/* 5.ts", "src/**/* 5.tsx", "src/**/* 6.ts", "src/**/* 6.tsx", ".next-*/**", "tmp", "output", "supabase/functions"]
 }

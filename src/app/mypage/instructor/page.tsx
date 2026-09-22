@@ -44,6 +44,9 @@ export default async function InstructorProfile({
         전문분야와 이력을 제출하고 사업단 확인 결과를 확인하세요.
       </PageIntro>
       <div className="mb-6 flex flex-wrap gap-3">
+        <Link href="/mypage/instructor/documents" className="btn-primary">
+          신분증·통장사본·이력서 제출
+        </Link>
         <Link href="/development" className="btn-secondary">
           과정 개발·제안
         </Link>
@@ -76,7 +79,7 @@ export default async function InstructorProfile({
           <h2 className="section-title">강사 이력 등록 시작</h2>
           <p className="notice mb-5">
             이력 심사와 실제 위촉·배정은
-            별도이며, 지급 계좌·신분증은 이곳에서 수집하지 않습니다.
+            별도입니다. 지급 계좌·신분증과 이력서 원본은 비공개 서류함에서 제출하세요.
           </p>
           <DossierStartForm orgId={org.id} policies={options.policies} />
         </section>

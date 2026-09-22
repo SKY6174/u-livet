@@ -27,6 +27,9 @@ export function officeSections(member: Member) {
     { title: "과정 운영", links: hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
       { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
     ] : [] },
+    { title: "전문가", links: manager ? [
+      { label: "전문가 관리", href: "/admin/instructors", description: "강사 이력을 심사하고 신분증·통장사본·이력서 제출 현황을 관리합니다." },
+    ] : [] },
     { title: "결과 보고·수료", links: [
       ...(manager ? [{ label: "결과 보고", href: "/admin/reports", description: "과정별 결과보고서 작성·검토와 6종 자료 출력을 진행합니다." }] : []),
       ...(certifier ? [
@@ -45,7 +48,6 @@ export function officeSections(member: Member) {
 export const courseOperationLinks: WorkspaceLink[] = [
   { label: "2026 과정 현황", href: "/admin/course-plan", description: "연간 교육과정 현황" },
   { label: "2026 개설 준비", href: "/admin/course-plan/opening", description: "운영계획서 기반 개설 준비" },
-  { label: "강사 이력 심사", href: "/admin/instructors", description: "강사 이력과 증빙 확인" },
   { label: "과정 개발·심의", href: "/admin/development", description: "제안 과정 개발과 심의" },
   { label: "안내문자 관리", href: "/admin/messages", description: "안내문 예약·처리 이력" },
 ];
@@ -53,7 +55,7 @@ export const courseOperationLinks: WorkspaceLink[] = [
 const within = (path: string, base: string) => path === base || path.startsWith(base + "/");
 export function officeActiveHref(path: string) {
   if (within(path, "/admin/reports") || /^\/admin\/offerings\/[^/]+\/reports(?:\/|$)/.test(path)) return "/admin/reports";
-  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts"])
+  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/instructors"])
     if (within(path, href)) return href;
   return path === "/admin" ? "/admin" : "/admin/courses";
 }

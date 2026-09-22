@@ -41,9 +41,11 @@ export default async function InstructorReview({
       <Link href="/admin" className="text-sm text-teal-800">
         ← 사업단 관리
       </Link>
-      <PageIntro eyebrow="INSTRUCTOR REVIEW" title="강사 이력 심사">
-        제출 이력과 외부 증빙을 대조하고 확인 근거·유효기간을 남깁니다.
+      <PageIntro eyebrow="EXPERT MANAGEMENT" title="전문가 관리">
+        강사 이력을 심사하고 신분증·통장사본·이력서 제출 현황을 관리합니다.
       </PageIntro>
+      <Link className="btn-primary mb-6" href={org ? `/admin/instructors/documents?org=${org.id}` : "/admin/instructors/documents"}>강사 서류 제출 현황</Link>
+      <h2 className="mb-4 text-xl font-bold">강사 이력 심사</h2>
       <form className="panel mb-6 flex flex-wrap items-end gap-3">
         <label className="field grow">
           담당 기관
@@ -63,10 +65,15 @@ export default async function InstructorReview({
         detail?.error || !detail?.data ? (
           <Empty title="열람 가능한 제출 이력이 없습니다" />
         ) : (
+          <>
+          <Link className="btn-primary mb-5" href={`/admin/instructors/documents?person=${detail.data.person_id}&org=${detail.data.org_id}`}>
+            강사 비공개 서류 확인·입력
+          </Link>
           <DossierDetail
             dossier={detail.data as Dossier}
             policies={options?.policies ?? []}
           />
+          </>
         )
       ) : (
         <>
