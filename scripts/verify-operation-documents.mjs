@@ -97,7 +97,7 @@ async function login(label) {
   ok(await c.auth.signInWithPassword({ email, password: "Local-Only-2026!" }));
   await ensureLocalMfa(c);
   const p = ok(await c.rpc("life_identity")).id;
-  if (["manager", "teacher"].includes(label))
+  if (label === "manager" || label.startsWith("teacher"))
     sql(
       `insert into public.life_role_assignments(person_id,org_id,role) values('${p}','${org}','${label === "manager" ? "COURSE_MANAGER" : "INSTRUCTOR"}');`,
     );
@@ -106,13 +106,14 @@ async function login(label) {
 const signup = JSON.parse(
   sql("select row_to_json(s) from life_private.signup_settings s"),
 );
-let manager, teacher, outsider, learner;
+let manager, teacher, alternate, outsider, learner;
 try {
   sql(
     "update life_private.signup_settings set enabled=true,policy_id='20000000-0000-4000-8000-000000000011',org_id='10000000-0000-4000-8000-000000000001'",
   );
   manager = await login("manager");
   teacher = await login("teacher");
+  alternate = await login("teacher2");
   outsider = await login("outsider");
   learner = await login("learner");
 } finally {
@@ -413,6 +414,40 @@ ok(
   }),
 );
 ok(await transition(teacher.c, "result", "review", 2));
+
+// The course-management selector is authoritative for both live document covers.
+deny(
+  await manager.c.rpc("life_assign_instructor", { f, p: teacher.p, enabled: false }),
+  "RESPONSIBLE_INSTRUCTOR",
+);
+ok(await manager.c.rpc("life_assign_instructor", { f, p: alternate.p, enabled: true }));
+ok(await manager.c.rpc("life_operation_assign", { f, p: alternate.p, expected_revision: 1 }));
+ctx = ok(await context(manager.c));
+assert.equal(ctx.responsible.name, "테스트 teacher2");
+assert.ok(ctx.documents.every((d) => d.content.fields.professor === "테스트 teacher2" && d.status === "DRAFT"));
+deny(await context(teacher.c), "FORBIDDEN");
+assert.equal(ok(await context(alternate.c)).responsible.person_id, alternate.p);
+const beforeRepeat = ctx.documents.map((d) => [d.kind, d.revision, d.status]);
+ok(await manager.c.rpc("life_operation_assign", { f, p: alternate.p, expected_revision: 2 }));
+ctx = ok(await context(manager.c));
+assert.equal(ctx.responsible.revision, 2);
+assert.deepEqual(ctx.documents.map((d) => [d.kind, d.revision, d.status]), beforeRepeat);
+const forged = structuredClone(ctx.documents.find((d) => d.kind === "plan").content);
+forged.fields.professor = "임의로 바꾼 강사";
+ctx = ok(await alternate.c.rpc("life_operation_save", {
+  f, k: "plan", c: forged, b: null,
+  expected_revision: ctx.documents.find((d) => d.kind === "plan").revision,
+}));
+assert.equal(ctx.documents.find((d) => d.kind === "plan").content.fields.professor, "테스트 teacher2");
+assert.equal(ok(await manager.c.rpc("life_operation_submission", { f, s: firstSubmission.id })).content.fields.professor, "테스트 teacher");
+deny(await manager.c.rpc("life_assign_instructor", { f, p: alternate.p, enabled: false }), "RESPONSIBLE_INSTRUCTOR");
+ok(await manager.c.rpc("life_operation_assign", { f, p: teacher.p, expected_revision: 2 }));
+ctx = ok(await context(manager.c));
+assert.ok(ctx.documents.every((d) => d.content.fields.professor === "테스트 teacher"));
+deny(await context(alternate.c), "FORBIDDEN");
+const resultRevision = ctx.documents.find((d) => d.kind === "result").revision;
+ok(await transition(teacher.c, "result", "review", resultRevision));
+console.log("PASS responsible switch, canonical plan/result cover, no-op, snapshot, role and unassignment guard");
 mkdirSync("tmp/operation-documents", { recursive: true });
 writeFileSync(
   "tmp/operation-documents/context.json",

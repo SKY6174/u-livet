@@ -37,7 +37,16 @@ export default async function CourseOperations({
     plan ? getOpeningWorkingCopy(org, plan.sourceId) : Promise.resolve({ copy: null, unavailable: false }),
   ]);
   const scopedCourses = courses.filter(c => c.org_id === org);
-  const overview = await getCourseBudgets(org, scopedCourses);
+  const [overview, responsibilityResult] = await Promise.all([
+    getCourseBudgets(org, scopedCourses),
+    (await createServerSupabaseClient()).rpc("life_operation_list"),
+  ]);
+  const responsibleNames = responsibilityResult.error
+    ? null
+    : Object.fromEntries(
+        ((responsibilityResult.data ?? []) as { id: string; responsible: string | null }[])
+          .map((course) => [course.id, course.responsible]),
+      );
   const linked = new Set(overview.courses.map(c => c.offering_id).filter(Boolean));
   const additional = scopedCourses.filter(c => !linked.has(c.id));
   return (
@@ -68,7 +77,7 @@ export default async function CourseOperations({
       {overview.unavailable || unavailable ? (
         <Empty title="과정 정보를 불러오지 못했습니다" />
       ) : (
-        <OperationsDashboard key={org} courses={overview.courses} workbooks={overview.workbooks} org={org} manager={manager} />
+        <OperationsDashboard key={org} courses={overview.courses} workbooks={overview.workbooks} org={org} manager={manager} responsibleNames={responsibleNames} />
       )}
       {!overview.unavailable && additional.length > 0 && <section className="mt-10"><h2 className="mb-5 text-xl font-bold">추가 개설 과정</h2><CourseList courses={additional} /></section>}
       {manager && <details

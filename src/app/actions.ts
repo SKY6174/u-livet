@@ -21,6 +21,7 @@ const errors: Record<string, string> = {
   PAID_ENROLLMENT_NOT_ENABLED: "유료 과정의 수납 기능은 준비 중입니다.",
   DEADLINE_PASSED: "과제 제출 기한이 지났습니다.",
   REVISION_CHANGED: "제출물이 변경되었습니다. 새로고침 후 다시 채점해 주세요.",
+  RESPONSIBLE_INSTRUCTOR: "현재 책임강사는 배정을 해제할 수 없습니다. 다른 강사를 책임강사로 지정한 뒤 다시 시도해 주세요.",
   INVALID_TRANSITION: "현재 상태에서는 이 작업을 처리할 수 없습니다.",
   WITHDRAWAL_REVIEW_REQUIRED: "교육 시작 후 취소는 사업단 확인이 필요합니다.",
 };

@@ -6,11 +6,11 @@ import { ActionForm } from "@/components/portal/action-form";
 import {
   decideApplication,
   publishOffering,
-  assignInstructor,
 } from "@/app/actions";
 import { configureFinance } from "@/app/finance-actions";
 import type { FinanceConfig } from "@/lib/finance/types";
 import { CourseHeader } from "@/components/course-workspace/course-header";
+import { ResponsibleInstructorSection } from "@/components/course-workspace/responsible-instructor-section";
 import { getManagedCourse } from "@/lib/course-workspace/data";
 import type { RosterRow } from "@/lib/portal/types";
 export default async function ManageOffering(props: {
@@ -26,6 +26,7 @@ export default async function ManageOffering(props: {
           active="manage"
           operator={workspace?.operator}
         />
+        <ResponsibleInstructorSection offeringId={o.id} />
         <section className="panel space-y-4">
           <h2 className="section-title">운영이 완료된 보관 과정입니다</h2>
           <p className="text-sm leading-relaxed text-slate-600">
@@ -52,11 +53,10 @@ export default async function ManageOffering(props: {
         </section>
       </div>
     );
-  const [{ data, error }, policies, instructors, financeResult] =
+  const [{ data, error }, policies, financeResult] =
     await Promise.all([
       (await createServerSupabaseClient()).rpc("life_roster", { f: o.id }),
       getPolicies(),
-      (await createServerSupabaseClient()).rpc("life_instructors", { f: o.id }),
       (await createServerSupabaseClient()).rpc("life_offering_finance", {
         f: o.id,
       }),
@@ -161,48 +161,7 @@ export default async function ManageOffering(props: {
           </p>
         )}
       </section>
-      <section className="panel mb-8 scroll-mt-6" id="instructors">
-        <h2 className="section-title">담당 강사 배정</h2>
-        <p className="mb-4 text-sm text-slate-600">
-          기관에서 승인한 강사에게 이 기수의 자료·과제·평가 권한을 부여합니다.
-        </p>
-        {instructors.error ? (
-          <p role="alert">강사 목록을 불러오지 못했습니다.</p>
-        ) : !(instructors.data ?? []).length ? (
-          <p className="notice">기관에서 승인한 활성 강사가 없습니다.</p>
-        ) : (
-          <div className="space-y-4">
-            {(
-              instructors.data as {
-                person_id: string;
-                name: string;
-                assigned: boolean;
-              }[]
-            ).map((i) => (
-              <div
-                key={i.person_id}
-                className="flex flex-wrap items-center justify-between gap-4 border-t pt-4"
-              >
-                <p>
-                  {i.name} · {i.assigned ? "배정됨" : "미배정"}
-                </p>
-                <ActionForm
-                  action={assignInstructor}
-                  label={i.assigned ? "기수 배정 해제" : "기수에 배정"}
-                >
-                  <input type="hidden" name="offering" value={o.id} />
-                  <input type="hidden" name="person" value={i.person_id} />
-                  <input
-                    type="hidden"
-                    name="enabled"
-                    value={String(!i.assigned)}
-                  />
-                </ActionForm>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      <ResponsibleInstructorSection offeringId={o.id} />
       {o.status === "DRAFT" && (
         <section className="panel mb-8">
           <h2 className="section-title">모집 공개</h2>
