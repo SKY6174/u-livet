@@ -89,15 +89,7 @@ export async function renderConsentPdf(
       color: rgb(0, 0, 0),
     });
   };
-  const lines = (
-    s: string,
-    x: number,
-    top: number,
-    width: number,
-    size = 10,
-    leading = 16,
-    strong = false,
-  ) => {
+  const wrapLines = (s: string, width: number, size: number, strong = false) => {
     const font = strong ? bold : regular,
       chunks: string[] = [];
     let current = "";
@@ -111,6 +103,18 @@ export async function renderConsentPdf(
       } else current += char;
     }
     if (current) chunks.push(current);
+    return chunks;
+  };
+  const lines = (
+    s: string,
+    x: number,
+    top: number,
+    width: number,
+    size = 10,
+    leading = 16,
+    strong = false,
+  ) => {
+    const chunks = wrapLines(s, width, size, strong);
     chunks.forEach((s, i) =>
       text(s, x, top + leading * i, size, strong, width),
     );
@@ -192,52 +196,51 @@ export async function renderConsentPdf(
     const left = 28.32, bodyWidth = 538.6;
     center(CONSENT_TITLES[type], 64, 19, true);
     lines(
-      "울산과학대학교 앵커사업단은 평생직업교육과정 강사·보조강사의 위촉, 강의 운영 및 수당 지급을 위해 아래와 같이 개인정보를 수집·이용하고 제공합니다.",
-      left,
-      108,
-      bodyWidth,
-      10.5,
-      17,
+      "울산과학대학교 지역성장 인재양성체계(앵커)사업단은 개인정보 보호법에 따라 평생직업교육과정 강사·보조강사의 개인정보 제공 및 활용에 대한 동의를 요청합니다.",
+      left, 108, bodyWidth, 10.5, 17,
     );
-    text("1. 개인정보 수집·이용 안내", left, 153, 12, true);
+    text("1. 개인정보의 수집·이용 목적", left, 150, 12, true);
+    lines(
+      "강사·보조강사의 위촉과 본인 확인, 교육과정 운영, 강사료 등 수당 지급, 사업 운영·정산에 필요한 개인정보를 수집·이용합니다.",
+      left, 172, bodyWidth, 10, 16,
+    );
+    text("2. 수집하려는 개인정보의 항목", left, 217, 12, true);
     const rows = [
       [
-        "수집 항목",
-        "성명, 주민등록번호, 주소, 연락처, 이메일, 소속·직위, 은행·계좌정보, 학력·경력·전문분야",
+        "일반정보",
+        "성명, 주민등록번호, 주소, 연락처, 소속·직위, 학력·경력·전문분야",
       ],
       [
-        "이용 목적",
-        "강사 위촉 및 본인 확인, 교육과정 운영, 강사료 등 수당 지급, 원천징수 및 세무 신고, 사업 운영·정산",
+        "금융정보",
+        "강사료 등 수당 지급을 위한 은행명 및 통장 계좌번호",
       ],
       [
-        "보유 기간",
-        "사업 관련 증빙자료로 5년간 보유한 후 관련 절차에 따라 파기",
+        "통신정보",
+        "전자우편(이메일) 주소 및 전화번호",
       ],
     ];
     rows.forEach(([label, content], i) => {
-      const y = 177 + i * 51;
+      const y = 240 + i * 51;
       box(left, y, 85, 51, true);
       box(left + 85, y, bodyWidth - 85, 51);
-      text(label, left + 10, y + 16, 10, true);
-      lines(content, left + 95, y + 8, bodyWidth - 107, 10, 16);
+      text(label, left + 10, 0, 10, true, 70, { centerTop: y + 25.5 });
+      const cellWidth = bodyWidth - 107;
+      const contentLines = wrapLines(content, cellWidth, 10);
+      contentLines.forEach((line, lineIndex) =>
+        text(line, left + 95, 0, 10, false, cellWidth, {
+          centerTop: y + 25.5 + (lineIndex - (contentLines.length - 1) / 2) * 16,
+        }),
+      );
     });
-    text("2. 개인정보 제3자 제공 안내", left, 350, 12, true);
+    text("3. 개인정보의 보유 및 이용기간", left, 410, 12, true);
     lines(
-      "제공받는 자: 관할 세무서\n제공 목적: 강사료 등 지급에 따른 원천징수 및 세무 신고\n제공 항목: 성명, 주민등록번호, 주소, 지급 금액\n보유·이용 기간: 해당 업무 목적 달성 및 관련 법령에 따른 보관 기간",
-      left,
-      374,
-      bodyWidth,
-      10,
-      18,
+      "수집·이용 목적을 달성한 후에도 사업 관련 증빙자료로 5년간 보유하며, 보유 기간이 끝나면 복구할 수 없는 방법으로 파기합니다.",
+      left, 433, bodyWidth, 10, 17,
     );
-    text("3. 동의 거부 및 개인정보 보호 안내", left, 464, 12, true);
+    text("4. 제3자 제공 및 개인정보 동의 거부 시", left, 484, 12, true);
     lines(
-      "개인정보 제공 및 활용에 대한 동의를 거부할 수 있습니다. 다만 본인 확인과 지급·신고에 필요한 정보 제공에 동의하지 않을 경우 강사 위촉 및 수당 지급 업무가 제한될 수 있습니다. 보유 기간이 지나거나 처리 목적이 달성된 정보는 복구할 수 없는 방법으로 파기합니다.",
-      left,
-      489,
-      bodyWidth,
-      10,
-      17,
+      "원천징수 이행을 위해 관할 세무서에 성명, 주민등록번호, 주소 및 수당 지급 금액을 신고합니다. 개인정보 제공·활용에 대한 동의를 거부할 수 있으나, 본인 확인과 원천징수 신고에 필요한 정보가 없으면 강사 위촉 및 수당 지급 업무가 제한될 수 있습니다.",
+      left, 507, bodyWidth, 10, 16,
     );
     box(left, 560, bodyWidth, 86, true);
     text(
