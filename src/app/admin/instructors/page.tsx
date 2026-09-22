@@ -1,117 +1,38 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
-import { PageIntro, Empty } from "@/components/portal/ui";
+import { Empty } from "@/components/portal/ui";
 import { DossierDetail } from "@/components/portal/instructor-detail";
-import {
-  reviewLabels,
-  type Dossier,
-  type InstructorOptions,
-} from "@/lib/instructors/types";
-export default async function InstructorReview({
-  searchParams,
-}: {
-  searchParams: Promise<{ org?: string; d?: string }>;
-}) {
-  await requireIdentity("/admin/instructors");
-  const q = await searchParams,
-    db = await createServerSupabaseClient();
-  const result = await db.rpc("life_instructor_options"),
-    options = result.data as InstructorOptions | null;
-  const orgs = options?.organizations.filter((o) => o.manager) ?? [],
-    org = orgs.find((o) => o.id === q.org) ?? orgs[0];
-  const list = org
-    ? await db.rpc("life_instructor_dossiers", { o: org.id, staff: true })
-    : null;
-  const detail =
-    q.d && UUID.test(q.d)
-      ? await db.rpc("life_instructor_dossier", { d: q.d })
-      : null;
-  const items = (list?.data?.items ?? []) as {
-    id: string;
-    name: string;
-    status: string;
-    specialty: string;
-    version: number;
-    current: boolean;
-  }[];
-  return (
-    <div className="page-shell">
-      <Link href="/admin" className="text-sm text-teal-800">
-        ← 사업단 관리
-      </Link>
-      <PageIntro eyebrow="EXPERT MANAGEMENT" title="전문가 관리">
-        강사 이력을 심사하고 신분증·통장사본·이력서 제출 현황을 관리합니다.
-      </PageIntro>
-      <Link className="btn-primary mb-6" href={org ? `/admin/instructors/documents?org=${org.id}` : "/admin/instructors/documents"}>강사 서류 제출 현황</Link>
-      <h2 className="mb-4 text-xl font-bold">강사 이력 심사</h2>
-      <form className="panel mb-6 flex flex-wrap items-end gap-3">
-        <label className="field grow">
-          담당 기관
-          <select name="org" defaultValue={org?.id}>
-            {orgs.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className="btn-secondary">기관 선택</button>
-      </form>
-      {result.error || list?.error || !org ? (
-        <Empty title="담당 기관·심사 목록을 불러오지 못했습니다" />
-      ) : q.d ? (
-        detail?.error || !detail?.data ? (
-          <Empty title="열람 가능한 제출 이력이 없습니다" />
-        ) : (
-          <>
-          <Link className="btn-primary mb-5" href={`/admin/instructors/documents?person=${detail.data.person_id}&org=${detail.data.org_id}`}>
-            강사 비공개 서류 확인·입력
-          </Link>
-          <DossierDetail
-            dossier={detail.data as Dossier}
-            policies={options?.policies ?? []}
-          />
-          </>
-        )
-      ) : (
-        <>
-          <p className="notice mb-6">
-            최근 등록 100건까지 표시합니다. 미제출 초안은 보이지 않습니다.
-            승인만으로 위촉·강사 역할·배정이 생성되지 않습니다. 실제 위촉 근거를
-            확인한 뒤 별도 권한 등록 절차를 사용하세요.
-          </p>
-          {!items.length ? (
-            <Empty title="제출된 강사 이력이 없습니다" />
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {items.map((x) => (
-                <Link
-                  key={x.id}
-                  className="panel"
-                  href={`/admin/instructors?org=${org.id}&d=${x.id}`}
-                >
-                  <span className="badge">
-                    {reviewLabels[x.status]} · v{x.version}
-                  </span>
-                  <h2 className="mt-3 text-xl font-bold">{x.name}</h2>
-                  <p className="mt-2">{x.specialty}</p>
-                  <p className="mt-3 text-sm text-teal-800">
-                    {x.current ? "확인 유효" : "현재 승인 확인 필요"} · 심사
-                    상세 →
-                  </p>
-                </Link>
-              ))}
-            </div>
-          )}
-          {list?.data?.more && (
-            <p className="notice mt-4">
-              추가 이력이 있습니다. 전체 내역은 사업단 관리 경로에서 확인하세요.
-            </p>
-          )}
-        </>
-      )}
-    </div>
-  );
+import { reviewLabels, type Dossier, type InstructorOptions } from "@/lib/instructors/types";
+import { pageNumber, type PoolBoard } from "@/lib/instructors/pool";
+import { PoolDashboard, type PoolQuery } from "@/components/instructors/pool-dashboard";
+async function Review({org,options,d}:{org:string;options:InstructorOptions;d?:string}) {
+ const db=await createServerSupabaseClient();
+ if(d) {
+  if(!UUID.test(d))notFound();
+  const {data,error}=await db.rpc('life_instructor_dossier',{d});
+  if(error||!data||data.org_id!==org)return <Empty title="열람 가능한 제출 이력이 없습니다"/>;
+  return <><Link className="btn-secondary mb-5" href={`/admin/instructors?org=${org}&tab=review`}>← 심사 목록</Link><Link className="btn-primary mb-5 ml-3" href={`/admin/instructors/documents?person=${data.person_id}&org=${org}`}>비공개 서류 확인</Link><DossierDetail dossier={data as Dossier} policies={options.policies}/></>;
+ }
+ const {data,error}=await db.rpc('life_instructor_dossiers',{o:org,staff:true});
+ if(error)return <Empty title="심사 목록을 불러오지 못했습니다"/>;
+ const items=(data?.items??[]) as {id:string;name:string;status:string;specialty:string;version:number;current:boolean}[];
+ return <section className="panel"><h2 className="section-title">강사 이력 심사</h2><p className="mb-5 text-sm text-slate-500">강사가 제출한 학력·경력·자격 이력을 검토합니다. 신규 강사 등록과 서류 확인은 강사 마스터에서 진행하세요.</p>{items.length?<div className="grid gap-4 md:grid-cols-2">{items.map(x=><Link key={x.id} href={`/admin/instructors?org=${org}&tab=review&d=${x.id}`} className="rounded-xl border border-slate-200 p-5 hover:border-blue-300"><span className="badge">{reviewLabels[x.status]} · v{x.version}</span><h3 className="mt-3 font-bold">{x.name}</h3><p className="mt-2 text-sm text-slate-600">{x.specialty}</p><p className="mt-3 text-xs text-blue-700">{x.current?'확인 유효':'검토 필요'} · 상세 →</p></Link>)}</div>:<Empty title="심사를 기다리는 제출 이력이 없습니다"/>}{data?.more&&<p className="notice mt-4">최근 100건을 표시합니다.</p>}</section>;
+}
+export default async function InstructorPoolPage({searchParams}:{searchParams:Promise<PoolQuery>}) {
+ await requireIdentity('/admin/instructors');
+ const query=await searchParams,db=await createServerSupabaseClient();
+ const {data,error}=await db.rpc('life_instructor_options');
+ const options=data as InstructorOptions|null;
+ const orgs=options?.organizations.filter(o=>o.manager)??[];
+ const org=orgs.find(o=>o.id===query.org)??orgs[0];
+ if(error||!org||!options)return <div className="page-shell"><Empty title="전문가 관리 권한이 있는 담당 기관을 확인해 주세요"/></div>;
+ if(query.person&&!UUID.test(query.person))notFound();
+ const kind=['ALL','INTERNAL','EXTERNAL','UNSPECIFIED'].includes(query.kind??'')?query.kind!:'ALL';
+ const result=await db.rpc('life_instructor_pool_board',{o:org.id,q:(query.q??'').slice(0,100),kind,page:pageNumber(query.page),p:query.person??null,activity_page:pageNumber(query.activity_page)});
+ if(result.error||!result.data)return <div className="page-shell"><Link href="/admin" className="text-blue-700">← 사업단 관리</Link><Empty title="강사 대장을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요."/></div>;
+ const normalized={...query,kind,tab:query.d?'review':query.tab};
+ return <PoolDashboard org={org.id} orgs={orgs} board={result.data as PoolBoard} query={normalized} review={normalized.tab==='review'?<Review org={org.id} options={options} d={query.d}/>:undefined}/>;
 }
