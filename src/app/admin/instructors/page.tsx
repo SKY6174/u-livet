@@ -108,7 +108,10 @@ export default async function InstructorPoolPage({
     db = await createServerSupabaseClient();
   const { data, error } = await db.rpc("life_instructor_options");
   const options = data as InstructorOptions | null;
-  const orgs = options?.organizations.filter((o) => o.manager) ?? [];
+  const orgs =
+    options?.organizations
+      .filter((o) => o.manager)
+      .sort((a, b) => a.name.localeCompare(b.name, "ko")) ?? [];
   const org = orgs.find((o) => o.id === query.org) ?? orgs[0];
   if (error || !org || !options)
     return (
