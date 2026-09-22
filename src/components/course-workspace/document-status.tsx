@@ -1,15 +1,46 @@
 import Link from "next/link";
 import { ArrowUpRight, FileText } from "lucide-react";
 import { documentReadiness } from "@/lib/course-workspace/progress";
-import type { CourseWorkspace } from "@/lib/course-workspace/types";
+import type { CourseWorkspace, DocumentReadiness } from "@/lib/course-workspace/types";
+import { STATUS_LABELS } from "@/lib/operation-documents/model";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-export function DocumentStatus({
+type OperationStatus = {
+  id: string;
+  result_status: keyof typeof STATUS_LABELS | null;
+};
+
+export async function DocumentStatus({
   course,
   compact = false,
 }: {
   course: CourseWorkspace;
   compact?: boolean;
 }) {
+  const { data, error } = await (await createServerSupabaseClient()).rpc("life_operation_list");
+  const current = !error && Array.isArray(data)
+    ? (data as OperationStatus[]).find((row) => row.id === course.id)
+    : undefined;
+  const status = current?.result_status;
+  const readiness: DocumentReadiness[] = documentReadiness(course).map((row) =>
+    row.kind === "result"
+      ? {
+          ...row,
+          owner: "책임강사 작성 · 담당자 최종 제출",
+          label: !current ? "상태 확인 불가" : status ? STATUS_LABELS[status] : "공식 문서 작성 전",
+          detail: !current
+            ? "공식 결과보고서 상태를 불러오지 못했습니다. 작성 화면에서 확인해 주세요."
+            : status === "SUBMITTED"
+              ? "최종 제출본이 보관되어 있습니다."
+              : status === "REVIEW"
+                ? "담당자가 내용을 검토하고 최종 제출합니다."
+                : status === "DRAFT"
+                  ? "저장된 초안을 검토하고 완성하세요."
+                  : "공식 결과보고서를 작성하고 저장해 주세요.",
+          tone: status === "SUBMITTED" ? "ready" : status === "REVIEW" || !current ? "attention" : "empty",
+        }
+      : row,
+  );
   return (
     <section id="documents" className="scroll-mt-6">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -31,7 +62,7 @@ export function DocumentStatus({
       <div
         className={`grid gap-3 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"}`}
       >
-        {documentReadiness(course).map((d, i) => (
+        {readiness.map((d, i) => (
           <article
             key={d.kind}
             className="rounded-2xl border border-slate-200 bg-white p-5"
@@ -62,7 +93,9 @@ export function DocumentStatus({
                 자료 확인·보완
               </Link>
               <Link
-                href={`/admin/offerings/${course.id}/reports/print?document=${d.kind}`}
+                href={d.kind === "result"
+                  ? `/operation-documents/${course.id}/result/print`
+                  : `/admin/offerings/${course.id}/reports/print?document=${d.kind}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 text-slate-600"

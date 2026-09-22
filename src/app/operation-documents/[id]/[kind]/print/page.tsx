@@ -9,9 +9,6 @@ import { DocumentPreview } from "@/components/operation-documents/document-previ
 import { OperationPrintControls } from "@/components/operation-documents/document-editor";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
-import { getSessionIdentity } from "@/lib/auth/session";
-import { getManagedReport } from "@/lib/reports/data";
-import { ReportDocuments } from "@/components/reports/report-documents";
 export const dynamic = "force-dynamic";
 export default async function Print({
   params,
@@ -33,9 +30,6 @@ export default async function Print({
     if (error || !data || data.kind !== kind) notFound();
     doc = data as OperationDocument;
   }
-  const identity = kind === "result" && !query.submission && context.manager ? await getSessionIdentity() : null;
-  const includeLedger = identity?.roles.some((role) => role.role === "COURSE_MANAGER" && role.org_id === context.course.org_id);
-  const report = includeLedger ? await getManagedReport(id) : null;
   return (
     <>
       <OperationPrintControls
@@ -48,7 +42,6 @@ export default async function Print({
         status={doc.status}
         revision={doc.revision}
       />
-      {report?.bundle && <ReportDocuments offering={report.offering} bundle={report.bundle} document="teaching" />}
     </>
   );
 }

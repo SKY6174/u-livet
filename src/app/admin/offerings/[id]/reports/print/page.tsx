@@ -1,6 +1,7 @@
 import { getOperationContext } from "@/lib/operation-documents/data";
+import { initialDocument } from "@/lib/operation-documents/model";
 import { DocumentPreview } from "@/components/operation-documents/document-preview";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Empty } from "@/components/portal/ui";
 import { ReportDocuments } from "@/components/reports/report-documents";
 import { PrintToolbar } from "@/components/reports/print-toolbar";
@@ -31,6 +32,7 @@ export default async function PrintReport({
   if (document !== "all" && !DOCUMENTS.some((d) => d[0] === document))
     notFound();
   const { offering, bundle } = await getManagedReport(id);
+  if (document === "result") redirect(`/operation-documents/${id}/result/print`);
   if (!bundle)
     return (
       <div className="page-shell">
@@ -40,24 +42,21 @@ export default async function PrintReport({
       </div>
     );
   const [context, attendance] = await Promise.all([
-    ["all", "result"].includes(document) ? getOperationContext(id) : Promise.resolve(null),
+    document === "all" ? getOperationContext(id) : Promise.resolve(null),
     ["all", "attendance"].includes(document) ? getAttendanceBook(id,"manager") : Promise.resolve(null),
   ]);
-  const official = context?.documents.find(d => d.kind === "result");
+  const official = context ? initialDocument(context, "result") : null;
   return (
     <>
       <PrintToolbar
         document={document}
         reveal={query.reveal === "1"}
       />
-      {official ? <>
+      {document === "all" && official && <>
         <DocumentPreview kind="result" content={official.content} budget={official.budget} status={official.status} revision={official.revision} />
-        {document === "result" && <ReportDocuments offering={offering} bundle={bundle} document="teaching" />}
-        {document === "all" && DOCUMENTS.filter(([kind]) => kind !== "result").map(([kind]) => <ReportDocuments key={kind} offering={offering} bundle={bundle} document={kind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />)}
-      </> : <>
-        <ReportDocuments offering={offering} bundle={bundle} document={document as DocumentKind | "all"} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />
-        {document === "result" && <ReportDocuments offering={offering} bundle={bundle} document="teaching" />}
+        {DOCUMENTS.filter(([kind]) => kind !== "result").map(([kind]) => <ReportDocuments key={kind} offering={offering} bundle={bundle} document={kind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />)}
       </>}
+      {document !== "all" && <ReportDocuments offering={offering} bundle={bundle} document={document as DocumentKind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />}
 
     </>
   );

@@ -147,7 +147,7 @@ export function ReportDocuments({
   const show = (key: DocumentKind) => document === "all" || document === key;
   return (
     <div className="report-output">
-      {!b.report && (
+      {!b.report && ["all", "result", "scholarships", "fees"].includes(document) && (
         <p className="no-print notice mx-auto max-w-4xl">
           미저장 초안입니다. 빈 항목을 작성하고 저장한 후 제출용으로 출력하세요.
         </p>
