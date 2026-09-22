@@ -47,6 +47,8 @@ tmp/
 output/
 test.pdf
 *.tsbuildinfo
+__pycache__/
+*.pyc
 .env.*.local
 docs/04-report/features/evidence/
 docs/04-report/features/assets/
