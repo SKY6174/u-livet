@@ -30,15 +30,24 @@ export default async function Classroom(props: {
       .eq("offering_id", o.id)
       .eq("published", true)
       .order("position"),
-    db.from("life_lesson_reads").select("lesson_id").eq("person_id", me.id),
+    db.from("life_lesson_reads")
+      .select("lesson_id,life_lessons!inner(offering_id)")
+      .eq("life_lessons.offering_id", o.id)
+      .eq("person_id", me.id),
     db
       .from("life_assignments")
       .select("*")
       .eq("offering_id", o.id)
       .eq("published", true)
       .order("due_at"),
-    db.from("life_submissions").select("*").eq("person_id", me.id),
-    db.from("life_submission_grades").select("*"),
+    db.from("life_submissions")
+      .select("*,life_assignments!inner(offering_id)")
+      .eq("life_assignments.offering_id", o.id)
+      .eq("person_id", me.id),
+    db.from("life_submission_grades")
+      .select("*,life_submissions!inner(life_assignments!inner(offering_id))")
+      .eq("life_submissions.life_assignments.offering_id", o.id)
+      .eq("life_submissions.person_id", me.id),
   ]);
   if ([lessons, reads, assignments, submissions, grades].some((r) => r.error))
     return (

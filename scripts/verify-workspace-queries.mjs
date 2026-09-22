@@ -27,6 +27,8 @@ function page(path, { roles = [], db = {}, workspace = async () => ({ offerings:
     },
     '@/components/portal/action-form': { ActionForm: ({ children }) => createElement('form', null, children) },
     '@/app/certificate-actions': {},
+    '@/components/teaching/teaching-segments-input': { TeachingSegmentsInput: () => null },
+    '@/components/teaching/teaching-signature-form': { TeachingSignatureForm: () => null },
     '@/lib/certificates/types': { kindLabel: {}, certificateState: {} },
   };
   const code = ts.transpileModule(readFileSync(path, 'utf8'), {

@@ -22,7 +22,7 @@ export default async function Teaching(props: {
   const db = await createServerSupabaseClient();
   const assigned = await db
     .from("life_offering_instructors")
-    .select("*")
+    .select("valid_until")
     .eq("offering_id", o.id)
     .eq("person_id", me.id)
     .maybeSingle();
@@ -41,8 +41,12 @@ export default async function Teaching(props: {
         .select("*")
         .eq("offering_id", o.id)
         .order("position"),
-      db.from("life_submissions").select("*"),
-      db.from("life_submission_grades").select("*"),
+      db.from("life_submissions")
+        .select("*,life_assignments!inner(offering_id)")
+        .eq("life_assignments.offering_id", o.id),
+      db.from("life_submission_grades")
+        .select("*,life_submissions!inner(life_assignments!inner(offering_id))")
+        .eq("life_submissions.life_assignments.offering_id", o.id),
     ],
   );
   if ([roster, assignments, lessons, submissions, grades].some((r) => r.error))

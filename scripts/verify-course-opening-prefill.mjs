@@ -121,7 +121,10 @@ await check("Admin route checks identity and role before loading a plan, and han
     "@/components/course-plan/offering-draft-form": { OfferingDraftForm },
     "@/lib/course-workspace/data": { getCourseWorkspaces: async () => ({ courses: [], unavailable: false }) },
     "@/components/course-workspace/course-list": { CourseList: () => null },
-    "@/lib/supabase/server": { createServerSupabaseClient: async () => ({ from: (table) => {
+    "@/components/course-workspace/operations-dashboard": { OperationsDashboard: () => null },
+    "@/lib/course-budget/data": { getCourseBudgets: async () => ({ courses: [], workbooks: [], unavailable: false }) },
+    "@/lib/course-budget/model": load("src/lib/course-budget/model.ts"),
+    "@/lib/supabase/server": { createServerSupabaseClient: async () => ({ rpc: async () => ({ data: [], error: null }), from: (table) => {
       assert.equal(table, "life_project_years");
       return { select: () => ({ in: async () => ({ data: [{ ...years[0], org_id: "test-org" }, { id: "other-year", label: "타기관", org_id: "other-org" }] }) }) };
     } }) },

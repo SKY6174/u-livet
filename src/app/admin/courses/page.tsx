@@ -6,6 +6,7 @@ import { getCourseWorkspaces } from "@/lib/course-workspace/data";
 import { CourseList } from "@/components/course-workspace/course-list";
 import { OperationsDashboard } from "@/components/course-workspace/operations-dashboard";
 import { getCourseBudgets } from "@/lib/course-budget/data";
+import { mergeOperationCourses } from "@/lib/course-budget/model";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { OfferingDraftForm } from "@/components/course-plan/offering-draft-form";
@@ -28,19 +29,19 @@ export default async function CourseOperations({
       ? undefined
       : findOpeningCourse(await getCourseOpeningPlan(), params.plan);
   if (params.plan !== undefined && !plan) notFound();
-  const [{ courses, unavailable }, { data: years }, workingCopy] = await Promise.all([
+  const db = await createServerSupabaseClient();
+  const [{ courses, unavailable }, { data: years }, workingCopy, budgets, responsibilityResult] = await Promise.all([
     manager ? getCourseWorkspaces() : Promise.resolve({ courses: [], unavailable: false }),
-    (await createServerSupabaseClient())
+    db
       .from("life_project_years")
-      .select("*")
+      .select("id,org_id,label")
       .in("org_id", orgs),
     plan ? getOpeningWorkingCopy(org, plan.sourceId) : Promise.resolve({ copy: null, unavailable: false }),
+    getCourseBudgets(org, []),
+    db.rpc("life_operation_list"),
   ]);
   const scopedCourses = courses.filter(c => c.org_id === org);
-  const [overview, responsibilityResult] = await Promise.all([
-    getCourseBudgets(org, scopedCourses),
-    (await createServerSupabaseClient()).rpc("life_operation_list"),
-  ]);
+  const overview = { ...budgets, courses: mergeOperationCourses(budgets.courses, scopedCourses) };
   const responsibleNames = responsibilityResult.error
     ? null
     : Object.fromEntries(

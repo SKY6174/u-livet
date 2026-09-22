@@ -18,6 +18,8 @@
     "test:core": "node scripts/verify-core.mjs",
     "check:db-performance": "node scripts/check-db-performance.mjs",
     "test:db-performance": "node scripts/verify-db-performance.mjs",
+    "test:db-response": "node scripts/verify-db-response-optimization.mjs",
+    "test:db-response:local": "node scripts/verify-db-response-local.mjs",
     "test:workspace-queries": "node scripts/verify-workspace-queries.mjs",
     "test:auth-load": "node scripts/check-auth-load.mjs",
     "build:vercel": "node scripts/build-vercel.mjs",

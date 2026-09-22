@@ -87,8 +87,11 @@ await check('failed working-copy load hides the editor instead of offering a bla
     '@/lib/course-opening/working-copy-server':{getOpeningWorkingCopy:async()=>({copy:null,unavailable:true})},
     '@/lib/course-workspace/data':{getCourseWorkspaces:async()=>({courses:[],unavailable:false})},
     '@/components/course-workspace/course-list':{CourseList:()=>null},
+    '@/components/course-workspace/operations-dashboard':{OperationsDashboard:()=>null},
+    '@/lib/course-budget/data':{getCourseBudgets:async()=>({courses:[],workbooks:[],unavailable:false})},
+    '@/lib/course-budget/model':load('src/lib/course-budget/model.ts'),
     '@/components/course-plan/offering-draft-form':{OfferingDraftForm},
-    '@/lib/supabase/server':{createServerSupabaseClient:async()=>({from:()=>({select:()=>({in:async()=>({data:[]})})})})},
+    '@/lib/supabase/server':{createServerSupabaseClient:async()=>({rpc:async()=>({data:[],error:null}),from:()=>({select:()=>({in:async()=>({data:[]})})})})},
     '@/components/portal/ui':{PageIntro:()=>null,Empty:()=>null},
   }).default;
   const html=renderToStaticMarkup(await Page({searchParams:Promise.resolve({plan:'P01'})}));
