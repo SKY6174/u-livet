@@ -41,7 +41,7 @@ export function AttendanceReadiness({ course: c }: { course: CourseWorkspace }) 
       <p className="mt-3 text-xs leading-relaxed text-slate-500">미입력은 결석과 다릅니다. 휴강·예정 수업은 위 집계에서 제외합니다. 출결이 기록되어도 수료 승인은 별도입니다.</p>
     </> : <p className="notice mt-4">{archived ? "개인별 수강생·회차 자료가 없습니다. 원본 출석부는 결과보고서 첨부에서 확인·보관하세요." : "수강 확정 명단과 수업 일정이 연결되면 회차별 출결 현황이 표시됩니다."}</p>}
     <div className="mt-5 flex flex-wrap gap-4 text-sm font-semibold">
-      {hasRecords && <Link href={`${base}/reports/print?document=attendance`} target="_blank" rel="noreferrer" className="text-teal-800">출석부 출력 확인 →</Link>}
+      {hasRecords && <Link href={`${base}/reports/print?document=attendance`} target="_blank" rel="noreferrer" className="text-teal-800">02 QR·확정 출석부 출력 →</Link>}
       {archived && <Link href={`${base}/reports#attachments`} className="text-teal-800">원본 출석부 첨부 확인 →</Link>}
     </div>
   </section>;

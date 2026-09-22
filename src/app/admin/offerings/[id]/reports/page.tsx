@@ -94,8 +94,8 @@ export default async function CourseReports({
           강사 강의실적 확인 · {b.teaching.length}건
         </h2>
         <div className="mb-4 flex flex-wrap gap-3">
-          <Link className="btn-secondary" href={`/admin/offerings/${id}/reports/print?document=teaching`} target="_blank">강사 강의날인부 취합·출력</Link>
-          <Link className="btn-secondary" href={`/admin/offerings/${id}/reports/print?document=attendance`} target="_blank">QR 확정 출석부 확인·출력</Link>
+          <Link className="btn-secondary" href={`/admin/offerings/${id}/reports/print?document=teaching`} target="_blank">05 강사 강의날인부 자동취합·출력</Link>
+          <Link className="btn-secondary" href={`/admin/offerings/${id}/reports/print?document=attendance`} target="_blank">02 QR·확정 출석부 출력</Link>
         </div>
         {!b.teaching.length ? (
           <p className="notice">강사가 실제 강의실적을 제출하면 표시됩니다.</p>

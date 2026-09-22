@@ -123,6 +123,12 @@ export function ReportDocuments({
     active = members.filter((m) => m.enrollment_status === "ACTIVE"),
     completed = members.filter(isCompleted);
   const sessions = b.sessions.filter((s) => s.status === "SCHEDULED");
+  const teachingRows = document === "teaching" || document === "all"
+    ? buildTeachingLedger(sessions, b.teaching)
+    : [];
+  const approvedTeachingMinutes = b.teaching
+    .filter((log) => log.current)
+    .reduce((sum, log) => sum + Number(log.minutes), 0);
   const totalMinutes = sessions.reduce(
     (n, s) => n + (Date.parse(s.ends_at) - Date.parse(s.starts_at)) / 60000,
     0,
@@ -319,12 +325,9 @@ export function ReportDocuments({
           </Sheet>
         </>
       )}
-      {show("attendance") && <AttendancePrint official book={attendanceBook ?? {
-        offering: { id:o.id,name:o.name,starts_on:o.starts_on,ends_on:o.ends_on },
-        viewer_id:"",generated_at:new Date().toISOString(),
-        members:active.map((member) => ({ person_id:member.person_id,name:member.name })),
-        sessions:b.sessions,attendance:b.attendance,qr_checkins:[],qr_unavailable:true,
-      }} />}
+      {show("attendance") && (attendanceBook
+        ? <AttendancePrint official book={attendanceBook} />
+        : <section className="report-sheet report-form-20"><h1>출석부</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p></section>)}
       {show("completion") &&
         chunk(members, 18).map((people, pi) => (
           <Sheet title={title("completion")} offering={o} wide key={`c-${pi}`}>
@@ -410,19 +413,19 @@ export function ReportDocuments({
             </p>
           </Sheet>
         ))}
-      {show("teaching") && chunk(buildTeachingLedger(sessions,b.teaching),12).map((rows, pi) => (
+      {show("teaching") && chunk(teachingRows,12).map((rows, pi) => (
         <section className="report-sheet report-portrait report-form-20 report-teaching-ledger" key={`t-${pi}`}>
           <h1>{title("teaching")}</h1>
-          <Table head={["과정명","강의기간","총 제출 강의시간"]} rows={[[
+          <Table head={["과정명","강의기간","승인된 실강의시간"]} rows={[[
             o.name,`${o.starts_on} ~ ${o.ends_on}`,
-            `${hours(b.teaching.reduce((sum,log) => sum+Number(log.minutes),0))}시간`,
+            `${hours(approvedTeachingMinutes)}시간`,
           ]]} />
           <Table head={["차수","날짜","시간","실강의시간","성명","서명"]} rows={rows.map((row) => [
             row.session,day(`${row.date}T00:00:00+09:00`),`${row.period} ${row.time}`,
             row.minutes === null ? "—" : `${hours(row.minutes)}시간`,row.name,
             row.signature ? <Image key={row.key} src={row.signature} width={110} height={42} unoptimized alt={`${row.name} 본인 서명`} className="report-teaching-signature" /> : row.note || "—",
           ])} />
-          <p className="report-note">실강의시간과 서명은 강사 본인의 최신 제출·서명 및 운영진 승인 기록을 기준으로 합니다. 미등록·승인 대기는 자동 날인되지 않습니다.</p>
+          <p className="report-note">승인된 실강의시간만 합산하고 유효한 본인 서명만 날인합니다. 미등록·승인 대기는 표시하되 자동 날인하지 않습니다.</p>
           <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
         </section>
       ))}

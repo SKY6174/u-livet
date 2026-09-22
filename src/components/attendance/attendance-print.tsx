@@ -15,7 +15,7 @@ const time = (value: string) => new Intl.DateTimeFormat("ko-KR", {
 export function AttendancePrint({ book, official = false }: { book: AttendanceBook; official?: boolean }) {
   const index = attendanceIndex(book.attendance), now = Date.parse(book.generated_at);
   const sessions = book.sessions.filter((session) => session.status === "SCHEDULED");
-  const landscape = book.sessions.length >= 5;
+  const landscape = sessions.length >= 5;
   const groups = groupsOf(sessions,landscape ? 5 : 4), members = groupsOf(book.members,landscape ? 18 : 20);
   const qr = new Map((book.qr_checkins ?? []).map((checkin) => [`${checkin.session_id}:${checkin.person_id}`,checkin.checked_in_at]));
   const expected = sessions.filter((session) => Date.parse(session.ends_at) <= now).length * book.members.length;

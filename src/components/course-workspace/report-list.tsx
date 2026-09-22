@@ -42,6 +42,8 @@ export function ReportList({ courses }: { courses: CourseWorkspace[] }) {
               <div className="mt-auto flex flex-wrap gap-3 pt-6">
                 <Link className="btn-primary" href={report}>{course.report_revision ? "기존 보고 내용 검토" : "증빙·지급자료 작성"}</Link>
                 <Link className="btn-secondary" href={`${report}/print?document=all`} target="_blank" rel="noreferrer">6종 출력 미리보기</Link>
+                <Link className="btn-secondary" href={`${report}/print?document=attendance`} target="_blank" rel="noreferrer">02 QR·확정 출석부 출력</Link>
+                <Link className="btn-secondary" href={`${report}/print?document=teaching`} target="_blank" rel="noreferrer">05 강사 강의날인부 출력</Link>
               </div>
             </article>
           );

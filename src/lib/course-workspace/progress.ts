@@ -33,7 +33,7 @@ export function documentReadiness(c: CourseWorkspace): DocumentReadiness[] {
             : c.ended_sessions < c.scheduled_sessions
               ? "수업 진행 중"
               : "출결 입력됨",
-      detail: "종료된 정상 수업 기준입니다. 미입력과 결석은 구분합니다.",
+      detail: "02 출석부에는 회차별 QR 입실과 강사 확정 출결을 함께 표시합니다. 미입력과 결석은 구분합니다.",
       tone:
         !c.scheduled_sessions || !c.enrolled
           ? "empty"
@@ -86,7 +86,7 @@ export function documentReadiness(c: CourseWorkspace): DocumentReadiness[] {
         : c.teaching_pending
           ? `${c.teaching_pending}건 승인 대기`
           : `${c.teaching_logs}건 승인됨`,
-      detail: "강사가 제출한 실제 강의시간과 내용을 확인합니다.",
+      detail: "강사가 입력·서명한 강의 구간을 운영진이 승인하면 05 강사 강의날인부에 자동 반영됩니다.",
       tone: !c.teaching_logs
         ? "empty"
         : c.teaching_pending

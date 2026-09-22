@@ -6,6 +6,7 @@ import { ReportDocuments } from "@/components/reports/report-documents";
 import { requireIdentity } from "@/lib/auth/session";
 import { createReportPreview, PREVIEW_OFFERING } from "@/lib/reports/preview";
 import { DOCUMENTS, type DocumentKind } from "@/lib/reports/types";
+import type { AttendanceBook } from "@/lib/attendance/model";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -28,6 +29,20 @@ export default async function ReportPreview({ searchParams }: {
   if (!me.roles.some((role) => role.role === "COURSE_MANAGER")) notFound();
   const document = (await searchParams).document ?? "all";
   if (document !== "all" && !DOCUMENTS.some(([key]) => key === document)) notFound();
+  const bundle = createReportPreview();
+  const attendanceBook: AttendanceBook = {
+    offering: PREVIEW_OFFERING,
+    viewer_id: "report-preview",
+    generated_at: "2026-08-08T09:00:00+09:00",
+    members: bundle.members.map(({ person_id, name }) => ({ person_id, name })),
+    sessions: bundle.sessions,
+    attendance: bundle.attendance,
+    qr_checkins: bundle.sessions.map((session) => ({
+      session_id: session.id,
+      person_id: "sample-learner-1",
+      checked_in_at: session.starts_at,
+    })),
+  };
   return (
     <>
       <div className="page-shell no-print">
@@ -55,8 +70,8 @@ export default async function ReportPreview({ searchParams }: {
         </div>
       </div>
       <PrintToolbar preview document={document} reveal={false} />
-      <ReportDocuments offering={PREVIEW_OFFERING} bundle={createReportPreview()}
-        document={document as DocumentKind | "all"} />
+      <ReportDocuments offering={PREVIEW_OFFERING} bundle={bundle}
+        document={document as DocumentKind | "all"} attendanceBook={attendanceBook} />
     </>
   );
 }

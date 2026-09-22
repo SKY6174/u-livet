@@ -100,7 +100,7 @@ export async function DocumentStatus({
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 text-slate-600"
               >
-                출력
+                {d.kind === "attendance" ? "QR·확정 양식 출력" : d.kind === "teaching" ? "자동취합 양식 출력" : "출력"}
                 <ArrowUpRight size={14} />
               </Link>
             </div>

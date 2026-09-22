@@ -79,7 +79,7 @@ export function ReportFiles({
           >
             {DOCUMENTS.map(([key, label]) => (
               <option value={key} key={key}>
-                {label} 원본
+                {key === "attendance" || key === "teaching" ? `${label} 기존 원본(보관용)` : `${label} 원본`}
               </option>
             ))}
             <option value="photo">운영사진</option>
@@ -123,9 +123,18 @@ export function ReportFiles({
               <p className="text-sm text-slate-500">
                 {f.kind === "photo"
                   ? "운영사진"
-                  : DOCUMENTS.find((d) => d[0] === f.kind)?.[1]}{" "}
+                  : f.kind === "attendance" || f.kind === "teaching"
+                    ? `기존 ${DOCUMENTS.find((d) => d[0] === f.kind)?.[1]} 원본 · 보관용`
+                    : DOCUMENTS.find((d) => d[0] === f.kind)?.[1]}{" "}
                 · {Math.ceil(f.size / 1024)}KB · {f.caption}
               </p>
+              {(f.kind === "attendance" || f.kind === "teaching") && (
+                <a className="mt-2 inline-block text-sm font-semibold text-teal-800 underline"
+                  href={`/admin/offerings/${offering}/reports/print?document=${f.kind}`}
+                  target="_blank" rel="noreferrer">
+                  현재 {f.kind === "attendance" ? "02 QR·확정 출석부" : "05 자동취합 강의날인부"} 출력
+                </a>
+              )}
               {f.kind !== "photo" && <div className="mt-2"><Pdf17CopyButton sourceUrl={`/api/course-reports/${offering}/files/${f.id}`} filename={f.filename} /></div>}
             </div>
             {remove === f.id ? (
