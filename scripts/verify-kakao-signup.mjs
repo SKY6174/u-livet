@@ -33,13 +33,13 @@ function mock({state='PENDING',enabled=true,guard=true,user=true,policy=true,rpc
  'next/navigation':{redirect:url=>{throw Error('REDIRECT '+url);}},'next/cache':{revalidatePath:()=>{}},'@/lib/supabase/server':base['@/lib/supabase/server'],
  '@/lib/auth/abuse':{guardAuthRequest:async(...args)=>{calls.push(['guard',...args]);return guard?{allowed:true}:{allowed:false,state:{message:'LIMIT'}};}},
  '@/lib/auth/recovery':{recoveryOrigin:()=> 'https://uc-life.example.invalid'},'@/lib/supabase/config':{getSupabaseConfig:()=>({url:'https://db.example.invalid'})},
- '@/lib/deployment/review-mode':{isReviewOnly:()=>false},'@/lib/auth/social':social,'@/lib/auth/signup-config':{publicSignupEnabled:()=>enabled,PUBLIC_SIGNUP_PENDING:'CLOSED'},'@/lib/auth/registration':reg,'@/lib/auth/login-audience':audiences,'@/lib/auth/social-providers':providers});
+ '@/lib/deployment/review-mode':{isReviewOnly:()=>false},'@/lib/auth/social':social,'@/lib/auth/signup-config':{publicSignupEnabled:()=>enabled,PUBLIC_SIGNUP_PENDING:'CLOSED'},'@/lib/auth/naver-signup':load('src/lib/auth/naver-signup.ts'), '@/lib/auth/registration':reg,'@/lib/auth/login-audience':audiences,'@/lib/auth/social-providers':providers});
  return {calls,social,actions};
 }
 function form(values={}) {const f=new FormData();for(const[k,v]of Object.entries({name:'Synthetic',phone:'010-1234-5678',privacy_policy_id:'policy-1',privacy_accepted:'on',next:'/courses',...values}))f.set(k,v);return f;}
 {
  const m=mock();await assert.rejects(m.actions.loginWithKakao({},form({next:'//evil.invalid'})),/REDIRECT https:\/\/db.example.invalid/);
- const input=m.calls.find(c=>c[0]==='oauth')[1];check('Kakao PKCE uses fixed site origin and safe return path',input.provider==='kakao' && input.options.redirectTo==='https://uc-life.example.invalid/auth/callback?next=%2F');
+ const input=m.calls.find(c=>c[0]==='oauth')[1];check('Kakao PKCE uses fixed site origin and safe return path',input.provider==='kakao' && input.options.redirectTo==='https://uc-life.example.invalid/auth/callback?next=%2F&audience=learner');
  check('OAuth rate limit uses separate flow',m.calls.find(c=>c[0]==='guard')[4]==='oauth');
  check('unneeded nickname and photo scopes are omitted',input.options.queryParams.scope==='account_email');
 }

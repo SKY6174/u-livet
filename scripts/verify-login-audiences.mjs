@@ -31,7 +31,7 @@ function mock({actual='learner', roles=[], mfa=false, contextError=false, env={}
   const modules={
     'next/navigation':{redirect:url=>{throw Error('REDIRECT '+url);}},'next/cache':{revalidatePath:()=>{}},
     '@/lib/supabase/server':{createServerSupabaseClient:async()=>client},'@/lib/auth/session':{safeReturnTo:reg.socialReturnTo},
-    '@/lib/auth/social':{},'@/lib/auth/registration':reg,'@/lib/auth/login-audience':audience,
+    '@/lib/auth/social':{},'@/lib/auth/naver-signup':load('src/lib/auth/naver-signup.ts'), '@/lib/auth/registration':reg,'@/lib/auth/login-audience':audience,
     '@/lib/auth/abuse':{guardAuthRequest:async()=>({allowed:true}),authProviderError:()=>null},
     '@/lib/auth/email-config':{},'@/lib/auth/signup-config':{},'@/lib/auth/password-policy':policy,
     '@/lib/auth/recovery':{recoveryOrigin:()=> 'https://life.example.invalid'},'@/lib/supabase/config':{getSupabaseConfig:()=>({url:'https://db.example.invalid'})},
@@ -70,7 +70,7 @@ for(const provider of ['google','naver','github']){
 for(const [provider,expected]of [['kakao','kakao'],['google','google'],['naver','custom:naver']]){
   const m=mock({env:{AUTH_GOOGLE_ENABLED:'true',AUTH_NAVER_ENABLED:'true'}});
   await assert.rejects(m.social.loginWithSocial({},form({provider,audience:'external'})),/REDIRECT https:\/\/db.example.invalid/);
-  const call=m.calls.find(c=>typeof c==='object');check(provider+' uses fixed provider and personal home callback',call.provider===expected && call.options.redirectTo==='https://life.example.invalid/auth/callback?next=%2F');
+  const call=m.calls.find(c=>typeof c==='object');check(provider+' uses fixed provider and personal home callback',call.provider===expected && call.options.redirectTo==='https://life.example.invalid/auth/callback?next=%2F&audience=external');
   const qrNext='/learning/10000000-0000-4000-8000-000000000001/attendance/checkin?session=10000000-0000-4000-8000-000000000002&t='+'b'.repeat(64);
   await assert.rejects(m.social.loginWithSocial({},form({provider,audience:'learner',next:qrNext})),/REDIRECT https:\/\/db.example.invalid/);
   const qrCall=m.calls.filter(c=>typeof c==='object').at(-1);

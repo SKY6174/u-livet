@@ -12,6 +12,7 @@ import { MOBILE_GUIDANCE, normalizeMobilePhone, socialReturnTo } from "@/lib/aut
 import type { ActionState } from "@/lib/portal/types";
 import { loginAudience } from "@/lib/auth/login-audience";
 import { socialProvider, socialProviderEnabled } from "@/lib/auth/social-providers";
+import { naverSignupNeedsEmail } from "@/lib/auth/naver-signup";
 
 export async function loginWithKakao(_: ActionState, form: FormData): Promise<ActionState> {
   form.set("provider", "kakao");
@@ -31,6 +32,7 @@ export async function loginWithSocial(_: ActionState, form: FormData): Promise<A
     const callback = new URL("/auth/callback", recoveryOrigin());
     const next = socialReturnTo(form.get("next"));
     callback.searchParams.set("next", next);
+    callback.searchParams.set("audience", audience);
     const client = await createServerSupabaseClient();
     // Supabase adds options.scopes to its defaults. Replace the provider scope
     // instead: signup collects a name directly and does not need profile photos.
@@ -63,6 +65,7 @@ export async function completeKakaoSignup(_: ActionState, form: FormData): Promi
     const client = await createServerSupabaseClient();
     const { data, error } = await client.auth.getUser();
     if (error || !data.user) return { message: "간편 로그인을 다시 진행해 주세요." };
+    if (naverSignupNeedsEmail(data.user)) return { message: "가입에 사용할 이메일을 먼저 확인해 주세요." };
     const policy = await getSignupPolicy();
     if (!policy || policy.id !== form.get("privacy_policy_id") || form.get("privacy_accepted") !== "on") return { message: "현재 개인정보 수집·이용 안내를 확인하고 동의해 주세요." };
     const result = await client.rpc("life_complete_registration", { p_name: name, p_phone: phone, p_policy: policy.id, p_accepted: true });

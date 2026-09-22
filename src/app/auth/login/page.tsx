@@ -12,7 +12,8 @@ export default async function Login(props: {
   const searchParams = await props.searchParams;
   const next = safeReturnTo(searchParams.next);
   const qrCheckin = qrCheckinReturnTo(next);
-  const audience = qrCheckin ? "learner" : loginAudience(searchParams.audience);
+  const audience = qrCheckin ? "learner" : loginAudience(searchParams.audience)
+    ?? (["email-verification", "callback", "cancelled"].includes(searchParams.social_error ?? "") ? "learner" : null);
   if (await getSessionIdentity()) redirect(socialReturnTo(next));
   return (
     <div className="mx-auto max-w-2xl px-5 py-12 sm:py-16">

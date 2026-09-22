@@ -6,6 +6,9 @@ import { socialReturnTo } from "@/lib/auth/registration";
 import { completeKakaoSignup } from "@/app/auth/social-actions";
 import { PhoneField } from "@/components/auth/phone-field";
 import { ActionForm } from "@/components/portal/action-form";
+import { naverSignupNeedsEmail, signupEmail } from "@/lib/auth/naver-signup";
+import { NaverSignupEmail } from "@/components/auth/naver-signup-email";
+export const metadata = { robots: { index: false, follow: false }, referrer: "no-referrer" as const };
 export default async function CompleteSignup({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const params = await searchParams;
   const next = socialReturnTo(params.next);
@@ -16,6 +19,7 @@ export default async function CompleteSignup({ searchParams }: { searchParams: P
   if (result.error) redirect("/auth/login?social_error=unavailable");
   if (result.data?.state !== "PENDING") redirect(await socialDestination(next));
   const policy = await getSignupPolicy();
+  const needsEmail = naverSignupNeedsEmail(data.user);
   return (
     <div className="mx-auto max-w-lg px-5 py-16">
       <p className="eyebrow">U-LIFE ACCOUNT</p>
@@ -24,7 +28,7 @@ export default async function CompleteSignup({ searchParams }: { searchParams: P
         간편 인증이 완료되었습니다. U-LIFE 회원가입에 필요한 이름·휴대폰 번호와 개인정보 동의를 확인해 주세요.
       </p>
       <div className="panel [&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
-        {policy ? <ActionForm action={completeKakaoSignup} label="동의하고 가입 완료" resetOnSuccess={false}>
+        {policy && needsEmail ? <NaverSignupEmail next={next} pendingEmail={data.user.email_change_sent_at ? signupEmail(data.user.new_email) ?? undefined : undefined} /> : policy ? <ActionForm action={completeKakaoSignup} label="동의하고 가입 완료" resetOnSuccess={false}>
           <input type="hidden" name="next" value={next} />
           <label className="field text-base">이름 (필수)<input name="name" autoComplete="name" maxLength={100} required /></label>
           <PhoneField />

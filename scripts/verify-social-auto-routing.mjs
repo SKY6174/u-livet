@@ -52,19 +52,19 @@ function fixture({ state = 'PENDING', signedIn = true, statusError = false, hasP
   });
   const actions = load('src/app/auth/social-actions.ts', {
     'next/navigation': { redirect }, 'next/cache': { revalidatePath: (...args) => calls.push(['revalidate', ...args]) },
-    '@/lib/supabase/server': server, '@/lib/auth/registration': registration, '@/lib/auth/social': social,
+    '@/lib/supabase/server': server, '@/lib/auth/naver-signup':load('src/lib/auth/naver-signup.ts'), '@/lib/auth/registration': registration, '@/lib/auth/social': social,
     '@/lib/auth/abuse': {}, '@/lib/auth/recovery': {}, '@/lib/supabase/config': {},
     '@/lib/deployment/review-mode': {}, '@/lib/auth/signup-config': {},
     '@/lib/auth/login-audience': {}, '@/lib/auth/social-providers': {},
   });
   const phone = load('src/components/auth/phone-field.tsx', {
-    react: React, 'react/jsx-runtime': jsxRuntime, '@/lib/auth/registration': registration,
+    react: React, 'react/jsx-runtime': jsxRuntime, '@/lib/auth/naver-signup':load('src/lib/auth/naver-signup.ts'), '@/lib/auth/registration': registration,
   });
   const page = load('src/app/auth/complete-signup/page.tsx', {
     'react/jsx-runtime': jsxRuntime, 'next/navigation': { redirect },
     'next/link': { default: ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children) },
-    '@/lib/supabase/server': server, '@/lib/auth/social': social, '@/lib/auth/registration': registration,
-    '@/app/auth/social-actions': actions, '@/components/auth/phone-field': phone,
+    '@/lib/supabase/server': server, '@/lib/auth/social': social, '@/lib/auth/naver-signup':load('src/lib/auth/naver-signup.ts'), '@/lib/auth/registration': registration,
+    '@/app/auth/social-actions': actions, '@/components/auth/phone-field': phone, '@/components/auth/naver-signup-email': { NaverSignupEmail: () => null },
     '@/components/portal/action-form': { ActionForm: ({ action, children, label }) => React.createElement('form', {
       method: 'post', action: '/fixture-signup',
     }, children, React.createElement('button', { type: 'submit', className: 'btn-primary' }, label)) },
@@ -72,7 +72,7 @@ function fixture({ state = 'PENDING', signedIn = true, statusError = false, hasP
   const callback = load('src/app/auth/callback/route.ts', {
     'next/server': { NextResponse: { redirect: url => ({ url: url.toString(), headers: new Map() }) } },
     '@/lib/supabase/server': server, '@/lib/auth/social': social,
-    '@/lib/auth/registration': registration,
+    '@/lib/auth/naver-signup':load('src/lib/auth/naver-signup.ts'), '@/lib/auth/registration': registration,
     '@/lib/auth/recovery': { recoveryOrigin: () => 'https://uc-life.example.invalid' },
     '@/lib/deployment/review-mode': { isReviewOnly: () => false },
   }).GET;
