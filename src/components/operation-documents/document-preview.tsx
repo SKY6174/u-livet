@@ -119,15 +119,24 @@ export function DocumentPreview({
           </span>
         </div>
       ) : (
-        <Grid
-          headers={["구분", "내용"]}
-          rows={[
-            ["영 역", v.academy],
-            ["세 부 프 로 그 램 명", v.program],
-            ["담 당 교 수", v.professor],
-            ["교 육 기 간", `${date(v.startsOn)} ~ ${date(v.endsOn)}`],
-          ]}
-        />
+        <>
+          <Grid
+            headers={["구분", "내용"]}
+            rows={[
+              ["영 역", v.academy],
+              ["세 부 프 로 그 램 명", v.program],
+              ["담 당 교 수", v.professor],
+              ["교 육 기 간", `${date(v.startsOn)} ~ ${date(v.endsOn)}`],
+            ]}
+          />
+          <div className="op-signature op-result-signature">
+            <b>책임강사</b>
+            <b>{v.professor || "성함"}</b>
+            <span>
+              서명 {content.signature && <img src={content.signature} alt="책임강사 서명" />}
+            </span>
+          </div>
+        </>
       )}
     </div>,
   );

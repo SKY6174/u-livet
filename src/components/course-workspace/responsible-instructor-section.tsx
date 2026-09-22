@@ -2,7 +2,7 @@ import Link from "next/link";
 import { assignInstructor } from "@/app/actions";
 import { assignResponsibleInstructor } from "@/app/admin/offerings/[id]/manage/actions";
 import { ActionForm } from "@/components/portal/action-form";
-import { STATUS_LABELS, type DocumentContext } from "@/lib/operation-documents/model";
+import { RESULT_STATUS_LABELS, STATUS_LABELS, type DocumentContext } from "@/lib/operation-documents/model";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 type Instructor = { person_id: string; name: string; assigned: boolean };
@@ -121,7 +121,7 @@ export async function ResponsibleInstructorSection({ offeringId }: { offeringId:
                 {(["plan", "result"] as const).map((kind) => {
                   const status = context.documents.find((document) => document.kind === kind)?.status;
                   return <Link className="underline" key={kind} href={`/operation-documents/${offeringId}/${kind}`}>
-                    {kind === "plan" ? "운영계획서" : "운영결과보고서"} · {status ? STATUS_LABELS[status] : "작성 전"} →
+                    {kind === "plan" ? "운영계획서" : "운영결과보고서"} · {status ? (kind === "result" ? RESULT_STATUS_LABELS : STATUS_LABELS)[status] : "작성 전"} →
                   </Link>;
                 })}
               </div>

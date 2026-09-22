@@ -4,7 +4,7 @@ import { requireIdentity } from "@/lib/auth/session";
 import { hasRole } from "@/lib/auth/workspace-navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getCourseWorkspaces } from "@/lib/course-workspace/data";
-import { STATUS_LABELS } from "@/lib/operation-documents/model";
+import { RESULT_STATUS_LABELS, STATUS_LABELS } from "@/lib/operation-documents/model";
 import { ReportList } from "@/components/course-workspace/report-list";
 import { Empty, PageIntro } from "@/components/portal/ui";
 
@@ -38,7 +38,7 @@ export async function DocumentList({ kind, view = "official" }: { kind: Kind; vi
     <div className="page-shell space-y-8">
       <PageIntro eyebrow="COURSE DOCUMENTS" title={label}>
         {result
-          ? "책임강사가 운영 결과를 작성하고, 담당자가 예산과 증빙을 확인해 최종 제출합니다."
+          ? "담당자가 예산을 입력·확정하면 책임강사가 운영 결과를 작성하고 서명하여 최종 제출합니다."
           : "책임강사가 운영 내용을 작성하고, 담당자가 예산을 완성해 최종 제출합니다."}
       </PageIntro>
       <nav className="flex flex-wrap gap-3" aria-label="과정 문서 종류">
@@ -84,7 +84,7 @@ export async function DocumentList({ kind, view = "official" }: { kind: Kind; vi
                 </p>
                 <Link className="mt-5 flex items-center justify-between rounded-xl border p-4 hover:border-teal-500 hover:bg-teal-50" href={`/operation-documents/${course.id}/${kind}`}>
                   <span className="font-semibold">{label} 작성·검토 →</span>
-                  <span className="text-sm text-teal-800">{status ? STATUS_LABELS[status] : "작성 시작"}</span>
+                  <span className="text-sm text-teal-800">{status ? (result ? RESULT_STATUS_LABELS : STATUS_LABELS)[status] : "작성 시작"}</span>
                 </Link>
               </article>;
             })}

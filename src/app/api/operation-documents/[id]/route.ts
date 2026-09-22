@@ -10,8 +10,13 @@ const messages: Record<string, string> = {
   REVISION_CHANGED:
     "다른 수정이 먼저 저장되었습니다. 현재 입력을 복사해 두고 새로고침해 주세요.",
   DOCUMENT_LOCKED:
-    "검토·제출 중인 문서입니다. 담당자의 보완 요청 또는 수정 재개가 필요합니다.",
+    "현재 단계에서는 수정할 수 없습니다. 결과보고서는 담당자 예산 확정 후 책임강사가 작성합니다.",
   BUDGET_FORBIDDEN: "예산은 담당자만 수정할 수 있습니다.",
+  BUDGET_LOCKED: "예산이 확정되었습니다. 변경하려면 담당자가 예산 입력 단계로 되돌려야 합니다.",
+  SIGNATURE_STAGE: "결과보고서 서명은 담당자 예산 확정 후에 입력해 주세요.",
+  SIGNATURE_FORBIDDEN: "결과보고서는 지정된 책임강사 본인만 서명할 수 있습니다.",
+  SIGNATURE_STALE: "내용이 바뀌었습니다. 기존 서명을 지우고 수정 후 다시 서명해 주세요.",
+  SIGNATURE_REQUIRED: "책임강사가 결과보고서 내용 확인 후 서명해야 최종 제출할 수 있습니다.",
   CONTENT_REQUIRED: "필수 항목을 모두 작성하고 내용 확인에 체크해 주세요.",
   RESPONSIBLE_REQUIRED: "유효하게 배정된 책임강사를 먼저 지정해 주세요.",
   INVALID_RESPONSIBLE:

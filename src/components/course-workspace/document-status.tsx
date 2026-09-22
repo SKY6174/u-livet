@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, FileText } from "lucide-react";
 import { documentReadiness } from "@/lib/course-workspace/progress";
 import type { CourseWorkspace, DocumentReadiness } from "@/lib/course-workspace/types";
-import { STATUS_LABELS } from "@/lib/operation-documents/model";
+import { RESULT_STATUS_LABELS, STATUS_LABELS } from "@/lib/operation-documents/model";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 type OperationStatus = {
@@ -26,17 +26,17 @@ export async function DocumentStatus({
     row.kind === "result"
       ? {
           ...row,
-          owner: "책임강사 작성 · 담당자 최종 제출",
-          label: !current ? "상태 확인 불가" : status ? STATUS_LABELS[status] : "공식 문서 작성 전",
+          owner: "담당자 예산 확정 · 책임강사 작성·서명·제출",
+          label: !current ? "상태 확인 불가" : status ? RESULT_STATUS_LABELS[status] : "공식 문서 작성 전",
           detail: !current
             ? "공식 결과보고서 상태를 불러오지 못했습니다. 작성 화면에서 확인해 주세요."
             : status === "SUBMITTED"
               ? "최종 제출본이 보관되어 있습니다."
               : status === "REVIEW"
-                ? "담당자가 내용을 검토하고 최종 제출합니다."
+                ? "예산이 확정되었습니다. 책임강사가 내용을 작성하고 서명하여 제출합니다."
                 : status === "DRAFT"
-                  ? "저장된 초안을 검토하고 완성하세요."
-                  : "공식 결과보고서를 작성하고 저장해 주세요.",
+                  ? "담당자가 예산·장학금 내역을 입력하고 확정해야 합니다."
+                  : "담당자가 예산·장학금 내역을 먼저 입력해 주세요.",
           tone: status === "SUBMITTED" ? "ready" : status === "REVIEW" || !current ? "attention" : "empty",
         }
       : row,

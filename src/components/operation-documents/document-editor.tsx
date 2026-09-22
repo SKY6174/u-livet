@@ -30,6 +30,7 @@ import {
   validBudget,
   emptyBudget,
   STATUS_LABELS,
+  RESULT_STATUS_LABELS,
   type DocumentContext,
   type CourseInfo,
   type Content,
@@ -94,7 +95,10 @@ export function DocumentEditor({
   const previewRef = useRef<HTMLDivElement>(null),
     manager = context.manager;
   const locked =
-      doc.status === "SUBMITTED" || (doc.status === "REVIEW" && !manager),
+      doc.status === "SUBMITTED" ||
+      (kind === "plan"
+        ? doc.status === "REVIEW" && !manager
+        : doc.status === "DRAFT" && !manager),
     readonly = locked || busy;
   const allSections = [
     ...sections(kind),
@@ -126,7 +130,19 @@ export function DocumentEditor({
     return () => observer.disconnect();
   }, [preview]);
   function change(next: Content | ((previous: Content) => Content)) {
-    setContent(next);
+    setContent((previous) => {
+      const updated = typeof next === "function" ? next(previous) : next;
+      if (
+        kind === "result" &&
+        previous.signature &&
+        updated.signature === previous.signature &&
+        (updated.fields !== previous.fields ||
+          updated.tables !== previous.tables ||
+          updated.photos !== previous.photos)
+      )
+        return { ...updated, signature: "" };
+      return updated;
+    });
     setDirty(true);
     setConfirmed(false);
     setMessage("");
@@ -183,13 +199,15 @@ export function DocumentEditor({
         adopt(next);
       }
       if (intent !== "save") {
-        if (["review", "submit"].includes(intent)) {
+        if (intent === "submit" || (intent === "review" && kind === "plan")) {
           const missing = missingContent(content, kind);
           if (missing.length)
             throw new Error(`작성 필요: ${missing.join(", ")}`);
-          if (!confirmed)
-            throw new Error("작성 내용을 확인한 후 확인란에 체크해 주세요.");
         }
+        if (kind === "result" && intent === "submit" && !content.signature)
+          throw new Error("책임강사 서명 후 최종 제출해 주세요.");
+        if (["review", "submit"].includes(intent) && !confirmed)
+          throw new Error("작성 내용을 확인한 후 확인란에 체크해 주세요.");
         const next = await request({ intent, revision, note, confirmed });
         adopt(next);
         setConfirmed(false);
@@ -199,7 +217,9 @@ export function DocumentEditor({
         intent === "save"
           ? "임시저장되었습니다. 다음 접속에서도 이어서 작성할 수 있습니다."
           : intent === "review"
-            ? "담당자에게 검토를 요청했습니다."
+            ? kind === "result"
+              ? "예산을 확정했습니다. 책임강사가 내용을 작성하고 서명할 수 있습니다."
+              : "담당자에게 검토를 요청했습니다."
             : intent === "submit"
               ? "최종 제출본이 보관되었습니다."
               : "작성 상태로 변경되었습니다.",
@@ -266,11 +286,10 @@ export function DocumentEditor({
         </div>
       </div>
       <div className="mb-6 grid gap-3 rounded-2xl border border-teal-100 bg-teal-50/50 p-5 sm:grid-cols-3">
-        {[
-          "책임강사 내용 작성",
-          "담당자 예산·내용 검토",
-          "담당자 최종 제출",
-        ].map((label, i) => (
+        {(kind === "result"
+          ? ["담당자 예산 입력", "책임강사 내용 입력", "서명 후 최종 제출"]
+          : ["책임강사 내용 작성", "담당자 예산·내용 검토", "담당자 최종 제출"]
+        ).map((label, i) => (
           <div key={label} className="flex items-center gap-3">
             <span
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${i === (doc.status === "DRAFT" ? 0 : doc.status === "REVIEW" ? 1 : 2) ? "bg-teal-800 text-white" : "bg-white text-teal-700"}`}
@@ -337,7 +356,7 @@ export function DocumentEditor({
       )}
       <div className="sticky top-32 z-20 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white/95 p-3 shadow-sm">
         <div>
-          <span className="badge">{STATUS_LABELS[doc.status]}</span>
+          <span className="badge">{(kind === "result" ? RESULT_STATUS_LABELS : STATUS_LABELS)[doc.status]}</span>
           <span className="ml-3 text-xs text-slate-500" aria-live="polite">
             {busy
               ? "처리 중…"
@@ -595,7 +614,7 @@ export function DocumentEditor({
                     ? "담당자가 예산 금액과 산출내역을 확인합니다. 해당 없는 금액도 0을 입력하세요."
                     : "예산은 담당자가 입력합니다. 책임강사는 내용을 확인할 수 있습니다."}
                 </p>
-                <fieldset disabled={readonly || !manager} className="space-y-4">
+                <fieldset disabled={readonly || !manager || (kind === "result" && doc.status !== "DRAFT")} className="space-y-4">
                   {budget.rows.map((r, i) => (
                     <div className="rounded-xl border bg-slate-50 p-4" key={i}>
                       <div className="mb-3 flex items-center justify-between gap-2">
@@ -739,11 +758,11 @@ export function DocumentEditor({
             {section === "submit" && (
               <div className="space-y-5">
                 <p className="text-sm leading-6 text-slate-600">
-                  예산을 제외한 모든 항목을 작성해 주세요. 해당 없는 내용은
-                  “해당 없음”과 사유를 적습니다. 책임강사가 검토를 요청하면
-                  담당자가 예산과 내용을 완성하여 최종 제출합니다.
+                  {kind === "result"
+                    ? "담당자가 예산계획·집행현황과 장학금 내역을 입력하고 확정합니다. 이어 책임강사가 운영 결과를 완성하고 본인 서명 후 최종 제출합니다."
+                    : "예산을 제외한 모든 항목을 작성해 주세요. 해당 없는 내용은 “해당 없음”과 사유를 적습니다. 책임강사가 검토를 요청하면 담당자가 예산과 내용을 완성하여 최종 제출합니다."}
                 </p>
-                {missingContent(content, kind).length > 0 && (
+                {(kind === "plan" || doc.status !== "DRAFT") && missingContent(content, kind).length > 0 && (
                   <details>
                     <summary className="cursor-pointer text-sm font-semibold text-amber-800">
                       작성할 항목 {missingContent(content, kind).length}개
@@ -755,41 +774,63 @@ export function DocumentEditor({
                     </ul>
                   </details>
                 )}
+                {kind === "result" && doc.status === "DRAFT" && !manager && (
+                  <p className="notice">담당자가 예산을 입력·확정하면 이곳에서 결과 내용을 작성할 수 있습니다.</p>
+                )}
+                {kind === "result" && doc.status === "REVIEW" && !manager && (
+                  <div>
+                    <h3 className="text-sm font-semibold">책임강사 서명 (최종 제출 필수)</h3>
+                    <AdvisorySignaturePad
+                      signatureUrl={content.signature}
+                      onChange={(signature) => {
+                        if (!readonly) change({ ...content, signature });
+                      }}
+                    />
+                    <p className="text-xs text-slate-500">내용과 저장본 미리보기를 모두 확인한 뒤 본인이 직접 서명해 주세요. 서명 후 내용을 수정하면 다시 서명해야 합니다.</p>
+                  </div>
+                )}
                 {doc.status !== "SUBMITTED" && (
                   <label className="flex items-start gap-3 text-sm leading-6">
                     <input
                       type="checkbox"
                       checked={confirmed}
                       onChange={(e) => setConfirmed(e.target.checked)}
-                      disabled={busy || (locked && !manager)}
+                      disabled={busy || locked}
                       className="mt-1"
                     />
-                    {manager && doc.status === "REVIEW"
-                      ? "내용과 예산계획·집행금액을 확인했으며 이 버전을 최종 제출합니다."
-                      : "예산을 제외한 작성 내용과 미리보기를 확인했습니다."}
+                    {kind === "result"
+                      ? doc.status === "DRAFT"
+                        ? "예산계획·집행금액과 장학금 내역을 모두 입력했으며 책임강사에게 전달합니다."
+                        : "운영 결과 전체와 저장본 미리보기를 확인하고 본인이 서명하여 최종 제출합니다."
+                      : manager && doc.status === "REVIEW"
+                        ? "내용과 예산계획·집행금액을 확인했으며 이 버전을 최종 제출합니다."
+                        : "예산을 제외한 작성 내용과 미리보기를 확인했습니다."}
                   </label>
                 )}
-                {doc.status === "DRAFT" && (
+                {doc.status === "DRAFT" && (kind === "plan" || manager) && (
                   <button
                     className="btn-primary gap-2"
                     disabled={busy || !confirmed}
                     onClick={() => act("review")}
                   >
                     <Send size={16} />
-                    담당자 검토 요청
+                    {kind === "result" ? "예산 확정 · 책임강사에게 전달" : "담당자 검토 요청"}
                   </button>
                 )}
-                {manager && doc.status === "REVIEW" && (
+                {(kind === "plan" ? manager : !manager) && doc.status === "REVIEW" && (
                   <button
                     className="btn-primary gap-2"
-                    disabled={busy || !confirmed}
+                    disabled={busy || !confirmed || (kind === "result" && !content.signature)}
                     onClick={() => act("submit")}
                   >
                     <CheckCircle2 size={16} />
-                    최종 제출
+                    {kind === "result" ? "서명 후 최종 제출" : "최종 제출"}
                   </button>
                 )}
-                {!manager && doc.status === "REVIEW" && (
+                {kind === "result" && manager && doc.status === "REVIEW" && (
+                  <p className="notice">예산이 확정되었습니다. 책임강사가 내용 작성과 서명을 마치면 최종 제출됩니다. 예산을 수정하려면 아래에서 예산 입력 단계로 되돌려 주세요.</p>
+                )}
+                {kind === "plan" && !manager && doc.status === "REVIEW" && (
                   <p className="notice">
                     담당자가 검토하고 있습니다. 보완 요청을 받으면 다시 작성할
                     수 있습니다.
@@ -817,7 +858,7 @@ export function DocumentEditor({
                     >
                       {doc.status === "SUBMITTED"
                         ? "수정 재개"
-                        : "책임강사에게 보완 요청"}
+                        : kind === "result" ? "예산 입력 단계로 되돌리기" : "책임강사에게 보완 요청"}
                     </button>
                   </div>
                 )}
@@ -857,7 +898,9 @@ export function DocumentEditor({
                 ))
             ) : (
               <p className="mt-2 text-sm text-slate-500">
-                담당자가 최종 제출하면 제출본이 보관됩니다.
+                {kind === "result"
+                  ? "책임강사가 서명 후 최종 제출하면 제출본이 보관됩니다."
+                  : "담당자가 최종 제출하면 제출본이 보관됩니다."}
               </p>
             )}
           </section>

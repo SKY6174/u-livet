@@ -70,6 +70,11 @@ export const STATUS_LABELS = {
   REVIEW: "담당자 검토 중",
   SUBMITTED: "최종 제출 완료",
 };
+export const RESULT_STATUS_LABELS: typeof STATUS_LABELS = {
+  DRAFT: "담당자 예산 입력 중",
+  REVIEW: "책임강사 작성 중",
+  SUBMITTED: "서명·최종 제출 완료",
+};
 export const blankRow = (columns: Field[]) =>
   Object.fromEntries(columns.map((c) => [c.key, ""]));
 export function emptyContent(kind: DocumentKind): Content {

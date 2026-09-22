@@ -12,13 +12,16 @@
 - 기존 개설관리 및 6종 증빙과 양방향 링크. 기존 보고서/보관 PDF는 유지. 저장 전 기본정보·성과·예산의 원천을 안내한다.
 
 ## 데이터와 API
+- 결과보고서 상태는 DRAFT=담당자 예산 입력, REVIEW=예산 확정 후 책임강사 내용 작성, SUBMITTED=책임강사 본인 서명 후 최종 제출로 해석한다. 계획서는 기존 상태 의미를 유지한다. 결과보고서의 review 전이는 담당자만 실행하고 예산 완성·책임강사 지정을 요구한다. submit 전이는 현재 책임강사만 실행하고 필수 내용·예산·서명을 확인한다.
+- REVIEW 단계 결과보고서 예산은 잠근다. 예산 수정은 담당자가 사유를 적어 DRAFT로 되돌린 후 수행한다. 책임강사만 REVIEW에서 서명을 저장할 수 있고, 서명 후 본문이 바뀌면 서명을 무효화한다. DRAFT/REVIEW 재진입 때 이전 서명은 지우며 기존 최종 제출 스냅샷은 보존한다.
+- 기존 REVIEW 결과보고서는 본문을 유지한 채 DRAFT로 되돌려 담당자의 예산 확인부터 다시 진행한다. 기존 SUBMITTED 이력은 수정하지 않는다. 결과보고서 출력에는 서명 이미지를 표시한다.
 - `life_operation_responsibilities`: offering PK, 책임강사 person FK, revision, updated actor/time. 현재 배정·활성 INSTRUCTOR만 선택. 책임강사 교체는 검토 중 문서를 초안으로 되돌리고 버전을 증가시킨다.
 - `life_operation_documents`: (offering,kind) PK, content JSONB(텍스트/표/사진/서명), budget JSONB 별도, status DRAFT/REVIEW/SUBMITTED, revision, reviewed/submitted actor/time, return note. 버전 낙관잠금과 offering 행 잠금.
 - `life_operation_submissions`: 최종제출마다 content/budget 전체 스냅샷 + 제출자/시각/버전. update/delete 차단.
 - private security definer 구현은 기존 프로젝트 패턴에 맞춰 auth.uid/person/session/MFA와 기관 권한을 재검증하고 빈 search_path를 사용한다. public invoker RPC만 authenticated execute. 직접 테이블 접근 회수 + RLS.
 - list/context/assign/save/transition RPC. 서버 Route Handler는 same-origin, UUID, body 크기, whitelist 스키마와 값 제한 검증. DB에서도 같은 구조·값·상태·역할 확인.
 - content 최초 기본값은 저장된 과정 정보와 기존 보고서 집계/강의일정에서 복사하며 수료승인·지급자료를 만들지 않는다. 계획서가 저장되면 결과보고서 기본정보와 강의계획은 계획서에서 채운다.
-- 예산은 관리자만 변경. 강사 RPC에서 budget 입력 자체를 거부. 최종제출은 REVIEW 상태+필수내용+확인된 예산이어야 한다. 제출 후 수정은 담당자가 사유와 함께 재개하고 새 최종본으로 제출한다.
+- 예산은 관리자만 변경. 강사 RPC에서 budget 입력 자체를 거부. 최종제출은 REVIEW 상태+필수내용+확인된 예산이어야 하며 결과보고서는 현재 책임강사의 서명이 추가로 필요하다. 제출 후 수정은 담당자가 사유와 함께 재개하고 새 최종본으로 제출한다.
 - 사진은 클라이언트에서 크기 최적화한 JPEG/PNG만, 6칸·각 300KB 이하·총 문서 3MB 제한. 외부 이미지 URL/SVG 불허. 서명은 직접 입력/업로드, 승인 주체는 별도 DB actor로 기록.
 
 ## 검증

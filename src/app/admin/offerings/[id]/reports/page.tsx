@@ -81,7 +81,7 @@ export default async function CourseReports({
           과정 운영 현황 보기
         </Link>
       </div>
-      <div className="rounded-2xl border border-teal-200 bg-teal-50 p-5"><h2 className="font-bold">공식 운영결과보고서 작성·최종 제출</h2><p className="my-3 text-sm text-slate-600">책임강사가 내용을 작성하고 담당자가 예산을 보완하여 제출합니다. 아래 자료는 출결·지급 증빙과 기존 보관 자료입니다.</p><Link className="btn-primary" href={`/operation-documents/${id}/result`}>공식 양식 작성·검토 →</Link></div>
+      <div className="rounded-2xl border border-teal-200 bg-teal-50 p-5"><h2 className="font-bold">공식 운영결과보고서 작성·최종 제출</h2><p className="my-3 text-sm text-slate-600">담당자가 예산계획·집행현황을 먼저 입력·확정하면 책임강사가 운영 결과를 작성하고 서명하여 최종 제출합니다. 아래 자료는 출결·지급 증빙과 기존 보관 자료입니다.</p><Link className="btn-primary" href={`/operation-documents/${id}/result`}>공식 양식 작성·검토 →</Link></div>
       <details className="rounded-xl border bg-white p-5"><summary className="cursor-pointer font-semibold">기존 보고서 집계·지급자료 입력</summary><ReportEditor
         key={b.report?.revision ?? 0}
         offering={id}

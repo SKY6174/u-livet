@@ -296,8 +296,14 @@ deny(
   "INVALID_CONTENT",
 );
 const incomplete = model.emptyContent("result");
-ctx = ok(
+deny(
   await teacher.c.rpc("life_operation_save", {
+    f, k: "result", c: incomplete, b: null, expected_revision: 0,
+  }),
+  "DOCUMENT_LOCKED",
+);
+ctx = ok(
+  await manager.c.rpc("life_operation_save", {
     f,
     k: "result",
     c: incomplete,
@@ -320,23 +326,69 @@ assert.equal(
     .budget.rows.find((r) => r.category === "외부강사").planned,
   "200000",
 );
-deny(
-  await teacher.c.rpc("life_operation_save", {
-    f,
-    k: "result",
-    c: incomplete,
-    b: storedBudget,
-    expected_revision: 1,
-  }),
-  "BUDGET_FORBIDDEN",
-);
-console.log(
-  "PASS first instructor result save preserves plan budget and prevents budget tampering",
-);
-deny(await transition(manager.c, "result", "review", 1), "CONTENT_REQUIRED");
-console.log(
-  "PASS DB schema validation, invalid image and incomplete review rejection",
-);
+deny(await transition(manager.c, "result", "review", 1), "BUDGET_REQUIRED");
+storedBudget.rows.forEach((row) => { row.planned ||= "0"; row.spent = "0"; });
+storedBudget.scholarshipCount = "0";
+storedBudget.scholarshipAmount = "0";
+ctx = ok(await manager.c.rpc("life_operation_save", {
+  f, k: "result", c: incomplete, b: storedBudget, expected_revision: 1,
+}));
+deny(await transition(teacher.c, "result", "review", 2), "FORBIDDEN");
+ctx = ok(await transition(manager.c, "result", "review", 2));
+assert.equal(ctx.documents.find((d) => d.kind === "result").status, "REVIEW");
+const changedBudget = structuredClone(storedBudget);
+changedBudget.rows[0].spent = "1";
+deny(await manager.c.rpc("life_operation_save", {
+  f, k: "result", c: incomplete, b: changedBudget, expected_revision: 3,
+}), "BUDGET_LOCKED");
+ctx = ok(await teacher.c.rpc("life_operation_save", {
+  f, k: "result", c: incomplete, b: null, expected_revision: 3,
+}));
+const resultContent = model.emptyContent("result");
+for (const field of schema.fields("result"))
+  resultContent.fields[field.key] = field.type === "number" ? "2" :
+    field.type === "date" ? "2026-09-22" : `${field.label} 검증자료`;
+resultContent.fields.year = "2026";
+resultContent.fields.startsOn = "2026-09-21";
+resultContent.fields.endsOn = "2026-09-23";
+for (const table of schema.tables("result"))
+  if (table.min)
+    resultContent.tables[table.key] = [Object.fromEntries(table.columns.map((col) => [
+      col.key, col.type === "number" ? "2" : `${col.label} 검증자료`,
+    ]))];
+resultContent.tables.schedule[0].date = "2026.09.22 09:00~11:00";
+assert.equal(model.validContent(resultContent, "result"), true);
+ctx = ok(await teacher.c.rpc("life_operation_save", {
+  f, k: "result", c: resultContent, b: null, expected_revision: 4,
+}));
+deny(await transition(manager.c, "result", "submit", 5), "FORBIDDEN");
+deny(await transition(teacher.c, "result", "submit", 5), "SIGNATURE_REQUIRED");
+const managerSignature = structuredClone(resultContent);
+managerSignature.signature = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9WvFIAAAAASUVORK5CYII=";
+deny(await manager.c.rpc("life_operation_save", {
+  f, k: "result", c: managerSignature, b: null, expected_revision: 5,
+}), "SIGNATURE_FORBIDDEN");
+resultContent.signature = managerSignature.signature;
+ctx = ok(await teacher.c.rpc("life_operation_save", {
+  f, k: "result", c: resultContent, b: null, expected_revision: 5,
+}));
+const changedAfterSigning = structuredClone(resultContent);
+changedAfterSigning.fields.content = "서명 뒤 변경";
+deny(await teacher.c.rpc("life_operation_save", {
+  f, k: "result", c: changedAfterSigning, b: null, expected_revision: 6,
+}), "SIGNATURE_STALE");
+ctx = ok(await transition(teacher.c, "result", "submit", 6));
+const resultDocument = ctx.documents.find((d) => d.kind === "result");
+assert.equal(resultDocument.status, "SUBMITTED");
+assert.equal(resultDocument.content.signature, resultContent.signature);
+const resultSubmission = ctx.submissions.find((s) => s.kind === "result");
+assert.equal(resultSubmission.name, "테스트 teacher");
+ctx = ok(await transition(manager.c, "result", "reopen", 7, "예산 수정"));
+assert.equal(ctx.documents.find((d) => d.kind === "result").content.signature, "");
+assert.equal(ctx.documents.find((d) => d.kind === "result").status, "DRAFT");
+const signedSnapshot = ok(await manager.c.rpc("life_operation_submission", { f, s: resultSubmission.id }));
+assert.equal(signedSnapshot.content.signature, resultContent.signature);
+console.log("PASS result budget-first gate, instructor-only signature/submit, immutable signed snapshot");
 // A different institution's administrator cannot access this course.
 sql(
   `insert into public.life_organizations(id,slug,name) values('99000000-0000-4000-8000-000000000099','operation-test-other','운영문서 다른기관 검증') on conflict do nothing; insert into public.life_role_assignments(person_id,org_id,role) select '${outsider.p}','99000000-0000-4000-8000-000000000099','SYSTEM_ADMIN' where not exists(select 1 from public.life_role_assignments where person_id='${outsider.p}' and org_id='99000000-0000-4000-8000-000000000099' and role='SYSTEM_ADMIN');`,
@@ -379,7 +431,7 @@ assert.throws(
     ),
   /SUBMISSION_IMMUTABLE/,
 );
-// Leave rich local fixtures for browser verification, with plan in DRAFT and result in REVIEW.
+// Leave rich local fixtures for browser verification, with plan in DRAFT and result in the instructor stage.
 ctx = ok(await context(manager.c));
 const result = model.initialDocument(
   { ...ctx, documents: ctx.documents.filter((d) => d.kind !== "result") },
@@ -404,16 +456,16 @@ for (const r of result.budget.rows) {
 }
 result.budget.scholarshipCount = "10";
 result.budget.scholarshipAmount = "300000";
-ok(
+ctx = ok(
   await manager.c.rpc("life_operation_save", {
     f,
     k: "result",
     c: result.content,
     b: result.budget,
-    expected_revision: 1,
+    expected_revision: ctx.documents.find((d) => d.kind === "result").revision,
   }),
 );
-ok(await transition(teacher.c, "result", "review", 2));
+ctx = ok(await transition(manager.c, "result", "review", ctx.documents.find((d) => d.kind === "result").revision));
 
 // The course-management selector is authoritative for both live document covers.
 deny(
@@ -446,7 +498,7 @@ ctx = ok(await context(manager.c));
 assert.ok(ctx.documents.every((d) => d.content.fields.professor === "테스트 teacher"));
 deny(await context(alternate.c), "FORBIDDEN");
 const resultRevision = ctx.documents.find((d) => d.kind === "result").revision;
-ok(await transition(teacher.c, "result", "review", resultRevision));
+ok(await transition(manager.c, "result", "review", resultRevision));
 console.log("PASS responsible switch, canonical plan/result cover, no-op, snapshot, role and unassignment guard");
 mkdirSync("tmp/operation-documents", { recursive: true });
 writeFileSync(

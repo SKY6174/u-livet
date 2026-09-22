@@ -164,6 +164,9 @@
 .op-result-cover .op-table thead {
   display: none;
 }
+.op-result-signature {
+  margin-top: 12mm;
+}
 .op-overview h2 {
   margin-top: 14mm;
 }
