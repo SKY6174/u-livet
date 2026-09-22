@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DOCUMENTS, type ReportFile } from "@/lib/reports/types";
 import { MAX_FILE_SIZE } from "@/lib/reports/validation";
+import { Pdf17CopyButton } from "@/components/pdf/pdf-17-copy-button";
 export function ReportFiles({
   offering,
   files,
@@ -66,6 +67,7 @@ export function ReportFiles({
       <p className="text-sm text-slate-600">
         원본 PDF는 서식별 1개, 사진은 최대 12장까지 보관합니다. 같은 서식에 다시
         올리면 기존 PDF를 교체합니다. 파일당 최대 4MB입니다.
+        PDF 1.7 변환본은 원본을 보존한 페이지 이미지 사본입니다.
       </p>
       <form ref={form} onSubmit={upload} className="grid gap-4 md:grid-cols-2">
         <label className="field">
@@ -124,6 +126,7 @@ export function ReportFiles({
                   : DOCUMENTS.find((d) => d[0] === f.kind)?.[1]}{" "}
                 · {Math.ceil(f.size / 1024)}KB · {f.caption}
               </p>
+              {f.kind !== "photo" && <div className="mt-2"><Pdf17CopyButton sourceUrl={`/api/course-reports/${offering}/files/${f.id}`} filename={f.filename} /></div>}
             </div>
             {remove === f.id ? (
               <div className="flex gap-4">

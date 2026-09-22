@@ -1,9 +1,10 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { PDFDocument, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import { PDFDocument, PDFName, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import QRCode from "qrcode";
 import type { CertificateJob } from "./types";
+import { PDF_VERSION, requirePdf17 } from "../pdf/version";
 // A single bundled, OFL-licensed Korean font makes output portable across hosts.
 let fontBytes: Promise<Buffer> | undefined;
 export async function renderCertificate(
@@ -23,6 +24,7 @@ export async function renderCertificate(
   )
     throw new Error("HTTPS_REQUIRED");
   const doc = await PDFDocument.create();
+  doc.catalog.set(PDFName.of("Version"), PDFName.of(PDF_VERSION));
   doc.registerFontkit(fontkit);
   fontBytes ??= readFile(
     path.join(process.cwd(), "assets/fonts/NanumGothic-Regular.ttf"),
@@ -169,5 +171,5 @@ export async function renderCertificate(
   doc.setAuthor(snapshot.issuer.organization_name);
   doc.setProducer("U-LIFE certificate renderer v1");
   doc.setCreationDate(new Date(`${job.issue_date}T00:00:00+09:00`));
-  return doc.save();
+  return requirePdf17(await doc.save());
 }

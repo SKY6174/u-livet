@@ -1,5 +1,6 @@
 // Adapted from uc-anchor expert intake; only instructor-document actions are exposed.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.2";
+import { PDFDocument, PDFName } from "https://esm.sh/pdf-lib@1.17.1?target=deno";
 
 
 
@@ -1057,14 +1058,21 @@ function decodeAdvisoryDocument(dataUrl: string, maxBytes = 1024 * 1024): { byte
 
 const MAX_EXPERT_GENERATED_PDF_BYTES = 10 * 1024 * 1024;
 
-function decodeExpertGeneratedPdf(dataUrl: string) {
+async function decodeExpertGeneratedPdf(dataUrl: string) {
   const match = /^data:application\/pdf(?:;[^,]*)?;base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
   if (!match) throw new VoteFunctionError("INVALID_DOCUMENT", "INVALID_PDF_DOCUMENT");
   const bytes = base64ToBytes(match[1]);
   if (bytes.length === 0 || bytes.length > MAX_EXPERT_GENERATED_PDF_BYTES) {
     throw new VoteFunctionError("DOCUMENT_TOO_LARGE", "DOCUMENT_TOO_LARGE", 413);
   }
-  if (new TextDecoder().decode(bytes.slice(0, 5)) !== "%PDF-") {
+  if (new TextDecoder().decode(bytes.slice(0, 8)) !== "%PDF-1.7" || ![10, 13].includes(bytes[8])) {
+    throw new VoteFunctionError("INVALID_DOCUMENT", "INVALID_PDF_DOCUMENT");
+  }
+  try {
+    const pdf = await PDFDocument.load(bytes, { updateMetadata: false });
+    const version = pdf.catalog.get(PDFName.of("Version"))?.toString();
+    if (!pdf.getPageCount() || (version && !/^\/1\.[0-7]$/.test(version)) || pdf.catalog.has(PDFName.of("Extensions"))) throw new Error("UNSUPPORTED_PDF_VERSION");
+  } catch {
     throw new VoteFunctionError("INVALID_DOCUMENT", "INVALID_PDF_DOCUMENT");
   }
   return bytes;
@@ -1351,7 +1359,7 @@ async function saveExpertGeneratedDocument(token: string, documentType: string, 
   const { member } = await getAdvisorySession(token);
   const instructorId = String(member.person_id ?? member.id ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(instructorId)) throw new VoteFunctionError("FORBIDDEN", "EXPERT_LINK_REQUIRED", 403);
-  const bytes = decodeExpertGeneratedPdf(dataUrl);
+  const bytes = await decodeExpertGeneratedPdf(dataUrl);
   const originalName = `${fileName.trim().replace(/[\\/]/g, "_").replace(/\.pdf$/i, "").slice(0, 140) || "전문가-문서"}.pdf`;
   const objectPath = `expert/${instructorId}/generated/${documentType.toLowerCase()}/${crypto.randomUUID()}.pdf`;
   const { error: uploadError } = await service.storage.from("instructor-private-documents")

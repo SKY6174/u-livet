@@ -6,6 +6,7 @@ import { UUID, dateTime } from "@/lib/portal/data";
 import { PageIntro } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import { requestCertificate } from "@/app/certificate-actions";
+import { Pdf17CopyButton } from "@/components/pdf/pdf-17-copy-button";
 import {
   certificateState,
   type CertificateDetail,
@@ -64,9 +65,13 @@ export default async function Certificate({
         </dl>
         <p className="my-6 whitespace-pre-wrap">{s.template.body}</p>
         {c.state === "ISSUED" ? (
+          <div className="flex flex-wrap items-start gap-3">
           <a className="btn-primary" href={`/api/certificates/${id}/download`}>
             PDF 원본 다운로드
           </a>
+          <Pdf17CopyButton sourceUrl={`/api/certificates/${id}/download`} filename={`${c.number}.pdf`} />
+          <p className="w-full text-xs text-slate-500">변환본은 페이지 이미지 사본입니다. 파일 해시 대조·텍스트 검색은 원본을 이용하세요.</p>
+          </div>
         ) : (
           <p className="notice">
             {c.last_error ??

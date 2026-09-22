@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FileDown, ShieldCheck } from "lucide-react";
+import { Pdf17CopyButton } from "@/components/pdf/pdf-17-copy-button";
 import { invoke, getCommitteeVoteErrorMessage } from "@/features/instructor-documents/services/committee-vote-service";
 import "@/features/instructor-documents/documents.css";
 
@@ -66,7 +67,11 @@ export function DocumentPortal({ personId, orgId, name, returnTo }: { personId: 
       {message && <p className="notice mt-4" role="status">{message}</p>}
       {session && <div className="mt-4 flex flex-wrap items-center gap-3">
         <button className="btn-secondary" disabled={downloadBusy} onClick={() => void loadDownloads()}><FileDown size={18} /> {downloadBusy ? "조회 중…" : "보관 PDF 확인"}</button>
-        {downloads.map(file => <a key={file.document_type} className="text-sm font-semibold text-teal-800 underline" href={file.signed_url} target="_blank" rel="noopener noreferrer">{file.document_type === "RESUME_PDF" ? "이력서 PDF" : "신분증·통장사본 PDF"}</a>)}
+        {downloads.map(file => <div key={file.document_type} className="flex flex-wrap items-start gap-3">
+          <a className="text-sm font-semibold text-teal-800 underline" href={file.signed_url} target="_blank" rel="noopener noreferrer">{file.document_type === "RESUME_PDF" ? "이력서 PDF 원본" : "신분증·통장사본 PDF 원본"}</a>
+          <Pdf17CopyButton sourceUrl={file.signed_url} filename={file.original_name} />
+        </div>)}
+        {downloads.length > 0 && <p className="w-full text-xs text-slate-500">PDF 1.7 변환본은 페이지 이미지 사본입니다. 텍스트 검색은 원본을 이용하세요.</p>}
       </div>}
     </header>
     {session ? <Submission key={session.token} voterToken={session.token} documentOnly onLogout={() => void lock()} /> : <section className="page-shell pt-0">

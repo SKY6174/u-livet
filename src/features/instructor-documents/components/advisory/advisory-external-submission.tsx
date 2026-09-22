@@ -51,6 +51,7 @@ import {
 } from "../../features/committee/utils/advisory-opinion";
 import { formatBankAccountNumber } from "../../utils/bank-account";
 import { getPdfCanvasPlacement, PDF_STANDARD, toPdf17DataUri } from "../../utils/pdf-export-standard";
+import { createPdf17 } from "@/lib/pdf/browser";
 
 const CONSENT_VERSION = "2026-08-14";
 type AdvisoryPage = "OPINION" | "CONSENT" | "IDENTITY_BANK" | "RESUME";
@@ -261,7 +262,7 @@ export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly 
     let captureHost: HTMLDivElement | null = null;
     try {
       await waitForAdvisoryDocumentFonts(document);
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")]);
+      const { default: html2canvas } = await import("html2canvas");
       captureHost = document.createElement("div");
       captureHost.className = "advisory-pdf-capture-host";
       const capturePaper = paper.cloneNode(true) as HTMLElement;
@@ -271,7 +272,7 @@ export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly 
       await Promise.all(Array.from(capturePaper.querySelectorAll("img"))
         .map(image => image.decode().catch(() => undefined)));
       const canvas = await html2canvas(capturePaper, { backgroundColor: "#ffffff", logging: false, scale: 2, useCORS: true });
-      const pdf = new jsPDF({ orientation: PDF_STANDARD.orientation, unit: PDF_STANDARD.unit, format: PDF_STANDARD.format, compress: true });
+      const pdf = await createPdf17({ orientation: PDF_STANDARD.orientation, unit: PDF_STANDARD.unit, format: PDF_STANDARD.format });
       const placement = getPdfCanvasPlacement(canvas.width, canvas.height);
       pdf.addImage(canvas.toDataURL("image/jpeg", 0.94), "JPEG", placement.x, placement.y, placement.width, placement.height, undefined, "FAST");
       const fileName = documentType === "IDENTITY_BANK_PDF"

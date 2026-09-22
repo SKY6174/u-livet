@@ -29,6 +29,16 @@ export function PrintToolbar({
       setBusy(false);
     }
   }
+  async function download() {
+    setBusy(true);
+    setError("");
+    try {
+      const { downloadReportPdf17 } = await import("@/lib/pdf/report-export");
+      await downloadReportPdf17(`U-LIFE-${preview ? "검토용-" : ""}보고서-${document}.pdf`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "PDF를 만들지 못했습니다. 다시 시도해 주세요.");
+    } finally { setBusy(false); }
+  }
   return (
     <nav className="no-print mx-auto flex max-w-7xl flex-wrap items-center gap-4 p-5">
       <Link
@@ -37,9 +47,10 @@ export function PrintToolbar({
       >
         {preview ? "← 과정 운영 관리" : "← 과정 보고서 관리"}
       </Link>
-      <button className="btn-primary" onClick={print} disabled={busy}>
-        {busy ? "출력 준비 중…" : "인쇄 / PDF 저장"}
+      <button className="btn-primary" onClick={download} disabled={busy}>
+        {busy ? "출력 준비 중…" : "PDF 1.7 다운로드"}
       </button>
+      <button className="btn-secondary" onClick={print} disabled={busy}>인쇄</button>
       {!preview && <Link
         className="btn-secondary"
         href={`?document=${document}&reveal=${reveal ? "0" : "1"}`}

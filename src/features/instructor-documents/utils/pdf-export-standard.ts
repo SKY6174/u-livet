@@ -83,48 +83,5 @@ export function applyPdfStandardStyles(root: HTMLElement): () => void {
   };
 }
 
-function asBytes(value: ArrayBuffer | Uint8Array): Uint8Array {
-  return value instanceof Uint8Array ? new Uint8Array(value) : new Uint8Array(value.slice(0));
-}
 
-export function normalizePdfVersion17(value: ArrayBuffer | Uint8Array): Uint8Array {
-  const bytes = asBytes(value);
-  const signature = String.fromCharCode(...Array.from(bytes.slice(0, 8)));
-  if (!signature.startsWith("%PDF-")) throw new Error("유효한 PDF 데이터가 아닙니다.");
-  bytes[5] = "1".charCodeAt(0);
-  bytes[6] = ".".charCodeAt(0);
-  bytes[7] = "7".charCodeAt(0);
-  return bytes;
-}
-
-export async function toPdf17Blob(
-  value: Blob | ArrayBuffer | Uint8Array,
-): Promise<Blob> {
-  const source = value instanceof Blob ? await value.arrayBuffer() : value;
-  return new Blob([normalizePdfVersion17(source) as BlobPart], { type: "application/pdf" });
-}
-
-export async function toPdf17DataUri(value: Blob | ArrayBuffer | Uint8Array): Promise<string> {
-  const blob = await toPdf17Blob(value);
-  const bytes = new Uint8Array(await blob.arrayBuffer());
-  let binary = "";
-  for (let index = 0; index < bytes.length; index += 0x8000) {
-    binary += String.fromCharCode(...Array.from(bytes.subarray(index, index + 0x8000)));
-  }
-  return `data:application/pdf;base64,${btoa(binary)}`;
-}
-
-export async function downloadPdf17(
-  value: Blob | ArrayBuffer | Uint8Array,
-  filename: string,
-): Promise<void> {
-  const blob = await toPdf17Blob(value);
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
+export { toPdf17Blob, toPdf17DataUri, downloadPdf17 } from "@/lib/pdf/browser";

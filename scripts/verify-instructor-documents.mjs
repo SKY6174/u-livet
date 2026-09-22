@@ -4,6 +4,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { ensureLocalMfa } from './local-mfa.mjs';
+import { PDFDocument, PDFName } from 'pdf-lib';
 
 const status = JSON.parse(execFileSync('supabase', ['status', '-o', 'json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
 assert.equal(status.API_URL, 'http://127.0.0.1:55321');
@@ -53,6 +54,17 @@ try {
   const final=await call(owner,'advisory-intake-context',{voter_token:token});assert.equal(final.data.documents.RESUME.exists,true);assert.equal(final.data.documents.RESUME.is_draft,false);pass('completed resume replaces draft');
   assert.equal((await call(owner,'advisory-intake-save-profile',{voter_token:token,resume:{...complete,korean_name:'다른사람'}})).status,400);pass('name mismatch rejected');
   assert.equal((await call(owner,'advisory-intake-upload',{voter_token:token,document_type:'ID_COPY',file_name:'fake.png',data_url:'data:image/png;base64,ZmFrZQ=='})).status,400);pass('fake image signature rejected');
+  const pdf=await PDFDocument.create();pdf.addPage();
+  const validPdf=await pdf.save();
+  const savePdf=bytes=>call(owner,'expert-document-save-generated',{voter_token:token,document_type:'RESUME_PDF',file_name:'synthetic.pdf',data_url:'data:application/pdf;base64,'+Buffer.from(bytes).toString('base64')});
+  for(const header of ['%PDF-1.4','%PDF-2.0']) {
+    const incompatible=validPdf.slice();incompatible.set(new TextEncoder().encode(header));
+    assert.equal((await savePdf(incompatible)).status,400);
+  }
+  assert.equal((await savePdf(new TextEncoder().encode('%PDF-1.7\ninvalid'))).status,400);
+  pdf.catalog.set(PDFName.of('Version'),PDFName.of('2.0'));
+  assert.equal((await savePdf(await pdf.save())).status,400);
+  pass('generated storage rejects old, 2.0, corrupt and catalog overrides before upload');
   for(const table of ['private_profiles','private_profile_drafts','private_documents','generated_documents','document_sessions']) assert.ok((await owner.client.from('life_instructor_'+table).select('*')).error);
   pass('direct authenticated table access denied');
   sql(`update public.life_role_assignments set valid_until=now() where id='${role}'`);
