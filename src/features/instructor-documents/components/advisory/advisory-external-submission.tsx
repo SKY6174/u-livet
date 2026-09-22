@@ -187,6 +187,7 @@ interface AdvisoryExternalSubmissionProps {
   voterToken: string;
   onLogout: () => void;
   documentOnly?: boolean;
+  hideDocumentTabs?: boolean;
   initialDocument?: "IDENTITY_BANK" | "RESUME";
 }
 
@@ -204,7 +205,7 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
   </label>
 );
 
-export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly = false, initialDocument = "IDENTITY_BANK" }: AdvisoryExternalSubmissionProps) {
+export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly = false, hideDocumentTabs = false, initialDocument = "IDENTITY_BANK" }: AdvisoryExternalSubmissionProps) {
   const [context, setContext] = React.useState<AdvisoryIntakeContext | null>(null);
   const [activePage, setActivePage] = React.useState<AdvisoryPage>(documentOnly ? initialDocument : getInitialAdvisoryPage);
   const [opinionTitle, setOpinionTitle] = React.useState("");
@@ -1000,7 +1001,7 @@ export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly 
         <div className="advisory-intake-complete"><CheckCircle2 size={20} /> 최종 제출 완료 · 수정 후 다시 제출하면 개정본으로 저장됩니다.</div>
       )}
 
-      <nav className={`advisory-document-nav${documentOnly ? " is-document-only" : ""}`} aria-label="제출 문서 선택">
+      <nav style={hideDocumentTabs ? { display: "none" } : undefined} className={`advisory-document-nav${documentOnly ? " is-document-only" : ""}`} aria-label="제출 문서 선택">
         {([
           ["OPINION", "자문의견서", FileText],
           ["CONSENT", "개인정보동의", ShieldCheck],

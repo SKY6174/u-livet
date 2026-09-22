@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "pdf-lib": "npm:pdf-lib@1.17.1",
+    "@pdf-lib/fontkit": "../_shared/fontkit-edge.ts",
+    "../_shared/instructor-consent-model": "../_shared/instructor-consent-model.ts"
+  }
+}

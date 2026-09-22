@@ -423,3 +423,5 @@ enabled = true
 # The handler verifies either the logged-in JWT or an individual document PIN session.
 [functions.instructor-documents]
 verify_jwt = false
+
+static_files = ["./functions/instructor-documents/assets/*"]

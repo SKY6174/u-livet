@@ -93,6 +93,9 @@ const worker = spawn(
     "run",
     "--allow-env",
     "--allow-net",
+    "--allow-read",
+    "--config",
+    "supabase/functions/instructor-documents/deno.json",
     "supabase/functions/instructor-documents/index.ts",
   ],
   {

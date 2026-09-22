@@ -24,7 +24,11 @@ export function PoolPersonForm({
   requestKey: string;
 }) {
   const [kind, setKind] = useState(
-    person?.kind === "INTERNAL" ? "INTERNAL" : "EXTERNAL",
+    person?.teaching_role === "ASSISTANT"
+      ? "ASSISTANT"
+      : person?.kind === "INTERNAL"
+        ? "INTERNAL"
+        : "EXTERNAL",
   );
   const [required, setRequired] = useState(person?.documents_required ?? true);
   return (
@@ -34,6 +38,16 @@ export function PoolPersonForm({
       resetOnSuccess={!person}
     >
       <input type="hidden" name="o" value={org} />
+      <input
+        type="hidden"
+        name="teaching_role"
+        value={kind === "ASSISTANT" ? "ASSISTANT" : "LECTURER"}
+      />
+      <input
+        type="hidden"
+        name="kind"
+        value={kind === "INTERNAL" ? "INTERNAL" : "EXTERNAL"}
+      />
       <input type="hidden" name="p" value={person?.id ?? ""} />
       <input type="hidden" name="revision" value={person?.revision ?? 0} />
       <input type="hidden" name="request_key" value={requestKey} />
@@ -52,7 +66,7 @@ export function PoolPersonForm({
         <label className="field">
           강사 구분
           <select
-            name="kind"
+            aria-label="강사 구분"
             value={kind}
             onChange={(e) => {
               setKind(e.target.value);
@@ -61,6 +75,7 @@ export function PoolPersonForm({
           >
             <option value="INTERNAL">교내 강사</option>
             <option value="EXTERNAL">교외 강사</option>
+            <option value="ASSISTANT">교외 보조강사</option>
           </select>
         </label>
         <label className="field">
@@ -117,7 +132,8 @@ export function PoolPersonForm({
           checked={required}
           onChange={(e) => setRequired(e.target.checked)}
         />
-        수당 지급에 신분증·통장사본·이력서 제출 필요
+        신분증·통장사본·이력서 제출 필요 (교외·보조강사는 이력서 및 동의서 3종
+        별도 필수)
       </label>
       <p className="text-xs text-slate-500">
         주민등록번호와 계좌번호는 비공개 서류함에서 관리합니다. 신규 등록 후

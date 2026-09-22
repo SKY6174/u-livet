@@ -124,7 +124,9 @@ export function PoolExcel({
             ],
             ...data.allowances.map((a) => [
               a.name,
-              KIND_LABELS[a.person_kind],
+              a.instructor_snapshot.teaching_role === "ASSISTANT"
+                ? "교외 보조강사"
+                : KIND_LABELS[a.person_kind],
               a.instructor_snapshot.affiliation,
               a.instructor_snapshot.department,
               a.instructor_snapshot.position,
@@ -160,7 +162,9 @@ export function PoolExcel({
             ],
             ...data.items.map((p) => [
               p.name,
-              KIND_LABELS[p.kind],
+              p.teaching_role === "ASSISTANT"
+                ? "교외(보조강사)"
+                : KIND_LABELS[p.kind],
               p.affiliation,
               p.department,
               p.position,
@@ -246,8 +250,11 @@ export function PoolExcel({
           <div className="max-h-48 overflow-auto text-sm">
             {rows.map((r, i) => (
               <p key={r.request_key} className="border-b border-blue-100 py-2">
-                {i + 1}. {r.payload.name} · {KIND_LABELS[r.payload.kind]} ·{" "}
-                {r.payload.affiliation || "소속 미입력"}
+                {i + 1}. {r.payload.name} ·{" "}
+                {r.payload.teaching_role === "ASSISTANT"
+                  ? "교외 보조강사"
+                  : KIND_LABELS[r.payload.kind]}{" "}
+                · {r.payload.affiliation || "소속 미입력"}
               </p>
             ))}
           </div>

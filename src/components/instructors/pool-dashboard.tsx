@@ -63,23 +63,31 @@ function DocumentCell({
 }: {
   person: PoolPerson;
   org: string;
-  kind: "identity" | "resume";
+  kind: "identity" | "resume" | "privacy" | "criminal" | "integrity";
 }) {
   const complete =
     kind === "identity"
       ? person.documents.id && person.documents.bank
-      : person.documents.resume;
-  const label = kind === "identity" ? "신분증·통장사본" : "이력서";
+      : person.documents[kind];
+  const label = {
+    identity: "신분증·통장사본",
+    resume: "이력서",
+    privacy: "개인정보동의",
+    criminal: "성범죄 조회동의",
+    integrity: "청렴서약",
+  }[kind];
+  const required =
+    kind === "identity"
+      ? person.documents_required
+      : kind === "resume"
+        ? person.kind === "EXTERNAL" || person.documents_required
+        : person.kind === "EXTERNAL";
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span
         className={`rounded-full px-2 py-1 text-xs font-semibold ${complete ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
       >
-        {complete
-          ? "제출 완료"
-          : !person.documents_required
-            ? "필수 제출 면제"
-            : "미제출"}
+        {complete ? "제출 완료" : !required ? "필수 제출 면제" : "미제출"}
       </span>
       {person.document_access && (
         <DocumentPopup
@@ -87,7 +95,7 @@ function DocumentCell({
           label={`${person.name} ${label} 입력 (새 창)`}
           className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600 hover:bg-blue-100"
         >
-          ↥ 입력
+          ↥ {kind === "identity" || kind === "resume" ? "입력" : label}
         </DocumentPopup>
       )}
     </div>
@@ -386,6 +394,7 @@ export function PoolDashboard({
                         "참여 과정",
                         "신분증·통장사본",
                         "이력서",
+                        "동의서·서약서",
                         "누적 실지급액",
                         "관리",
                       ].map((h) => (
@@ -412,6 +421,11 @@ export function PoolDashboard({
                           </Link>
                           <div className="mt-2 flex gap-1">
                             <Badge kind={person.kind} />
+                            {person.teaching_role === "ASSISTANT" && (
+                              <span className="rounded-full bg-violet-50 px-2 py-1 text-xs font-semibold text-violet-700">
+                                보조강사
+                              </span>
+                            )}
                             {person.status === "INACTIVE" && (
                               <span className="text-xs text-slate-400">
                                 중지
@@ -458,6 +472,18 @@ export function PoolDashboard({
                             org={org}
                             kind="resume"
                           />
+                        </td>
+                        <td className="space-y-2 px-4 py-5">
+                          {(["privacy", "criminal", "integrity"] as const).map(
+                            (kind) => (
+                              <DocumentCell
+                                key={kind}
+                                person={person}
+                                org={org}
+                                kind={kind}
+                              />
+                            ),
+                          )}
                         </td>
                         <td className="whitespace-nowrap px-4 py-5 font-semibold">
                           {money(person.paid)}
@@ -653,7 +679,10 @@ export function PoolDashboard({
                         {board.profile_history?.map((h) => (
                           <div key={h.id} className="py-3 text-sm">
                             <p className="font-medium">
-                              {KIND_LABELS[h.snapshot.kind]} ·{" "}
+                              {h.snapshot.teaching_role === "ASSISTANT"
+                                ? "교외 보조강사"
+                                : KIND_LABELS[h.snapshot.kind]}{" "}
+                              ·{" "}
                               {[
                                 h.snapshot.affiliation,
                                 h.snapshot.department,
@@ -946,7 +975,9 @@ export function PoolDashboard({
                 <dt className="text-slate-500">등록 당시 소속</dt>
                 <dd>
                   {[
-                    KIND_LABELS[allowance.person_kind],
+                    allowance.instructor_snapshot.teaching_role === "ASSISTANT"
+                      ? "교외 보조강사"
+                      : KIND_LABELS[allowance.person_kind],
                     allowance.instructor_snapshot.affiliation,
                     allowance.instructor_snapshot.department,
                     allowance.instructor_snapshot.position,

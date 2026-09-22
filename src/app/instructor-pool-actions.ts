@@ -85,6 +85,7 @@ export async function savePoolPerson(_: ActionState, form: FormData) {
           "status",
         ].map((k) => [k, value(form, k)]),
       ),
+      teaching_role: form.get("teaching_role") ?? "LECTURER",
       documents_required: form.get("documents_required") === "on",
     });
     return run("life_instructor_pool_save", {

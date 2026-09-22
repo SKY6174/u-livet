@@ -10,9 +10,9 @@ import {
 import "@/features/instructor-documents/documents.css";
 const Submission = dynamic(
   () =>
-    import(
-      "@/features/instructor-documents/components/advisory/advisory-external-submission"
-    ).then((m) => m.AdvisoryExternalSubmission),
+    import("@/features/instructor-documents/components/advisory/advisory-external-submission").then(
+      (m) => m.AdvisoryExternalSubmission,
+    ),
   {
     ssr: false,
     loading: () => (
@@ -21,6 +21,15 @@ const Submission = dynamic(
       </p>
     ),
   },
+);
+import {
+  CONSENT_TITLES,
+  isConsentType,
+  type ConsentType,
+} from "../../../supabase/functions/_shared/instructor-consent-model";
+const ConsentEditor = dynamic(
+  () => import("./consent-editor").then((m) => m.ConsentEditor),
+  { ssr: false },
 );
 export type DocumentSession = {
   token: string;
@@ -43,7 +52,7 @@ export function DocumentPortal({
   personId: string;
   orgId: string;
   name: string;
-  initialDocument?: "IDENTITY_BANK" | "RESUME";
+  initialDocument?: "IDENTITY_BANK" | "RESUME" | ConsentType;
   initialSession?: DocumentSession;
   onGuestLogout?: () => void;
 }) {
@@ -54,6 +63,8 @@ export function DocumentPortal({
     [message, setMessage] = useState(""),
     [downloads, setDownloads] = useState<Download[]>([]),
     [downloadBusy, setDownloadBusy] = useState(false);
+  const [activeDocument, setActiveDocument] = useState(initialDocument);
+  const dirtyConsent = useRef(false);
   const automatic = useRef<Promise<DocumentSession> | null>(null);
   const start = useCallback(async () => {
     setBusy(true);
@@ -161,8 +172,8 @@ export function DocumentPortal({
             </p>
             <h1 className="mt-2 text-2xl font-bold">{name} 강사 서류 입력</h1>
             <p className="mt-2 text-sm text-slate-600">
-              신분증·통장사본과 이력서를 표준 A4 PDF로 보관합니다. 변경이 있을
-              때만 갱신하세요.
+              신분증·통장사본, 이력서와 동의서·서약서를 작성하고 비공개 PDF로
+              보관합니다.
             </p>
           </div>
         </div>
@@ -216,13 +227,65 @@ export function DocumentPortal({
         )}
       </header>
       {session ? (
-        <Submission
-          key={session.token}
-          voterToken={session.token}
-          documentOnly
-          initialDocument={initialDocument}
-          onLogout={() => void lock()}
-        />
+        <>
+          <nav
+            aria-label="필요서류 선택"
+            className="flex flex-wrap gap-2 border-b bg-white px-5 py-4"
+          >
+            {Object.entries({
+              IDENTITY_BANK: "신분증·통장사본",
+              RESUME: "이력서",
+              ...CONSENT_TITLES,
+            }).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={activeDocument === key}
+                className={`rounded-xl px-4 py-3 text-sm font-semibold ${activeDocument === key ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"}`}
+                onClick={() => {
+                  if (
+                    activeDocument !== key &&
+                    dirtyConsent.current &&
+                    !window.confirm(
+                      "저장하지 않은 입력은 사라집니다. 다른 서류로 이동할까요?",
+                    )
+                  )
+                    return;
+                  dirtyConsent.current = false;
+                  setActiveDocument(key as typeof activeDocument);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              className="ml-auto px-3 text-sm text-slate-600"
+              onClick={() => void lock()}
+            >
+              인증 해제
+            </button>
+          </nav>
+          {isConsentType(activeDocument) ? (
+            <ConsentEditor
+              key={`${session.token}-${activeDocument}`}
+              type={activeDocument}
+              token={session.token}
+              name={name}
+              onDirtyChange={(dirty) => {
+                dirtyConsent.current = dirty;
+              }}
+            />
+          ) : (
+            <Submission
+              key={`${session.token}-${activeDocument}`}
+              voterToken={session.token}
+              documentOnly
+              initialDocument={activeDocument}
+              hideDocumentTabs
+              onLogout={() => void lock()}
+            />
+          )}
+        </>
       ) : (
         <section className="mx-auto max-w-3xl px-5 py-12">
           <div className="panel">

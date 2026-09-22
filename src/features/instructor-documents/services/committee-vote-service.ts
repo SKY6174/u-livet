@@ -8,7 +8,7 @@ export async function invoke<T>(action: string, body: Record<string, unknown>): 
     if (error && "context" in error && error.context instanceof Response) {
       try { envelope = await error.context.json(); } catch { /* Non-JSON network response. */ }
     }
-    throw new CommitteeVoteApiError(envelope?.error?.code || "NETWORK_ERROR", "서류 요청을 처리하지 못했습니다.");
+    throw new CommitteeVoteApiError(envelope?.error?.code || "NETWORK_ERROR", action.startsWith("consent-") && typeof envelope?.error?.message === "string" ? envelope.error.message : "서류 요청을 처리하지 못했습니다.");
   }
   return data.data as T;
 }

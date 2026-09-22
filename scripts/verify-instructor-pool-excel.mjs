@@ -38,11 +38,17 @@ assert.equal(
   ])[0].documents_required,
   false,
 );
+for (const kind of ["보조강사", "교외(보조강사)"]) {
+  const assistant = parsePoolWorkbook([POOL_COLUMNS, [row[0], kind, ...row.slice(2)]])[0];
+  assert.equal(assistant.kind, "EXTERNAL");
+  assert.equal(assistant.teaching_role, "ASSISTANT");
+  assert.equal(assistant.documents_required, true);
+}
 assert.throws(() => parsePoolWorkbook([["성명"], row]), /열 이름/);
 assert.throws(() => parsePoolWorkbook([POOL_COLUMNS, row, row]), /중복/);
 assert.throws(
   () => parsePoolWorkbook([POOL_COLUMNS, ["가상", "구분 없음"]]),
-  /교내 또는 교외/,
+  /교내, 교외 또는 보조강사/,
 );
 assert.throws(
   () =>
@@ -84,5 +90,5 @@ await write([
 const exported = await read("tmp/instructor-pool/export.xlsx");
 assert.deepEqual(exported[0].data[0], ["=1+1", "@SUM(1,2)", "+123", 194000]);
 console.log(
-  "12 instructor pool Excel checks passed (including XLSX round-trip and literal formula-like cells).",
+  "18 instructor pool Excel checks passed (including XLSX round-trip and literal formula-like cells).",
 );

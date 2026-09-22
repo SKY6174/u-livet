@@ -21,11 +21,15 @@ export type PoolDocuments = {
   resume: boolean;
   identity_pdf: boolean;
   resume_pdf: boolean;
+  privacy: boolean;
+  criminal: boolean;
+  integrity: boolean;
 };
 export type PoolPerson = {
   id: string;
   name: string;
   kind: string;
+  teaching_role: "LECTURER" | "ASSISTANT";
   affiliation: string;
   department: string;
   position: string;
@@ -48,6 +52,7 @@ export type PoolInput = Pick<
   PoolPerson,
   | "name"
   | "kind"
+  | "teaching_role"
   | "affiliation"
   | "department"
   | "position"
@@ -67,6 +72,7 @@ export type Allowance = {
   offering_name: string | null;
   instructor_snapshot: {
     kind: string;
+    teaching_role?: "LECTURER" | "ASSISTANT";
     affiliation: string;
     department: string;
     position: string;
@@ -104,6 +110,7 @@ export type PoolBoard = {
     id: number;
     snapshot: {
       kind: string;
+      teaching_role?: "LECTURER" | "ASSISTANT";
       affiliation: string;
       department: string;
       position: string;
@@ -130,8 +137,15 @@ export type PoolBoard = {
 export const money = (value: number) =>
   `${Number(value).toLocaleString("ko-KR")}원`;
 export const documentReady = (person: PoolPerson) =>
-  !person.documents_required ||
-  (person.documents.id && person.documents.bank && person.documents.resume);
+  (!person.documents_required ||
+    (person.documents.id &&
+      person.documents.bank &&
+      person.documents.resume)) &&
+  (person.kind !== "EXTERNAL" ||
+    (person.documents.resume &&
+      person.documents.privacy &&
+      person.documents.criminal &&
+      person.documents.integrity));
 export const pageNumber = (value?: string) =>
   value && /^[1-9]\d{0,4}$/.test(value) ? Number(value) : 1;
 export const POOL_COLUMNS = [
@@ -182,7 +196,17 @@ export function validatePoolInput(input: unknown): PoolInput {
     throw new Error("연락처 형식을 확인해 주세요.");
   if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email))
     throw new Error("이메일 형식을 확인해 주세요.");
-  return { ...values, documents_required: row.documents_required } as PoolInput;
+  const teaching_role = row.teaching_role ?? "LECTURER";
+  if (
+    !["LECTURER", "ASSISTANT"].includes(String(teaching_role)) ||
+    (teaching_role === "ASSISTANT" && values.kind !== "EXTERNAL")
+  )
+    throw new Error("보조강사는 교외 강사로 등록해 주세요.");
+  return {
+    ...values,
+    teaching_role,
+    documents_required: row.documents_required,
+  } as PoolInput;
 }
 export function parsePoolWorkbook(rows: unknown[][]): PoolInput[] {
   if (
@@ -209,8 +233,10 @@ export function parsePoolWorkbook(rows: unknown[][]): PoolInput[] {
       email = "",
       notes = "",
     ] = values;
-    if (!["교내", "교외"].includes(kind))
-      throw new Error(`${index + 2}행: 구분은 교내 또는 교외로 입력해 주세요.`);
+    if (!["교내", "교외", "보조강사", "교외(보조강사)"].includes(kind))
+      throw new Error(
+        `${index + 2}행: 구분은 교내, 교외 또는 보조강사로 입력해 주세요.`,
+      );
     const key = `${name}\n${kind}\n${affiliation}`;
     if (seen.has(key))
       throw new Error(`${index + 2}행: 같은 성명·구분·소속이 중복되었습니다.`);
@@ -219,6 +245,7 @@ export function parsePoolWorkbook(rows: unknown[][]): PoolInput[] {
       return validatePoolInput({
         name,
         kind: kind === "교내" ? "INTERNAL" : "EXTERNAL",
+        teaching_role: kind.includes("보조") ? "ASSISTANT" : "LECTURER",
         affiliation,
         department,
         position,
@@ -226,7 +253,7 @@ export function parsePoolWorkbook(rows: unknown[][]): PoolInput[] {
         phone,
         email,
         notes,
-        documents_required: kind === "교외",
+        documents_required: kind !== "교내",
         status: "ACTIVE",
       });
     } catch (error) {

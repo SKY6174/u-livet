@@ -28,7 +28,7 @@ export function officeSections(member: Member) {
       { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
     ] : [] },
     { title: "전문가", links: manager ? [
-      { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외 강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
+      { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
     ] : [] },
     { title: "결과 보고·수료", links: [
       ...(manager ? [{ label: "결과 보고", href: "/admin/reports", description: "과정별 결과보고서 작성·검토와 6종 자료 출력을 진행합니다." }] : []),

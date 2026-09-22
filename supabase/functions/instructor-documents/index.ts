@@ -1,3 +1,4 @@
+import { CONSENT_ACTIONS, handleConsentAction } from "./consent-handler.ts";
 // Adapted from uc-anchor expert intake; only instructor-document actions are exposed.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.2";
 import { PDFDocument, PDFName } from "https://esm.sh/pdf-lib@1.17.1?target=deno";
@@ -1422,6 +1423,7 @@ async function getAdvisorySession(token: string) {
 }
 
 const DOCUMENT_ACTIONS = new Set([
+  ...CONSENT_ACTIONS,
   "session", "invite-auth", "logout", "downloads", "advisory-intake-context", "advisory-intake-save-profile",
   "advisory-intake-save-profile-draft", "advisory-intake-analyze-resume",
   "advisory-intake-analyze-document-layout", "advisory-intake-upload",
@@ -1473,7 +1475,9 @@ Deno.serve(async (request: Request) => {
       access=authorized;
     }
     let data: unknown;
-    if (action === "session") {
+    if (CONSENT_ACTIONS.includes(action)) {
+      data=await handleConsentAction(action,body,access,actorUserId,{service,encrypt:encryptAdvisoryResume,decrypt:decryptAdvisoryResume,sha256,fail:(code,message,status)=>new VoteFunctionError(code,message,status)});
+    } else if (action === "session") {
       // Expired sessions contain hashes only; prune for this actor on entry.
       const {error: pruneError} = await service.from("life_instructor_document_sessions").delete().eq("actor_user_id",actorUserId!).lt("expires_at",new Date().toISOString());
       if (pruneError) throw mapDatabaseError(pruneError);

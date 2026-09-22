@@ -16,6 +16,9 @@ type DocumentRow = {
   has_draft: boolean;
   has_identity_pdf: boolean;
   has_resume_pdf: boolean;
+  has_privacy: boolean;
+  has_criminal: boolean;
+  has_integrity: boolean;
 };
 
 export default async function InstructorDocumentAdmin({
@@ -87,6 +90,12 @@ export default async function InstructorDocumentAdmin({
                         ? "미생성"
                         : ""}
                     </dd>
+                    <dt>개인정보동의</dt>
+                    <dd>{row.has_privacy ? "제출 완료" : "미제출"}</dd>
+                    <dt>성범죄 조회동의</dt>
+                    <dd>{row.has_criminal ? "제출 완료" : "미제출"}</dd>
+                    <dt>청렴서약</dt>
+                    <dd>{row.has_integrity ? "제출 완료" : "미제출"}</dd>
                   </dl>
                   <DocumentPopup
                     className="btn-secondary"
@@ -117,7 +126,17 @@ export default async function InstructorDocumentAdmin({
   return (
     <DocumentPortal
       key={`${person}-${org}-${document}`}
-      initialDocument={document === "resume" ? "RESUME" : "IDENTITY_BANK"}
+      initialDocument={
+        document === "privacy"
+          ? "PRIVACY_CONSENT"
+          : document === "criminal"
+            ? "CRIMINAL_CONSENT"
+            : document === "integrity"
+              ? "INTEGRITY_PLEDGE"
+              : document === "resume"
+                ? "RESUME"
+                : "IDENTITY_BANK"
+      }
       personId={data.id}
       orgId={data.org_id}
       name={data.name}
