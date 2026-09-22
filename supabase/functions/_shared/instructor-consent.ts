@@ -33,7 +33,7 @@ export async function renderConsentPdf(
     const source = await PDFDocument.load(a.criminal);
     [page] = await pdf.copyPages(source, [0]);
     pdf.addPage(page);
-  } else page = pdf.addPage([595.28, 841.89]);
+  } else page = pdf.addPage([595, 842]);
   const height = page.getHeight();
   const text = (
     s: string,
@@ -149,16 +149,18 @@ export async function renderConsentPdf(
     text(v.name, 359, 490, 11, false, 104);
     await sign(454, 480, 75, 31);
   } else if (type === "PRIVACY_CONSENT") {
-    center(CONSENT_TITLES[type], 47, 19, true);
+    // Original form body bounds: x=28.32..566.92pt on a 595×842pt page.
+    const left = 28.32, bodyWidth = 538.6;
+    center(CONSENT_TITLES[type], 64, 19, true);
     lines(
       "울산과학대학교 앵커사업단은 평생직업교육과정 강사·보조강사의 위촉, 강의 운영 및 수당 지급을 위해 아래와 같이 개인정보를 수집·이용하고 제공합니다.",
-      45,
-      88,
-      505,
+      left,
+      108,
+      bodyWidth,
       10.5,
       17,
     );
-    text("1. 개인정보 수집·이용 안내", 45, 139, 12, true);
+    text("1. 개인정보 수집·이용 안내", left, 153, 12, true);
     const rows = [
       [
         "수집 항목",
@@ -174,46 +176,46 @@ export async function renderConsentPdf(
       ],
     ];
     rows.forEach(([label, content], i) => {
-      const y = 163 + i * 51;
-      box(45, y, 85, 51, true);
-      box(130, y, 420, 51);
-      text(label, 55, y + 16, 10, true);
-      lines(content, 140, y + 8, 398, 10, 16);
+      const y = 177 + i * 51;
+      box(left, y, 85, 51, true);
+      box(left + 85, y, bodyWidth - 85, 51);
+      text(label, left + 10, y + 16, 10, true);
+      lines(content, left + 95, y + 8, bodyWidth - 107, 10, 16);
     });
-    text("2. 개인정보 제3자 제공 안내", 45, 337, 12, true);
+    text("2. 개인정보 제3자 제공 안내", left, 350, 12, true);
     lines(
       "제공받는 자: 관할 세무서\n제공 목적: 강사료 등 지급에 따른 원천징수 및 세무 신고\n제공 항목: 성명, 주민등록번호, 주소, 지급 금액\n보유·이용 기간: 해당 업무 목적 달성 및 관련 법령에 따른 보관 기간",
-      45,
-      361,
-      505,
+      left,
+      374,
+      bodyWidth,
       10,
       18,
     );
-    text("3. 동의 거부 및 개인정보 보호 안내", 45, 451, 12, true);
+    text("3. 동의 거부 및 개인정보 보호 안내", left, 464, 12, true);
     lines(
       "개인정보 제공 및 활용에 대한 동의를 거부할 수 있습니다. 다만 본인 확인과 지급·신고에 필요한 정보 제공에 동의하지 않을 경우 강사 위촉 및 수당 지급 업무가 제한될 수 있습니다. 보유 기간이 지나거나 처리 목적이 달성된 정보는 복구할 수 없는 방법으로 파기합니다.",
-      45,
-      476,
-      505,
+      left,
+      489,
+      bodyWidth,
       10,
       17,
     );
-    box(45, 547, 505, 86, true);
+    box(left, 560, bodyWidth, 86, true);
     text(
       "위 내용을 확인하고 개인정보 수집·이용 및 제3자 제공에",
-      57,
-      559,
+      left + 12,
+      572,
       10,
       true,
     );
-    text(checks(v.privacy_consent), 230, 579, 10);
-    text("고유식별정보(주민등록번호)의 처리에", 57, 605, 10, true);
-    text(checks(v.unique_id_consent), 290, 605, 9.5);
-    center(`${date[0]}년  ${date[1]}월  ${date[2]}일`, 665, 12);
+    text(checks(v.privacy_consent), 230, 592, 10);
+    text("고유식별정보(주민등록번호)의 처리에", left + 12, 618, 10, true);
+    text(checks(v.unique_id_consent), 290, 618, 9.5);
+    center(`${date[0]}년  ${date[1]}월  ${date[2]}일`, 670, 12);
     text(`동의자: ${v.name}`, 310, 703, 12, false, 150);
     text("(서명 또는 인)", 466, 706, 9);
     await sign(460, 686);
-    center("울산과학대학교 앵커사업단장 귀하", 763, 14, true);
+    center("울산과학대학교 앵커사업단장 귀하", 745.4, 14, true);
   } else {
     box(38, 35, 519, 766);
     center(CONSENT_TITLES[type], 52, 19, true);
@@ -310,7 +312,23 @@ export async function renderConsentPdf(
     await sign(460, 726, 77, 30);
     center("울산과학대학교 산학협력단장 귀하", 774, 13, true);
   }
-  if (draft) text("작성 중 · 최종 제출 전 미확정 문서", 38, 817, 8);
+  if (draft) {
+    // Keep draft notices in unused body space, never in the original margins.
+    const [x, top] = type === "PRIVACY_CONSENT"
+      ? [28.32, 728]
+      : type === "CRIMINAL_CONSENT" ? [60.84, 590] : [51, 345];
+    text("작성 중 · 최종 제출 전 미확정 문서", x, top, 8);
+  }
+  if (type === "INTEGRITY_PLEDGE") {
+    // Map the complete vector layout (including signatures) into the original
+    // outer frame. Its asymmetric left/right margins are intentional.
+    const scaleX = 470.52 / 519, scaleY = 698.64 / 766;
+    page.scaleContent(scaleX, scaleY);
+    page.translateContent(
+      72.84 - 38 * scaleX,
+      height - 772.32 - (height - 801) * scaleY,
+    );
+  }
   pdf.setTitle(CONSENT_TITLES[type]);
   pdf.setProducer("UC-LIFE / PDF 1.7");
   pdf.setSubject(`서식 ${TEMPLATE_VERSION}`);

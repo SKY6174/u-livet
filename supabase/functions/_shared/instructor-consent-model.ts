@@ -5,7 +5,7 @@ export const CONSENT_TITLES = {
 } as const;
 export type ConsentType = keyof typeof CONSENT_TITLES;
 export type Choice = "" | "YES" | "NO";
-export const TEMPLATE_VERSION = "2026-09-22.1";
+export const TEMPLATE_VERSION = "2026-09-22.2";
 export const RELATION_QUESTIONS = [
   "본 대학 재직 교직원 중 4촌 이내의 친족(배우자, 혈족, 인척)이 있습니까?",
   "본 대학 재직 교직원과 공동으로 영리활동을 하거나 경제적 이해관계를 공유하고 있습니까?",
