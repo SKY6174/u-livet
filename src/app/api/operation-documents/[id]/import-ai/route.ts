@@ -46,7 +46,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
     const data = await analysis.json().catch(() => ({ message: "AI 응답을 읽지 못했습니다." }));
     if (!analysis.ok) return NextResponse.json({
-      message: analysis.status === 429
+      message: data.code === "AI_KEY_MISSING" || data.code === "AI_KEY_INVALID"
+        ? "AI 분석용 OpenAI API 키를 확인해 주세요. 원본 PDF와 사진은 보관되어 있습니다."
+        : analysis.status === 429
         ? "AI 요청이 많습니다. 잠시 후 다시 시도해 주세요."
         : analysis.status >= 500
           ? "AI 서버에 연결하지 못했습니다. 원본 PDF와 추출한 사진은 보관되어 있습니다."
