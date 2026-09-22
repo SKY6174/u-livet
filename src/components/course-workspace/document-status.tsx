@@ -58,7 +58,7 @@ export function DocumentStatus({
               </p>
             )}
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-slate-100 pt-3 text-sm font-semibold">
-              <Link href={d.href} className="text-teal-800">
+              <Link href={d.kind === "result" ? `/operation-documents/${course.id}/result` : d.href} className="text-teal-800">
                 자료 확인·보완
               </Link>
               <Link

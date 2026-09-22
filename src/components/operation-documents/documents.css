@@ -1,0 +1,338 @@
+@font-face {
+  font-family: OperationDocument;
+  src: url("/fonts/KoPubDotum-Medium.ttf") format("truetype");
+  font-display: swap;
+}
+.op-output {
+  color: #111;
+  font-family: OperationDocument, "Malgun Gothic", sans-serif;
+}
+.op-output .op-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 24px;
+  padding: 20mm 20mm 14mm;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 12px #0f172a15;
+  box-sizing: border-box;
+  font-size: 11pt;
+  line-height: 1.6;
+}
+.op-page-content {
+  flex: 1;
+}
+.op-output h1 {
+  font-size: 21pt;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 14mm;
+  line-height: 1.6;
+}
+.op-output h2 {
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 6mm 0 3mm;
+}
+.op-output h3 {
+  font-size: 11pt;
+  font-weight: 700;
+  margin: 3mm 0;
+}
+.op-output p {
+  margin: 2mm 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.op-output small {
+  font-size: 10pt;
+  font-weight: normal;
+}
+.op-table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  margin: 3mm 0;
+  font-size: 9.5pt;
+  line-height: 1.45;
+}
+.op-table td,
+.op-table th {
+  border: 0.25mm solid #222;
+  padding: 2mm 1.2mm;
+  text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+  min-height: 8mm;
+}
+.op-table th {
+  background: #e3e3e3;
+  font-weight: 700;
+}
+.op-result .op-table th {
+  background: #e1e7f4;
+}
+.op-table thead {
+  display: table-header-group;
+}
+.op-table tr,
+.op-output figure {
+  break-inside: avoid;
+}
+.op-table .op-left {
+  text-align: left;
+}
+.op-text-box {
+  border: 0.25mm solid #222;
+  padding: 3mm;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-height: 25mm;
+}
+.op-cover .op-kicker {
+  display: inline-block;
+  border: 0.3mm solid #111;
+  padding: 2mm 4mm;
+  font-weight: bold;
+  font-size: 12pt;
+}
+.op-academies {
+  width: 115mm;
+  margin: 18mm auto 3mm;
+}
+.op-academies th:first-child,
+.op-academies td:first-child {
+  width: 13mm;
+}
+.op-academies td:nth-child(2) {
+  text-align: left;
+}
+.op-cover-title {
+  padding: 12mm 5mm 10mm;
+  border-top: 0.5mm solid #111;
+  border-bottom: 0.5mm solid #111;
+  margin: 4mm 0;
+}
+.op-output .op-cover-title h1 {
+  font-size: 25pt;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.op-output .op-audience {
+  font-size: 17pt;
+  text-align: center;
+  margin-top: 8mm;
+}
+.op-output .op-cover-date {
+  font-size: 16pt;
+  font-weight: bold;
+  text-align: center;
+  margin: 18mm 0;
+}
+.op-signature {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 48mm;
+}
+.op-signature span {
+  position: relative;
+}
+.op-signature img {
+  position: absolute;
+  width: 30mm;
+  height: 15mm;
+  object-fit: contain;
+  top: -5mm;
+  left: -8mm;
+}
+.op-result-cover .op-cover-title {
+  margin-top: 28mm;
+  border: 0.3mm solid #111;
+}
+.op-result-cover .op-cover-date {
+  margin-top: 55mm;
+  margin-bottom: 35mm;
+}
+.op-result-cover .op-table td:first-child {
+  width: 34%;
+  font-weight: bold;
+  background: #e1e7f4;
+}
+.op-result-cover .op-table thead {
+  display: none;
+}
+.op-overview h2 {
+  margin-top: 14mm;
+}
+.op-overview .op-text-box {
+  min-height: 32mm;
+}
+.op-governance td:last-child {
+  width: 55%;
+  text-align: left;
+}
+.op-schedule {
+  font-size: 8.5pt;
+}
+.op-schedule td {
+  height: 9mm;
+  padding: 1.1mm;
+}
+.op-schedule th:first-child {
+  width: 7mm;
+}
+.op-schedule th:nth-child(2) {
+  width: 26mm;
+}
+.op-schedule th:nth-child(3) {
+  width: 37mm;
+}
+.op-schedule th:nth-child(4),
+.op-schedule th:nth-child(5) {
+  width: 27mm;
+}
+.op-hours {
+  text-align: right;
+  font-weight: bold;
+}
+.op-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 0.25mm solid #111;
+  border-left: 0.25mm solid #111;
+  margin: 4mm 0;
+}
+.op-photos figure {
+  margin: 0;
+  border-right: 0.25mm solid #111;
+  border-bottom: 0.25mm solid #111;
+}
+.op-photos figcaption {
+  text-align: center;
+  border-bottom: 0.25mm solid #111;
+  font-size: 9pt;
+  padding: 1mm;
+}
+.op-photos figure > div {
+  height: 43mm;
+  padding: 1mm;
+}
+.op-photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.op-photo-note {
+  font-size: 9pt;
+}
+
+.op-quality td {
+  height: 31mm;
+  text-align: left;
+}
+
+.op-review td {
+  height: 42mm;
+  text-align: left;
+}
+.op-unit {
+  font-size: 9pt;
+  text-align: right;
+}
+.op-budget-notice {
+  font-size: 9pt;
+  color: #555;
+  margin-top: 5mm !important;
+}
+.op-page-footer {
+  border-top: 0.3mm solid #1b6670;
+  margin-top: 8mm;
+  padding-top: 2mm;
+  display: flex;
+  justify-content: space-between;
+  gap: 3mm;
+  font-size: 8pt;
+  color: #555;
+}
+.op-preview-scroll {
+  overflow: auto;
+  max-height: 82vh;
+  background: #e8edf2;
+  border: 1px solid #dbe2e9;
+  border-radius: 12px;
+  padding: 12px;
+}
+.op-preview-scroll .op-output {
+  zoom: var(--paper-zoom, 0.65);
+}
+.op-editor .advisory-signature-pad canvas {
+  width: 100%;
+  height: 140px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  touch-action: none;
+  background: white;
+}
+.op-editor .advisory-signature-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  margin: 8px 0;
+}
+.op-editor .advisory-signature-toolbar button,
+.op-editor .advisory-signature-toolbar label {
+  display: inline-flex;
+  gap: 5px;
+  cursor: pointer;
+}
+.op-editor .advisory-signature-toolbar input {
+  max-width: 180px;
+}
+.op-editor .advisory-current-signature img {
+  width: 160px;
+  height: 60px;
+  object-fit: contain;
+}
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  body:has(.op-output) header,
+  body:has(.op-output) main > footer,
+  body:has(.op-output) .no-print {
+    display: none !important;
+  }
+  .op-output {
+    padding: 0;
+    margin: 0;
+  }
+  .op-output .op-page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 20mm 20mm 14mm !important;
+    margin: 0 !important;
+    box-shadow: none;
+    break-after: page;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .op-output .op-page:last-child {
+    break-after: auto;
+  }
+}
+
+@media print {
+  .op-output .op-page-footer {
+    display: flex !important;
+  }
+}
+
+.op-output .op-quality tbody th,
+.op-output .op-review tbody th {
+  background: white;
+}

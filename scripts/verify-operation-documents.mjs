@@ -1,0 +1,444 @@
+// Local synthetic accounts only. Exercises actual PostgREST authorization and revision locks.
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import vm from "node:vm";
+import ts from "typescript";
+import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { ensureLocalMfa } from "./local-mfa.mjs";
+const status = JSON.parse(
+  execFileSync("supabase", ["status", "-o", "json"], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }),
+);
+assert.equal(status.API_URL, "http://127.0.0.1:55321");
+const admin = createClient(status.API_URL, status.SERVICE_ROLE_KEY, {
+  auth: { persistSession: false },
+});
+const run = Date.now().toString(36);
+const schema = {};
+vm.runInNewContext(
+  ts.transpileModule(
+    readFileSync("src/lib/operation-documents/schema.ts", "utf8"),
+    {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+      },
+    },
+  ).outputText,
+  { exports: schema },
+);
+const model = {};
+vm.runInNewContext(
+  ts.transpileModule(
+    readFileSync("src/lib/operation-documents/model.ts", "utf8"),
+    {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+      },
+    },
+  ).outputText,
+  { exports: model, require: () => schema, Intl, Date, TextEncoder },
+);
+const sql = (q) =>
+  execFileSync(
+    "docker",
+    [
+      "exec",
+      "-i",
+      "supabase_db_uc-life-core",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "postgres",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-tA",
+    ],
+    { input: q, encoding: "utf8" },
+  ).trim();
+const ok = (r) => {
+  assert.equal(r.error, null, JSON.stringify(r.error));
+  return r.data;
+};
+const deny = (r, reason) => {
+  assert.ok(r.error, "request must be denied");
+  if (reason) assert.equal(r.error.message, reason);
+};
+let f;
+const org = "10000000-0000-4000-8000-000000000001";
+async function login(label) {
+  const email = `operation-${run}-${label}@example.invalid`;
+  ok(
+    await admin.auth.admin.createUser({
+      email,
+      password: "Local-Only-2026!",
+      email_confirm: true,
+      user_metadata: {
+        name: `테스트 ${label}`,
+        privacy_policy_id: "20000000-0000-4000-8000-000000000011",
+        privacy_accepted: true,
+        mobile_phone: "+821000000000",
+      },
+    }),
+  );
+  const jar = new Map();
+  const c = createServerClient(status.API_URL, status.ANON_KEY, {
+    cookies: {
+      getAll: () => Array.from(jar, ([name, value]) => ({ name, value })),
+      setAll: (items) => items.forEach((i) => jar.set(i.name, i.value)),
+    },
+  });
+  ok(await c.auth.signInWithPassword({ email, password: "Local-Only-2026!" }));
+  await ensureLocalMfa(c);
+  const p = ok(await c.rpc("life_identity")).id;
+  if (["manager", "teacher"].includes(label))
+    sql(
+      `insert into public.life_role_assignments(person_id,org_id,role) values('${p}','${org}','${label === "manager" ? "COURSE_MANAGER" : "INSTRUCTOR"}');`,
+    );
+  return { c, p, jar };
+}
+const signup = JSON.parse(
+  sql("select row_to_json(s) from life_private.signup_settings s"),
+);
+let manager, teacher, outsider, learner;
+try {
+  sql(
+    "update life_private.signup_settings set enabled=true,policy_id='20000000-0000-4000-8000-000000000011',org_id='10000000-0000-4000-8000-000000000001'",
+  );
+  manager = await login("manager");
+  teacher = await login("teacher");
+  outsider = await login("outsider");
+  learner = await login("learner");
+} finally {
+  sql(
+    `update life_private.signup_settings set enabled=${signup.enabled},policy_id=${signup.policy_id ? "'" + signup.policy_id + "'" : "null"},org_id='${signup.org_id}'`,
+  );
+}
+
+f = ok(
+  await manager.c.rpc("life_create_offering", {
+    o: org,
+    y: "10000000-0000-4000-8000-000000000002",
+    title: "[검증] 운영계획서·결과보고서 과정",
+    academy: "로컬창업 아카데미",
+    summary: "운영 문서 검증",
+    curriculum: "프로그램 개발과 실습",
+    mode: "OFFLINE",
+    location: "302호",
+    capacity: 20,
+    selection_method: "REVIEW",
+    apply_from: "2026-09-01T00:00:00Z",
+    apply_until: "2026-09-10T00:00:00Z",
+    starts_on: "2026-09-15",
+    ends_on: "2026-09-30",
+  }),
+);
+ok(
+  await manager.c.rpc("life_assign_instructor", {
+    f,
+    p: teacher.p,
+    enabled: true,
+  }),
+);
+const anon = createClient(status.API_URL, status.ANON_KEY, {
+  auth: { persistSession: false },
+});
+const context = (c) => c.rpc("life_operation_context", { f });
+let ctx = ok(await context(manager.c));
+assert.equal(ctx.manager, true);
+assert.equal(ctx.responsible, null);
+for (const c of [teacher.c, outsider.c, learner.c, anon])
+  deny(await context(c));
+assert.ok(!JSON.stringify(ctx.legacy).includes("account"));
+console.log(
+  "PASS manager scope, anonymous/non-responsible denial, no payment PII",
+);
+ok(
+  await manager.c.rpc("life_operation_assign", {
+    f,
+    p: teacher.p,
+    expected_revision: 0,
+  }),
+);
+ctx = ok(await context(teacher.c));
+assert.equal(ctx.manager, false);
+assert.equal(ctx.candidates.length, 0);
+deny(
+  await teacher.c.rpc("life_operation_assign", {
+    f,
+    p: teacher.p,
+    expected_revision: 1,
+  }),
+  "FORBIDDEN",
+);
+assert.ok(
+  ok(await teacher.c.rpc("life_operation_list")).some((r) => r.id === f),
+);
+let content = model.emptyContent("plan"),
+  budget = model.emptyBudget("plan");
+for (const field of schema.fields("plan"))
+  content.fields[field.key] =
+    field.type === "number"
+      ? "10"
+      : field.type === "date"
+        ? "2026-09-22"
+        : `${field.label} 검증자료`;
+content.fields.year = "2026";
+content.fields.title = "[검증] 평생직업교육 프로그램";
+content.fields.academy = "로컬창업 아카데미";
+content.fields.audience = "성인학습자";
+content.fields.professor = "테스트 teacher";
+content.fields.program = "로컬창업 프로그램";
+for (const table of schema.tables("plan"))
+  if (table.min)
+    content.tables[table.key] = [
+      Object.fromEntries(
+        table.columns.map((col) => [
+          col.key,
+          col.type === "number" ? "2" : `${col.label} 검증`,
+        ]),
+      ),
+    ];
+content.tables.schedule[0].date = "2026.09.22 09:00~11:00";
+for (const r of budget.rows) r.planned = "0";
+budget.rows.find((r) => r.category === "내부강사").planned = "100000";
+budget.rows.find((r) => r.category === "외부강사").planned = "200000";
+budget.rows.find((r) => r.category === "운영비").planned = "50000";
+assert.equal(model.validContent(content, "plan"), true);
+const save = (c, rev, b = undefined) =>
+  c.rpc("life_operation_save", {
+    f,
+    k: "plan",
+    c: content,
+    b: b === undefined ? null : b,
+    expected_revision: rev,
+  });
+deny(await save(teacher.c, 0, budget), "BUDGET_FORBIDDEN");
+ctx = ok(await save(teacher.c, 0));
+assert.equal(ctx.documents[0].budget.rows.length, 9);
+assert.equal(ctx.documents[0].revision, 1);
+deny(await save(teacher.c, 0), "REVISION_CHANGED");
+console.log(
+  "PASS explicit responsibility, budget tamper denied, revision conflicts and default budget rows",
+);
+const transition = (c, k, intent, revision, note = "", confirmed = true) =>
+  c.rpc("life_operation_transition", {
+    f,
+    k,
+    intent,
+    expected_revision: revision,
+    note,
+    confirmed,
+  });
+deny(await transition(teacher.c, "plan", "submit", 1), "FORBIDDEN");
+ctx = ok(await transition(teacher.c, "plan", "review", 1));
+assert.equal(ctx.documents[0].status, "REVIEW");
+deny(await save(teacher.c, 2), "DOCUMENT_LOCKED");
+deny(await transition(manager.c, "plan", "submit", 2), "BUDGET_REQUIRED");
+ctx = ok(await save(manager.c, 2, budget));
+assert.equal(ctx.documents[0].status, "REVIEW");
+ctx = ok(await transition(manager.c, "plan", "submit", 3));
+assert.equal(ctx.documents[0].status, "SUBMITTED");
+assert.equal(ctx.submissions.length, 1);
+const firstSubmission = ctx.submissions[0];
+deny(await save(manager.c, 4, budget), "DOCUMENT_LOCKED");
+deny(await transition(manager.c, "plan", "reopen", 4), "REASON_REQUIRED");
+ctx = ok(await transition(manager.c, "plan", "reopen", 4, "운영일정 보완"));
+assert.equal(ctx.documents[0].status, "DRAFT");
+content.fields.content = "수정된 주요내용";
+ctx = ok(await save(teacher.c, 5));
+const snapshot = ok(
+  await manager.c.rpc("life_operation_submission", {
+    f,
+    s: firstSubmission.id,
+  }),
+);
+assert.notEqual(snapshot.content.fields.content, content.fields.content);
+deny(
+  await outsider.c.rpc("life_operation_submission", {
+    f,
+    s: firstSubmission.id,
+  }),
+  "FORBIDDEN",
+);
+console.log(
+  "PASS review locks, manager-only final submission, reopen reason, immutable prior version",
+);
+const malformed = structuredClone(content);
+malformed.fields.year = "-1";
+deny(
+  await manager.c.rpc("life_operation_save", {
+    f,
+    k: "plan",
+    c: malformed,
+    b: budget,
+    expected_revision: 6,
+  }),
+  "INVALID_CONTENT",
+);
+const xss = structuredClone(content);
+xss.signature = "data:image/svg+xml;base64,PHN2Zz4=";
+deny(
+  await manager.c.rpc("life_operation_save", {
+    f,
+    k: "plan",
+    c: xss,
+    b: budget,
+    expected_revision: 6,
+  }),
+  "INVALID_CONTENT",
+);
+const incomplete = model.emptyContent("result");
+ctx = ok(
+  await teacher.c.rpc("life_operation_save", {
+    f,
+    k: "result",
+    c: incomplete,
+    b: null,
+    expected_revision: 0,
+  }),
+);
+let storedBudget = ctx.documents.find((d) => d.kind === "result").budget;
+assert.equal(
+  storedBudget.rows.find((r) => r.category === "강사료").planned,
+  "300000",
+);
+assert.equal(
+  storedBudget.rows.find((r) => r.category === "운영비").planned,
+  "50000",
+);
+assert.equal(
+  ctx.documents
+    .find((d) => d.kind === "plan")
+    .budget.rows.find((r) => r.category === "외부강사").planned,
+  "200000",
+);
+deny(
+  await teacher.c.rpc("life_operation_save", {
+    f,
+    k: "result",
+    c: incomplete,
+    b: storedBudget,
+    expected_revision: 1,
+  }),
+  "BUDGET_FORBIDDEN",
+);
+console.log(
+  "PASS first instructor result save preserves plan budget and prevents budget tampering",
+);
+deny(await transition(manager.c, "result", "review", 1), "CONTENT_REQUIRED");
+console.log(
+  "PASS DB schema validation, invalid image and incomplete review rejection",
+);
+// A different institution's administrator cannot access this course.
+sql(
+  `insert into public.life_organizations(id,slug,name) values('99000000-0000-4000-8000-000000000099','operation-test-other','운영문서 다른기관 검증') on conflict do nothing; insert into public.life_role_assignments(person_id,org_id,role) select '${outsider.p}','99000000-0000-4000-8000-000000000099','SYSTEM_ADMIN' where not exists(select 1 from public.life_role_assignments where person_id='${outsider.p}' and org_id='99000000-0000-4000-8000-000000000099' and role='SYSTEM_ADMIN');`,
+);
+deny(await context(outsider.c), "FORBIDDEN");
+sql(
+  `update public.life_offering_instructors set valid_until=now() where offering_id='${f}' and person_id='${teacher.p}';`,
+);
+deny(await context(teacher.c), "FORBIDDEN");
+sql(
+  `update public.life_offering_instructors set valid_until=null where offering_id='${f}' and person_id='${teacher.p}';`,
+);
+const oldRole = sql(
+  `select id from public.life_role_assignments where person_id='${manager.p}' and org_id='${org}' and role='COURSE_MANAGER' limit 1`,
+);
+sql(
+  `update public.life_role_assignments set role='SYSTEM_ADMIN' where id='${oldRole}';`,
+);
+try {
+  assert.equal(ok(await context(manager.c)).manager, true);
+} finally {
+  sql(
+    `update public.life_role_assignments set role='COURSE_MANAGER' where id='${oldRole}';`,
+  );
+}
+for (const table of [
+  "life_operation_documents",
+  "life_operation_responsibilities",
+  "life_operation_submissions",
+])
+  deny(await teacher.c.from(table).select("*"));
+console.log(
+  "PASS different-org admin, expired teaching assignment, system admin support, table access denied",
+);
+// Confirm PostgreSQL immutable snapshot trigger, even outside API grants.
+assert.throws(
+  () =>
+    sql(
+      `update public.life_operation_submissions set revision=99 where id='${firstSubmission.id}';`,
+    ),
+  /SUBMISSION_IMMUTABLE/,
+);
+// Leave rich local fixtures for browser verification, with plan in DRAFT and result in REVIEW.
+ctx = ok(await context(manager.c));
+const result = model.initialDocument(
+  { ...ctx, documents: ctx.documents.filter((d) => d.kind !== "result") },
+  "result",
+);
+for (const field of schema.fields("result"))
+  if (!result.content.fields[field.key])
+    result.content.fields[field.key] =
+      field.type === "number"
+        ? "0"
+        : field.type === "date"
+          ? "2026-09-22"
+          : `${field.label} 확인 완료`;
+result.content.tables.schedule = content.tables.schedule.map((r) =>
+  Object.fromEntries(
+    schema.tables("result")[0].columns.map((c) => [c.key, r[c.key]]),
+  ),
+);
+for (const r of result.budget.rows) {
+  r.planned = "100000";
+  r.spent = "90000";
+}
+result.budget.scholarshipCount = "10";
+result.budget.scholarshipAmount = "300000";
+ok(
+  await manager.c.rpc("life_operation_save", {
+    f,
+    k: "result",
+    c: result.content,
+    b: result.budget,
+    expected_revision: 1,
+  }),
+);
+ok(await transition(teacher.c, "result", "review", 2));
+mkdirSync("tmp/operation-documents", { recursive: true });
+writeFileSync(
+  "tmp/operation-documents/context.json",
+  JSON.stringify({ offering: f, teacher: teacher.p, manager: manager.p }),
+);
+for (const [label, a] of [
+  ["manager", manager],
+  ["teacher", teacher],
+])
+  writeFileSync(
+    `tmp/operation-documents/${label}-state.json`,
+    JSON.stringify({
+      cookies: Array.from(a.jar, ([name, value]) => ({
+        name,
+        value,
+        domain: "127.0.0.1",
+        path: "/",
+        httpOnly: false,
+        secure: false,
+        sameSite: "Lax",
+        expires: -1,
+      })),
+      origins: [],
+    }),
+    { mode: 0o600 },
+  );
+console.log(
+  "All operation document checks passed. Browser fixtures: tmp/operation-documents",
+);

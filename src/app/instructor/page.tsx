@@ -80,6 +80,7 @@ export default async function InstructorRoom() {
       </div>
 
       <AccountSecurity />
+      <Link className="btn-primary mb-7" href="/operation-documents">책임과정 운영계획서·결과보고서 작성 →</Link>
       {/* 3. 강사 전주기 라이프사이클 (10대 프로세스 워크플로우 허브) */}
       <section className="mb-10" aria-label="강사 라이프사이클 업무 가이드">
         <h2 className="section-title flex items-center gap-2">

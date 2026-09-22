@@ -67,6 +67,7 @@ export default async function Teaching(props: {
       <Link className="btn-primary mb-6 mr-3" href={`/instructor/offerings/${o.id}/attendance`}>출석부 생성·관리 →</Link>
       <Link className="btn-secondary mb-6 mr-3" href={`/instructor/offerings/${o.id}/completion`}>이수 확인 →</Link>
       <Link className="btn-secondary mb-6" href={`/quality/${o.id}`}>만족도 조사 →</Link>
+      <Link className="btn-secondary mb-6 mr-3" href="/operation-documents">책임과정 계획서·결과보고서 →</Link>
       <p className="notice mb-6">교내·외 강사는 수업 일정·학습자료·평가를 준비하고 사업단(센터)과 함께 홍보합니다. 수강 확정 인원을 확인한 뒤 최종 개설 여부를 사업단에 확인해 주세요.</p>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <section className="space-y-6">

@@ -43,13 +43,15 @@ export function CourseHeader({
       </div>
       <nav
         aria-label="이 과정의 관리 메뉴"
-        className="mt-7 flex gap-1 border-b border-slate-200"
+        className="mt-7 flex flex-wrap gap-1 border-b border-slate-200"
       >
         {(
           [
             ["overview", "운영 개요", base],
             ["manage", "운영 설정·신청", `${base}/manage`],
-            ["reports", "결과보고서", `${base}/reports`],
+            ["plan", "운영계획서", `/operation-documents/${o.id}/plan`],
+            ["result", "운영결과보고서", `/operation-documents/${o.id}/result`],
+            ["reports", "증빙·지급자료", `${base}/reports`],
           ] as const
         ).map(([key, label, href]) => (
           <Link

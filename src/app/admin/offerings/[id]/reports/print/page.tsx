@@ -1,3 +1,5 @@
+import { getOperationContext } from "@/lib/operation-documents/data";
+import { DocumentPreview } from "@/components/operation-documents/document-preview";
 import { notFound } from "next/navigation";
 import { Empty } from "@/components/portal/ui";
 import { ReportDocuments } from "@/components/reports/report-documents";
@@ -36,18 +38,19 @@ export default async function PrintReport({
         </Empty>
       </div>
     );
+  const context = ["all", "result"].includes(document) ? await getOperationContext(id) : null;
+  const official = context?.documents.find(d => d.kind === "result");
   return (
     <>
       <PrintToolbar
         document={document}
         reveal={query.reveal === "1"}
       />
-      <ReportDocuments
-        offering={offering}
-        bundle={bundle}
-        document={document as DocumentKind | "all"}
-        reveal={query.reveal === "1"}
-      />
+      {official ? <>
+        <DocumentPreview kind="result" content={official.content} budget={official.budget} status={official.status} revision={official.revision} />
+        {document === "all" && DOCUMENTS.filter(([kind]) => kind !== "result").map(([kind]) => <ReportDocuments key={kind} offering={offering} bundle={bundle} document={kind} reveal={query.reveal === "1"} />)}
+      </> : <ReportDocuments offering={offering} bundle={bundle} document={document as DocumentKind | "all"} reveal={query.reveal === "1"} />}
+
     </>
   );
 }

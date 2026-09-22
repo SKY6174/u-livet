@@ -62,10 +62,10 @@ export async function downloadReportPdf17(filename: string): Promise<void> {
     const landscape = sheet.classList.contains("report-landscape");
     const width = landscape ? 297 : 210;
     const height = landscape ? 210 : 297;
-    const margin = landscape ? 10 : 12;
+    const margin = sheet.classList.contains("op-page") ? 20 : landscape ? 10 : 12;
     const host = document.createElement("div");
     host.style.cssText = "position:fixed;left:-10000px;top:0;pointer-events:none;background:white;";
-    host.className = "report-output";
+    host.className = sheet.closest(".report-output")?.className ?? "report-output";
     const paper = sheet.cloneNode(true) as HTMLElement;
     paper.style.cssText = `width:${width - margin * 2}mm;min-height:0;margin:0;padding:0 0 3mm;box-shadow:none;background:white;`;
     paper.querySelectorAll(".no-print").forEach(node => node.remove());
