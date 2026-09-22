@@ -7,11 +7,13 @@ export function DocumentPopup({
   children,
   className = "",
   label,
+  windowName,
 }: {
   href: string;
   children: ReactNode;
   className?: string;
   label?: string;
+  windowName?: string;
 }) {
   const router = useRouter(),
     opened = useRef(false);
@@ -40,7 +42,7 @@ export function DocumentPopup({
           event.preventDefault();
           const popup = window.open(
             href,
-            "instructor-document-" +
+            windowName ?? "instructor-document-" +
               new URL(href, window.location.origin).searchParams.get("person"),
             `popup=yes,width=${Math.min(1680, screen.availWidth)},height=${Math.min(1000, screen.availHeight)},resizable=yes,scrollbars=yes`,
           );

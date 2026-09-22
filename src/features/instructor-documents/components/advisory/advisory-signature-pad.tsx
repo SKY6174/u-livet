@@ -22,8 +22,12 @@ const fileToDataUrl = (file: File): Promise<string> => new Promise((resolve, rej
 export function AdvisorySignaturePad({ signatureUrl, onChange, strokeWidth = 2.4 }: AdvisorySignaturePadProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const drawingRef = React.useRef(false);
+  const [uploadError, setUploadError] = React.useState("");
+  const uploadJob = React.useRef(0);
 
   const clear = React.useCallback(() => {
+    uploadJob.current++;
+    setUploadError("");
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
@@ -64,13 +68,21 @@ export function AdvisorySignaturePad({ signatureUrl, onChange, strokeWidth = 2.4
 
   const uploadImage = async (file?: File) => {
     if (!file) return;
-    const normalized = await normalizeAdvisorySignature(file);
-    onChange(await fileToDataUrl(normalized), normalized.name);
+    const job = ++uploadJob.current;
+    setUploadError("");
+    try {
+      const normalized = await normalizeAdvisorySignature(file);
+      const dataUrl = await fileToDataUrl(normalized);
+      if (job === uploadJob.current) onChange(dataUrl, normalized.name);
+    } catch {
+      if (job === uploadJob.current) setUploadError("서명 이미지를 불러오지 못했습니다. 10MB 이하의 PNG 또는 JPG 파일을 확인해 주세요.");
+    }
   };
 
   return (
     <div className="advisory-signature-pad">
-      <div className="advisory-signature-toolbar"><strong>서명창</strong><span>마우스나 손가락으로 서명하거나 이미지 파일을 올려 주세요.</span><button type="button" onClick={clear}><Eraser size={15} /> 지우기</button><label><Upload size={15} /> 이미지 업로드<input type="file" accept="image/png,image/jpeg" onChange={event => void uploadImage(event.target.files?.[0])} /></label></div>
+      <div className="advisory-signature-toolbar"><strong>서명창</strong><span>마우스나 손가락으로 서명하거나 이미지 파일을 올려 주세요.</span><button type="button" onClick={clear}><Eraser size={15} /> 지우기</button><label><Upload size={15} /> 이미지 업로드<input type="file" accept="image/png,image/jpeg" onChange={async event => { const input = event.currentTarget; await uploadImage(input.files?.[0]); input.value = ""; }} /></label></div>
+      {uploadError && <p role="alert" className="mb-3 text-sm text-red-700">{uploadError}</p>}
       <canvas ref={canvasRef} onPointerDown={event => { const context = event.currentTarget.getContext("2d"); if (!context) return; const p = point(event); drawingRef.current = true; event.currentTarget.setPointerCapture(event.pointerId); context.beginPath(); context.moveTo(p.x, p.y); }} onPointerMove={event => { if (!drawingRef.current) return; const context = event.currentTarget.getContext("2d"); if (!context) return; const p = point(event); context.lineTo(p.x, p.y); context.stroke(); }} onPointerUp={finish} onPointerCancel={finish} />
       {signatureUrl && <div className="advisory-current-signature"><span>현재 적용 서명</span><img src={signatureUrl} alt="현재 적용 서명" /></div>}
     </div>

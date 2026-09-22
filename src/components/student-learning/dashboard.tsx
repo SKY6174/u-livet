@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ActionForm } from "@/components/portal/action-form";
+import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { decideApplication } from "@/app/actions";
 import { submitLearningRequest } from "@/app/learning-request-actions";
 import { attendanceState } from "@/lib/attendance/model";
@@ -533,6 +534,17 @@ export function StudentDashboard({
           </a>
         ))}
       </nav>
+
+      <section className="mb-8 flex flex-wrap items-center justify-between gap-5 rounded-2xl border border-teal-100 bg-white p-5 sm:p-6" aria-label="수강생 작성 서류">
+        <div className="flex items-center gap-4">
+          <span className="rounded-xl bg-teal-50 p-3 text-teal-800"><Check className="h-5 w-5" aria-hidden="true" /></span>
+          <div><h2 className="font-bold text-slate-900">수강생 작성 서류</h2><p className="mt-1 text-sm text-slate-500">정보 입력부터 서명까지, 원본 서식으로 간편하게 작성하세요.</p></div>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <DocumentPopup href="/mypage/documents/application" windowName="learner-application" className="btn-secondary gap-2">수강신청원서 작성 <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></DocumentPopup>
+          <DocumentPopup href="/mypage/documents/scholarship" windowName="learner-scholarship" className="btn-primary gap-2">장학금 지급신청서 작성 <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></DocumentPopup>
+        </div>
+      </section>
 
       <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_320px]">
         <section id="my-classes" className={sectionClass}>
