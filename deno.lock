@@ -64,7 +64,8 @@
         "npm:read-excel-file@9.3.10",
         "npm:tailwind-merge@^2.5.2",
         "npm:tailwindcss@^3.4.10",
-        "npm:typescript@^5.5.4"
+        "npm:typescript@^5.5.4",
+        "npm:write-excel-file@4.1.1"
       ],
       "overrides": {
         "postcss": "$postcss",
