@@ -372,13 +372,18 @@ export function DocumentEditor({
               return field && validField(value, field);
             }));
             const slots = PHOTO_CAPTIONS.length + MAX_OPERATION_PHOTOS - content.photos.length;
+            const existingImages = new Set(content.photos.map((photo) => photo.image).filter(Boolean));
+            const uniquePhotos = photos.filter((photo) => !existingImages.has(photo.image));
             const columns = documentTables("result").find((table) => table.key === "schedule")!.columns;
             const acceptedSchedule = schedule.filter((row) => columns.every((column) => validField(row[column.key], column)));
             const next: Content = {
               ...content,
               fields: { ...content.fields, ...accepted },
               tables: { ...content.tables, schedule: schedule.length ? acceptedSchedule : content.tables.schedule },
-              photos: [...content.photos, ...photos.slice(0, slots)],
+              photos: [...content.photos, ...uniquePhotos.slice(0, slots).map((photo, index) => ({
+                ...photo,
+                caption: `운영사진${content.photos.length - PHOTO_CAPTIONS.length + index + 1}`,
+              }))],
               signature: "",
             };
             if (!validContent(next, "result")) {
@@ -387,7 +392,7 @@ export function DocumentEditor({
             }
             change(next);
             setError("");
-            if (Object.keys(accepted).length !== Object.keys(proposal).length || photos.length > slots || acceptedSchedule.length !== schedule.length)
+            if (Object.keys(accepted).length !== Object.keys(proposal).length || uniquePhotos.length > slots || acceptedSchedule.length !== schedule.length)
               setMessage("일부 날짜·숫자 형식, 강의표 행 또는 사진 장수가 한도를 넘어 제외되었습니다. 원본과 비교해 주세요.");
             return true;
           }}

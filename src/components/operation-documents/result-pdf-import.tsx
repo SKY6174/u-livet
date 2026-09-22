@@ -64,9 +64,13 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
     }
     setSourceText(extracted.text);
     setPhotos(extracted.photos);
+    setIncludePhotos(extracted.photos.some((photo) => !content.photos.some((saved) => saved.image === photo.image)));
     setMessage(`${extracted.pages}쪽을 읽고 사진 ${extracted.photos.length}장을 찾았습니다. AI가 내용 제안을 작성 중입니다.`);
     try { await analyze(extracted.text); }
-    catch (cause) { setError(`${cause instanceof Error ? cause.message : "AI 분석 실패"} 사진은 아래에서 따로 반영할 수 있습니다.`); }
+    catch (cause) {
+      setMessage(`${extracted.pages}쪽에서 사진 ${extracted.photos.length}장을 읽었습니다. 사진은 아래에서 따로 반영할 수 있습니다.`);
+      setError(cause instanceof Error ? cause.message : "AI 제안을 받지 못했습니다.");
+    }
   }
 
   async function loadExisting() {
@@ -102,6 +106,7 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
   }
 
   const proposals = Object.entries(suggested);
+  const newPhotos = photos.filter((photo) => !content.photos.some((saved) => saved.image === photo.image));
   return (
     <section className="mb-5 rounded-2xl border border-teal-200 bg-white p-5" aria-label="기존 결과보고서 가져오기">
       <h2 className="text-lg font-bold">제출 완료된 결과보고서 PDF 가져오기</h2>
@@ -113,7 +118,7 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
       <input className="mt-4 block w-full text-sm" type="file" accept="application/pdf,.pdf" disabled={disabled || busy}
         aria-label="제출된 결과보고서 PDF 업로드"
         onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file); event.target.value = ""; }} />
-      {busy && <p className="mt-3 text-sm text-teal-800" role="status">PDF 보관·분석 중…</p>}
+      {busy && <p className="mt-3 text-sm text-teal-800" role="status">PDF 내용·사진 분석 중…</p>}
       {message && !busy && <p className="mt-3 text-sm text-teal-800" role="status">{message}</p>}
       {error && <p className="mt-3 text-sm text-red-700" role="alert">{error}</p>}
       {fileId && <a className="mt-2 inline-block text-sm text-teal-800 underline" href={`/api/course-reports/${courseId}/files/${fileId}`} target="_blank" rel="noreferrer">보관된 원본 PDF 확인</a>}
@@ -131,12 +136,12 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
         <p className="mt-1 text-xs text-slate-500">기존 강의표를 교체합니다. 실제 강의일·시수와 대조해 주세요.</p>
         <div className="mt-2 max-h-32 overflow-y-auto text-sm text-slate-600">{schedule.slice(0, 8).map((row, index) => <p key={index}>{row.date} · {row.topic} · {row.instructor} · {row.hours}시간</p>)}</div>
       </div>}
-      {photos.length > 0 && <div className="mt-5"><label className="flex items-center gap-2 font-semibold"><input type="checkbox" checked={includePhotos} onChange={(event) => setIncludePhotos(event.target.checked)} /> 원본의 사진 {photos.length}장 반영</label>
+      {photos.length > 0 && <div className="mt-5"><label className="flex items-center gap-2 font-semibold"><input type="checkbox" checked={includePhotos} disabled={newPhotos.length === 0} onChange={(event) => setIncludePhotos(event.target.checked)} /> 원본의 사진 {photos.length}장 중 새 사진 {newPhotos.length}장 반영</label>
         <p className="mt-1 text-xs text-slate-500">사진 순서와 촬영일·설명은 원본과 비교해 주세요. 식별되지 않은 날짜는 비워 둡니다.</p>
         <div className="mt-3 flex gap-2 overflow-x-auto">{photos.slice(0, 8).map((photo, index) => <img key={index} src={photo.image} alt={`추출 사진 ${index + 1}`} className="h-20 w-24 shrink-0 rounded border object-cover" />)}</div>
       </div>}
-      {(proposals.length > 0 || photos.length > 0 || schedule.length > 0) && <button type="button" className="btn-primary mt-5" disabled={disabled || busy || (!selected.length && (!includePhotos || !photos.length) && (!includeSchedule || !schedule.length))}
-        onClick={() => { if (!onApply(Object.fromEntries(selected.map((key) => [key, suggested[key]])), includePhotos ? photos : [], includeSchedule ? schedule : [])) return; setPhotos([]); setSchedule([]); setSuggested({}); setSelected([]); setMessage("선택한 내용을 초안에 반영했습니다. 원본과 대조한 뒤 임시저장해 주세요."); }}>
+      {(proposals.length > 0 || photos.length > 0 || schedule.length > 0) && <button type="button" className="btn-primary mt-5" disabled={disabled || busy || (!selected.length && (!includePhotos || !newPhotos.length) && (!includeSchedule || !schedule.length))}
+        onClick={() => { if (!onApply(Object.fromEntries(selected.map((key) => [key, suggested[key]])), includePhotos ? newPhotos : [], includeSchedule ? schedule : [])) return; setPhotos([]); setSchedule([]); setSuggested({}); setSelected([]); setError(""); setMessage("선택한 내용을 초안에 반영했습니다. 원본과 대조한 뒤 임시저장해 주세요."); }}>
         선택한 내용·사진 초안에 반영
       </button>}
     </section>
