@@ -32,3 +32,9 @@
 - 담당자와 강사는 AI 추출 결과를 확인한 뒤 저장한다. 분석 실패 시 안내에 따라 재시도하거나 직접 내용을 입력할 수 있다.
 
 프런트엔드는 main push에 연결된 Vercel 자동 배포로 반영한다.
+
+## GPT-5.6 모델 변경
+- 사용자 요청으로 이력서 분석, 문서 이미지 영역 인식, 신분증·통장 정보 추출의 OpenAI 모델을 `gpt-5.6`으로 통일했다. 공식 모델 문서상 GPT-5.6 Sol의 별칭이며 이미지 입력과 구조화 출력을 지원한다: https://developers.openai.com/api/docs/models/gpt-5.6-sol
+- 모델 문자열은 Edge Function의 `OPENAI_DOCUMENT_MODEL` 상수 한 곳에서 관리하고 UI 분석 안내와 응답 타입도 변경했다. 기존 Gemini 실패 대체 경로는 유지한다.
+- 실제 API 호출은 `401 token_invalidated`(API key invalidated)로 거부되었다. 운영 `OPENAI_API_KEY` secret의 digest가 시험에 사용한 키와 일치함을 확인했다. 유효한 키 갱신 전에는 GPT-5.6의 실제 응답을 확인할 수 없고 기존 Gemini 대체 경로가 작동한다.
+- TypeScript, 변경 파일 ESLint, Deno 타입 검사를 통과했다. 키 갱신 후 가상 문서·이미지로 실제 GPT-5.6 응답을 재검증해야 한다.

@@ -777,10 +777,10 @@ export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly 
     }
     try {
       setIsAnalyzingResume(true);
-      setNotice("OpenAI가 기존 이력서를 분석하고 있습니다. 응답할 수 없으면 Gemini로 자동 전환합니다.");
+      setNotice("GPT-5.6이 기존 이력서를 분석하고 있습니다. 응답할 수 없으면 Gemini로 자동 전환합니다.");
       const dataUrl = await readFileDataUrl(file);
       const analysis = await analyzeAdvisoryResume(voterToken, file.name, file.type, dataUrl);
-      const analysisProvider = analysis.model.startsWith("gemini") ? "Gemini" : "GPT-5.6 Luna";
+      const analysisProvider = analysis.model.startsWith("gemini") ? "Gemini" : "GPT-5.6";
       const analyzedResume = normalizeAdvisoryResume(analysis.resume, context.member.name, 20);
       const warningText = analysis.warnings.length > 0 ? ` 확인 필요: ${analysis.warnings.join(" · ")}` : "";
       if (analyzedResume.careers.length > MAX_CAREER_ROWS) {
@@ -1143,7 +1143,7 @@ export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly 
                   : "이력서 입력과 AI 적용 결과는 변경 후 자동으로 암호화 임시저장됩니다."
         }</p>
         <div className="advisory-resume-ai-import">
-          <div><Sparkles size={20} /><span><strong>기존 이력서 AI 자동입력</strong><small>PDF·DOCX·TXT·JPG·PNG, 최대 6MB · OpenAI 우선 / Gemini 자동 대체 · 원본 미보관</small></span></div>
+          <div><Sparkles size={20} /><span><strong>기존 이력서 AI 자동입력</strong><small>PDF·DOCX·TXT·JPG·PNG, 최대 6MB · GPT-5.6 우선 / Gemini 자동 대체 · 원본 미보관</small></span></div>
           <label className="advisory-upload-button"><Upload size={15} /> {isAnalyzingResume ? "AI 분석 중..." : "기존 이력서 선택"}
             <input type="file" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png" disabled={isAnalyzingResume} onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; if (file) void handleResumeAiImport(file); }} />
           </label>

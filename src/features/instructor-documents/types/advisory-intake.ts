@@ -56,7 +56,7 @@ export interface AdvisoryResume {
 export interface AdvisoryResumeAiAnalysis {
   resume: AdvisoryResume;
   warnings: string[];
-  model: "gpt-5.6-luna" | "gemini-3.1-pro-preview";
+  model: "gpt-5.6" | "gemini-3.1-pro-preview";
 }
 
 export interface AdvisoryStoredDocumentStatus {

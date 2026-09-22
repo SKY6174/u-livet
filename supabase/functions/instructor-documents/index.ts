@@ -8,6 +8,7 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
 const ADVISORY_PII_KEY = Deno.env.get("ADVISORY_PII_KEY") ?? "";
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") ?? "";
+const OPENAI_DOCUMENT_MODEL = "gpt-5.6";
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
 const GEMINI_DOCUMENT_MODEL = "gemini-3.1-pro-preview";
 const ALLOWED_ORIGINS = (Deno.env.get("INSTRUCTOR_DOCUMENT_ALLOWED_ORIGINS") ?? "")
@@ -396,7 +397,7 @@ async function analyzeAdvisoryResumeWithOpenAi(file: {
       method: "POST",
       headers: { "Authorization": `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-5.6-luna",
+        model: OPENAI_DOCUMENT_MODEL,
         store: false,
         reasoning: { effort: "medium" },
         instructions: ADVISORY_RESUME_AI_INSTRUCTIONS,
@@ -476,7 +477,7 @@ async function analyzeAdvisoryResume(
   if (OPENAI_API_KEY) {
     try {
       parsed = await analyzeAdvisoryResumeWithOpenAi(file);
-      model = "gpt-5.6-luna";
+      model = OPENAI_DOCUMENT_MODEL;
     } catch (error) {
       const failure = error instanceof VoteFunctionError
         ? error
@@ -618,7 +619,7 @@ async function analyzeAdvisoryDocumentLayoutWithOpenAi(
       method: "POST",
       headers: { "Authorization": `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-5.6-luna",
+        model: OPENAI_DOCUMENT_MODEL,
         store: false,
         reasoning: { effort: "low" },
         instructions: ADVISORY_DOCUMENT_LAYOUT_INSTRUCTIONS,
@@ -849,7 +850,7 @@ async function extractAdvisoryDocumentWithOpenAi(
       method: "POST",
       headers: { "Authorization": `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-5.6-luna",
+        model: OPENAI_DOCUMENT_MODEL,
         store: false,
         reasoning: { effort: "medium" },
         instructions: ADVISORY_DOCUMENT_EXTRACTION_INSTRUCTIONS,
