@@ -100,7 +100,9 @@ export async function POST(
       return NextResponse.json(
         {
           message:
-            error.message === "PHOTO_LIMIT"
+            error.message === "SOURCE_SIGNATURE_IN_USE"
+              ? "기존 원본 서명이 결과보고서에 연결되어 있습니다. 서명 이미지를 초안에서 제거·저장한 뒤 PDF를 교체해 주세요."
+              : error.message === "PHOTO_LIMIT"
               ? "운영사진은 최대 12장입니다."
               : "저장하지 못했습니다. 권한·추가 인증 상태를 확인해 주세요.",
         },

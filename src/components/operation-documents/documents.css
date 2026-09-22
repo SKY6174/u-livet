@@ -167,6 +167,21 @@
 .op-result-signature {
   margin-top: 12mm;
 }
+.op-source-signature {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4mm;
+  margin-top: 5mm;
+  font-size: 9pt;
+  color: #555;
+}
+.op-source-signature img {
+  width: 38mm;
+  height: 18mm;
+  object-fit: contain;
+  border: 0.2mm solid #aaa;
+}
 .op-overview h2 {
   margin-top: 14mm;
 }

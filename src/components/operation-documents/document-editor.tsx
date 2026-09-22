@@ -365,7 +365,13 @@ export function DocumentEditor({
           courseId={context.course.id}
           disabled={busy}
           content={content}
-          onApply={(proposal, photos, schedule) => {
+          budget={budget}
+          budgetEditable={doc.status === "DRAFT"}
+          onRemoveSourceSignature={() => {
+            const { sourceSignature: _removed, ...withoutSourceSignature } = content;
+            change(withoutSourceSignature);
+          }}
+          onApply={(proposal, photos, schedule, importedBudget, sourceSignature) => {
             const allowed = new Map(documentFields("result").map((field) => [field.key, field]));
             const accepted = Object.fromEntries(Object.entries(proposal).filter(([key, value]) => {
               const field = allowed.get(key);
@@ -385,12 +391,14 @@ export function DocumentEditor({
                 caption: `운영사진${content.photos.length - PHOTO_CAPTIONS.length + index + 1}`,
               }))],
               signature: "",
+              ...(sourceSignature ? { sourceSignature } : {}),
             };
-            if (!validContent(next, "result")) {
+            if (!validContent(next, "result") || (importedBudget && !validBudget(importedBudget))) {
               setError("가져올 내용이나 사진이 3MB 저장 한도를 넘었습니다. 사진을 줄인 뒤 다시 반영해 주세요.");
               return false;
             }
             change(next);
+            if (importedBudget) changeBudget(importedBudget);
             setError("");
             if (Object.keys(accepted).length !== Object.keys(proposal).length || uniquePhotos.length > slots || acceptedSchedule.length !== schedule.length)
               setMessage("일부 날짜·숫자 형식, 강의표 행 또는 사진 장수가 한도를 넘어 제외되었습니다. 원본과 비교해 주세요.");

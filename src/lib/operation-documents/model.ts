@@ -13,6 +13,7 @@ export type Content = {
   tables: Record<string, Record<string, string>[]>;
   photos: { caption: string; date: string; image: string }[];
   signature: string;
+  sourceSignature?: { image: string; page: number; fileId: string };
 };
 export type Budget = {
   rows: {
@@ -256,7 +257,8 @@ export function validContent(
 ): value is Content {
   if (
     !record(value) ||
-    !exact(value, ["fields", "tables", "photos", "signature"]) ||
+    !(exact(value, ["fields", "tables", "photos", "signature"]) ||
+      (kind === "result" && exact(value, ["fields", "tables", "photos", "signature", "sourceSignature"]))) ||
     !record(value.fields) ||
     !record(value.tables)
   )
@@ -318,6 +320,16 @@ export function validContent(
     return false;
   return (
     validImage(value.signature, 200_000) &&
+    (value.sourceSignature === undefined ||
+      (record(value.sourceSignature) &&
+        exact(value.sourceSignature, ["image", "page", "fileId"]) &&
+        validImage(value.sourceSignature.image, 200_000) &&
+        value.sourceSignature.image !== "" &&
+        Number.isInteger(value.sourceSignature.page) &&
+        (value.sourceSignature.page as number) >= 1 &&
+        (value.sourceSignature.page as number) <= 50 &&
+        typeof value.sourceSignature.fileId === "string" &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value.sourceSignature.fileId))) &&
     JSON.stringify(value).length <= 3_000_000 &&
     (!vals.startsOn ||
       !vals.endsOn ||

@@ -71,11 +71,35 @@ export async function extractResultPdf(file: File): Promise<{ text: string; phot
       page.cleanup();
     }
     const raw = text.join("\n");
-    if (raw.replace(/\s/g, "").length < 80) throw new Error("텍스트를 읽을 수 없는 PDF입니다. 원본은 보관되지만 내용은 직접 입력해 주세요.");
     return {
       text: raw.slice(0, 95_000), photos, pages: pdf.numPages,
     };
   } finally {
     await documentTask.destroy();
+  }
+}
+
+export async function renderResultPdfPage(file: File, pageNumber: number): Promise<string> {
+  const pdfjs = await import("pdfjs-dist");
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+  const task = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), stopAtErrors: true });
+  try {
+    const pdf = await task.promise;
+    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pdf.numPages) throw new Error("PDF 쪽수를 확인해 주세요.");
+    const page = await pdf.getPage(pageNumber);
+    const base = page.getViewport({ scale: 1 });
+    const viewport = page.getViewport({ scale: Math.min(1.5, 820 / base.width) });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("PDF 페이지를 표시하지 못했습니다.");
+    await page.render({ canvasContext: context, canvas, viewport }).promise;
+    const image = canvas.toDataURL("image/jpeg", 0.78);
+    canvas.width = canvas.height = 0;
+    page.cleanup();
+    return image;
+  } finally {
+    await task.destroy();
   }
 }

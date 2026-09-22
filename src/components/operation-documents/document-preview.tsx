@@ -137,6 +137,12 @@ export function DocumentPreview({
               서명 {content.signature && <img src={content.signature} alt="책임강사 서명" />}
             </span>
           </div>
+          {content.sourceSignature && (
+            <div className="op-source-signature">
+              <span>원본 PDF 서명(참고) · {content.sourceSignature.page}쪽</span>
+              <img src={content.sourceSignature.image} alt="원본 결과보고서의 서명 이미지" />
+            </div>
+          )}
         </>
       )}
     </div>,
