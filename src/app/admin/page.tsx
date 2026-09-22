@@ -7,7 +7,8 @@ import { hasRole, isOfficeMember, officeSections } from "@/lib/auth/workspace-na
 const WORKSPACE_ICONS = {
   "/admin/courses": BookOpen,
   "/admin/instructors": UsersRound,
-  "/admin/reports": FileText,
+  "/operation-documents/plan": BookOpen,
+  "/operation-documents/result": FileText,
   "/completion": ClipboardCheck,
   "/credentials": Award,
   "/finance": Wallet,

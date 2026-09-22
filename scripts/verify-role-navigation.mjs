@@ -34,8 +34,8 @@ common['@/components/portal/ui'] = {
 };
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
-  [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/courses', '/admin/instructors', '/operation-documents', '/admin/reports', '/completion', '/credentials', '/performance'], 'office'],
+  [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/operation-documents/result', '/admin/parking', '/admin/accounts'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/courses', '/admin/instructors', '/operation-documents/plan', '/operation-documents/result', '/completion', '/credentials', '/admin/parking', '/performance'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
@@ -78,7 +78,7 @@ await test('expert management is an independent office menu with correct nested 
   }
 });
 await test('nested report, completion and certificate routes stay under the office menu', () => {
-  for (const [pathname, active] of [['/admin', '/admin'], ['/admin/course-plan/opening', '/admin/courses'], ['/admin/offerings/id', '/admin/courses'], ['/admin/offerings/id/reports/print', '/admin/reports'], ['/completion/id', '/completion'], ['/credentials/badges', '/credentials'], ['/admin/accounts', '/admin/accounts']]) {
+  for (const [pathname, active] of [['/admin', '/admin'], ['/admin/course-plan/opening', '/admin/courses'], ['/admin/offerings/id', '/admin/courses'], ['/operation-documents/id/plan', '/operation-documents/plan'], ['/operation-documents/id/result', '/operation-documents/result'], ['/admin/reports', '/operation-documents/result'], ['/admin/offerings/id/reports/print', '/operation-documents/result'], ['/completion/id', '/completion'], ['/credentials/badges', '/credentials'], ['/admin/accounts', '/admin/accounts']]) {
     assert.equal(nav.officeActiveHref(pathname), active);
     assert(nav.primaryActive(pathname, '/admin'));
   }
@@ -123,7 +123,7 @@ await test('office hub rejects guests/learners/teachers and permits each actual 
 await test('every pre-existing course subtree retains a manager gate when the hub is widened', async () => {
   const redirectOnly = ['finance', 'performance', 'kpi'];
   for (const dir of readdirSync('src/app/admin', { withFileTypes: true }).filter(dir => dir.isDirectory())) {
-    if (['accounts', 'course-requests'].includes(dir.name)) continue; // page has its own SYSTEM_ADMIN gate
+    if (['accounts', 'course-requests', 'parking'].includes(dir.name)) continue; // pages enforce their own role gates
     if (redirectOnly.includes(dir.name)) continue; // no data; destination layout gates it
     const gate = load(`src/app/admin/${dir.name}/layout.tsx`, { '@/components/navigation/office-section': section }).default;
     for (const roles of [[], ['INSTRUCTOR'], ['SYSTEM_ADMIN'], ['CERTIFIER'], ['FINANCE'], ['PERFORMANCE']]) {
@@ -191,16 +191,53 @@ await test('report states/search isolate results and link to the correct report/
   assert(renderToStaticMarkup(renderReports()).includes('조건에 맞는 보고서가 없습니다.'));
 });
 let reportReads = 0;
-let failed = false;
-const Reports = load('src/app/admin/reports/page.tsx', { ...common,
-  '@/lib/course-workspace/data': { getCourseWorkspaces: async () => { reportReads++; return { courses: [], unavailable: failed }; } },
-  '@/components/course-workspace/report-list': { ReportList: () => React.createElement('p', null, '아직 등록된 과정이 없습니다.') },
-}).default;
-await test('reports reject unrelated roles before reading data and distinguish empty from failure', async () => {
-  me = member('SYSTEM_ADMIN'); await assert.rejects(Reports(), /NOT_FOUND/); assert.equal(reportReads, 0);
+let documentFailure = false;
+let legacyFailure = false;
+const DocumentList = load('src/components/operation-documents/document-list.tsx', { ...common,
+  '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async () => ({
+    data: [{ id: 'course-1', name: '검증 과정', starts_on: '2026-01-01', ends_on: '2026-02-01', responsible: '책임강사', plan_status: 'DRAFT', result_status: 'REVIEW' }],
+    error: documentFailure ? new Error('unavailable') : null,
+  }) }) },
+  '@/lib/course-workspace/data': { getCourseWorkspaces: async () => { reportReads++; return { courses: [], unavailable: legacyFailure }; } },
+  '@/lib/operation-documents/model': { STATUS_LABELS: { DRAFT: '작성 중', REVIEW: '검토 중' } },
+  '@/components/course-workspace/report-list': { ReportList: () => React.createElement('p', null, '기존 결과 보고 목록') },
+}).DocumentList;
+await test('plan and result menus separate documents and keep legacy reports manager-only', async () => {
   me = member('COURSE_MANAGER');
-  assert(renderToStaticMarkup(await Reports()).includes('아직 등록된 과정이 없습니다.'));
-  failed = true; const output = renderToStaticMarkup(await Reports());
-  assert(output.includes('보고서 현황을 불러오지 못했습니다')); assert(!output.includes('아직 등록된 과정이 없습니다.'));
+  let output = renderToStaticMarkup(await DocumentList({ kind: 'plan' }));
+  assert(output.includes('/operation-documents/course-1/plan'));
+  assert(!output.includes('/operation-documents/course-1/result'));
+  assert(!output.includes('기존 결과 보고 목록'));
+  assert.equal(reportReads, 0);
+  output = renderToStaticMarkup(await DocumentList({ kind: 'result' }));
+  assert(output.includes('/operation-documents/course-1/result'));
+  assert(output.includes('/operation-documents/result?view=evidence'));
+  assert(!output.includes('기존 결과 보고 목록'));
+  assert.equal(reportReads, 0);
+  output = renderToStaticMarkup(await DocumentList({ kind: 'result', view: 'evidence' }));
+  assert(output.includes('기존 결과 보고 목록'));
+  assert(!output.includes('/operation-documents/course-1/result'));
+  assert.equal(reportReads, 1);
+  for (const role of ['SYSTEM_ADMIN', 'INSTRUCTOR']) {
+    me = member(role);
+    output = renderToStaticMarkup(await DocumentList({ kind: 'result' }));
+    assert(output.includes('/operation-documents/course-1/result'));
+    assert(!output.includes('기존 결과 보고 목록'));
+    assert.equal(reportReads, 1);
+    await assert.rejects(DocumentList({ kind: 'result', view: 'evidence' }), /NOT_FOUND/);
+  }
+  me = member('COURSE_MANAGER'); documentFailure = true;
+  output = renderToStaticMarkup(await DocumentList({ kind: 'result' }));
+  assert(output.includes('문서 현황을 불러오지 못했습니다'));
+  assert(!output.includes('기존 결과 보고 목록'));
+  documentFailure = false; legacyFailure = true;
+  output = renderToStaticMarkup(await DocumentList({ kind: 'result', view: 'evidence' }));
+  assert(output.includes('증빙 현황을 불러오지 못했습니다'));
+});
+const Reports = load('src/app/admin/reports/page.tsx', common).default;
+const Documents = load('src/app/operation-documents/page.tsx', common).default;
+await test('saved list addresses redirect to the matching menu', async () => {
+  assert.throws(() => Reports(), error => error.destination === '/operation-documents/result?view=evidence');
+  assert.throws(() => Documents(), error => error.destination === '/operation-documents/plan');
 });
 console.log(`${checks} role navigation checks passed; synthetic identities only, no DB writes.`);

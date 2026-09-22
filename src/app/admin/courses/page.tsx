@@ -66,8 +66,8 @@ export default async function CourseOperations({
           <Link className="btn-primary" href={`/admin/courses?org=${org}&create=1#new-course`}>
             새 과정 등록
           </Link>
-          <Link className="btn-secondary" href="/admin/reports">
-            결과 보고로 이동
+          <Link className="btn-secondary" href="/operation-documents/result">
+            결과보고서로 이동
           </Link>
         </div>
       </section>}

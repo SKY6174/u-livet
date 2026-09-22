@@ -31,8 +31,10 @@ export function officeSections(member: Member) {
       { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
     ] : [] },
     { title: "결과 보고·수료", links: [
-      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [{ label: "운영계획서·결과보고서", href: "/operation-documents", description: "책임강사 작성, 담당자 예산 검토와 최종 제출" }] : []),
-      ...(manager ? [{ label: "결과 보고", href: "/admin/reports", description: "과정별 결과보고서 작성·검토와 6종 자료 출력을 진행합니다." }] : []),
+      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
+        { label: "운영계획서", href: "/operation-documents/plan", description: "책임강사 작성, 담당자 예산 검토와 최종 제출" },
+        { label: "결과보고서", href: "/operation-documents/result", description: "공식 결과보고서와 과정별 결과 보고·6종 증빙을 관리합니다." },
+      ] : []),
       ...(certifier ? [
         { label: "수료 검토", href: "/completion", description: "출결·평가 근거를 확인하고 수료 판정을 검토·승인합니다." },
         { label: "증명 관리", href: "/credentials", description: "증명 신청·발급과 디지털배지를 관리합니다." },
@@ -56,8 +58,10 @@ export const courseOperationLinks: WorkspaceLink[] = [
 
 const within = (path: string, base: string) => path === base || path.startsWith(base + "/");
 export function officeActiveHref(path: string) {
-  if (within(path, "/operation-documents")) return "/operation-documents";
-  if (within(path, "/admin/reports") || /^\/admin\/offerings\/[^/]+\/reports(?:\/|$)/.test(path)) return "/admin/reports";
+  if (within(path, "/operation-documents/plan") || /^\/operation-documents\/[^/]+\/plan(?:\/|$)/.test(path)) return "/operation-documents/plan";
+  if (within(path, "/operation-documents/result") || /^\/operation-documents\/[^/]+\/result(?:\/|$)/.test(path)) return "/operation-documents/result";
+  if (within(path, "/operation-documents")) return "/operation-documents/plan";
+  if (within(path, "/admin/reports") || /^\/admin\/offerings\/[^/]+\/reports(?:\/|$)/.test(path)) return "/operation-documents/result";
   for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/instructors", "/admin/parking"])
     if (within(path, href)) return href;
   return path === "/admin" ? "/admin" : "/admin/courses";
@@ -79,7 +83,7 @@ export function primaryLinks(member: Member | null, loginPage = false) {
   return links;
 }
 export function primaryActive(path: string, href: string) {
-  if (href === "/admin") return ["/admin", "/completion", "/credentials", "/finance", "/performance"].some((base) => within(path, base));
+  if (href === "/admin") return ["/admin", "/operation-documents", "/completion", "/credentials", "/finance", "/performance"].some((base) => within(path, base));
   if (href === "/instructor") return ["/instructor", "/development", "/mypage", "/auth/security", "/quality"].some(base => within(path, base));
   return within(path, href);
 }

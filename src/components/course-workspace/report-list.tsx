@@ -40,7 +40,7 @@ export function ReportList({ courses }: { courses: CourseWorkspace[] }) {
               <p className="mt-3 text-sm text-slate-600">운영 담당 {course.operator || "미입력"} · 원본 PDF {course.document_kinds.length}/6종</p>
               {course.report_missing.length > 0 && <p className="mt-3 text-sm text-amber-800">확인할 내용: {course.report_missing.join(" · ")}</p>}
               <div className="mt-auto flex flex-wrap gap-3 pt-6">
-                <Link className="btn-primary" href={report}>{course.report_revision ? "보고서 검토·보완" : "결과보고서 작성"}</Link>
+                <Link className="btn-primary" href={report}>{course.report_revision ? "기존 보고 내용 검토" : "증빙·지급자료 작성"}</Link>
                 <Link className="btn-secondary" href={`${report}/print?document=all`} target="_blank" rel="noreferrer">6종 출력 미리보기</Link>
               </div>
             </article>

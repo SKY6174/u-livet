@@ -14,7 +14,7 @@ function CourseActions({ course: c, manager, org }: { course: OperationCourse; m
     {manager && c.workspace && <Link className="hover:underline" href={`/operation-documents/${c.workspace.id}/plan`}>계획서 →</Link>}
     {manager && c.workspace && <Link className="hover:underline" href={`/operation-documents/${c.workspace.id}/result`}>결과보고서 →</Link>}
     <Link className="hover:underline" href={`/courses/${c.id}`}>과정 소개</Link>
-    {manager && c.workspace?.report_revision && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/reports`}>결과 보고</Link>}
+    {manager && c.workspace?.report_revision && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/reports`}>증빙·지급자료</Link>}
   </div>;
 }
 export function OperationsDashboard({ courses, workbooks, org, manager, responsibleNames }: { courses: OperationCourse[]; workbooks: WorkbookSummary[]; org: string; manager: boolean; responsibleNames: Record<string, string | null> | null }) {

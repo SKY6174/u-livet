@@ -238,8 +238,8 @@ export function DocumentEditor({
           <p className="mt-2 text-slate-600">{context.course.name}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link className="btn-secondary" href="/operation-documents">
-            문서 현황
+          <Link className="btn-secondary" href={`/operation-documents/${kind}`}>
+            {kind === "plan" ? "운영계획서 목록" : "결과보고서 목록"}
           </Link>
           <Link
             className="btn-secondary"
