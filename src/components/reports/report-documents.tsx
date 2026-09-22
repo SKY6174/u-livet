@@ -1,5 +1,8 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { AttendancePrint } from "@/components/attendance/attendance-print";
+import type { AttendanceBook } from "@/lib/attendance/model";
+import { buildTeachingLedger } from "@/lib/reports/teaching-ledger";
 import type { Offering } from "@/lib/portal/types";
 import {
   attendanceSummary,
@@ -106,11 +109,13 @@ export function ReportDocuments({
   bundle: b,
   document,
   reveal = false,
+  attendanceBook,
 }: {
   offering: Offering;
   bundle: ReportBundle;
   document: DocumentKind | "all";
   reveal?: boolean;
+  attendanceBook?: AttendanceBook | null;
 }) {
   const p = b.report?.payload ?? emptyReport(o),
     source = o.status === "ARCHIVED" ? p.sourceReport : undefined,
@@ -314,67 +319,12 @@ export function ReportDocuments({
           </Sheet>
         </>
       )}
-      {show("attendance") &&
-        chunk(sessions, 4).flatMap((group, si) =>
-          chunk(active, 12).map((people, pi) => (
-            <Sheet
-              title={`${title("attendance")} · ${si + 1}-${pi + 1}`}
-              offering={o}
-              wide
-              key={`a-${si}-${pi}`}
-            >
-              <p>
-                총 {hours(totalMinutes)}시간 · 강사 입력 출결 / 수기 서명용
-                시작·종료 칸
-              </p>
-              <Table
-                head={[
-                  "번호",
-                  "성명",
-                  ...group.map((s) => (
-                    <span key={s.id}>
-                      {sessions.indexOf(s) + 1}회 · {day(s.starts_at)}
-                      <br />
-                      {clock(s.starts_at)}~{clock(s.ends_at)}
-                    </span>
-                  )),
-                  "총 인정시간 / 출석률",
-                ]}
-                rows={people.map((m, i) => {
-                  const a = attendanceSummary(b, m.person_id);
-                  return [
-                    pi * 12 + i + 1,
-                    m.name,
-                    ...group.map((s) => {
-                      const r = b.attendance.find(
-                        (a) =>
-                          a.session_id === s.id && a.person_id === m.person_id,
-                      );
-                      return (
-                        <div key={s.id}>
-                          <strong>
-                            {r
-                              ? `${hours(Number(r.credited_minutes))}h${Number(r.credited_minutes) === 0 ? " (결석)" : ""}`
-                              : "미입력"}
-                          </strong>
-                          <div className="signature-pair">
-                            <span>시작</span>
-                            <span>종료</span>
-                          </div>
-                        </div>
-                      );
-                    }),
-                    `${hours(a.credited)}h / ${a.percent === null ? "—" : a.percent.toFixed(1) + "%"}${a.missing ? ` (${a.missing}회 미입력)` : ""}`,
-                  ];
-                })}
-              />
-              <p className="report-note">
-                출석률은 전체 등록 수업시간 대비 인정시간입니다. 미입력 회차가
-                있으면 잠정 수치이며 결석 확정을 의미하지 않습니다.
-              </p>
-            </Sheet>
-          )),
-        )}
+      {show("attendance") && <AttendancePrint official book={attendanceBook ?? {
+        offering: { id:o.id,name:o.name,starts_on:o.starts_on,ends_on:o.ends_on },
+        viewer_id:"",generated_at:new Date().toISOString(),
+        members:active.map((member) => ({ person_id:member.person_id,name:member.name })),
+        sessions:b.sessions,attendance:b.attendance,qr_checkins:[],qr_unavailable:true,
+      }} />}
       {show("completion") &&
         chunk(members, 18).map((people, pi) => (
           <Sheet title={title("completion")} offering={o} wide key={`c-${pi}`}>
@@ -460,36 +410,22 @@ export function ReportDocuments({
             </p>
           </Sheet>
         ))}
-      {show("teaching") &&
-        chunk(b.teaching, 16).map((rows, pi) => (
-          <Sheet title={title("teaching")} offering={o} key={`t-${pi}`}>
-            <Table
-              head={[
-                "차수",
-                "날짜 / 시간",
-                "실강의시간",
-                "성명",
-                "제출·확인",
-                "수기 서명",
-              ]}
-              rows={rows.map((l) => {
-                const s = sessions.find((s) => s.id === l.session_id)!;
-                return [
-                  sessions.indexOf(s) + 1,
-                  `${day(s.starts_at)} ${clock(s.starts_at)}~${clock(s.ends_at)}`,
-                  `${hours(l.minutes)}h`,
-                  l.name,
-                  `${day(l.confirmed_at)} 제출 · ${l.current ? "운영진 승인" : "검토 중"}`,
-                  <div className="signature-space" key={l.id} />,
-                ];
-              })}
-            />
-            <p className="report-note">
-              강사 본인의 로그인 제출기록을 표시합니다. 수기 서명이 필요한 경우
-              인쇄 후 서명하세요.
-            </p>
-          </Sheet>
-        ))}
+      {show("teaching") && chunk(buildTeachingLedger(sessions,b.teaching),12).map((rows, pi) => (
+        <section className="report-sheet report-portrait report-form-20 report-teaching-ledger" key={`t-${pi}`}>
+          <h1>{title("teaching")}</h1>
+          <Table head={["과정명","강의기간","총 제출 강의시간"]} rows={[[
+            o.name,`${o.starts_on} ~ ${o.ends_on}`,
+            `${hours(b.teaching.reduce((sum,log) => sum+Number(log.minutes),0))}시간`,
+          ]]} />
+          <Table head={["차수","날짜","시간","실강의시간","성명","서명"]} rows={rows.map((row) => [
+            row.session,day(`${row.date}T00:00:00+09:00`),`${row.period} ${row.time}`,
+            row.minutes === null ? "—" : `${hours(row.minutes)}시간`,row.name,
+            row.signature ? <Image key={row.key} src={row.signature} width={110} height={42} unoptimized alt={`${row.name} 본인 서명`} className="report-teaching-signature" /> : row.note || "—",
+          ])} />
+          <p className="report-note">실강의시간과 서명은 강사 본인의 최신 제출·서명 및 운영진 승인 기록을 기준으로 합니다. 미등록·승인 대기는 자동 날인되지 않습니다.</p>
+          <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
+        </section>
+      ))}
       {show("fees") &&
         chunk(p.fees, 14).map((rows, pi) => (
           <Sheet title={title("fees")} offering={o} wide key={`f-${pi}`}>

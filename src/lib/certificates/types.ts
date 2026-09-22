@@ -28,6 +28,10 @@ export type TeachingRecord = {
   revision: number;
   approved_at: string | null;
   current: boolean | null;
+  segments: { starts_at: string; ends_at: string }[];
+  signature: string | null;
+  signed_at: string | null;
+  signed_revision: number | null;
 };
 export type CertificateRequest = {
   id: string;

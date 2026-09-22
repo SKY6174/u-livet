@@ -6,6 +6,8 @@ import { getWorkspaceOfferings, dateTime } from "@/lib/portal/data";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import { submitTeaching } from "@/app/certificate-actions";
+import { TeachingSegmentsInput } from "@/components/teaching/teaching-segments-input";
+import { TeachingSignatureForm } from "@/components/teaching/teaching-signature-form";
 import type { TeachingRecord } from "@/lib/certificates/types";
 import type { ClassSession } from "@/lib/portal/evaluation";
 export default async function Records() {
@@ -50,8 +52,8 @@ export default async function Records() {
   return (
     <div className="page-shell">
       <PageIntro eyebrow="TEACHING RECORD" title="실제 강의실적">
-        완료된 수업의 실제 강의시간과 내용을 제출하세요. 과정담당이 별도로
-        확인한 실적만 경력증명에 반영됩니다.
+        완료된 수업의 실제 강의 구간과 내용을 제출하고 본인 서명을 등록하세요.
+        과정담당이 확인한 실적과 서명이 강의날인부에 반영됩니다.
       </PageIntro>
       <Link className="btn-secondary mb-6" href="/mypage/certificates">
         강의경력증명 신청 →
@@ -63,6 +65,7 @@ export default async function Records() {
           <span className="badge">{log.current ? "승인 완료" : "승인·재검토 필요"}</span>
           <h3 className="mt-3 font-bold">{log.course_name}</h3><p className="mt-2">{log.session_title} · {log.minutes}분</p>
           <p className="mt-2 text-sm text-slate-600">{dateTime(log.starts_at)} ~ {dateTime(log.ends_at)}</p>
+          <p className="mt-2 text-sm text-slate-600">강의날인부 서명: {log.signature && log.signed_revision === log.revision ? "등록 완료" : "미등록"}</p>
         </article>)}</div> : <Empty title="제출한 강의이력이 없습니다" />}
       </section>
       <h2 className="section-title">완료 수업 실적 제출·정정</h2>
@@ -90,6 +93,7 @@ export default async function Records() {
                 <ActionForm
                   action={submitTeaching}
                   label={l ? "실적 정정 제출" : "실적 제출"}
+                  resetOnSuccess={false}
                 >
                   <input type="hidden" name="session" value={s.id} />
                   <input
@@ -97,21 +101,7 @@ export default async function Records() {
                     name="revision"
                     value={l?.revision ?? 0}
                   />
-                  <label className="field">
-                    실제 강의시간 (분)
-                    <input
-                      type="number"
-                      name="minutes"
-                      min={0.01}
-                      max={
-                        (Date.parse(s.ends_at) - Date.parse(s.starts_at)) /
-                        60000
-                      }
-                      step="0.01"
-                      defaultValue={l?.minutes}
-                      required
-                    />
-                  </label>
+                  <TeachingSegmentsInput startsAt={s.starts_at} endsAt={s.ends_at} saved={l?.segments ?? []} />
                   <label className="field">
                     강의 내용·정정 근거
                     <textarea
@@ -129,6 +119,9 @@ export default async function Records() {
                     </p>
                   )}
                 </ActionForm>
+                {l && (l.segments?.length ?? 0) > 0 && <div className="mt-5 border-t pt-5">
+                  <TeachingSignatureForm log={l.id} revision={l.revision} existing={l.signature && l.signed_revision === l.revision ? l.signature : null} />
+                </div>}
               </article>
             );
           },

@@ -62,12 +62,17 @@ export async function downloadReportPdf17(filename: string): Promise<void> {
     const landscape = sheet.classList.contains("report-landscape");
     const width = landscape ? 297 : 210;
     const height = landscape ? 210 : 297;
-    const margin = sheet.classList.contains("op-page") ? 20 : landscape ? 10 : 12;
+    const form20 = sheet.classList.contains("report-form-20");
+    const margin = form20 || sheet.classList.contains("op-page") ? 20 : landscape ? 10 : 12;
     const host = document.createElement("div");
     host.style.cssText = "position:fixed;left:-10000px;top:0;pointer-events:none;background:white;";
     host.className = sheet.closest(".report-output")?.className ?? "report-output";
     const paper = sheet.cloneNode(true) as HTMLElement;
-    paper.style.cssText = `width:${width - margin * 2}mm;min-height:0;margin:0;padding:0 0 3mm;box-shadow:none;background:white;`;
+    paper.style.cssText = `width:${width - margin * 2}mm;min-height:${form20 ? height-margin*2 : 0}mm;margin:0;padding:0 0 ${form20 ? 20 : 3}mm;position:relative;box-shadow:none;background:white;`;
+    if (form20) {
+      const logo = paper.querySelector<HTMLElement>(".report-form-logo");
+      if (logo) { logo.style.bottom = "0"; logo.style.left = "0"; }
+    }
     paper.querySelectorAll(".no-print").forEach(node => node.remove());
     host.appendChild(paper);
     document.body.appendChild(host);
@@ -93,7 +98,8 @@ export async function downloadReportPdf17(filename: string): Promise<void> {
       const canvas = await html2canvas(paper, { scale: 2, backgroundColor: "#ffffff", logging: false, useCORS: true });
       if (!canvas.width || !canvas.height) throw new Error("문서 이미지를 만들지 못했습니다.");
       const scale = canvas.width / bounds.width;
-      const capacity = Math.floor((height - margin * 2) * canvas.width / (width - margin * 2));
+      // CSS mm-to-pixel rounding can leave a one-pixel white strip on 20mm forms.
+      const capacity = Math.floor((height - margin * 2) * canvas.width / (width - margin * 2)) + (form20 ? 3 : 0);
       const slices = getPdfPageSlices(canvas.height, capacity, blocks.map(b => ({ top: Math.floor(b.top * scale), bottom: Math.ceil(b.bottom * scale) })), (top, end) => findCanvasWhitespace(canvas, top, end));
       for (const slice of slices) {
         pdf.addPage("a4", landscape ? "landscape" : "portrait");
@@ -104,7 +110,7 @@ export async function downloadReportPdf17(filename: string): Promise<void> {
         const context = crop.getContext("2d");
         if (!context) throw new Error("PDF 페이지를 만들지 못했습니다.");
         context.drawImage(canvas, 0, slice.top, canvas.width, slice.height, 0, 0, crop.width, crop.height);
-        pdf.addImage(crop.toDataURL("image/jpeg", 0.95), "JPEG", margin, margin, width - margin * 2, slice.height * (width - margin * 2) / canvas.width);
+        pdf.addImage(crop.toDataURL("image/jpeg", 0.95), "JPEG", margin, margin, width - margin * 2, Math.min(height - margin * 2, slice.height * (width - margin * 2) / canvas.width));
         crop.width = crop.height = 0;
       }
       canvas.width = canvas.height = 0;

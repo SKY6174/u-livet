@@ -12,6 +12,8 @@ const errors: Record<string, string> = {
   SELF_APPROVAL_FORBIDDEN: "본인 실적·본인 증명은 승인할 수 없습니다.",
   REVISION_CHANGED: "기록이 바뀌었습니다. 새로고침 후 확인하세요.",
   CLASS_NOT_FINISHED: "종료된 정상 수업의 실제 강의시간만 기록할 수 있습니다.",
+  INVALID_SEGMENTS: "강의 구간의 순서·범위와 실제 강의시간 합계를 확인해 주세요.",
+  INVALID_SIGNATURE: "서명 이미지를 다시 작성해 주세요.",
   CERTIFICATE_EVIDENCE_REQUIRED:
     "현재 승인된 수료 또는 강의실적이 필요합니다. 자료 변경 여부를 확인하세요.",
   ISSUER_TEMPLATE_REQUIRED:
@@ -58,11 +60,27 @@ async function mutate(
 }
 export async function submitTeaching(_: ActionState, f: FormData) {
   if (!value(f, "minutes")) return { message: "실제 강의시간을 입력하세요." };
-  return mutate("life_submit_teaching", {
+  let segments: unknown;
+  try { segments = JSON.parse(value(f, "segments")); } catch { return { message: errors.INVALID_SEGMENTS }; }
+  if (!Array.isArray(segments) || segments.length < 1 || segments.length > 12 ||
+    segments.some((part) => !part || typeof part.starts_at !== "string" || typeof part.ends_at !== "string"))
+    return { message: errors.INVALID_SEGMENTS };
+  return mutate("life_submit_teaching_detail", {
     s: value(f, "session"),
     minutes: Number(value(f, "minutes")),
     notes: value(f, "notes"),
     expected_revision: Number(value(f, "revision")),
+    segments,
+  });
+}
+export async function signTeaching(_: ActionState, f: FormData) {
+  const image = value(f, "image");
+  if (image.length > 200000 || !/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/]+=*$/.test(image))
+    return { message: errors.INVALID_SIGNATURE };
+  return mutate("life_sign_teaching", {
+    l: value(f, "log"),
+    expected_revision: Number(value(f, "revision")),
+    image,
   });
 }
 export async function approveTeaching(_: ActionState, f: FormData) {

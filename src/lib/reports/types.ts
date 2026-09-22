@@ -98,6 +98,10 @@ export type TeachingLog = {
   confirmed_at: string;
   revision: number;
   current: boolean;
+  segments?: { starts_at: string; ends_at: string }[];
+  signature?: string | null;
+  signed_at?: string | null;
+  signed_revision?: number | null;
 };
 export type ReportFile = {
   id: string;

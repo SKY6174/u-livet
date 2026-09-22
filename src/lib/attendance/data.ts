@@ -6,14 +6,14 @@ import { UUID } from "@/lib/portal/data";
 import type { AttendanceBook } from "./model";
 
 // Request-local memoization only: attendance must never be shared between sessions.
-export const getAttendanceBook = cache(async (id: string, audience: "instructor" | "learner") => {
-  const path = audience === "instructor" ? `/instructor/offerings/${id}/attendance` : `/learning/${id}/attendance`;
+export const getAttendanceBook = cache(async (id: string, audience: "instructor" | "learner" | "manager") => {
+  const path = audience === "manager" ? `/admin/offerings/${id}/reports` : audience === "instructor" ? `/instructor/offerings/${id}/attendance` : `/learning/${id}/attendance`;
   await requireIdentity(path);
   if (!UUID.test(id)) notFound();
   const result = await (async () => {
     try {
       return await (await createServerSupabaseClient()).rpc(
-        audience === "instructor" ? "life_teaching_attendance" : "life_my_attendance", { f: id },
+        audience === "learner" ? "life_my_attendance" : "life_teaching_attendance", { f: id },
       );
     } catch { return { data: null, error: { message: "CONNECTION_FAILED" } }; }
   })();

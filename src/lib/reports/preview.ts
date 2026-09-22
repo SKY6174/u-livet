@@ -63,7 +63,7 @@ export function createReportPreview(): ReportBundle {
   }];
   const sessions = [5, 7].map((date, index) => ({
     id: `sample-session-${index + 1}`, title: `실습 ${index + 1} (예시)`,
-    starts_at: `2026-08-0${date}T14:00:00+09:00`,
+    starts_at: `2026-08-0${date}T${index === 0 ? "09" : "14"}:00:00+09:00`,
     ends_at: `2026-08-0${date}T17:00:00+09:00`,
     status: "SCHEDULED", replaces_id: null, reason: "가상 예시",
   }));
@@ -83,14 +83,18 @@ export function createReportPreview(): ReportBundle {
     attendance: sessions.flatMap((session, index) =>
       [1, 2, 3].filter((number) => !(number === 3 && index === 1)).map((number) => ({
         session_id: session.id, person_id: `sample-learner-${number}`,
-        credited_minutes: number === 2 && index === 1 ? 0 : 180,
+        credited_minutes: number === 2 && index === 1 ? 0 : index === 0 ? 420 : 180,
         reason: "강사 입력 예시", revision: 1, recorded_at: recordedAt,
       })),
     ),
     teaching: sessions.map((session, index) => ({
       id: `sample-teaching-${index + 1}`, session_id: session.id,
-      person_id: "sample-instructor", name: "예시 강사", minutes: 180,
+      person_id: "sample-instructor", name: "예시 강사", minutes: index === 0 ? 420 : 180,
       topic: session.title, confirmed_at: recordedAt, revision: 1, current: index === 0,
+      segments: index === 0 ? [
+        { starts_at:"2026-08-05T09:00:00+09:00",ends_at:"2026-08-05T12:00:00+09:00" },
+        { starts_at:"2026-08-05T13:00:00+09:00",ends_at:"2026-08-05T17:00:00+09:00" },
+      ] : [{ starts_at:session.starts_at, ends_at:session.ends_at }],
     })),
     files: [],
   };

@@ -93,6 +93,10 @@ export default async function CourseReports({
         <h2 className="section-title">
           강사 강의실적 확인 · {b.teaching.length}건
         </h2>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <Link className="btn-secondary" href={`/admin/offerings/${id}/reports/print?document=teaching`} target="_blank">강사 강의날인부 취합·출력</Link>
+          <Link className="btn-secondary" href={`/admin/offerings/${id}/reports/print?document=attendance`} target="_blank">QR 확정 출석부 확인·출력</Link>
+        </div>
         {!b.teaching.length ? (
           <p className="notice">강사가 실제 강의실적을 제출하면 표시됩니다.</p>
         ) : (
@@ -111,6 +115,7 @@ export default async function CourseReports({
                   <p className="mt-1 whitespace-pre-wrap text-sm text-slate-600">
                     {l.topic}
                   </p>
+                  <p className="mt-1 text-sm text-slate-600">강의 구간 {l.segments?.length ?? 0}건 · 본인 서명 {l.signature && l.signed_revision === l.revision ? "완료" : "대기"}</p>
                 </div>
                 {l.current ? (
                   <span className="badge self-start">승인 완료</span>

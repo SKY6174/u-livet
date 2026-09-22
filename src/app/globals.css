@@ -249,6 +249,31 @@ body {
 .signature-space {
   min-height: 9mm;
 }
+.report-form-20 {
+  position: relative;
+  padding: 20mm 20mm 38mm;
+}
+.report-form-logo {
+  position: absolute;
+  bottom: 20mm;
+  left: 20mm;
+  width: 58mm;
+  height: auto;
+}
+.report-teaching-ledger h1 {
+  font-size: 18pt;
+  margin: 0 0 5mm;
+}
+.report-teaching-ledger .report-table th,
+.report-teaching-ledger .report-table td {
+  padding: 1.8mm 1mm;
+  font-size: 8pt;
+}
+.report-teaching-signature {
+  width: 28mm;
+  max-height: 11mm;
+  object-fit: contain;
+}
 @media screen and (max-width: 1120px) {
   .report-output {
     overflow-x: auto;
@@ -265,6 +290,14 @@ body {
 @page reportLandscape {
   size: A4 landscape;
   margin: 10mm;
+}
+@page reportFormPortrait {
+  size: A4 portrait;
+  margin: 20mm;
+}
+@page reportFormLandscape {
+  size: A4 landscape;
+  margin: 20mm;
 }
 @media print {
   .report-portrait {
@@ -304,5 +337,26 @@ body {
   .report-cover {
     min-height: 200mm;
     padding-top: 15mm;
+  }
+  .report-form-20.report-portrait {
+    page: reportFormPortrait;
+    width: 170mm;
+  }
+  .report-form-20.report-landscape {
+    page: reportFormLandscape;
+    width: 257mm;
+  }
+  .report-form-20 {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 257mm;
+    padding: 0 0 20mm;
+  }
+  .report-form-20.report-landscape {
+    min-height: 170mm;
+  }
+  .report-form-logo {
+    bottom: 0;
+    left: 0;
   }
 }

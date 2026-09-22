@@ -6,6 +6,7 @@ import { ReportDocuments } from "@/components/reports/report-documents";
 import { PrintToolbar } from "@/components/reports/print-toolbar";
 import { getManagedReport } from "@/lib/reports/data";
 import { DOCUMENTS, type DocumentKind } from "@/lib/reports/types";
+import { getAttendanceBook } from "@/lib/attendance/data";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   searchParams,
@@ -38,7 +39,10 @@ export default async function PrintReport({
         </Empty>
       </div>
     );
-  const context = ["all", "result"].includes(document) ? await getOperationContext(id) : null;
+  const [context, attendance] = await Promise.all([
+    ["all", "result"].includes(document) ? getOperationContext(id) : Promise.resolve(null),
+    ["all", "attendance"].includes(document) ? getAttendanceBook(id,"manager") : Promise.resolve(null),
+  ]);
   const official = context?.documents.find(d => d.kind === "result");
   return (
     <>
@@ -48,8 +52,12 @@ export default async function PrintReport({
       />
       {official ? <>
         <DocumentPreview kind="result" content={official.content} budget={official.budget} status={official.status} revision={official.revision} />
-        {document === "all" && DOCUMENTS.filter(([kind]) => kind !== "result").map(([kind]) => <ReportDocuments key={kind} offering={offering} bundle={bundle} document={kind} reveal={query.reveal === "1"} />)}
-      </> : <ReportDocuments offering={offering} bundle={bundle} document={document as DocumentKind | "all"} reveal={query.reveal === "1"} />}
+        {document === "result" && <ReportDocuments offering={offering} bundle={bundle} document="teaching" />}
+        {document === "all" && DOCUMENTS.filter(([kind]) => kind !== "result").map(([kind]) => <ReportDocuments key={kind} offering={offering} bundle={bundle} document={kind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />)}
+      </> : <>
+        <ReportDocuments offering={offering} bundle={bundle} document={document as DocumentKind | "all"} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />
+        {document === "result" && <ReportDocuments offering={offering} bundle={bundle} document="teaching" />}
+      </>}
 
     </>
   );
