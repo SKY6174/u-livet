@@ -5,6 +5,7 @@ import { normalizeAdvisorySignature } from "../../features/committee/utils/advis
 
 interface AdvisorySignaturePadProps {
   signatureUrl?: string;
+  strokeWidth?: number;
   onChange: (dataUrl: string, fileName: string) => void;
 }
 
@@ -18,7 +19,7 @@ const fileToDataUrl = (file: File): Promise<string> => new Promise((resolve, rej
   reader.readAsDataURL(file);
 });
 
-export function AdvisorySignaturePad({ signatureUrl, onChange }: AdvisorySignaturePadProps) {
+export function AdvisorySignaturePad({ signatureUrl, onChange, strokeWidth = 2.4 }: AdvisorySignaturePadProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const drawingRef = React.useRef(false);
 
@@ -41,10 +42,10 @@ export function AdvisorySignaturePad({ signatureUrl, onChange }: AdvisorySignatu
     context.scale(ratio, ratio);
     context.clearRect(0, 0, SIGNATURE_WIDTH, SIGNATURE_HEIGHT);
     context.strokeStyle = "#111827";
-    context.lineWidth = 2.4;
+    context.lineWidth = strokeWidth;
     context.lineCap = "round";
     context.lineJoin = "round";
-  }, []);
+  }, [strokeWidth]);
 
   const point = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();

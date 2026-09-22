@@ -376,6 +376,7 @@ export function ConsentEditor({
             <div>
               <h3 className="mb-3 font-bold">본인 서명</h3>
               <AdvisorySignaturePad
+                strokeWidth={4.8}
                 signatureUrl={form.signature}
                 onChange={(value) => change("signature", value)}
               />

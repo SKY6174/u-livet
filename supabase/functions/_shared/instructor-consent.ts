@@ -1,4 +1,4 @@
-import { PDFDocument, PDFPage, rgb } from "pdf-lib";
+import { BlendMode, PDFDocument, PDFPage, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import {
   CONSENT_TITLES,
@@ -35,6 +35,28 @@ export async function renderConsentPdf(
     pdf.addPage(page);
   } else page = pdf.addPage([595, 842]);
   const height = page.getHeight();
+  // HWP paper setup: top 25mm + header 10mm; left/right/bottom 10mm.
+  // The original criminal form already fits this body area, apart from the
+  // page number corrected in its template. Preserve its internal table indents.
+  const mm = 72 / 25.4;
+  const frame = type === "PRIVACY_CONSENT"
+    ? { left: 28.32, top: 64, width: 538.6, height: 698.9 }
+    : type === "INTEGRITY_PLEDGE"
+      ? { left: 38, top: 35, width: 519, height: 766 } : null;
+  const body = {
+    left: 10 * mm + 0.325, top: 35 * mm + 0.325,
+    width: page.getWidth() - 20 * mm - 0.65,
+    height: height - 45 * mm - 0.65,
+  };
+  const mapX = (x: number) => frame
+    ? body.left + (x - frame.left) * body.width / frame.width : x;
+  const mapTop = (top: number) => frame
+    ? body.top + (top - frame.top) * body.height / frame.height : top;
+  const mapWidth = (width: number) => frame ? width * body.width / frame.width : width;
+  const mapHeight = (h: number) => frame ? h * body.height / frame.height : h;
+  const regularMetrics = fontkit.create(a.regular);
+  const boldMetrics = type === "CRIMINAL_CONSENT"
+    ? regularMetrics : fontkit.create(a.bold);
   const text = (
     s: string,
     x: number,
@@ -42,16 +64,26 @@ export async function renderConsentPdf(
     size = 10,
     strong = false,
     width = 500,
+    align?: { centerTop: number } | { baselineTop: number },
   ) => {
     const font = strong ? bold : regular;
     s = s.replace(/\r?\n/g, " ");
+    if (!s.trim()) return;
     const fit = Math.min(
       size,
-      width / Math.max(font.widthOfTextAtSize(s || " ", 1), 1),
+      mapWidth(width) / Math.max(font.widthOfTextAtSize(s || " ", 1), 1),
     );
+    let baseline = height - mapTop(top) - fit;
+    if (align && "baselineTop" in align) baseline = height - mapTop(align.baselineTop);
+    else if (align) {
+      const metrics = strong ? boldMetrics : regularMetrics;
+      const bounds = metrics.layout(s).bbox;
+      baseline = height - mapTop(align.centerTop)
+        - (bounds.minY + bounds.maxY) * fit / (2 * metrics.unitsPerEm);
+    }
     page.drawText(s, {
-      x,
-      y: height - top - fit,
+      x: mapX(x),
+      y: baseline,
       size: fit,
       font,
       color: rgb(0, 0, 0),
@@ -72,7 +104,7 @@ export async function renderConsentPdf(
     for (const char of s) {
       if (
         char === "\n" ||
-        font.widthOfTextAtSize(current + char, size) > width
+        font.widthOfTextAtSize(current + char, size) > mapWidth(width)
       ) {
         chunks.push(current);
         current = char === "\n" ? "" : char;
@@ -92,23 +124,20 @@ export async function renderConsentPdf(
     shaded = false,
   ) =>
     page.drawRectangle({
-      x,
-      y: height - top - h,
-      width,
-      height: h,
+      x: mapX(x),
+      y: height - mapTop(top) - mapHeight(h),
+      width: mapWidth(width),
+      height: mapHeight(h),
       borderColor: rgb(0.2, 0.2, 0.2),
       borderWidth: 0.65,
       ...(shaded ? { color: rgb(0.95, 0.95, 0.95) } : {}),
     });
-  const center = (s: string, top: number, size: number, strong = false) =>
-    text(
-      s,
-      (page.getWidth() - (strong ? bold : regular).widthOfTextAtSize(s, size)) /
-        2,
-      top,
-      size,
-      strong,
-    );
+  const center = (s: string, top: number, size: number, strong = false) => {
+    const textWidth = (strong ? bold : regular).widthOfTextAtSize(s, size);
+    const x = (page.getWidth() - textWidth) / 2;
+    text(s, frame ? frame.left + (x - body.left) * frame.width / body.width : x,
+      top, size, strong);
+  };
   const checks = (c: Choice) =>
     `${c === "YES" ? "[V]" : "[  ]"} 동의함     ${c === "NO" ? "[V]" : "[  ]"} 동의하지 않음`;
   const date = v.date ? v.date.split("-").map(Number) : ["", "", ""];
@@ -127,26 +156,36 @@ export async function renderConsentPdf(
       image.height < 2
     )
       throw new Error("서명 이미지 크기를 확인해 주세요.");
-    const ratio = Math.min(w / image.width, h / image.height);
-    page.drawImage(image, {
-      x,
-      y: height - top - image.height * ratio,
+    const ratio = Math.min(mapWidth(w) / image.width, mapHeight(h) / image.height);
+    // Expand existing ink by at most 0.24pt without modifying the saved PNG.
+    // Multiply also keeps white uploaded backgrounds from covering the form.
+    for (const [dx, dy] of [
+      [0, 0], [0.24, 0], [-0.24, 0], [0, 0.24], [0, -0.24],
+      [0.17, 0.17], [-0.17, 0.17], [0.17, -0.17], [-0.17, -0.17],
+    ]) page.drawImage(image, {
+      x: mapX(x) + dx,
+      y: height - mapTop(top) - image.height * ratio + dy,
       width: image.width * ratio,
       height: image.height * ratio,
+      blendMode: BlendMode.Multiply,
     });
   };
   if (type === "CRIMINAL_CONSENT") {
-    text(v.name, 175, 177, 12, false, 340);
+    const nameCenter = (162.48 + 228.96) / 2;
+    const identityCenter = (228.96 + 283.44) / 2;
+    text(v.name, 175, 0, 12, false, 340, {
+      centerTop: nameCenter - (v.is_foreign ? 8 : 0),
+    });
     if (v.is_foreign) {
-      text(`영문: ${v.english_name}`, 175, 199, 10, false, 340);
-      text(v.birth_date, 175, 248, 11, false, 108);
-      text(v.foreign_number, 402, 248, 10, false, 125);
-    } else text(v.resident_number, 175, 248, 11, false, 108);
-    text(v.phone, 175, 306, 12, false, 340);
+      text(`영문: ${v.english_name}`, 175, 0, 10, false, 340, { centerTop: nameCenter + 8 });
+      text(v.birth_date, 175, 0, 11, false, 108, { centerTop: identityCenter });
+      text(v.foreign_number, 402, 0, 10, false, 125, { centerTop: identityCenter });
+    } else text(v.resident_number, 175, 0, 11, false, 108, { centerTop: identityCenter });
+    text(v.phone, 175, 0, 12, false, 340, { centerTop: (283.44 + 340.2) / 2 });
     text(String(date[0]), 379, 448, 11);
     text(String(date[1]), 448, 448, 11);
     text(String(date[2]), 494, 448, 11);
-    text(v.name, 359, 490, 11, false, 104);
+    text(v.name, 359, 0, 11, false, 104, { baselineTop: 499.44 });
     await sign(454, 480, 75, 31);
   } else if (type === "PRIVACY_CONSENT") {
     // Original form body bounds: x=28.32..566.92pt on a 595×842pt page.
@@ -229,8 +268,8 @@ export async function renderConsentPdf(
     ) => {
       box(x, y, 69, 36, true);
       box(x + 69, y, width - 69, 36);
-      text(label, x + 5, y + 12, 9, true, 59);
-      text(content, x + 77, y + 11, 10, false, width - 85);
+      text(label, x + 5, 0, 9, true, 59, { centerTop: y + 18 });
+      text(content, x + 77, 0, 10, false, width - 85, { centerTop: y + 18 });
     };
     cell("성명", v.name, 51, 119, 200);
     cell("위촉 프로그램명", v.program, 251, 119, 293);
@@ -318,16 +357,6 @@ export async function renderConsentPdf(
       ? [28.32, 728]
       : type === "CRIMINAL_CONSENT" ? [60.84, 590] : [51, 345];
     text("작성 중 · 최종 제출 전 미확정 문서", x, top, 8);
-  }
-  if (type === "INTEGRITY_PLEDGE") {
-    // Map the complete vector layout (including signatures) into the original
-    // outer frame. Its asymmetric left/right margins are intentional.
-    const scaleX = 470.52 / 519, scaleY = 698.64 / 766;
-    page.scaleContent(scaleX, scaleY);
-    page.translateContent(
-      72.84 - 38 * scaleX,
-      height - 772.32 - (height - 801) * scaleY,
-    );
   }
   pdf.setTitle(CONSENT_TITLES[type]);
   pdf.setProducer("UC-LIFE / PDF 1.7");
