@@ -1,0 +1,15 @@
+.manual-document { overflow-wrap: anywhere; }
+.manual-document section[id] { scroll-margin-top: 10rem; }
+@page manual { size: A4 portrait; margin: 16mm; }
+@media print {
+  body:has(.manual-document) { display: block; min-height: 0; font-size: 10pt; background: white !important; }
+  body:has(.manual-document) > aside { display: none !important; }
+  .manual-document { page: manual; max-width: none; margin: 0; padding: 0; }
+  .manual-columns { display: block; }
+  .manual-section { border: 0; padding: 0; margin: 0 0 8mm; box-shadow: none; }
+  .manual-document h1 { font-size: 23pt; }
+  .manual-document h2 { font-size: 15pt; break-after: avoid; }
+  .manual-document h3 { break-after: avoid; }
+  .manual-document li, .manual-document dl > div { break-inside: avoid; }
+  .manual-document p, .manual-document li { orphans: 3; widows: 3; }
+}

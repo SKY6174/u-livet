@@ -38,6 +38,7 @@ export default function Footer() {
           <nav className="flex flex-wrap gap-x-5 gap-y-3" aria-label="서비스 안내">
             <Link className={FOOTER_LINK_CLASS} href="/privacy">개인정보처리방침</Link>
             <Link className={FOOTER_LINK_CLASS} href="/terms">수강안내</Link>
+            <Link className={FOOTER_LINK_CLASS} href="/manuals">이용 매뉴얼</Link>
             <Link className={FOOTER_LINK_CLASS} href="/verify">증명서 진위확인</Link>
           </nav>
           <SupportContact compact className="text-teal-50 [&_a:focus-visible]:outline-white" />
