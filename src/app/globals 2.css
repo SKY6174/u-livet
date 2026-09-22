@@ -1,0 +1,308 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==============================================================================
+   울산과학대학교 앵커사업단 평생직업교육 플랫폼 - 전역 스타일
+   ============================================================================== */
+
+:root {
+  /* Shared tracking for current and future menu/page labels. */
+  --tracking-label: 0.05em;
+  --tracking-label-compact: 0.025em;
+  --font-sans:
+    "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+    sans-serif;
+}
+
+html {
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  /* 성인학습자 및 시니어 학습자를 위한 기본 텍스트 렌더링 최적화 */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  color: #1e293b;
+  background-color: #f8fafc;
+  font-size: 16px; /* 기본 폰트 크기를 16px로 유지하여 높은 가독성 확보 */
+  line-height: 1.6;
+}
+
+/* 직관적인 포커스 링 (웹 접근성 강화) */
+:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* 수료증 및 증명서 인쇄용 스타일 */
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+@layer utilities {
+  .tracking-label {
+    letter-spacing: var(--tracking-label);
+  }
+  .tracking-label-compact {
+    letter-spacing: var(--tracking-label-compact);
+  }
+}
+
+@layer components {
+  .page-shell {
+    @apply mx-auto max-w-7xl px-5 py-12;
+  }
+  .page-title {
+    @apply mb-4 text-3xl font-bold leading-tight tracking-tight md:text-4xl;
+  }
+  .eyebrow {
+    @apply mb-3 text-xs font-bold uppercase tracking-label text-teal-800;
+  }
+  .section-title {
+    @apply mb-5 text-xl font-bold;
+  }
+  .panel {
+    @apply rounded-2xl border border-slate-200 bg-white p-6;
+  }
+  .btn-primary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-lg bg-teal-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-900 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold hover:bg-slate-100;
+  }
+  .field {
+    @apply flex min-w-0 flex-col gap-2 text-sm font-medium;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-base font-normal;
+  }
+  .notice {
+    @apply rounded-lg bg-slate-100 p-4 text-sm leading-relaxed text-slate-700;
+  }
+  .badge {
+    @apply inline-block rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800;
+  }
+}
+
+/* Course report print templates: named pages retain portrait/landscape in one PDF. */
+.report-output {
+  color: #111827;
+}
+.report-sheet {
+  box-sizing: border-box;
+  background: white;
+  margin: 24px auto;
+  padding: 16mm;
+  box-shadow: 0 3px 20px #0f172a18;
+  font-size: 10pt;
+  line-height: 1.55;
+}
+.report-portrait {
+  width: 210mm;
+  min-height: 297mm;
+}
+.report-landscape {
+  width: 297mm;
+  min-height: 210mm;
+  font-size: 8.5pt;
+}
+.report-brand {
+  color: #155e75;
+  font-size: 9pt;
+  font-weight: 700;
+  padding-bottom: 4mm;
+  border-bottom: 2px solid #155e75;
+}
+.report-sheet h1 {
+  font-size: 21pt;
+  font-weight: 700;
+  text-align: center;
+  margin: 9mm 0 4mm;
+}
+.report-sheet h2 {
+  font-size: 13pt;
+  font-weight: 700;
+  margin: 7mm 0 3mm;
+  break-after: avoid;
+}
+.report-sheet h3 {
+  font-weight: 700;
+  margin-bottom: 2mm;
+  break-after: avoid;
+}
+.report-meta {
+  text-align: center;
+  margin-bottom: 8mm;
+}
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4mm 0;
+  table-layout: fixed;
+}
+.report-table th,
+.report-table td {
+  border: 1px solid #4b5563;
+  padding: 2.5mm 1.5mm;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.report-table th {
+  background: #edf3ed;
+  font-weight: 700;
+}
+.report-table thead {
+  display: table-header-group;
+}
+.report-table tr {
+  break-inside: avoid;
+}
+.report-table td {
+  text-align: center;
+}
+.report-narrative {
+  margin: 5mm 0;
+}
+.report-narrative p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.report-note {
+  color: #475569;
+  font-size: 8.5pt;
+  margin: 3mm 0;
+}
+.report-total {
+  text-align: right;
+  font-weight: 700;
+  margin: 6mm 0;
+}
+.report-cover {
+  text-align: center;
+  padding-top: 25mm;
+}
+.report-cover h2 {
+  font-size: 26pt;
+  margin: 14mm 0;
+}
+.report-cover-date {
+  margin: 14mm 0;
+  font-size: 14pt;
+}
+.report-cover .report-table {
+  margin-top: 24mm;
+}
+.report-foot {
+  margin-top: 10mm;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 3mm;
+  font-size: 8pt;
+  text-align: right;
+  color: #64748b;
+}
+.report-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+}
+.report-photos figure {
+  break-inside: avoid;
+}
+.report-photos img {
+  width: 100%;
+  height: 64mm;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
+}
+.report-photos figcaption {
+  text-align: center;
+  padding: 3mm;
+  overflow-wrap: anywhere;
+}
+.signature-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 8mm;
+  margin-top: 2mm;
+  font-size: 7pt;
+  color: #64748b;
+}
+.signature-pair span {
+  border-top: 1px dashed #94a3b8;
+}
+.signature-pair span + span {
+  border-left: 1px dashed #94a3b8;
+}
+.signature-space {
+  min-height: 9mm;
+}
+@media screen and (max-width: 1120px) {
+  .report-output {
+    overflow-x: auto;
+  }
+  .report-sheet {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+}
+@page reportPortrait {
+  size: A4 portrait;
+  margin: 12mm;
+}
+@page reportLandscape {
+  size: A4 landscape;
+  margin: 10mm;
+}
+@media print {
+  .report-portrait {
+    page: reportPortrait;
+  }
+  .report-landscape {
+    page: reportLandscape;
+  }
+  .report-sheet {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    break-after: page;
+  }
+  .report-sheet:last-child {
+    break-after: auto;
+  }
+  .report-output {
+    overflow: visible;
+  }
+  .report-table th {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  body:has(.report-output) {
+    display: block;
+    min-height: 0;
+  }
+  .report-portrait {
+    width: 186mm;
+  }
+  .report-landscape {
+    width: 277mm;
+  }
+  .report-cover {
+    min-height: 200mm;
+    padding-top: 15mm;
+  }
+}

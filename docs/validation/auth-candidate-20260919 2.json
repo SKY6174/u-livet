@@ -1,0 +1,85 @@
+{
+  "checkedAt": "2026-09-18T23:00:12.643Z",
+  "authVersion": "v2.196.0",
+  "images": {
+    "db": {
+      "tag": "postgres:17-alpine",
+      "imageId": "sha256:ff80089083d7365046af7f03d949a2defa14e0b09e14bd5b8f08a242291be8b2"
+    },
+    "auth": {
+      "tag": "public.ecr.aws/supabase/gotrue:v2.196.0",
+      "imageId": "sha256:e88fac3e0cf252752039d92855cbfaea0960c705ad6a9c5faa1bb16d22e622b8"
+    },
+    "rest": {
+      "tag": "public.ecr.aws/supabase/postgrest:v16.1",
+      "imageId": "sha256:9de6b1435c8471e201e080662e47d69159218fc61030f1d3af521a366f4f7871"
+    },
+    "mail": {
+      "tag": "public.ecr.aws/supabase/mailpit:v1.30.2",
+      "imageId": "sha256:82e20cb567b0cc4f9551c59a1eb629705d55600ab6bdc1fe303598fc6689ab97"
+    },
+    "proxy": {
+      "tag": "ghcr.io/supabase/kong:2.8.1",
+      "imageId": "sha256:a5957d67fc55af3d11bdbd87de76f7480e3c4d8bcb715d6cfd01922780f46ea9"
+    }
+  },
+  "migrations": [
+    "001_create_enums_and_extensions.sql",
+    "002_create_users_and_profiles.sql",
+    "003_create_courses_and_instructors.sql",
+    "004_create_enrollments_and_payments.sql",
+    "005_create_lms_attendance_and_assignments.sql",
+    "006_create_certificates_and_evaluations.sql",
+    "007_create_classrooms_scholarships_and_history.sql",
+    "008_create_digital_open_badges.sql",
+    "009_fix_rls_recursion_and_optimize_performance.sql",
+    "010_role_based_db_separation_and_optimization.sql",
+    "20260918145727_anchor_core.sql",
+    "20260918152510_anchor_instructor_assignment.sql",
+    "20260918153332_anchor_learning_evaluation.sql",
+    "20260918155308_anchor_certificates.sql",
+    "20260918161548_anchor_finance.sql",
+    "20260918164152_anchor_messaging.sql",
+    "20260918170157_anchor_annual_evaluation.sql",
+    "20260918172613_anchor_digital_badges.sql",
+    "20260918174631_anchor_instructor_development.sql",
+    "20260918182304_anchor_auth_recovery.sql",
+    "20260918184205_anchor_admin_mfa.sql",
+    "20260918191702_anchor_auth_abuse.sql"
+  ],
+  "isolated": true,
+  "cleaned": true,
+  "existingContainersPreserved": true,
+  "checksPassed": 28,
+  "checks": [
+    "all 22 migrations run against native Auth 2.196.0",
+    "direct signup rejects 11 characters",
+    "direct signup rejects missing punctuation",
+    "direct signup rejects missing letters",
+    "direct signup rejects missing digits",
+    "12 characters allow lowercase with colon",
+    "12 characters allow uppercase with backslash",
+    "12 characters allow lowercase with dollar",
+    "12 characters allow lowercase with single quote",
+    "12 characters allow uppercase with double quote",
+    "email confirmation is required before password sign-in",
+    "signup metadata cannot grant administrator privileges",
+    "missing credential policy removes business access",
+    "user metadata cannot forge policy approval",
+    "storage rehash and unrelated admin event do not approve credentials",
+    "native recovery proof works without granting business access",
+    "native password change rejects weak composition",
+    "password audit approves only the changed credential and blocks old JWT access",
+    "global sign-out revokes old refresh token and new password preserves person",
+    "recovery proof cannot be reused or fabricated",
+    "expired recovery proof is refused",
+    "signed-out access JWT cannot keep business access",
+    "staff AAL1 cannot access business identity",
+    "direct native MFA enrollment without permit is blocked",
+    "permitted enrollment and real TOTP verification restore staff access",
+    "administrator last verified factor cannot be removed",
+    "old MFA proof cannot authorize new factor enrollment",
+    "anonymous direct business mutation stays blocked"
+  ],
+  "scope": "Local native Auth and DB integration only; CAPTCHA disabled, local HTTP/Mailpit, no production acceptance."
+}

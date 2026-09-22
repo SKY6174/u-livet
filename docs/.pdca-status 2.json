@@ -1,0 +1,6760 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-09-21T12:42:35.685Z",
+  "activeFeatures": [
+    "anchor-lifelong-education-platform",
+    "anchor-core-flow",
+    "anchor-learning-evaluation",
+    "anchor-certificates",
+    "anchor-finance",
+    "anchor-messaging",
+    "anchor-annual-evaluation",
+    "anchor-digital-badges",
+    "anchor-instructor-development",
+    "anchor-accessible-auth",
+    "anchor-auth-recovery",
+    "anchor-admin-mfa",
+    "anchor-auth-abuse",
+    "anchor-release-readiness",
+    "anchor-hosted-auth-preflight",
+    "anchor-migration-retry",
+    "anchor-preview-environment",
+    "anchor-preview-db-validation",
+    "anchor-self-hosted-preflight",
+    "anchor-auth-candidate-lab",
+    "anchor-review-preview-deploy",
+    "anchor-managed-cloud-release",
+    "anchor-primary-domain-mail",
+    "anchor-signup-readiness",
+    "anchor-initial-account",
+    "anchor-consent-readability",
+    "anchor-invite-only-opening",
+    "anchor-invitation-mail-navigation",
+    "anchor-course-content",
+    "anchor-db-connectivity",
+    "anchor-db-performance",
+    "anchor-auth-load-verification",
+    "anchor-course-reports",
+    "anchor-preview-main-integration",
+    "anchor-preview-integration-verification",
+    "anchor-production-db-preparation",
+    "anchor-production-db-rollout",
+    "anchor-production-app-release",
+    "anchor-production-opening",
+    "anchor-report-review",
+    "anchor-report-import",
+    "anchor-course-opening-plans",
+    "anchor-course-opening-view",
+    "anchor-course-opening-prefill",
+    "anchor-preview-db-performance",
+    "anchor-public-course-cards",
+    "anchor-role-navigation",
+    "anchor-attendance-book",
+    "anchor-attendance-readiness",
+    "anchor-opening-working-copy",
+    "anchor-opening-draft-overview",
+    "anchor-account-list-layout",
+    "anchor-business-menu",
+    "anchor-business-menu-refresh",
+    "anchor-member-management",
+    "anchor-member-manual-entry",
+    "anchor-course-budget",
+    "anchor-budget-comparison",
+    "anchor-student-learning"
+  ],
+  "primaryFeature": "anchor-lifelong-education-platform",
+  "features": {
+    "anchor-lifelong-education-platform": {
+      "phase": "do",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T14:36:14.778Z",
+          "completedAt": "2026-09-18T14:42:50.751Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T14:36:14.778Z",
+          "completedAt": "2026-09-18T14:54:02.349Z"
+        },
+        {
+          "phase": "do",
+          "status": "active",
+          "createdAt": "2026-09-18T14:36:14.778Z"
+        },
+        {
+          "phase": "check",
+          "status": "pending",
+          "createdAt": "2026-09-18T14:36:14.778Z"
+        },
+        {
+          "phase": "report",
+          "status": "pending",
+          "createdAt": "2026-09-18T14:36:14.778Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T14:36:14.778Z",
+        "lastUpdated": "2026-09-18T14:54:02.349Z"
+      }
+    },
+    "anchor-core-flow": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:12:48.355Z",
+          "completedAt": "2026-09-18T15:13:47.226Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:12:48.355Z",
+          "completedAt": "2026-09-18T15:13:47.259Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:12:48.355Z",
+          "completedAt": "2026-09-18T15:21:55.041Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:12:48.355Z",
+          "completedAt": "2026-09-18T15:28:35.861Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:12:48.355Z",
+          "completedAt": "2026-09-18T15:29:18.435Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T15:12:48.356Z",
+        "lastUpdated": "2026-09-18T15:29:18.435Z"
+      },
+      "completedAt": "2026-09-18T15:29:18.434Z"
+    },
+    "anchor-learning-evaluation": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:32:58.130Z",
+          "completedAt": "2026-09-18T15:33:31.874Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:32:58.130Z",
+          "completedAt": "2026-09-18T15:33:31.886Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:32:58.130Z",
+          "completedAt": "2026-09-18T15:48:26.407Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:32:58.130Z",
+          "completedAt": "2026-09-18T15:49:21.540Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:32:58.130Z",
+          "completedAt": "2026-09-18T15:50:10.136Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T15:32:58.130Z",
+        "lastUpdated": "2026-09-18T15:50:10.136Z"
+      },
+      "completedAt": "2026-09-18T15:50:10.135Z"
+    },
+    "anchor-certificates": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:52:47.330Z",
+          "completedAt": "2026-09-18T15:52:47.397Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:52:47.330Z",
+          "completedAt": "2026-09-18T15:52:47.406Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:52:47.330Z",
+          "completedAt": "2026-09-18T16:12:47.737Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:52:47.330Z",
+          "completedAt": "2026-09-18T16:12:47.752Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T15:52:47.330Z",
+          "completedAt": "2026-09-18T16:12:47.775Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T15:52:47.330Z",
+        "lastUpdated": "2026-09-18T16:12:47.775Z"
+      },
+      "completedAt": "2026-09-18T16:12:47.774Z"
+    },
+    "anchor-finance": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:14:30.704Z",
+          "completedAt": "2026-09-18T16:15:03.097Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:14:30.704Z",
+          "completedAt": "2026-09-18T16:15:47.898Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:14:30.704Z",
+          "completedAt": "2026-09-18T16:35:11.107Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:14:30.704Z",
+          "completedAt": "2026-09-18T16:35:11.112Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:14:30.704Z",
+          "completedAt": "2026-09-18T16:35:11.119Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T16:14:30.704Z",
+        "lastUpdated": "2026-09-18T16:35:11.119Z"
+      },
+      "completedAt": "2026-09-18T16:35:11.118Z"
+    },
+    "anchor-messaging": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:40:48.517Z",
+          "completedAt": "2026-09-18T16:41:18.848Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:40:48.517Z",
+          "completedAt": "2026-09-18T16:41:51.910Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:40:48.517Z",
+          "completedAt": "2026-09-18T16:49:11.308Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:40:48.517Z",
+          "completedAt": "2026-09-18T16:55:11.959Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:40:48.517Z",
+          "completedAt": "2026-09-18T16:55:11.969Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T16:40:48.517Z",
+        "lastUpdated": "2026-09-18T16:55:11.969Z"
+      },
+      "completedAt": "2026-09-18T16:55:11.968Z"
+    },
+    "anchor-annual-evaluation": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:59:39.325Z",
+          "completedAt": "2026-09-18T17:00:37.254Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:59:39.325Z",
+          "completedAt": "2026-09-18T17:01:57.397Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:59:39.325Z",
+          "completedAt": "2026-09-18T17:17:34.014Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:59:39.325Z",
+          "completedAt": "2026-09-18T17:23:26.280Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T16:59:39.325Z",
+          "completedAt": "2026-09-18T17:23:26.292Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T16:59:39.325Z",
+        "lastUpdated": "2026-09-18T17:23:26.292Z"
+      },
+      "completedAt": "2026-09-18T17:23:26.291Z"
+    },
+    "anchor-digital-badges": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:24:23.822Z",
+          "completedAt": "2026-09-18T17:25:22.086Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:24:23.822Z",
+          "completedAt": "2026-09-18T17:26:13.154Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:24:23.822Z",
+          "completedAt": "2026-09-18T17:36:32.217Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:24:23.822Z",
+          "completedAt": "2026-09-18T17:42:55.036Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:24:23.822Z",
+          "completedAt": "2026-09-18T17:42:55.047Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T17:24:23.822Z",
+        "lastUpdated": "2026-09-18T17:42:55.047Z"
+      },
+      "completedAt": "2026-09-18T17:42:55.047Z"
+    },
+    "anchor-instructor-development": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:44:31.249Z",
+          "completedAt": "2026-09-18T17:45:41.677Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:44:31.249Z",
+          "completedAt": "2026-09-18T17:46:30.855Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:44:31.249Z",
+          "completedAt": "2026-09-18T17:57:25.885Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:44:31.249Z",
+          "completedAt": "2026-09-18T18:07:07.031Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T17:44:31.249Z",
+          "completedAt": "2026-09-18T18:07:07.042Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T17:44:31.249Z",
+        "lastUpdated": "2026-09-18T18:07:07.042Z"
+      },
+      "completedAt": "2026-09-18T18:07:07.042Z"
+    },
+    "anchor-accessible-auth": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:08:41.386Z",
+          "completedAt": "2026-09-18T18:08:41.396Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:08:41.386Z",
+          "completedAt": "2026-09-18T18:10:10.596Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:08:41.386Z",
+          "completedAt": "2026-09-18T18:13:40.191Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:08:41.386Z",
+          "completedAt": "2026-09-18T18:19:24.979Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:08:41.386Z",
+          "completedAt": "2026-09-18T18:19:24.989Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T18:08:41.386Z",
+        "lastUpdated": "2026-09-18T18:19:24.989Z"
+      },
+      "completedAt": "2026-09-18T18:19:24.989Z"
+    },
+    "anchor-auth-recovery": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:23:03.699Z",
+          "completedAt": "2026-09-18T18:23:03.711Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:23:03.699Z",
+          "completedAt": "2026-09-18T18:24:06.086Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:23:03.699Z",
+          "completedAt": "2026-09-18T18:33:45.324Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:23:03.699Z",
+          "completedAt": "2026-09-18T18:38:04.288Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:23:03.699Z",
+          "completedAt": "2026-09-18T18:38:20.854Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T18:23:03.700Z",
+        "lastUpdated": "2026-09-18T18:38:20.854Z"
+      },
+      "completedAt": "2026-09-18T18:38:20.852Z"
+    },
+    "anchor-admin-mfa": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 3,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:39:37.703Z",
+          "completedAt": "2026-09-18T18:40:51.228Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:39:37.703Z",
+          "completedAt": "2026-09-18T18:41:35.357Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:39:37.703Z",
+          "completedAt": "2026-09-18T18:48:51.045Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:39:37.703Z",
+          "completedAt": "2026-09-18T19:01:18.012Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T18:39:37.703Z",
+          "completedAt": "2026-09-18T19:02:47.977Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T18:39:37.704Z",
+        "lastUpdated": "2026-09-20T16:48:45.894Z"
+      },
+      "completedAt": "2026-09-20T16:48:45.892Z"
+    },
+    "anchor-auth-abuse": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:15:50.952Z",
+          "completedAt": "2026-09-18T19:16:17.142Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:15:50.952Z",
+          "completedAt": "2026-09-18T19:17:02.241Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:15:50.952Z",
+          "completedAt": "2026-09-18T19:24:35.004Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:15:50.952Z",
+          "completedAt": "2026-09-18T19:28:58.575Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:15:50.952Z",
+          "completedAt": "2026-09-18T19:29:41.473Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T19:15:50.952Z",
+        "lastUpdated": "2026-09-18T19:29:41.473Z"
+      },
+      "completedAt": "2026-09-18T19:29:41.472Z"
+    },
+    "anchor-release-readiness": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:31:01.100Z",
+          "completedAt": "2026-09-18T19:33:27.691Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:31:01.100Z",
+          "completedAt": "2026-09-18T19:33:27.700Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:31:01.100Z",
+          "completedAt": "2026-09-18T19:42:11.490Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:31:01.100Z",
+          "completedAt": "2026-09-18T19:43:17.346Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T19:31:01.100Z",
+          "completedAt": "2026-09-18T19:43:17.355Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T19:31:01.101Z",
+        "lastUpdated": "2026-09-18T19:43:17.355Z"
+      },
+      "completedAt": "2026-09-18T19:43:17.354Z"
+    },
+    "anchor-hosted-auth-preflight": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T21:58:43.158Z",
+          "completedAt": "2026-09-18T21:59:22.350Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T21:58:43.158Z",
+          "completedAt": "2026-09-18T21:59:22.360Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T21:58:43.158Z",
+          "completedAt": "2026-09-18T22:04:48.168Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T21:58:43.158Z",
+          "completedAt": "2026-09-18T22:05:31.185Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T21:58:43.158Z",
+          "completedAt": "2026-09-18T22:05:31.200Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T21:58:43.158Z",
+        "lastUpdated": "2026-09-18T22:05:31.200Z"
+      },
+      "completedAt": "2026-09-18T22:05:31.197Z"
+    },
+    "anchor-migration-retry": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:12:45.469Z",
+          "completedAt": "2026-09-18T22:15:00.674Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:12:45.469Z",
+          "completedAt": "2026-09-18T22:15:29.290Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:12:45.469Z",
+          "completedAt": "2026-09-18T22:18:14.301Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:12:45.469Z",
+          "completedAt": "2026-09-18T22:18:51.693Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:12:45.469Z",
+          "completedAt": "2026-09-18T22:18:51.711Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T22:12:45.469Z",
+        "lastUpdated": "2026-09-18T22:18:51.711Z"
+      },
+      "completedAt": "2026-09-18T22:18:51.710Z"
+    },
+    "anchor-preview-environment": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:20:02.147Z",
+          "completedAt": "2026-09-18T22:20:26.573Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:20:02.147Z",
+          "completedAt": "2026-09-18T22:20:26.591Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:20:02.147Z",
+          "completedAt": "2026-09-18T22:24:01.714Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:20:02.147Z",
+          "completedAt": "2026-09-18T22:24:34.420Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:20:02.147Z",
+          "completedAt": "2026-09-18T22:24:34.435Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T22:20:02.148Z",
+        "lastUpdated": "2026-09-18T22:24:34.435Z"
+      },
+      "completedAt": "2026-09-18T22:24:34.433Z"
+    },
+    "anchor-preview-db-validation": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 2,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:25:53.569Z",
+          "completedAt": "2026-09-18T22:27:10.995Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:25:53.569Z",
+          "completedAt": "2026-09-18T22:27:11.023Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:25:53.569Z",
+          "completedAt": "2026-09-18T22:34:33.799Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:25:53.569Z",
+          "completedAt": "2026-09-18T22:36:13.704Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:25:53.569Z",
+          "completedAt": "2026-09-18T22:36:13.717Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T22:25:53.569Z",
+        "lastUpdated": "2026-09-19T14:23:35.587Z"
+      },
+      "completedAt": "2026-09-19T14:23:35.584Z"
+    },
+    "anchor-self-hosted-preflight": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:38:34.522Z",
+          "completedAt": "2026-09-18T22:39:09.702Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:38:34.522Z",
+          "completedAt": "2026-09-18T22:39:45.690Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:38:34.522Z",
+          "completedAt": "2026-09-18T22:47:16.478Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:38:34.522Z",
+          "completedAt": "2026-09-18T22:48:17.102Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:38:34.522Z",
+          "completedAt": "2026-09-18T22:48:17.114Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T22:38:34.522Z",
+        "lastUpdated": "2026-09-18T22:48:17.114Z"
+      },
+      "completedAt": "2026-09-18T22:48:17.113Z"
+    },
+    "anchor-auth-candidate-lab": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:49:59.683Z",
+          "completedAt": "2026-09-18T22:50:33.578Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:49:59.683Z",
+          "completedAt": "2026-09-18T22:50:59.218Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:49:59.683Z",
+          "completedAt": "2026-09-18T23:00:18.989Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:49:59.683Z",
+          "completedAt": "2026-09-18T23:01:54.636Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T22:49:59.683Z",
+          "completedAt": "2026-09-18T23:01:54.650Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T22:49:59.684Z",
+        "lastUpdated": "2026-09-18T23:01:54.650Z"
+      },
+      "completedAt": "2026-09-18T23:01:54.649Z"
+    },
+    "anchor-review-preview-deploy": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:07:38.489Z",
+          "completedAt": "2026-09-18T23:08:00.178Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:07:38.489Z",
+          "completedAt": "2026-09-18T23:08:00.191Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:07:38.489Z",
+          "completedAt": "2026-09-18T23:20:04.067Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:07:38.489Z",
+          "completedAt": "2026-09-18T23:23:47.912Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:07:38.489Z",
+          "completedAt": "2026-09-18T23:23:47.925Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T23:07:38.490Z",
+        "lastUpdated": "2026-09-18T23:23:47.925Z"
+      },
+      "completedAt": "2026-09-18T23:23:47.923Z"
+    },
+    "anchor-managed-cloud-release": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:29:48.181Z",
+          "completedAt": "2026-09-18T23:30:46.822Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:29:48.181Z",
+          "completedAt": "2026-09-18T23:31:25.780Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:29:48.181Z",
+          "completedAt": "2026-09-18T23:40:41.354Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:29:48.181Z",
+          "completedAt": "2026-09-18T23:45:53.535Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:29:48.181Z",
+          "completedAt": "2026-09-18T23:45:53.542Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T23:29:48.181Z",
+        "lastUpdated": "2026-09-18T23:45:53.542Z"
+      },
+      "completedAt": "2026-09-18T23:45:53.541Z"
+    },
+    "anchor-primary-domain-mail": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:52:19.197Z",
+          "completedAt": "2026-09-18T23:53:08.361Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:52:19.197Z",
+          "completedAt": "2026-09-18T23:53:08.370Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:52:19.197Z",
+          "completedAt": "2026-09-19T00:31:44.603Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:52:19.197Z",
+          "completedAt": "2026-09-19T00:32:37.360Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-18T23:52:19.197Z",
+          "completedAt": "2026-09-19T00:32:43.061Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-18T23:52:19.197Z",
+        "lastUpdated": "2026-09-19T00:32:43.061Z"
+      },
+      "completedAt": "2026-09-19T00:32:43.060Z"
+    },
+    "anchor-signup-readiness": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:07:21.444Z",
+          "completedAt": "2026-09-19T01:08:33.660Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:07:21.444Z",
+          "completedAt": "2026-09-19T01:14:17.733Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:07:21.444Z",
+          "completedAt": "2026-09-19T01:17:07.187Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:07:21.444Z",
+          "completedAt": "2026-09-19T01:18:23.522Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:07:21.444Z",
+          "completedAt": "2026-09-19T01:18:23.532Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T01:07:21.445Z",
+        "lastUpdated": "2026-09-19T01:18:23.532Z"
+      },
+      "completedAt": "2026-09-19T01:18:23.531Z"
+    },
+    "anchor-initial-account": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:23:18.393Z",
+          "completedAt": "2026-09-19T01:23:18.407Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:23:18.393Z",
+          "completedAt": "2026-09-19T01:23:18.425Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:23:18.393Z",
+          "completedAt": "2026-09-19T02:43:48.715Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:23:18.393Z",
+          "completedAt": "2026-09-19T02:49:23.390Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T01:23:18.393Z",
+          "completedAt": "2026-09-19T02:50:37.143Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T01:23:18.393Z",
+        "lastUpdated": "2026-09-19T02:50:37.143Z"
+      },
+      "completedAt": "2026-09-19T02:50:37.140Z"
+    },
+    "anchor-consent-readability": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T02:57:11.918Z",
+          "completedAt": "2026-09-19T02:57:11.939Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T02:57:11.918Z",
+          "completedAt": "2026-09-19T02:57:34.210Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T02:57:11.918Z",
+          "completedAt": "2026-09-19T02:59:25.401Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T02:57:11.918Z",
+          "completedAt": "2026-09-19T03:01:33.583Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T02:57:11.918Z",
+          "completedAt": "2026-09-19T03:01:33.598Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T02:57:11.919Z",
+        "lastUpdated": "2026-09-19T03:01:33.598Z"
+      },
+      "completedAt": "2026-09-19T03:01:33.597Z"
+    },
+    "anchor-invite-only-opening": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 2,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:11:21.675Z",
+          "completedAt": "2026-09-19T03:11:21.709Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:11:21.675Z",
+          "completedAt": "2026-09-19T03:12:19.912Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:11:21.675Z",
+          "completedAt": "2026-09-19T03:16:00.585Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:11:21.675Z",
+          "completedAt": "2026-09-19T03:21:34.155Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:11:21.675Z",
+          "completedAt": "2026-09-19T03:21:34.166Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T03:11:21.675Z",
+        "lastUpdated": "2026-09-19T03:21:34.166Z"
+      },
+      "completedAt": "2026-09-19T03:21:34.165Z"
+    },
+    "anchor-invitation-mail-navigation": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:40:18.360Z",
+          "completedAt": "2026-09-19T03:40:48.659Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:40:18.360Z",
+          "completedAt": "2026-09-19T03:40:48.687Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:40:18.360Z",
+          "completedAt": "2026-09-19T03:41:06.744Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:40:18.360Z",
+          "completedAt": "2026-09-19T03:44:14.955Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:40:18.360Z",
+          "completedAt": "2026-09-19T03:44:14.978Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T03:40:18.360Z",
+        "lastUpdated": "2026-09-19T03:44:14.978Z"
+      },
+      "completedAt": "2026-09-19T03:44:14.977Z"
+    },
+    "anchor-course-content": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:44:23.526Z",
+          "completedAt": "2026-09-19T03:46:03.295Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:44:23.526Z",
+          "completedAt": "2026-09-19T04:34:25.098Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:44:23.526Z",
+          "completedAt": "2026-09-19T04:41:43.826Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:44:23.526Z",
+          "completedAt": "2026-09-19T04:42:44.489Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:44:23.526Z",
+          "completedAt": "2026-09-19T04:42:44.495Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T03:44:23.529Z",
+        "lastUpdated": "2026-09-19T04:42:44.495Z"
+      },
+      "completedAt": "2026-09-19T04:42:44.494Z"
+    },
+    "anchor-db-connectivity": {
+      "phase": "act",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {}
+    },
+    "anchor-db-performance": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:47:01.989Z",
+          "completedAt": "2026-09-19T03:47:18.947Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:47:01.989Z",
+          "completedAt": "2026-09-19T03:48:17.818Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:47:01.989Z",
+          "completedAt": "2026-09-19T03:50:29.279Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:47:01.989Z",
+          "completedAt": "2026-09-19T03:56:35.621Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:47:01.989Z",
+          "completedAt": "2026-09-19T03:56:35.628Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T03:47:01.989Z",
+        "lastUpdated": "2026-09-19T03:56:35.628Z"
+      },
+      "completedAt": "2026-09-19T03:56:35.627Z"
+    },
+    "anchor-auth-load-verification": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 2,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:59:50.015Z",
+          "completedAt": "2026-09-19T04:01:00.325Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:59:50.015Z",
+          "completedAt": "2026-09-19T04:01:00.336Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:59:50.015Z",
+          "completedAt": "2026-09-19T04:05:10.916Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:59:50.015Z",
+          "completedAt": "2026-09-19T04:15:01.816Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T03:59:50.015Z",
+          "completedAt": "2026-09-19T04:15:37.602Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T03:59:50.016Z",
+        "lastUpdated": "2026-09-19T04:15:37.602Z"
+      },
+      "completedAt": "2026-09-19T04:15:37.598Z"
+    },
+    "anchor-course-reports": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T04:19:32.916Z",
+          "completedAt": "2026-09-19T04:20:18.417Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T04:19:32.916Z",
+          "completedAt": "2026-09-19T04:20:18.423Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T04:19:32.916Z",
+          "completedAt": "2026-09-19T04:41:13.494Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T04:19:32.916Z",
+          "completedAt": "2026-09-19T04:41:26.571Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T04:19:32.916Z",
+          "completedAt": "2026-09-19T04:41:26.581Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T04:19:32.917Z",
+        "lastUpdated": "2026-09-19T04:41:26.581Z"
+      },
+      "completedAt": "2026-09-19T04:41:26.579Z"
+    },
+    "anchor-preview-main-integration": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:32:13.105Z",
+          "completedAt": "2026-09-19T05:32:27.618Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:32:13.105Z",
+          "completedAt": "2026-09-19T05:32:40.754Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:32:13.105Z",
+          "completedAt": "2026-09-19T05:33:06.864Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:32:13.105Z",
+          "completedAt": "2026-09-19T05:33:48.598Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:32:13.105Z",
+          "completedAt": "2026-09-19T05:34:08.308Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T05:32:13.105Z",
+        "lastUpdated": "2026-09-19T05:34:08.308Z"
+      },
+      "completedAt": "2026-09-19T05:34:08.307Z"
+    },
+    "anchor-preview-integration-verification": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 2,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:35:46.631Z",
+          "completedAt": "2026-09-19T05:36:07.264Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:35:46.631Z",
+          "completedAt": "2026-09-19T05:36:30.919Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:35:46.631Z",
+          "completedAt": "2026-09-19T05:39:21.240Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:35:46.631Z",
+          "completedAt": "2026-09-19T05:40:16.058Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T05:35:46.631Z",
+          "completedAt": "2026-09-19T06:00:12.943Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T05:35:46.632Z",
+        "lastUpdated": "2026-09-19T06:00:12.943Z"
+      },
+      "completedAt": "2026-09-19T06:00:12.941Z"
+    },
+    "anchor-production-db-preparation": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:01:21.387Z",
+          "completedAt": "2026-09-19T06:02:46.153Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:01:21.387Z",
+          "completedAt": "2026-09-19T06:02:46.171Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:01:21.387Z",
+          "completedAt": "2026-09-19T06:10:21.344Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:01:21.387Z",
+          "completedAt": "2026-09-19T06:12:24.651Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:01:21.387Z",
+          "completedAt": "2026-09-19T06:12:32.673Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T06:01:21.387Z",
+        "lastUpdated": "2026-09-19T06:12:32.673Z"
+      },
+      "completedAt": "2026-09-19T06:12:32.672Z"
+    },
+    "anchor-production-db-rollout": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:13:20.338Z",
+          "completedAt": "2026-09-19T06:13:42.387Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:13:20.338Z",
+          "completedAt": "2026-09-19T06:13:42.400Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:13:20.338Z",
+          "completedAt": "2026-09-19T06:14:59.384Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:13:20.338Z",
+          "completedAt": "2026-09-19T06:15:50.098Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:13:20.338Z",
+          "completedAt": "2026-09-19T06:15:51.909Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T06:13:20.339Z",
+        "lastUpdated": "2026-09-19T06:15:51.909Z"
+      },
+      "completedAt": "2026-09-19T06:15:51.908Z"
+    },
+    "anchor-production-app-release": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:16:50.355Z",
+          "completedAt": "2026-09-19T06:16:51.047Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:16:50.355Z",
+          "completedAt": "2026-09-19T06:16:51.058Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:16:50.355Z",
+          "completedAt": "2026-09-19T06:25:27.281Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:16:50.355Z",
+          "completedAt": "2026-09-19T06:27:19.583Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:16:50.355Z",
+          "completedAt": "2026-09-19T06:27:19.588Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T06:16:50.355Z",
+        "lastUpdated": "2026-09-19T06:27:19.588Z"
+      },
+      "completedAt": "2026-09-19T06:27:19.586Z"
+    },
+    "anchor-production-opening": {
+      "phase": "do",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:28:48.345Z",
+          "completedAt": "2026-09-19T06:29:26.192Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T06:28:48.345Z",
+          "completedAt": "2026-09-19T06:30:16.863Z"
+        },
+        {
+          "phase": "do",
+          "status": "active",
+          "createdAt": "2026-09-19T06:28:48.345Z"
+        },
+        {
+          "phase": "check",
+          "status": "pending",
+          "createdAt": "2026-09-19T06:28:48.345Z"
+        },
+        {
+          "phase": "report",
+          "status": "pending",
+          "createdAt": "2026-09-19T06:28:48.345Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T06:28:48.347Z",
+        "lastUpdated": "2026-09-19T06:30:16.863Z"
+      }
+    },
+    "anchor-report-review": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:14:38.445Z",
+          "completedAt": "2026-09-19T13:15:05.641Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:14:38.445Z",
+          "completedAt": "2026-09-19T13:15:05.655Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:14:38.445Z",
+          "completedAt": "2026-09-19T13:19:04.920Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:14:38.445Z",
+          "completedAt": "2026-09-19T13:22:08.130Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:14:38.445Z",
+          "completedAt": "2026-09-19T13:22:08.140Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T13:14:38.446Z",
+        "lastUpdated": "2026-09-19T13:22:08.140Z"
+      },
+      "completedAt": "2026-09-19T13:22:08.138Z"
+    },
+    "anchor-report-import": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 2,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:22:08.147Z",
+          "completedAt": "2026-09-19T13:22:08.170Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:22:08.147Z",
+          "completedAt": "2026-09-19T13:22:08.179Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:22:08.147Z",
+          "completedAt": "2026-09-19T13:31:09.273Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:22:08.147Z",
+          "completedAt": "2026-09-19T13:42:33.823Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:22:08.147Z",
+          "completedAt": "2026-09-19T13:42:33.831Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T13:22:08.148Z",
+        "lastUpdated": "2026-09-19T13:42:33.831Z"
+      },
+      "completedAt": "2026-09-19T13:42:33.829Z"
+    },
+    "anchor-course-opening-plans": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:28:03.765Z",
+          "completedAt": "2026-09-19T13:28:29.007Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:28:03.765Z",
+          "completedAt": "2026-09-19T13:28:52.368Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:28:03.765Z",
+          "completedAt": "2026-09-19T13:38:21.203Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:28:03.765Z",
+          "completedAt": "2026-09-19T13:39:57.242Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:28:03.765Z",
+          "completedAt": "2026-09-19T13:40:14.087Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T13:28:03.765Z",
+        "lastUpdated": "2026-09-19T13:40:14.087Z"
+      },
+      "completedAt": "2026-09-19T13:40:14.086Z"
+    },
+    "anchor-course-opening-view": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:43:20.161Z",
+          "completedAt": "2026-09-19T13:43:49.271Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:43:20.161Z",
+          "completedAt": "2026-09-19T13:44:10.985Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:43:20.161Z",
+          "completedAt": "2026-09-19T13:47:10.719Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:43:20.161Z",
+          "completedAt": "2026-09-19T13:49:16.250Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:43:20.161Z",
+          "completedAt": "2026-09-19T13:49:31.945Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T13:43:20.162Z",
+        "lastUpdated": "2026-09-19T13:49:31.945Z"
+      },
+      "completedAt": "2026-09-19T13:49:31.940Z"
+    },
+    "anchor-course-opening-prefill": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:51:41.384Z",
+          "completedAt": "2026-09-19T13:51:41.408Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:51:41.384Z",
+          "completedAt": "2026-09-19T13:52:33.340Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:51:41.384Z",
+          "completedAt": "2026-09-19T13:54:49.645Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:51:41.384Z",
+          "completedAt": "2026-09-19T13:56:40.120Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T13:51:41.384Z",
+          "completedAt": "2026-09-19T13:56:49.014Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T13:51:41.386Z",
+        "lastUpdated": "2026-09-19T13:56:49.014Z"
+      },
+      "completedAt": "2026-09-19T13:56:49.012Z"
+    },
+    "anchor-preview-db-performance": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-19T14:20:14.708Z",
+          "completedAt": "2026-09-19T14:21:20.028Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-19T14:20:14.708Z",
+          "completedAt": "2026-09-19T14:21:54.205Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-19T14:20:14.708Z",
+          "completedAt": "2026-09-19T14:27:39.469Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-19T14:20:14.708Z",
+          "completedAt": "2026-09-19T14:30:00.100Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-19T14:20:14.708Z",
+          "completedAt": "2026-09-19T14:30:16.264Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-19T14:20:14.708Z",
+        "lastUpdated": "2026-09-19T14:30:16.264Z"
+      },
+      "completedAt": "2026-09-19T14:30:16.259Z"
+    },
+    "anchor-public-course-cards": {
+      "phase": "design",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-20T15:54:09.459Z",
+          "completedAt": "2026-09-20T15:54:19.736Z"
+        },
+        {
+          "phase": "design",
+          "status": "active",
+          "createdAt": "2026-09-20T15:54:09.459Z"
+        },
+        {
+          "phase": "do",
+          "status": "pending",
+          "createdAt": "2026-09-20T15:54:09.459Z"
+        },
+        {
+          "phase": "check",
+          "status": "pending",
+          "createdAt": "2026-09-20T15:54:09.459Z"
+        },
+        {
+          "phase": "report",
+          "status": "pending",
+          "createdAt": "2026-09-20T15:54:09.459Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-20T15:54:09.460Z",
+        "lastUpdated": "2026-09-20T15:54:19.736Z"
+      }
+    },
+    "anchor-role-navigation": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-20T16:58:15.320Z",
+          "completedAt": "2026-09-20T16:58:40.571Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-20T16:58:15.320Z",
+          "completedAt": "2026-09-20T16:59:14.677Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-20T16:58:15.320Z",
+          "completedAt": "2026-09-20T17:05:45.168Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-20T16:58:15.320Z",
+          "completedAt": "2026-09-20T17:07:57.083Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-20T16:58:15.320Z",
+          "completedAt": "2026-09-20T17:08:32.577Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-20T16:58:15.321Z",
+        "lastUpdated": "2026-09-20T17:08:32.577Z"
+      },
+      "completedAt": "2026-09-20T17:08:32.574Z"
+    },
+    "anchor-attendance-book": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-20T17:10:50.588Z",
+          "completedAt": "2026-09-20T17:10:50.645Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-20T17:10:50.588Z",
+          "completedAt": "2026-09-20T17:11:30.564Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-20T17:10:50.588Z",
+          "completedAt": "2026-09-20T17:25:25.241Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-20T17:10:50.588Z",
+          "completedAt": "2026-09-20T17:26:46.986Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-20T17:10:50.588Z",
+          "completedAt": "2026-09-20T17:28:30.971Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-20T17:10:50.588Z",
+        "lastUpdated": "2026-09-20T17:28:30.971Z"
+      },
+      "completedAt": "2026-09-20T17:28:30.969Z"
+    },
+    "anchor-attendance-readiness": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:27:43.663Z",
+          "completedAt": "2026-09-20T22:28:03.892Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:27:43.663Z",
+          "completedAt": "2026-09-20T22:28:29.720Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:27:43.663Z",
+          "completedAt": "2026-09-20T22:31:55.475Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:27:43.663Z",
+          "completedAt": "2026-09-20T22:31:56.665Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:27:43.663Z",
+          "completedAt": "2026-09-20T22:33:22.201Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-20T22:27:43.664Z",
+        "lastUpdated": "2026-09-20T22:33:22.201Z"
+      },
+      "completedAt": "2026-09-20T22:33:22.198Z"
+    },
+    "anchor-opening-working-copy": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:35:27.843Z",
+          "completedAt": "2026-09-20T22:35:27.863Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:35:27.843Z",
+          "completedAt": "2026-09-20T22:35:27.884Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:35:27.843Z",
+          "completedAt": "2026-09-20T22:42:36.608Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:35:27.843Z",
+          "completedAt": "2026-09-20T22:43:51.206Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-20T22:35:27.843Z",
+          "completedAt": "2026-09-20T22:46:10.312Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-20T22:35:27.843Z",
+        "lastUpdated": "2026-09-20T22:46:10.312Z"
+      },
+      "completedAt": "2026-09-20T22:46:10.309Z"
+    },
+    "anchor-opening-draft-overview": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "completedAt": "2026-09-20T22:53:52.809Z"
+    },
+    "anchor-account-list-layout": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "completedAt": "2026-09-21T00:41:46.667Z"
+    },
+    "anchor-business-menu": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T00:43:31.391Z",
+          "completedAt": "2026-09-21T00:43:52.408Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T00:43:31.391Z",
+          "completedAt": "2026-09-21T00:43:52.419Z"
+        },
+        {
+          "phase": "do",
+          "status": "active",
+          "createdAt": "2026-09-21T00:43:31.391Z"
+        },
+        {
+          "phase": "check",
+          "status": "pending",
+          "createdAt": "2026-09-21T00:43:31.391Z"
+        },
+        {
+          "phase": "report",
+          "status": "pending",
+          "createdAt": "2026-09-21T00:43:31.391Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T00:43:31.392Z",
+        "lastUpdated": "2026-09-21T00:47:12.748Z"
+      },
+      "completedAt": "2026-09-21T00:47:12.747Z"
+    },
+    "anchor-business-menu-refresh": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:29:22.446Z",
+          "completedAt": "2026-09-21T03:29:22.516Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:29:22.446Z",
+          "completedAt": "2026-09-21T03:29:22.523Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:29:22.446Z",
+          "completedAt": "2026-09-21T03:29:50.772Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:29:22.446Z",
+          "completedAt": "2026-09-21T03:31:53.052Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:29:22.446Z",
+          "completedAt": "2026-09-21T03:31:53.074Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T03:29:22.446Z",
+        "lastUpdated": "2026-09-21T03:31:53.074Z"
+      },
+      "completedAt": "2026-09-21T03:31:53.071Z"
+    },
+    "anchor-member-management": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:40:40.979Z",
+          "completedAt": "2026-09-21T03:40:41.078Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:40:40.979Z",
+          "completedAt": "2026-09-21T03:40:41.086Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:40:40.979Z",
+          "completedAt": "2026-09-21T03:49:56.490Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:40:40.979Z",
+          "completedAt": "2026-09-21T03:52:22.037Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-21T03:40:40.979Z",
+          "completedAt": "2026-09-21T03:52:22.047Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T03:40:40.980Z",
+        "lastUpdated": "2026-09-21T03:52:22.047Z"
+      },
+      "completedAt": "2026-09-21T03:52:22.045Z"
+    },
+    "anchor-member-manual-entry": {
+      "phase": "act",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T04:08:59.248Z",
+          "completedAt": "2026-09-21T04:10:15.973Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T04:08:59.248Z",
+          "completedAt": "2026-09-21T04:10:15.981Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-21T04:08:59.248Z",
+          "completedAt": "2026-09-21T04:17:04.496Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-21T04:08:59.248Z",
+          "completedAt": "2026-09-21T04:19:22.193Z"
+        },
+        {
+          "phase": "report",
+          "status": "active",
+          "createdAt": "2026-09-21T04:08:59.248Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T04:08:59.249Z",
+        "lastUpdated": "2026-09-21T04:19:22.193Z"
+      }
+    },
+    "anchor-course-catalog-views": {
+      "phase": "archived",
+      "matchRate": 100,
+      "iterationCount": 1,
+      "documents": {
+        "plan": "docs/archive/2026-09/anchor-course-catalog-views/anchor-course-catalog-views.plan.md",
+        "design": "docs/archive/2026-09/anchor-course-catalog-views/anchor-course-catalog-views.design.md",
+        "analysis": "docs/archive/2026-09/anchor-course-catalog-views/anchor-course-catalog-views.analysis.md",
+        "report": "docs/archive/2026-09/anchor-course-catalog-views/anchor-course-catalog-views.report.md"
+      },
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T07:58:38.271Z",
+          "completedAt": "2026-09-21T07:58:54.986Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T07:58:38.271Z",
+          "completedAt": "2026-09-21T07:59:32.398Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-21T07:58:38.271Z",
+          "completedAt": "2026-09-21T08:03:24.301Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-21T07:58:38.271Z",
+          "completedAt": "2026-09-21T08:06:36.879Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-21T07:58:38.271Z",
+          "completedAt": "2026-09-21T08:06:36.896Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T07:58:38.272Z",
+        "lastUpdated": "2026-09-21T08:13:26.467Z"
+      },
+      "completedAt": "2026-09-21T08:06:36.894Z",
+      "archivedAt": "2026-09-21T08:13:26.467Z",
+      "archivePath": "docs/archive/2026-09/anchor-course-catalog-views"
+    },
+    "anchor-course-budget": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 0,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T09:49:54.621Z",
+          "completedAt": "2026-09-21T09:50:37.808Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T09:49:54.621Z",
+          "completedAt": "2026-09-21T09:50:37.815Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-21T09:49:54.621Z",
+          "completedAt": "2026-09-21T10:00:58.892Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-21T09:49:54.621Z",
+          "completedAt": "2026-09-21T10:07:14.340Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-21T09:49:54.621Z",
+          "completedAt": "2026-09-21T10:10:30.408Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T09:49:54.622Z",
+        "lastUpdated": "2026-09-21T10:10:30.408Z"
+      },
+      "completedAt": "2026-09-21T10:10:30.402Z"
+    },
+    "anchor-budget-comparison": {
+      "phase": "completed",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T11:33:58.207Z",
+          "completedAt": "2026-09-21T11:33:58.256Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T11:33:58.207Z",
+          "completedAt": "2026-09-21T11:33:58.272Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-21T11:33:58.207Z",
+          "completedAt": "2026-09-21T11:47:46.434Z"
+        },
+        {
+          "phase": "check",
+          "status": "completed",
+          "createdAt": "2026-09-21T11:33:58.207Z",
+          "completedAt": "2026-09-21T11:48:21.525Z"
+        },
+        {
+          "phase": "report",
+          "status": "completed",
+          "createdAt": "2026-09-21T11:33:58.207Z",
+          "completedAt": "2026-09-21T11:49:32.511Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T11:33:58.211Z",
+        "lastUpdated": "2026-09-21T11:49:32.511Z"
+      },
+      "completedAt": "2026-09-21T11:49:32.507Z"
+    },
+    "anchor-student-learning": {
+      "phase": "check",
+      "matchRate": null,
+      "iterationCount": 1,
+      "documents": {},
+      "taskChain": [
+        {
+          "phase": "plan",
+          "status": "completed",
+          "createdAt": "2026-09-21T12:30:53.910Z",
+          "completedAt": "2026-09-21T12:31:30.602Z"
+        },
+        {
+          "phase": "design",
+          "status": "completed",
+          "createdAt": "2026-09-21T12:30:53.910Z",
+          "completedAt": "2026-09-21T12:32:19.771Z"
+        },
+        {
+          "phase": "do",
+          "status": "completed",
+          "createdAt": "2026-09-21T12:30:53.910Z",
+          "completedAt": "2026-09-21T12:42:35.667Z"
+        },
+        {
+          "phase": "check",
+          "status": "active",
+          "createdAt": "2026-09-21T12:30:53.910Z"
+        },
+        {
+          "phase": "report",
+          "status": "pending",
+          "createdAt": "2026-09-21T12:30:53.910Z"
+        }
+      ],
+      "timestamps": {
+        "started": "2026-09-21T12:30:53.911Z",
+        "lastUpdated": "2026-09-21T12:42:35.667Z"
+      }
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Starter",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-09-18T14:36:14.777Z",
+    "onboardingCompleted": false,
+    "lastActivity": "2026-09-21T12:42:35.685Z"
+  },
+  "history": [
+    {
+      "feature": "anchor-lifelong-education-platform",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T14:42:50.746Z"
+    },
+    {
+      "feature": "anchor-lifelong-education-platform",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T14:42:50.750Z"
+    },
+    {
+      "feature": "anchor-lifelong-education-platform",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T14:45:01.116Z"
+    },
+    {
+      "feature": "anchor-lifelong-education-platform",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T14:54:02.345Z"
+    },
+    {
+      "feature": "anchor-lifelong-education-platform",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T14:54:02.348Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T15:13:47.221Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T15:13:47.224Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T15:13:47.251Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T15:13:47.257Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T15:13:47.257Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T15:21:55.039Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T15:21:55.040Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T15:28:35.860Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T15:28:35.861Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T15:29:18.426Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T15:29:18.428Z"
+    },
+    {
+      "feature": "anchor-core-flow",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T15:29:18.434Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T15:33:31.873Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T15:33:31.874Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T15:33:31.882Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T15:33:31.886Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T15:33:31.886Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T15:48:26.406Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T15:48:26.407Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T15:49:21.539Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T15:49:21.539Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T15:49:21.543Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T15:49:21.544Z"
+    },
+    {
+      "feature": "anchor-learning-evaluation",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T15:50:10.136Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T15:52:47.396Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T15:52:47.396Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T15:52:47.400Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T15:52:47.405Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T15:52:47.405Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T16:12:47.734Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T16:12:47.735Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T16:12:47.751Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T16:12:47.751Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T16:12:47.757Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T16:12:47.758Z"
+    },
+    {
+      "feature": "anchor-certificates",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T16:12:47.774Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T16:15:03.096Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T16:15:03.097Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T16:15:03.101Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T16:15:47.897Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T16:15:47.898Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T16:35:11.105Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T16:35:11.106Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T16:35:11.111Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T16:35:11.112Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T16:35:11.115Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T16:35:11.115Z"
+    },
+    {
+      "feature": "anchor-finance",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T16:35:11.118Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T16:41:18.847Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T16:41:18.848Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T16:41:18.852Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T16:41:51.909Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T16:41:51.910Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T16:49:11.306Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T16:49:11.307Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T16:55:11.957Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T16:55:11.958Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T16:55:11.963Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T16:55:11.964Z"
+    },
+    {
+      "feature": "anchor-messaging",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T16:55:11.968Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T17:00:37.252Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T17:00:37.253Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T17:00:37.257Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T17:01:57.395Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T17:01:57.396Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T17:17:34.013Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T17:17:34.014Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T17:23:26.279Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T17:23:26.280Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T17:23:26.288Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T17:23:26.288Z"
+    },
+    {
+      "feature": "anchor-annual-evaluation",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T17:23:26.292Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T17:25:22.085Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T17:25:22.086Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T17:25:22.091Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T17:26:13.152Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T17:26:13.153Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T17:36:32.215Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T17:36:32.216Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T17:42:55.035Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T17:42:55.036Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T17:42:55.041Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T17:42:55.042Z"
+    },
+    {
+      "feature": "anchor-digital-badges",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T17:42:55.047Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T17:45:41.676Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T17:45:41.677Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T17:45:41.681Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T17:46:30.854Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T17:46:30.855Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T17:57:25.883Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T17:57:25.885Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T18:07:07.029Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T18:07:07.031Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T18:07:07.036Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T18:07:07.036Z"
+    },
+    {
+      "feature": "anchor-instructor-development",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T18:07:07.042Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T18:08:41.395Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T18:08:41.395Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T18:08:41.400Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T18:10:10.594Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T18:10:10.595Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T18:13:40.188Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T18:13:40.191Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T18:19:24.978Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T18:19:24.978Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T18:19:24.983Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T18:19:24.984Z"
+    },
+    {
+      "feature": "anchor-accessible-auth",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T18:19:24.989Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T18:23:03.710Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T18:23:03.711Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T18:23:03.714Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T18:24:06.083Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T18:24:06.085Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T18:33:45.322Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T18:33:45.323Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T18:38:04.287Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T18:38:04.287Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T18:38:13.909Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T18:38:13.909Z"
+    },
+    {
+      "feature": "anchor-auth-recovery",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T18:38:20.853Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T18:40:51.227Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T18:40:51.227Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T18:40:51.231Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T18:41:35.356Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T18:41:35.356Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T18:48:51.043Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T18:48:51.044Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T19:01:18.011Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T19:01:18.012Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T19:01:44.496Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T19:01:44.496Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T19:02:47.977Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T19:16:17.141Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T19:16:17.141Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T19:16:17.146Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T19:17:02.240Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T19:17:02.241Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T19:24:35.002Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T19:24:35.003Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T19:28:58.574Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T19:28:58.574Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T19:28:58.586Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T19:28:58.586Z"
+    },
+    {
+      "feature": "anchor-auth-abuse",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T19:29:41.473Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T19:33:27.689Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T19:33:27.690Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T19:33:27.694Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T19:33:27.699Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T19:33:27.699Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T19:42:11.486Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T19:42:11.489Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T19:43:17.344Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T19:43:17.345Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T19:43:17.350Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T19:43:17.351Z"
+    },
+    {
+      "feature": "anchor-release-readiness",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T19:43:17.354Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T21:59:22.348Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T21:59:22.349Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T21:59:22.354Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T21:59:22.359Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T21:59:22.360Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T22:04:48.166Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T22:04:48.167Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T22:05:31.184Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T22:05:31.185Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T22:05:31.189Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T22:05:31.191Z"
+    },
+    {
+      "feature": "anchor-hosted-auth-preflight",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T22:05:31.199Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T22:15:00.672Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T22:15:00.673Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T22:15:00.680Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T22:15:29.289Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T22:15:29.290Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T22:18:14.295Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T22:18:14.300Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T22:18:51.684Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T22:18:51.692Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T22:18:51.705Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T22:18:51.706Z"
+    },
+    {
+      "feature": "anchor-migration-retry",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T22:18:51.710Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T22:20:26.571Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T22:20:26.572Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T22:20:26.580Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T22:20:26.590Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T22:20:26.590Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T22:24:01.710Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T22:24:01.714Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T22:24:34.418Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T22:24:34.419Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T22:24:34.425Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T22:24:34.426Z"
+    },
+    {
+      "feature": "anchor-preview-environment",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T22:24:34.434Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T22:27:10.993Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T22:27:10.994Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T22:27:11.005Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T22:27:11.021Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T22:27:11.022Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T22:34:33.795Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T22:34:33.798Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T22:36:13.697Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T22:36:13.701Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T22:36:13.711Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T22:36:13.711Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T22:36:13.717Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T22:39:09.700Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T22:39:09.702Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T22:39:09.707Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T22:39:45.689Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T22:39:45.690Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T22:47:16.474Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T22:47:16.476Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T22:48:17.101Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T22:48:17.101Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T22:48:17.108Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T22:48:17.108Z"
+    },
+    {
+      "feature": "anchor-self-hosted-preflight",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T22:48:17.113Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T22:50:33.577Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T22:50:33.578Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T22:50:33.589Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T22:50:59.217Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T22:50:59.217Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T23:00:18.986Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T23:00:18.989Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T23:01:54.634Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T23:01:54.635Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T23:01:54.641Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T23:01:54.641Z"
+    },
+    {
+      "feature": "anchor-auth-candidate-lab",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T23:01:54.649Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T23:08:00.176Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T23:08:00.177Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T23:08:00.182Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T23:08:00.190Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T23:08:00.191Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T23:20:04.065Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T23:20:04.066Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T23:23:47.909Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T23:23:47.911Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-18T23:23:47.918Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-18T23:23:47.918Z"
+    },
+    {
+      "feature": "anchor-review-preview-deploy",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T23:23:47.923Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T23:30:46.819Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T23:30:46.820Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-18T23:30:46.829Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T23:31:25.778Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T23:31:25.779Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-18T23:40:41.352Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-18T23:40:41.353Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-18T23:45:53.533Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-18T23:45:53.534Z"
+    },
+    {
+      "feature": "anchor-managed-cloud-release",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-18T23:45:53.541Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-18T23:53:08.359Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-18T23:53:08.360Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-18T23:53:08.368Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-18T23:53:08.369Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T00:31:44.601Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T00:31:44.603Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T00:32:37.358Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T00:32:37.359Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T00:32:43.056Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T00:32:43.057Z"
+    },
+    {
+      "feature": "anchor-primary-domain-mail",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T00:32:43.061Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T01:08:33.657Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T01:08:33.658Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T01:08:33.669Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T01:14:17.731Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T01:14:17.732Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T01:17:07.181Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T01:17:07.185Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T01:18:23.521Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T01:18:23.521Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T01:18:23.527Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T01:18:23.528Z"
+    },
+    {
+      "feature": "anchor-signup-readiness",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T01:18:23.532Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T01:23:18.405Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T01:23:18.406Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T01:23:18.413Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T01:23:18.423Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T01:23:18.424Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T02:43:48.712Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T02:43:48.714Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T02:49:23.387Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T02:49:23.389Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T02:49:23.394Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T02:49:23.395Z"
+    },
+    {
+      "feature": "anchor-initial-account",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T02:50:37.142Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T02:57:11.937Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T02:57:11.939Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T02:57:11.944Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T02:57:34.209Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T02:57:34.209Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T02:59:25.398Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T02:59:25.400Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T03:01:33.581Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T03:01:33.582Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T03:01:33.591Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T03:01:33.591Z"
+    },
+    {
+      "feature": "anchor-consent-readability",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T03:01:33.597Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T03:11:21.708Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T03:11:21.708Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T03:11:21.715Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T03:12:19.907Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T03:12:19.911Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T03:16:00.582Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T03:16:00.584Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T03:21:34.152Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T03:21:34.154Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T03:21:34.160Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T03:21:34.160Z"
+    },
+    {
+      "feature": "anchor-invite-only-opening",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T03:21:34.165Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T03:40:48.656Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T03:40:48.657Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T03:40:48.667Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T03:40:48.686Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T03:40:48.686Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T03:41:06.739Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T03:41:06.741Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T03:44:14.953Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T03:44:14.954Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T03:44:14.964Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T03:44:14.966Z"
+    },
+    {
+      "feature": "anchor-invitation-mail-navigation",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T03:44:14.977Z"
+    },
+    {
+      "feature": "anchor-db-connectivity",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T03:45:35.825Z"
+    },
+    {
+      "feature": "anchor-db-connectivity",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T03:45:35.826Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T03:46:03.293Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T03:46:03.294Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T03:47:18.943Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T03:47:18.945Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T03:47:18.956Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T03:48:17.816Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T03:48:17.817Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T03:50:29.276Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T03:50:29.277Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T03:56:35.619Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T03:56:35.620Z"
+    },
+    {
+      "feature": "anchor-db-performance",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T03:56:35.627Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T04:01:00.323Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T04:01:00.324Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T04:01:00.334Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T04:01:00.335Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T04:05:10.914Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T04:05:10.915Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T04:15:01.813Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T04:15:01.814Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T04:15:01.820Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T04:15:01.821Z"
+    },
+    {
+      "feature": "anchor-auth-load-verification",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T04:15:37.601Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T04:20:18.415Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T04:20:18.416Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T04:20:18.422Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T04:20:18.423Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T04:33:21.078Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T04:34:25.096Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T04:34:25.097Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T04:41:13.492Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T04:41:13.493Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T04:41:26.570Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T04:41:26.571Z"
+    },
+    {
+      "feature": "anchor-course-reports",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T04:41:26.580Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T04:41:43.822Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T04:41:43.825Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T04:42:44.487Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T04:42:44.488Z"
+    },
+    {
+      "feature": "anchor-course-content",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T04:42:44.494Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T05:32:27.616Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T05:32:27.617Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T05:32:27.624Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T05:32:40.752Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T05:32:40.753Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T05:33:06.860Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T05:33:06.862Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T05:33:48.597Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T05:33:48.597Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T05:33:48.604Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T05:33:48.605Z"
+    },
+    {
+      "feature": "anchor-preview-main-integration",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T05:34:08.307Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T05:36:07.262Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T05:36:07.263Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T05:36:07.270Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T05:36:30.918Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T05:36:30.919Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T05:39:21.234Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T05:39:21.237Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T05:40:16.055Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T05:40:16.057Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T06:00:10.393Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T06:00:10.394Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T06:00:10.401Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T06:00:10.401Z"
+    },
+    {
+      "feature": "anchor-preview-integration-verification",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T06:00:12.942Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T06:02:46.150Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T06:02:46.152Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T06:02:46.160Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T06:02:46.169Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T06:02:46.170Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T06:10:21.337Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T06:10:21.341Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T06:12:24.648Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T06:12:24.650Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T06:12:24.657Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T06:12:24.658Z"
+    },
+    {
+      "feature": "anchor-production-db-preparation",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T06:12:32.672Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T06:13:42.385Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T06:13:42.386Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T06:13:42.390Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T06:13:42.399Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T06:13:42.399Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T06:14:59.383Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T06:14:59.384Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T06:15:50.096Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T06:15:50.097Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T06:15:50.102Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T06:15:50.102Z"
+    },
+    {
+      "feature": "anchor-production-db-rollout",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T06:15:51.909Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T06:16:51.045Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T06:16:51.046Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T06:16:51.050Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T06:16:51.057Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T06:16:51.057Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T06:25:27.278Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T06:25:27.279Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T06:27:19.582Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T06:27:19.582Z"
+    },
+    {
+      "feature": "anchor-production-app-release",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T06:27:19.587Z"
+    },
+    {
+      "feature": "anchor-production-opening",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T06:29:26.190Z"
+    },
+    {
+      "feature": "anchor-production-opening",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T06:29:26.191Z"
+    },
+    {
+      "feature": "anchor-production-opening",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T06:29:26.197Z"
+    },
+    {
+      "feature": "anchor-production-opening",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T06:30:16.860Z"
+    },
+    {
+      "feature": "anchor-production-opening",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T06:30:16.863Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T13:15:05.636Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T13:15:05.638Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T13:15:05.652Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T13:15:05.653Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T13:19:04.918Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T13:19:04.919Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T13:22:08.125Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T13:22:08.128Z"
+    },
+    {
+      "feature": "anchor-report-review",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T13:22:08.139Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T13:22:08.168Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T13:22:08.169Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T13:22:08.177Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T13:22:08.177Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T13:28:29.005Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T13:28:29.006Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T13:28:29.012Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T13:28:52.365Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T13:28:52.367Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T13:31:09.268Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T13:31:09.271Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T13:38:21.200Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T13:38:21.202Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T13:39:57.239Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T13:39:57.240Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T13:39:57.249Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T13:39:57.250Z"
+    },
+    {
+      "feature": "anchor-course-opening-plans",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T13:40:14.086Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T13:42:33.821Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T13:42:33.823Z"
+    },
+    {
+      "feature": "anchor-report-import",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T13:42:33.830Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T13:43:49.269Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T13:43:49.270Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T13:43:49.276Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T13:44:10.982Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T13:44:10.984Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T13:47:10.716Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T13:47:10.717Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T13:49:16.248Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T13:49:16.249Z"
+    },
+    {
+      "feature": "anchor-course-opening-view",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T13:49:31.943Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T13:51:41.406Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T13:51:41.407Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T13:51:41.413Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T13:52:33.338Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T13:52:33.339Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T13:54:49.643Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T13:54:49.644Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T13:56:40.118Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T13:56:40.119Z"
+    },
+    {
+      "feature": "anchor-course-opening-prefill",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T13:56:49.013Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-19T14:21:20.025Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-19T14:21:20.026Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-19T14:21:20.033Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-19T14:21:54.203Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-19T14:21:54.204Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T14:23:31.664Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T14:23:31.668Z"
+    },
+    {
+      "feature": "anchor-preview-db-validation",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T14:23:35.585Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-19T14:27:39.464Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-19T14:27:39.467Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-19T14:30:00.096Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-19T14:30:00.098Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-19T14:30:00.105Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-19T14:30:00.106Z"
+    },
+    {
+      "feature": "anchor-preview-db-performance",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-19T14:30:16.262Z"
+    },
+    {
+      "feature": "anchor-public-course-cards",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-20T15:54:19.734Z"
+    },
+    {
+      "feature": "anchor-public-course-cards",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-20T15:54:19.735Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "completed",
+      "to": "design",
+      "timestamp": "2026-09-20T16:22:37.116Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-20T16:22:37.133Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-20T16:22:37.134Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-20T16:26:26.589Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-20T16:26:26.595Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-20T16:28:34.694Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-20T16:28:34.696Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-20T16:28:58.809Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "completed",
+      "to": "design",
+      "timestamp": "2026-09-20T16:43:04.829Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-20T16:44:14.731Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-20T16:44:14.733Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-20T16:46:50.539Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-20T16:46:50.542Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-20T16:48:37.670Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-20T16:48:37.671Z"
+    },
+    {
+      "feature": "anchor-admin-mfa",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-20T16:48:45.893Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-20T16:58:40.569Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-20T16:58:40.570Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-20T16:58:40.582Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-20T16:59:14.673Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-20T16:59:14.675Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-20T17:05:45.162Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-20T17:05:45.166Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-20T17:07:57.077Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-20T17:07:57.082Z"
+    },
+    {
+      "feature": "anchor-role-navigation",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-20T17:08:32.576Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-20T17:10:50.643Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-20T17:10:50.644Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-20T17:10:50.665Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-20T17:11:30.560Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-20T17:11:30.563Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-20T17:25:25.236Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-20T17:25:25.238Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-20T17:26:46.983Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-20T17:26:46.985Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-20T17:26:47.002Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-20T17:26:47.002Z"
+    },
+    {
+      "feature": "anchor-attendance-book",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-20T17:28:30.970Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-20T22:28:03.889Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-20T22:28:03.890Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-20T22:28:03.896Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-20T22:28:29.718Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-20T22:28:29.719Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-20T22:31:55.473Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-20T22:31:55.474Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-20T22:31:56.663Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-20T22:31:56.664Z"
+    },
+    {
+      "feature": "anchor-attendance-readiness",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-20T22:33:22.199Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-20T22:35:27.861Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-20T22:35:27.862Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-20T22:35:27.871Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-20T22:35:27.882Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-20T22:35:27.883Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-20T22:42:36.605Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-20T22:42:36.607Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-20T22:43:51.203Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-20T22:43:51.205Z"
+    },
+    {
+      "feature": "anchor-opening-working-copy",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-20T22:46:10.310Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-20T22:47:33.064Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-20T22:47:33.064Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-20T22:47:33.069Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-20T22:47:33.071Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-20T22:51:32.325Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-20T22:51:32.326Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-20T22:52:10.660Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-20T22:52:10.662Z"
+    },
+    {
+      "feature": "anchor-opening-draft-overview",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-20T22:53:52.810Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T00:31:40.224Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T00:31:40.226Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T00:31:40.255Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T00:31:40.258Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T00:34:44.785Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T00:34:44.790Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T00:37:51.293Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T00:37:51.295Z"
+    },
+    {
+      "feature": "anchor-account-list-layout",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-21T00:41:46.671Z"
+    },
+    {
+      "feature": "anchor-business-menu",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T00:43:52.404Z"
+    },
+    {
+      "feature": "anchor-business-menu",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T00:43:52.405Z"
+    },
+    {
+      "feature": "anchor-business-menu",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T00:43:52.417Z"
+    },
+    {
+      "feature": "anchor-business-menu",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T00:43:52.418Z"
+    },
+    {
+      "feature": "anchor-business-menu",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T00:47:12.738Z"
+    },
+    {
+      "feature": "anchor-business-menu",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T00:47:12.739Z"
+    },
+    {
+      "feature": "anchor-business-menu",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-21T00:47:12.748Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T03:29:22.513Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T03:29:22.514Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T03:29:22.521Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T03:29:22.522Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T03:29:50.756Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T03:29:50.768Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T03:31:53.046Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T03:31:53.050Z"
+    },
+    {
+      "feature": "anchor-business-menu-refresh",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-21T03:31:53.072Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T03:40:41.076Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T03:40:41.077Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T03:40:41.084Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T03:40:41.085Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T03:49:56.486Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T03:49:56.488Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T03:52:22.034Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T03:52:22.036Z"
+    },
+    {
+      "feature": "anchor-member-management",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-21T03:52:22.045Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T04:10:15.969Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T04:10:15.971Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T04:10:15.978Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T04:10:15.979Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T04:17:04.491Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T04:17:04.493Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T04:19:22.190Z"
+    },
+    {
+      "feature": "anchor-member-manual-entry",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T04:19:22.192Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T07:58:54.983Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T07:58:54.984Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-21T07:58:54.993Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T07:59:32.395Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T07:59:32.396Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T08:03:24.297Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T08:03:24.299Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T08:06:36.876Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T08:06:36.877Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-21T08:06:36.895Z"
+    },
+    {
+      "feature": "anchor-course-catalog-views",
+      "action": "archive",
+      "phase": "archived",
+      "timestamp": "2026-09-21T08:13:26.467Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T09:50:37.802Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T09:50:37.806Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T09:50:37.813Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T09:50:37.814Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T10:00:58.887Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T10:00:58.890Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T10:07:14.337Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T10:07:14.339Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-21T10:09:34.699Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-21T10:09:34.702Z"
+    },
+    {
+      "feature": "anchor-course-budget",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-21T10:10:30.405Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T11:33:58.250Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T11:33:58.252Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T11:33:58.269Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T11:33:58.271Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T11:47:46.431Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T11:47:46.432Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-09-21T11:48:21.523Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-09-21T11:48:21.524Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-09-21T11:48:41.227Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-09-21T11:48:41.228Z"
+    },
+    {
+      "feature": "anchor-budget-comparison",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-09-21T11:49:32.509Z"
+    },
+    {
+      "feature": "anchor-student-learning",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-09-21T12:31:30.599Z"
+    },
+    {
+      "feature": "anchor-student-learning",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-09-21T12:31:30.601Z"
+    },
+    {
+      "feature": "anchor-student-learning",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-09-21T12:31:30.609Z"
+    },
+    {
+      "feature": "anchor-student-learning",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-09-21T12:32:19.767Z"
+    },
+    {
+      "feature": "anchor-student-learning",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-09-21T12:32:19.768Z"
+    },
+    {
+      "feature": "anchor-student-learning",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-09-21T12:42:35.661Z"
+    },
+    {
+      "feature": "anchor-student-learning",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-09-21T12:42:35.664Z"
+    }
+  ]
+}

@@ -1,0 +1,904 @@
+{
+  "year": 2026,
+  "source": {
+    "title": "2026년 지역혁신중심 대학지원체계(RISE)사업 평생직업교육과정 현황",
+    "fileName": "2026 지역혁신중심 대학지원체계(RISE)사업 평생직업교육과정 현황.pdf",
+    "page": 1,
+    "sha256": "59c6673b180ab1a59172b1dbfa3e8923b3a7c1502fa53c9c44227d0015da28f0"
+  },
+  "academySummaries": [
+    {
+      "academy": "스마트테크",
+      "capacity": 15,
+      "hours": 20,
+      "budget": {
+        "materials": null,
+        "printing": null,
+        "instructors": null,
+        "operations": null,
+        "support": null,
+        "scholarships": null,
+        "total": null
+      }
+    },
+    {
+      "academy": "라이프케어",
+      "capacity": 114,
+      "hours": 280,
+      "budget": {
+        "materials": 8405000,
+        "printing": 2385000,
+        "instructors": 28030000,
+        "operations": 4750000,
+        "support": 1918500,
+        "scholarships": 11400100,
+        "total": 56888600
+      }
+    },
+    {
+      "academy": "로컬창업",
+      "capacity": 76,
+      "hours": 153,
+      "budget": {
+        "materials": 7890000,
+        "printing": 530000,
+        "instructors": 17270000,
+        "operations": 2193000,
+        "support": 997620,
+        "scholarships": 5263200,
+        "total": 34143820
+      }
+    },
+    {
+      "academy": "팝업",
+      "capacity": 62,
+      "hours": 90,
+      "budget": {
+        "materials": 4970800,
+        "printing": null,
+        "instructors": 8170000,
+        "operations": 1260000,
+        "support": 1151100,
+        "scholarships": 3024000,
+        "total": 18575900
+      }
+    }
+  ],
+  "total": {
+    "capacity": 267,
+    "hours": 543,
+    "budget": {
+      "materials": 21265800,
+      "printing": 2915000,
+      "instructors": 53470000,
+      "operations": 8203000,
+      "support": 4067220,
+      "scholarships": 19687300,
+      "total": 109608320
+    }
+  },
+  "courses": [
+    {
+      "id": "2026-life-care-01",
+      "academy": "라이프케어",
+      "sourceOrder": 1,
+      "task": "C1",
+      "title": "도수물리치료인력양성과정",
+      "capacity": 15,
+      "hours": 30,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "이관우,김정현",
+        "members": [
+          {
+            "name": "이관우",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "김정현",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "김정현,최유진",
+        "members": [
+          {
+            "name": "김정현",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "최유진",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "supportStaff": {
+        "sourceText": "미정",
+        "members": []
+      },
+      "department": "물리치료학과",
+      "partner": "동천동강병원",
+      "schedule": {
+        "startDate": "2026-07-01",
+        "endDate": "2026-07-16",
+        "sourcePeriod": "26.07.01~26.07.16.",
+        "frequency": "매주",
+        "time": "17:00~21:00",
+        "location": "2-417",
+        "weekdays": "월수금"
+      },
+      "budget": {
+        "materials": 780000,
+        "printing": 300000,
+        "instructors": 3200000,
+        "operations": 450000,
+        "support": 383700,
+        "scholarships": 1080000,
+        "total": 6193700
+      },
+      "certificate": null,
+      "notes": null
+    },
+    {
+      "id": "2026-life-care-02",
+      "academy": "라이프케어",
+      "sourceOrder": 2,
+      "task": "C1",
+      "title": "산과필라테스자격증과정",
+      "capacity": 15,
+      "hours": 50,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "김원호,김동주",
+        "members": [
+          {
+            "name": "김원호",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "김동주",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": "-",
+        "members": []
+      },
+      "department": "물리치료학과",
+      "partner": "비앤비네오필라테스",
+      "schedule": {
+        "startDate": "2026-10-10",
+        "endDate": "2026-12-05",
+        "sourcePeriod": "26.10.10~26.12.05.",
+        "frequency": "매주",
+        "time": "14:00~20:00",
+        "location": "2-418, 비앤비네오필라테스센터",
+        "weekdays": "토"
+      },
+      "budget": {
+        "materials": 150000,
+        "printing": 225000,
+        "instructors": 4535000,
+        "operations": 750000,
+        "support": "-",
+        "scholarships": 1800000,
+        "total": 7460000
+      },
+      "certificate": "산과필라테스자격증",
+      "notes": null
+    },
+    {
+      "id": "2026-life-care-03",
+      "academy": "라이프케어",
+      "sourceOrder": 3,
+      "task": "C1",
+      "title": "실버푸드전문가과정",
+      "capacity": 10,
+      "hours": 30,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "김일낭,김은경,최진혁",
+        "members": [
+          {
+            "name": "김일낭",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "김은경",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "최진혁",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": "미정",
+        "members": []
+      },
+      "department": "식품영양학과",
+      "partner": "올바른식생활연구협회",
+      "schedule": {
+        "startDate": "2026-08-04",
+        "endDate": "2026-08-18",
+        "sourcePeriod": "26.08.04.~26.08.18.",
+        "frequency": "매주",
+        "time": "14:00~17:00",
+        "location": "1-302,331",
+        "weekdays": "화목"
+      },
+      "budget": {
+        "materials": 1600000,
+        "printing": 150000,
+        "instructors": 2675000,
+        "operations": 300000,
+        "support": 511600,
+        "scholarships": 720000,
+        "total": 5956600
+      },
+      "certificate": "시니어요리지도사",
+      "notes": null
+    },
+    {
+      "id": "2026-life-care-04",
+      "academy": "라이프케어",
+      "sourceOrder": 4,
+      "task": "C1",
+      "title": "건강식생활지도사",
+      "capacity": 14,
+      "hours": 45,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "정영혜,박전순,신효정",
+        "members": [
+          {
+            "name": "정영혜",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "박전순",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "신효정",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": "김태호,박규태,강민석",
+        "members": [
+          {
+            "name": "김태호",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "박규태",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "강민석",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "department": "식품영양학과",
+      "partner": "한국식생활건강교육협회",
+      "schedule": {
+        "startDate": "2026-07-03",
+        "endDate": "2026-07-24",
+        "sourcePeriod": "26.07.03.~26.07.24.",
+        "frequency": "매주",
+        "time": "09:30~18:00",
+        "location": "1-302,330",
+        "weekdays": "금토"
+      },
+      "budget": {
+        "materials": 2100000,
+        "printing": 210000,
+        "instructors": 3985000,
+        "operations": 630000,
+        "support": 1023200,
+        "scholarships": 1512100,
+        "total": 9460300
+      },
+      "certificate": "건강식생활지도사",
+      "notes": null
+    },
+    {
+      "id": "2026-life-care-05",
+      "academy": "라이프케어",
+      "sourceOrder": 5,
+      "task": "C1",
+      "title": "파크골프지도사양성과정",
+      "capacity": 20,
+      "hours": 35,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "서봉한,조경호",
+        "members": [
+          {
+            "name": "서봉한",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "조경호",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "우철호",
+        "members": [
+          {
+            "name": "우철호",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "supportStaff": {
+        "sourceText": "-",
+        "members": []
+      },
+      "department": "스포츠재활학부",
+      "partner": "k-스포츠재활운동과학연구소",
+      "schedule": {
+        "startDate": "2026-07-14",
+        "endDate": "2026-07-24",
+        "sourcePeriod": "26.07.14.~26.07.24.",
+        "frequency": "매일",
+        "time": "09:00~18:00",
+        "location": "G-110, 지역파크골프장",
+        "weekdays": "월~목"
+      },
+      "budget": {
+        "materials": 1680000,
+        "printing": 600000,
+        "instructors": 3930000,
+        "operations": 700000,
+        "support": "-",
+        "scholarships": 1680000,
+        "total": 8590000
+      },
+      "certificate": "파크골프지도사",
+      "notes": null
+    },
+    {
+      "id": "2026-life-care-06",
+      "academy": "라이프케어",
+      "sourceOrder": 6,
+      "task": "C1",
+      "title": "재활운동지도사 자격증과정",
+      "capacity": 20,
+      "hours": 48,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "김원문,부화순",
+        "members": [
+          {
+            "name": "김원문",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "부화순",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "김준서",
+        "members": [
+          {
+            "name": "김준서",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "supportStaff": {
+        "sourceText": "-",
+        "members": []
+      },
+      "department": "스포츠재활학부",
+      "partner": "한국메디컬트레이닝협회",
+      "schedule": {
+        "startDate": "2026-07-04",
+        "endDate": "2026-07-30",
+        "sourcePeriod": "26.07.04.~26.07.30.",
+        "frequency": "매일",
+        "time": "09:00~18:00",
+        "location": "G-111,113",
+        "weekdays": "월~금"
+      },
+      "budget": {
+        "materials": 1600000,
+        "printing": 600000,
+        "instructors": 4845000,
+        "operations": 960000,
+        "support": "-",
+        "scholarships": 2304000,
+        "total": 10309000
+      },
+      "certificate": "스포츠컨디셔닝전문가",
+      "notes": null
+    },
+    {
+      "id": "2026-life-care-07",
+      "academy": "라이프케어",
+      "sourceOrder": 7,
+      "task": "C1",
+      "title": "스포츠테이핑관리사(자격증)양성과정",
+      "capacity": 20,
+      "hours": 42,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "서봉한,조경호",
+        "members": [
+          {
+            "name": "서봉한",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "조경호",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "우철호,손승우",
+        "members": [
+          {
+            "name": "우철호",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "손승우",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "supportStaff": {
+        "sourceText": "-",
+        "members": []
+      },
+      "department": "스포츠재활학부",
+      "partner": "한국스포츠산업인력개발원",
+      "schedule": {
+        "startDate": "2026-07-04",
+        "endDate": "2026-07-19",
+        "sourcePeriod": "26.07.04.~26.07.19.",
+        "frequency": "매주",
+        "time": "09:00~18:00",
+        "location": "G-113",
+        "weekdays": "토,일"
+      },
+      "budget": {
+        "materials": 495000,
+        "printing": 300000,
+        "instructors": 4860000,
+        "operations": 960000,
+        "support": "-",
+        "scholarships": 2304000,
+        "total": 8919000
+      },
+      "certificate": "스포츠테이핑관리사",
+      "notes": null
+    },
+    {
+      "id": "2026-local-business-01",
+      "academy": "로컬창업",
+      "sourceOrder": 1,
+      "task": "C1",
+      "title": "로컬쿠키창업마스터클래스",
+      "capacity": 15,
+      "hours": 30,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "신언환, 구범기, 김중록, A",
+        "members": [
+          {
+            "name": "신언환",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "구범기",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "김중록",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "A",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "구범기,B",
+        "members": [
+          {
+            "name": "구범기",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "B",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "supportStaff": {
+        "sourceText": "미정",
+        "members": []
+      },
+      "department": "호텔조리제빵과",
+      "partner": "랑콩뜨레과자점",
+      "schedule": {
+        "startDate": "2026-06-30",
+        "endDate": "2026-07-13",
+        "sourcePeriod": "26.06.30.~26.07.13.",
+        "frequency": "매주",
+        "time": "10:00~17:00",
+        "location": "1-206, FAB Lab",
+        "weekdays": "화~금"
+      },
+      "budget": {
+        "materials": 1800000,
+        "printing": 75000,
+        "instructors": 4410000,
+        "operations": 450000,
+        "support": 613920,
+        "scholarships": 1080000,
+        "total": 8428920
+      },
+      "certificate": null,
+      "notes": null
+    },
+    {
+      "id": "2026-local-business-02",
+      "academy": "로컬창업",
+      "sourceOrder": 2,
+      "task": "C1",
+      "title": "반려동물수제간식만들기",
+      "capacity": 10,
+      "hours": 30,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "최수경,문해담",
+        "members": [
+          {
+            "name": "최수경",
+            "affiliation": "UNCONFIRMED"
+          },
+          {
+            "name": "문해담",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": "미정",
+        "members": []
+      },
+      "department": "식품영양학과",
+      "partner": "국제펫푸드영양협회",
+      "schedule": {
+        "startDate": "2026-08-05",
+        "endDate": "2026-08-21",
+        "sourcePeriod": "26.08.05.~26.08.21.",
+        "frequency": "매주",
+        "time": "10:00~16:00",
+        "location": "1-302,331",
+        "weekdays": "수금"
+      },
+      "budget": {
+        "materials": 1500000,
+        "printing": 300000,
+        "instructors": 2650000,
+        "operations": 300000,
+        "support": 383700,
+        "scholarships": 720000,
+        "total": 5853700
+      },
+      "certificate": "반려동물영양전문가2급",
+      "notes": null
+    },
+    {
+      "id": "2026-local-business-03",
+      "academy": "로컬창업",
+      "sourceOrder": 3,
+      "task": "C1",
+      "title": "반려동물행동교정사3급양성과정",
+      "capacity": 16,
+      "hours": 48,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "이채원",
+        "members": [
+          {
+            "name": "이채원",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": null,
+        "members": []
+      },
+      "department": "반려동물보건과",
+      "partner": "필애견엽견훈련학교",
+      "schedule": {
+        "startDate": "2026-06-05",
+        "endDate": "2026-09-18",
+        "sourcePeriod": "26.06.05~26.09.18.",
+        "frequency": "매주",
+        "time": "15:00~18:00",
+        "location": "1-114",
+        "weekdays": "금"
+      },
+      "budget": {
+        "materials": 2160000,
+        "printing": 80000,
+        "instructors": 4960000,
+        "operations": 768000,
+        "support": "-",
+        "scholarships": 1843200,
+        "total": 9811200
+      },
+      "certificate": "반려동물행동교정사3급",
+      "notes": null
+    },
+    {
+      "id": "2026-local-business-04",
+      "academy": "로컬창업",
+      "sourceOrder": 4,
+      "task": "C1",
+      "title": "애견미용사3급양성과정",
+      "capacity": 15,
+      "hours": 45,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "김선아",
+        "members": [
+          {
+            "name": "김선아",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "곽나영",
+        "members": [
+          {
+            "name": "곽나영",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "supportStaff": {
+        "sourceText": null,
+        "members": []
+      },
+      "department": "반려동물보건과",
+      "partner": "울산퍼스트애견미용학원",
+      "schedule": {
+        "startDate": "2026-06-05",
+        "endDate": "2026-09-11",
+        "sourcePeriod": "26.06.05.~26.09.11.",
+        "frequency": "매주",
+        "time": "15:00~18:00",
+        "location": "1-113",
+        "weekdays": "금"
+      },
+      "budget": {
+        "materials": 2430000,
+        "printing": 75000,
+        "instructors": 5250000,
+        "operations": 675000,
+        "support": "-",
+        "scholarships": 1620000,
+        "total": 10050000
+      },
+      "certificate": "애견미용사3급",
+      "notes": null
+    },
+    {
+      "id": "2026-popup-01",
+      "academy": "팝업",
+      "sourceOrder": 1,
+      "task": "C1",
+      "title": "가구소품전문시공인력양성과정",
+      "capacity": 14,
+      "hours": 30,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "손창서",
+        "members": [
+          {
+            "name": "손창서",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": "김두영",
+        "members": [
+          {
+            "name": "김두영",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "department": "실내건축디자인과",
+      "partner": "디자인그룹아이엠씨",
+      "schedule": {
+        "startDate": "2026-10-06",
+        "endDate": "2026-10-29",
+        "sourcePeriod": "26.10.06.~26.10.29.",
+        "frequency": "매주",
+        "time": "18:00~21:00",
+        "location": "2-110",
+        "weekdays": "화,목"
+      },
+      "budget": {
+        "materials": 1507000,
+        "printing": "-",
+        "instructors": 2960000,
+        "operations": 420000,
+        "support": 383700,
+        "scholarships": 1008000,
+        "total": 6278700
+      },
+      "certificate": null,
+      "notes": null
+    },
+    {
+      "id": "2026-popup-02",
+      "academy": "팝업",
+      "sourceOrder": 2,
+      "task": "C1",
+      "title": "도배전문시공인력양성과정",
+      "capacity": 14,
+      "hours": 30,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "조영민",
+        "members": [
+          {
+            "name": "조영민",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": "홍성혁",
+        "members": [
+          {
+            "name": "홍성혁",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "department": "실내건축디자인과",
+      "partner": "유이디자인",
+      "schedule": {
+        "startDate": "2026-11-03",
+        "endDate": "2026-11-26",
+        "sourcePeriod": "26.11.03.~26.11.26.",
+        "frequency": "매주",
+        "time": "18:00~21:00",
+        "location": "2-211",
+        "weekdays": "화,목"
+      },
+      "budget": {
+        "materials": 1507000,
+        "printing": "-",
+        "instructors": 2960000,
+        "operations": 420000,
+        "support": 383700,
+        "scholarships": 1008000,
+        "total": 6278700
+      },
+      "certificate": "도배시공사",
+      "notes": null
+    },
+    {
+      "id": "2026-popup-03",
+      "academy": "팝업",
+      "sourceOrder": 3,
+      "task": "C1",
+      "title": "인테리어목공전문인력양성과정",
+      "capacity": 14,
+      "hours": 30,
+      "recruited": null,
+      "completed": null,
+      "instructors": {
+        "sourceText": "한충목",
+        "members": [
+          {
+            "name": "한충목",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "assistantInstructors": {
+        "sourceText": "-",
+        "members": []
+      },
+      "supportStaff": {
+        "sourceText": "김기범",
+        "members": [
+          {
+            "name": "김기범",
+            "affiliation": "UNCONFIRMED"
+          }
+        ]
+      },
+      "department": "실내건축디자인과",
+      "partner": "노브디자인",
+      "schedule": {
+        "startDate": "2026-09-01",
+        "endDate": "2026-09-29",
+        "sourcePeriod": "26.09.01.~26.09.29.",
+        "frequency": "매주",
+        "time": "18:00~21:00",
+        "location": "2-110",
+        "weekdays": "화,목"
+      },
+      "budget": {
+        "materials": 1956800,
+        "printing": "-",
+        "instructors": 2250000,
+        "operations": 420000,
+        "support": 383700,
+        "scholarships": 1008000,
+        "total": 6018500
+      },
+      "certificate": "목공지도사",
+      "notes": null
+    }
+  ]
+}
