@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { Download, FileCheck2, FileText, ShieldCheck } from "lucide-react";
 import { PdfPreview } from "@/components/instructor-documents/pdf-preview";
-import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { DOCUMENT_TITLES, PURPOSES, documentErrors, initialValues, koreaToday,
   type ConsentChoice, type LearnerDocumentType, type LearnerDocumentValues } from "@/lib/learner-documents/model";
 import type { LearnerPdfAssets } from "@/lib/learner-documents/pdf";
@@ -55,39 +54,58 @@ function Consent({ id, title, value, onChange, children, error }: {
   </fieldset>;
 }
 
-export function LearnerDocumentEditor({ type, name, email, courses, initialCourse = "" }: {
+export function LearnerDocumentEditor({ type: initialType, name, email, courses, initialCourse = "" }: {
   type: LearnerDocumentType; name: string; email: string; courses: { id: string; name: string }[]; initialCourse?: string;
 }) {
-  const [values, setValues] = useState(() => initialValues(name, email, initialCourse));
-  const [rendered, setRendered] = useState<{ values: LearnerDocumentValues; bytes: Uint8Array } | null>(null);
+  const [type, setType] = useState(initialType);
+  const [forms, setForms] = useState(() => ({
+    application: initialValues(name, email, initialCourse),
+    scholarship: initialValues(name, email, initialCourse),
+  }));
+  const values = forms[type];
+  const [rendered, setRendered] = useState<{ type: LearnerDocumentType; values: LearnerDocumentValues; bytes: Uint8Array } | null>(null);
   const [previewError, setPreviewError] = useState("");
   const [errors, setErrors] = useState<ReturnType<typeof documentErrors>>({});
   const [notice, setNotice] = useState("");
   const [retry, setRetry] = useState(0);
   const [showResident, setShowResident] = useState(false);
-  const savedValues = useRef(values);
+  const savedValues = useRef(forms);
+  const activeType = useRef(initialType);
   const signatureJob = useRef(0);
   const application = type === "application";
-  const pending = rendered?.values !== values;
+  const pending = rendered?.type !== type || rendered?.values !== values;
   function update<K extends keyof LearnerDocumentValues>(key: K, value: LearnerDocumentValues[K]) {
-    setValues(old => ({ ...old, [key]: value }));
+    setForms(old => ({ ...old, [type]: { ...old[type], [key]: value } }));
     setErrors({});
     setNotice("");
   }
+  function selectDocument(nextType: LearnerDocumentType) {
+    if (nextType === type) return;
+    activeType.current = nextType;
+    signatureJob.current++;
+    setType(nextType);
+    setRendered(null);
+    setPreviewError("");
+    setErrors({});
+    setNotice("");
+    setShowResident(false);
+  }
   useEffect(() => {
     const beforeUnload = (event: BeforeUnloadEvent) => {
-      if (savedValues.current !== values) { event.preventDefault(); event.returnValue = ""; }
+      if (savedValues.current.application !== forms.application || savedValues.current.scholarship !== forms.scholarship) {
+        event.preventDefault(); event.returnValue = "";
+      }
     };
     window.addEventListener("beforeunload", beforeUnload);
     return () => window.removeEventListener("beforeunload", beforeUnload);
-  }, [values]);
+  }, [forms]);
   useEffect(() => {
     let active = true;
     setPreviewError("");
     const timer = setTimeout(() => {
       void Promise.all([loadAssets(type), import("@/lib/learner-documents/pdf")])
         .then(([assets, renderer]) => renderer.renderLearnerDocument(type, values, assets))
-        .then(bytes => { if (active) setRendered({ values, bytes }); })
+        .then(bytes => { if (active) setRendered({ type, values, bytes }); })
         .catch(error => {
           if (active) { setRendered(null); setPreviewError(error instanceof Error ? error.message : "PDF를 만들지 못했습니다. 다시 시도해 주세요."); }
         });
@@ -96,6 +114,7 @@ export function LearnerDocumentEditor({ type, name, email, courses, initialCours
   }, [type, values, retry]);
 
   async function setSignature(dataUrl: string) {
+    if (activeType.current !== type) return;
     const job = ++signatureJob.current;
     if (!dataUrl) { update("signature", ""); return; }
     update("signature", "");
@@ -139,7 +158,7 @@ export function LearnerDocumentEditor({ type, name, email, courses, initialCours
     link.href = url; link.download = `${DOCUMENT_TITLES[type]}_${values.signedOn}.pdf`;
     document.body.appendChild(link); link.click(); link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 30000);
-    savedValues.current = values;
+    savedValues.current = { ...savedValues.current, [type]: values };
     setNotice("PDF를 내려받았습니다. 작성한 파일은 담당자가 안내한 방법으로 제출해 주세요.");
   }
   const input = (key: keyof LearnerDocumentValues) => ({ id: key, name: key, value: typeof values[key] === "string" ? values[key] as string : "", onChange: (e: React.ChangeEvent<HTMLInputElement>) => update(key, e.target.value), error: errors[key] });
@@ -147,16 +166,24 @@ export function LearnerDocumentEditor({ type, name, email, courses, initialCours
     <div className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8">
         <div><p className="mb-1 text-[11px] font-bold tracking-[.16em] text-teal-700">U-LIFE · LEARNER DOCUMENTS</p>
-          <h1 className="text-xl font-bold sm:text-2xl">{DOCUMENT_TITLES[type]}</h1></div>
+          <h1 className="text-xl font-bold sm:text-2xl">수강생 작성 서류</h1></div>
         <span className="flex items-center gap-2 rounded-full bg-teal-50 px-4 py-2 text-xs font-semibold text-teal-800"><FileCheck2 size={16} />원본 서식 · PDF 1.7</span>
       </div>
     </div>
     <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm">
-        <p className="text-slate-600">정보를 입력하면 오른쪽 원본 서식에 바로 반영됩니다.</p>
-        <DocumentPopup href={`/mypage/documents/${application ? "scholarship" : "application"}`} windowName={`learner-${application ? "scholarship" : "application"}`} className="font-semibold text-teal-800 underline underline-offset-4">{application ? "장학금 지급신청서" : "수강신청원서"} 별도 창 열기 ↗</DocumentPopup>
+      <div className="mb-6">
+        <div className="mb-4 flex flex-wrap gap-3" role="group" aria-label="작성할 서식 선택">
+          {([ ["application", "수강신청원서"], ["scholarship", "장학금 지급신청서"] ] as const).map(([documentType, label]) => (
+            <button key={documentType} type="button" aria-pressed={type === documentType} aria-controls="learner-document-fields"
+              onClick={() => selectDocument(documentType)}
+              className={`inline-flex min-h-12 items-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition ${type === documentType ? "border-[#123353] bg-[#123353] text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-800"}`}>
+              <FileText size={17} aria-hidden="true" />{label}
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-slate-600">같은 창에서 두 서식을 작성하세요. 서식을 전환해도 입력한 내용은 유지됩니다.</p>
       </div>
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+      <div id="learner-document-fields" role="region" aria-label={`${DOCUMENT_TITLES[type]} 작성`} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <div className="min-w-0 space-y-5">
           <Section number="01" title="과정과 인적사항">
             <div className="space-y-5">
@@ -206,7 +233,7 @@ export function LearnerDocumentEditor({ type, name, email, courses, initialCours
           </Section>
           <Section number={application ? "03" : "04"} title="작성일과 서명">
             <Field {...input("signedOn")} label="작성일" type="date" />
-            <div id="signature" tabIndex={-1}><SignaturePad signatureUrl={values.signature} strokeWidth={4.8} onChange={dataUrl => void setSignature(dataUrl)} /></div>
+            <div id="signature" tabIndex={-1}><SignaturePad key={type} signatureUrl={values.signature} strokeWidth={4.8} onChange={dataUrl => void setSignature(dataUrl)} /></div>
             {errors.signature && <p className="mt-2 text-sm text-red-700">서명을 작성해 주세요.</p>}
           </Section>
           <p className="flex items-start gap-2 px-1 text-xs leading-5 text-slate-500"><ShieldCheck className="mt-0.5 shrink-0" size={16} />입력 내용은 서버에 자동 저장되지 않습니다. 창을 닫기 전에 PDF를 내려받아 주세요. PDF 다운로드만으로 수강신청이나 장학금 접수가 완료되지는 않습니다.</p>

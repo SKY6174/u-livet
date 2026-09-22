@@ -542,8 +542,7 @@ export function StudentDashboard({
           <div><h2 className="font-bold text-slate-900">수강생 작성 서류</h2><p className="mt-1 text-sm text-slate-500">정보 입력부터 서명까지, 원본 서식으로 간편하게 작성하세요.</p></div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <DocumentPopup href="/mypage/documents/application" windowName="learner-application" className="btn-secondary gap-2">수강신청원서 작성 <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></DocumentPopup>
-          <DocumentPopup href="/mypage/documents/scholarship" windowName="learner-scholarship" className="btn-primary gap-2">장학금 지급신청서 작성 <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></DocumentPopup>
+          <DocumentPopup href="/mypage/documents" windowName="learner-documents" className="btn-primary gap-2">수강생 서류 작성 <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></DocumentPopup>
         </div>
       </section>
 
