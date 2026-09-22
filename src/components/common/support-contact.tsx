@@ -10,10 +10,10 @@ export function SupportContact({ className = "", compact = false }: { className?
           <li key={contact.center} className={compact ? "flex flex-wrap items-center gap-x-3" : ""}>
             <p className={`font-semibold ${compact ? `flex ${rowHeight} items-center` : ""}`}>{contact.center} · {contact.name}</p>
             <div className="flex min-w-0 flex-wrap gap-x-3">
-              <a href={contact.phoneHref} className={`inline-flex ${rowHeight} items-center rounded-sm underline underline-offset-4`}>
+              <a href={contact.phoneHref} className={`inline-flex ${rowHeight} items-center rounded-sm no-underline`}>
                 {contact.phone}
               </a>
-              <a href={contact.emailHref} className={`inline-flex ${rowHeight} items-center break-all rounded-sm underline underline-offset-4`}>
+              <a href={contact.emailHref} className={`inline-flex ${rowHeight} items-center break-all rounded-sm no-underline`}>
                 {contact.email}
               </a>
             </div>
