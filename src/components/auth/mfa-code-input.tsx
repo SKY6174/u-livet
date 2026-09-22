@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function MfaCodeInput({
   id,
@@ -8,15 +8,21 @@ export function MfaCodeInput({
   onChange,
   disabled,
   describedBy,
+  autoFocus = false,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   disabled: boolean;
   describedBy: string;
+  autoFocus?: boolean;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
+  useEffect(() => {
+    if (autoFocus && !disabled) inputRef.current?.focus();
+  }, [autoFocus, disabled]);
   const readSelection = (input: HTMLInputElement) => {
     setSelection({
       start: input.selectionStart ?? value.length,
@@ -33,6 +39,7 @@ export function MfaCodeInput({
   return (
     <div className="relative mx-auto sm:w-3/5">
       <input
+        ref={inputRef}
         id={id}
         name="code"
         className="absolute inset-0 z-10 h-full w-full cursor-text opacity-0 disabled:cursor-not-allowed"

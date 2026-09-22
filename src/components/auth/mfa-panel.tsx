@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   enrollMfa,
@@ -26,6 +26,7 @@ export function MfaPanel({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const running = useRef(false);
   const [result, setResult] = useState<MfaResult>({ message: "" });
   const [enrollment, setEnrollment] = useState<MfaResult["enrollment"]>();
   const [selected, setSelected] = useState("");
@@ -37,15 +38,18 @@ export function MfaPanel({
     (verified.some((f) => f.id === selected)
       ? selected
       : (verified[0]?.id ?? ""));
+  const autoVerify = returnToWork && !enrollment;
   const run = (
     operation: () => Promise<MfaResult>,
     kind: "enroll" | "verify" | "remove",
   ) => {
-    if (pending) return;
+    if (pending || running.current) return;
+    running.current = true;
     startTransition(async () => {
       try {
         const response = await operation();
         setResult(response);
+        if (kind === "verify") setCode("");
         if (response.enrollment) {
           setEnrollment(response.enrollment);
           setCode("");
@@ -60,11 +64,24 @@ export function MfaPanel({
         }
         if (kind === "remove" && response.ok) setSelected("");
       } catch {
+        if (kind === "verify") setCode("");
         setResult({
           message: "연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.",
         });
+      } finally {
+        running.current = false;
       }
     });
+  };
+  const verifyCode = (value: string) => {
+    if (factorId && /^\d{6}$/.test(value)) {
+      run(() => verifyMfa(factorId, value), "verify");
+    }
+  };
+  const changeCode = (value: string) => {
+    if (pending || running.current) return;
+    setCode(value);
+    if (autoVerify) verifyCode(value);
   };
   return (
     <section className="panel space-y-6 text-base">
@@ -185,7 +202,7 @@ export function MfaPanel({
           className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
-            run(() => verifyMfa(factorId, code), "verify");
+            verifyCode(code);
           }}
         >
           <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
@@ -196,16 +213,19 @@ export function MfaPanel({
               id="mfa-code-help"
               className="text-sm leading-6 text-slate-600 sm:text-right"
             >
-              인증 앱의 숫자는 일정 시간마다 바뀝니다. 현재 보이는 숫자를 입력해
-              주세요.
+              {autoVerify
+                ? "인증 앱의 현재 숫자 6자리를 입력하면 자동으로 확인합니다."
+                : "인증 앱의 숫자는 일정 시간마다 바뀝니다. 현재 보이는 숫자를 입력해 주세요."}
             </p>
           </div>
           <MfaCodeInput
+            key={factorId}
             id="mfa-code"
             value={code}
-            onChange={setCode}
+            onChange={changeCode}
             describedBy="mfa-code-help"
             disabled={pending}
+            autoFocus={autoVerify}
           />
           <button
             className="btn-primary w-full text-base"

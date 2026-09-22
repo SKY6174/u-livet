@@ -58,8 +58,9 @@ function panelHarness(returnToWork, response = { ok: true, message: 'verified' }
   let cursor = 0;
   const states = [], tasks = [], calls = [];
   const hooks = { useState(initial) { const i = cursor++; if (!(i in states)) states[i] = initial; return [states[i], value => { states[i] = value; }]; },
+    useRef(initial) { const i = cursor++; if (!(i in states)) states[i] = { current: initial }; return states[i]; },
     useTransition: () => [false, run => tasks.push(run())] };
-  const actions = { verifyMfa: async (id, code) => { calls.push(['verify', id, code]); return response; },
+  const actions = { verifyMfa: async (id, code) => { calls.push(['verify', id, code]); return typeof response === 'function' ? response() : response; },
     enrollMfa: async () => ({ enrollment: { id: factorId, qr: 'data:image/svg+xml,test', secret: 'SYNTHETIC' }, message: 'enroll' }),
     removeMfa: async () => ({ ok: true, message: 'removed' }) };
   const { MfaPanel: Panel } = load(panelFile, { ...panelImports, react: hooks, '@/app/auth/mfa-actions': actions });
@@ -82,6 +83,67 @@ for (const [label, returnToWork, response, expected] of [
   await h.flush();
   assert.deepEqual(h.calls, [['verify', factorId, '123456']]);
   assert.deepEqual(routeCalls, expected);
+});
+await test('login focuses the native code input; management does not steal focus', () => {
+  for (const mode of [true, false]) {
+    const input = elements(panelHarness(mode).render()).find(e => e.props?.id === 'mfa-code');
+    assert.equal(input.props.autoFocus, mode);
+  }
+});
+await test('incomplete input never verifies and the sixth digit submits the newest value once', async () => {
+  const h = panelHarness(true);
+  for (const value of ['', '0', '01', '012', '0123', '01234']) {
+    elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange(value);
+  }
+  assert.equal(h.calls.length, 0);
+  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange('012345');
+  const form = elements(h.render()).find(e => e.type === 'form');
+  form.props.onSubmit({ preventDefault() {} });
+  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange('012345');
+  await h.flush();
+  assert.deepEqual(h.calls, [['verify', factorId, '012345']]);
+});
+for (const [label, response] of [
+  ['rejected code', { message: 'invalid' }],
+  ['connection failure', () => { throw Error('Synthetic network failure'); }],
+]) await test(label + ' clears input, stays in place, and allows a deliberate retry', async () => {
+  routeCalls.length = 0;
+  const h = panelHarness(true, response);
+  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange('111111');
+  await h.flush();
+  assert.equal(elements(h.render()).find(e => e.props?.id === 'mfa-code').props.value, '');
+  assert(elements(h.render()).some(e => e.props?.role === 'alert'));
+  assert.equal(h.calls.length, 1);
+  assert.deepEqual(routeCalls, []);
+  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange('222222');
+  await h.flush();
+  assert.equal(h.calls.length, 2);
+});
+await test('pending verification blocks a second request until the first response', async () => {
+  let finish;
+  const h = panelHarness(true, () => new Promise(resolve => { finish = resolve; }));
+  const change = value => elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange(value);
+  change('012345'); change('654321');
+  elements(h.render()).find(e => e.type === 'form').props.onSubmit({ preventDefault() {} });
+  assert.equal(h.calls.length, 1);
+  finish({ message: 'invalid' });
+  await h.flush();
+  assert.equal(elements(h.render()).find(e => e.props?.id === 'mfa-code').props.value, '');
+});
+await test('management and new app enrollment still need explicit confirmation', async () => {
+  const h = panelHarness(false);
+  elements(h.render()).find(e => e.props?.id === 'mfa-code').props.onChange('012345');
+  assert.equal(h.calls.length, 0);
+  const enrollment = panelHarness(true, undefined, []);
+  elements(enrollment.render()).find(e => e.type === 'button' && e.props.children === '인증 앱 연결하기').props.onClick();
+  await enrollment.flush();
+  const input = elements(enrollment.render()).find(e => e.props?.id === 'mfa-code');
+  assert.equal(input.props.autoFocus, false);
+  input.props.onChange('012345');
+  assert.equal(enrollment.calls.length, 0);
+  elements(enrollment.render()).find(e => e.type === 'form').props.onSubmit({ preventDefault() {} });
+  await enrollment.flush();
+  assert.equal(enrollment.calls.length, 1);
 });
 await test('enrolling another authenticator shows its confirmation even with fresh MFA', async () => {
   const h = panelHarness(false);
@@ -144,7 +206,7 @@ await test('relocated add-app action still requires recent authentication', () =
 function codeHarness(initial = '') {
   let value = initial, cursor = 0;
   const states = [];
-  const hooks = { useState(initialState) { const i = cursor++; if (!(i in states)) states[i] = initialState; return [states[i], next => { states[i] = next; }]; } };
+  const hooks = { useRef: () => ({ current: null }), useEffect() {}, useState(initialState) { const i = cursor++; if (!(i in states)) states[i] = initialState; return [states[i], next => { states[i] = next; }]; } };
   const { MfaCodeInput: Input } = load(codeInputFile, { react: hooks });
   const input = { value, selectionStart: value.length, selectionEnd: value.length,
     setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; } };
@@ -271,6 +333,9 @@ for (const [label, roles, expected] of [
   const query = { select() { return this; }, eq(column, id) { assert.equal(column, 'person_id'); assert.equal(id, 'self'); return this; },
     order: async () => ({ data: [], error: null }) };
   const MyPage = load('src/app/mypage/page.tsx', {
+    'next/navigation': { redirect },
+    '@/lib/student-learning/data': { getStudentLearning: async () => ({}) },
+    '@/components/student-learning/dashboard': { StudentDashboard: 'student-dashboard' },
     '@/lib/auth/workspace-navigation': navigation,
     'next/link': { default: 'a' }, '@/lib/auth/session': { requireIdentity: async () => ({ id: 'self', name: 'Synthetic', roles: roles.map(role => ({ role })) }) },
     '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ from: () => query }) },
@@ -279,6 +344,10 @@ for (const [label, roles, expected] of [
     '@/components/portal/ui': { Empty: 'section', PageIntro: 'section' },
     '@/components/auth/account-security': { AccountSecurity: 'account-security' },
   }).default;
+  if (roles.includes('INSTRUCTOR')) {
+    await assert.rejects(MyPage(), error => error.destination === '/instructor');
+    return;
+  }
   assert.equal(elements(await MyPage()).some(element => element.type === 'account-security'), expected);
 });
 console.log(`${checks} MFA navigation regressions passed; no network, real accounts, or mail.`);
