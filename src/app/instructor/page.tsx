@@ -52,7 +52,7 @@ export default async function InstructorRoom() {
             <span className="badge">{memberLabel(me)}</span>
             {isExternal && (
               <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
-                RCC센터 연간 자격 점검 대상
+                운영센터 연간 자격 점검 대상
               </span>
             )}
           </div>
@@ -117,9 +117,9 @@ export default async function InstructorRoom() {
                 <ShieldCheck className="h-5 w-5" />
                 <span className="text-xs font-bold uppercase tracking-wider text-teal-700">STEP 2</span>
               </div>
-              <h3 className="mt-2 text-lg font-bold text-slate-900">RCC센터 자격 점검 & 배정</h3>
+              <h3 className="mt-2 text-lg font-bold text-slate-900">운영센터 자격 점검 & 배정</h3>
               <p className="mt-2 text-xs leading-5 text-slate-600">
-                교외 강사는 매년 이력·자격 자료를 갱신하고 RCC센터의 조건 충족 점검을 받습니다. 점검 이후 담당자가 강좌의 강사진에 배정합니다.
+                교외 강사는 매년 이력·자격 자료를 갱신하고 운영센터의 조건 충족 점검을 받습니다. 점검 이후 담당자가 강좌의 강사진에 배정합니다.
               </p>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
@@ -217,7 +217,7 @@ export default async function InstructorRoom() {
           <Empty title="담당 과정을 불러오지 못했습니다" />
         ) : !own.length ? (
           <Empty title="현재 배정된 교육과정이 없습니다">
-            사업단 및 RCC센터에서 강사진 배정을 완료하면 이곳에 표시됩니다. 교외 강사는 연간 자격 점검을 먼저 확인해 주세요.
+            사업단 및 운영센터에서 강사진 배정을 완료하면 이곳에 표시됩니다. 교외 강사는 연간 자격 점검을 먼저 확인해 주세요.
           </Empty>
         ) : (
           <div className="grid gap-6 md:grid-cols-2">

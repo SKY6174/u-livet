@@ -52,7 +52,10 @@ for (const [label, policies, missing] of [
   for (const item of missing) assert.ok(html.includes(item));
   assert.ok(html.includes("tel:0522300427"));
   assert.ok(html.includes("mailto:yhlee4@uc.ac.kr"));
-  assert.ok(html.includes("이연향 연구원"));
+  for (const contact of ["RCC센터", "이연향", "AID-X지원센터", "임은애", "ECC센터", "이은주",
+    "tel:0522793319", "mailto:jslover85@uc.ac.kr", "tel:0522300414", "mailto:ejlee7@uc.ac.kr"]) {
+    assert.ok(html.includes(contact));
+  }
   console.log("PASS blocked state: " + label); checks++;
 }
 const ready = render([privacy, review]);

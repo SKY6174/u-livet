@@ -9,8 +9,8 @@ const FOOTER_LINK_CLASS =
 export default function Footer() {
   return (
     <footer className="isolate mt-16 border-t border-[#105e59] bg-[#105e59] text-white">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-10 text-sm lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 text-sm lg:grid-cols-2 lg:items-center">
+        <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center sm:gap-8 lg:flex-col lg:items-start xl:flex-row xl:items-center">
           <div className="relative w-60 max-w-full shrink-0">
             <Image
               src={anchorFooterLogo}
@@ -34,7 +34,7 @@ export default function Footer() {
             </p>
           </div>
         </div>
-        <div className="flex min-w-0 shrink-0 flex-col items-start gap-2 lg:items-end">
+        <div className="flex min-w-0 flex-col items-start gap-5 lg:justify-self-end">
           <nav className="flex flex-wrap gap-x-5 gap-y-3" aria-label="서비스 안내">
             <Link className={FOOTER_LINK_CLASS} href="/privacy">개인정보처리방침</Link>
             <Link className={FOOTER_LINK_CLASS} href="/terms">수강안내</Link>

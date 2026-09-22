@@ -1,5 +1,5 @@
 export const LOGIN_AUDIENCES = [
-  { id: "office", label: "사업단∙RCC센터", description: "학교 이메일로 로그인" },
+  { id: "office", label: "사업단", description: "학교 이메일로 로그인" },
   { id: "internal", label: "강사(교내)", description: "학교 이메일로 로그인" },
   { id: "external", label: "강사(교외)", description: "간편 로그인 · 이메일" },
   { id: "learner", label: "수강생", description: "간편 로그인 · 회원가입" },

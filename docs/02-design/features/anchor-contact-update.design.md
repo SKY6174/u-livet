@@ -1,7 +1,7 @@
 # 시스템 문의 담당자 변경 설계
 
 ## 표시
-- SUPPORT_CONTACT 상수와 SupportContact 구성요소에서 담당자 이름·직위, 전화·이메일과 tel/mailto 주소를 통일한다.
+- SUPPORT_CONTACTS 배열과 SupportContact 구성요소에서 센터명·담당자 이름, 전화·이메일과 tel/mailto 주소를 통일한다. 2026-09-22부터 RCC센터 이연향, AID-X지원센터 임은애, ECC센터 이은주를 함께 안내한다. 상세값과 표현은 `anchor-multi-center.design.md`를 따른다.
 - 모든 페이지의 Footer와 교내 로그인, 계정 복구·MFA, 강사 등록 준비, 개인정보 안내에 적용한다. 수강안내의 남색 문의 영역도 같은 상수를 사용한다.
 - 사용자는 연락처만 지정했다. 계정 생성, 역할 부여, 이메일 발송, 개인정보 수집 목적·항목·기간은 변경하지 않는다.
 

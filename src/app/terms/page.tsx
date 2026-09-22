@@ -10,7 +10,7 @@ import {
   Search,
 } from "lucide-react";
 import { PageIntro } from "@/components/portal/ui";
-import { SUPPORT_CONTACT } from "@/lib/portal/contact";
+import { SupportContact } from "@/components/common/support-contact";
 
 const STEPS = [
   {
@@ -147,15 +147,8 @@ export default function Terms() {
         <aside aria-labelledby="help-title" className="rounded-2xl bg-[#102b5b] p-7 text-white lg:mt-14">
           <Phone size={26} className="mb-5 text-teal-200" aria-hidden="true" />
           <h2 id="help-title" className="text-xl font-bold">도움이 필요하신가요?</h2>
-          <p className="mb-5 mt-3 leading-relaxed text-slate-200">과정별 모집 안내를 먼저 확인해 주세요. 추가 문의는 앵커사업단이 도와드립니다.</p>
-          <p className="mb-2 font-semibold">{SUPPORT_CONTACT.name} {SUPPORT_CONTACT.title}</p>
-          <a href={SUPPORT_CONTACT.phoneHref} className="inline-flex min-h-11 items-center text-2xl font-bold tracking-tight text-white underline-offset-4 hover:underline">
-            {SUPPORT_CONTACT.phone}
-          </a>
-          <a href={SUPPORT_CONTACT.emailHref} className="flex min-h-11 w-fit items-center break-all text-teal-100 underline underline-offset-4">
-            {SUPPORT_CONTACT.email}
-          </a>
-          <p className="mt-1 text-sm text-slate-200">울산과학대학교 앵커사업단</p>
+          <p className="mb-5 mt-3 leading-relaxed text-slate-200">과정별 모집 안내를 먼저 확인해 주세요. 추가 문의는 해당 과정을 운영하는 센터로 연락해 주세요.</p>
+          <SupportContact className="text-teal-50 [&_a:focus-visible]:outline-white" />
         </aside>
       </div>
     </div>
