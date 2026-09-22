@@ -37,6 +37,7 @@ export type PoolPerson = {
   documents_required: boolean;
   document_access: boolean;
   registered: boolean;
+  removed?: boolean;
   revision: number;
   documents: PoolDocuments;
   courses: number;

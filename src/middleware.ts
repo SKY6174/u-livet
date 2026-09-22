@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
   response.headers.set(
     "Referrer-Policy",
     [
+      "/instructor-documents",
       "/verify",
       "/certificate",
       "/api/verify",

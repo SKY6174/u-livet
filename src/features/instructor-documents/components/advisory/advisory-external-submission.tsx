@@ -187,6 +187,7 @@ interface AdvisoryExternalSubmissionProps {
   voterToken: string;
   onLogout: () => void;
   documentOnly?: boolean;
+  initialDocument?: "IDENTITY_BANK" | "RESUME";
 }
 
 const readFileDataUrl = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -203,9 +204,9 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
   </label>
 );
 
-export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly = false }: AdvisoryExternalSubmissionProps) {
+export function AdvisoryExternalSubmission({ voterToken, onLogout, documentOnly = false, initialDocument = "IDENTITY_BANK" }: AdvisoryExternalSubmissionProps) {
   const [context, setContext] = React.useState<AdvisoryIntakeContext | null>(null);
-  const [activePage, setActivePage] = React.useState<AdvisoryPage>(documentOnly ? "IDENTITY_BANK" : getInitialAdvisoryPage);
+  const [activePage, setActivePage] = React.useState<AdvisoryPage>(documentOnly ? initialDocument : getInitialAdvisoryPage);
   const [opinionTitle, setOpinionTitle] = React.useState("");
   const [operationOpinion, setOperationOpinion] = React.useState("");
   const [bestPracticeOpinion, setBestPracticeOpinion] = React.useState("");

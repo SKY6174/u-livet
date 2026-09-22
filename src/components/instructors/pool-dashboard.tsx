@@ -8,10 +8,8 @@ import {
   Plus,
   ArrowUpRight,
   Search,
-  FileText,
   BookOpen,
   BadgeCheck,
-  Pencil,
   CircleHelp,
   ClipboardList,
 } from "lucide-react";
@@ -27,6 +25,8 @@ import {
 } from "@/lib/instructors/pool";
 import { PoolPersonForm, AllowanceForm, PaymentForm } from "./pool-forms";
 import { PoolExcel } from "./pool-excel";
+import { PoolRowActions } from "./pool-row-actions";
+import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 export type PoolQuery = {
   org?: string;
   tab?: string;
@@ -56,28 +56,39 @@ function Badge({ kind }: { kind: string }) {
     </span>
   );
 }
-function Documents({ person }: { person: PoolPerson }) {
+function DocumentCell({
+  person,
+  org,
+  kind,
+}: {
+  person: PoolPerson;
+  org: string;
+  kind: "identity" | "resume";
+}) {
+  const complete =
+    kind === "identity"
+      ? person.documents.id && person.documents.bank
+      : person.documents.resume;
+  const label = kind === "identity" ? "신분증·통장사본" : "이력서";
   return (
-    <div className="space-y-1.5">
-      {!person.documents_required ? (
-        <span className="text-xs text-slate-500">필수 서류 면제</span>
-      ) : (
-        <div className="flex flex-wrap gap-1">
-          {(
-            [
-              ["id", "신분증"],
-              ["bank", "통장"],
-              ["resume", "이력서"],
-            ] as const
-          ).map(([key, label]) => (
-            <span
-              key={key}
-              className={`rounded px-1.5 py-1 text-[11px] font-semibold ${person.documents[key] ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
-            >
-              {label} {person.documents[key] ? "✓" : "미제출"}
-            </span>
-          ))}
-        </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <span
+        className={`rounded-full px-2 py-1 text-xs font-semibold ${complete ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
+      >
+        {complete
+          ? "제출 완료"
+          : !person.documents_required
+            ? "필수 제출 면제"
+            : "미제출"}
+      </span>
+      {person.document_access && (
+        <DocumentPopup
+          href={`/admin/instructors/documents?org=${org}&person=${person.id}&document=${kind}`}
+          label={`${person.name} ${label} 입력 (새 창)`}
+          className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600 hover:bg-blue-100"
+        >
+          ↥ 입력
+        </DocumentPopup>
       )}
     </div>
   );
@@ -332,7 +343,8 @@ export function PoolDashboard({
               ))}
             </div>
           </section>
-          {(query.new === "1" || (query.edit === "1" && selected)) && (
+          {(query.new === "1" ||
+            (query.edit === "1" && selected && !selected.removed)) && (
             <section className="panel mb-6 border-blue-200">
               <div className="mb-5 flex justify-between gap-4">
                 <h2 className="text-lg font-bold">
@@ -375,7 +387,8 @@ export function PoolDashboard({
                         "소속 / 부서 · 직위",
                         "전문분야",
                         "참여 과정",
-                        "지급 준비 서류",
+                        "신분증·통장사본",
+                        "이력서",
                         "누적 실지급액",
                         "관리",
                       ].map((h) => (
@@ -436,7 +449,18 @@ export function PoolDashboard({
                           </Link>
                         </td>
                         <td className="px-4 py-5">
-                          <Documents person={person} />
+                          <DocumentCell
+                            person={person}
+                            org={org}
+                            kind="identity"
+                          />
+                        </td>
+                        <td className="px-4 py-5">
+                          <DocumentCell
+                            person={person}
+                            org={org}
+                            kind="resume"
+                          />
                         </td>
                         <td className="whitespace-nowrap px-4 py-5 font-semibold">
                           {money(person.paid)}
@@ -445,32 +469,15 @@ export function PoolDashboard({
                           </p>
                         </td>
                         <td className="px-4 py-5">
-                          <div className="flex flex-col items-start gap-2">
-                            <Link
-                              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700"
-                              href={url({
-                                person: person.id,
-                                edit: "1",
-                                new: undefined,
-                              })}
-                            >
-                              <Pencil size={13} />
-                              {person.registered
-                                ? "정보 수정"
-                                : "기본정보 등록"}
-                            </Link>
-                            <Link
-                              className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700"
-                              href={
-                                person.document_access
-                                  ? docUrl(person.id)
-                                  : url({ person: person.id, edit: "1" })
-                              }
-                            >
-                              <FileText size={13} />
-                              서류 확인·입력
-                            </Link>
-                          </div>
+                          <PoolRowActions
+                            org={org}
+                            person={person}
+                            editUrl={url({
+                              person: person.id,
+                              edit: "1",
+                              new: undefined,
+                            })}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -563,33 +570,40 @@ export function PoolDashboard({
                       <span className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">
                         누적 실지급 {money(selected.paid)}
                       </span>
-                      <Link
-                        className="btn-secondary !px-3 !py-2 text-xs"
-                        href={
-                          selected.document_access
-                            ? docUrl(selected.id)
-                            : url({ edit: "1" })
-                        }
-                      >
-                        비공개 서류함
-                      </Link>
-                      <Link
-                        className="btn-secondary !px-3 !py-2 text-xs"
-                        href={url({ edit: "1", new: undefined })}
-                      >
-                        기본정보 수정
-                      </Link>
-                      <Link
-                        className="btn-primary !px-3 !py-2 text-xs"
-                        href={
-                          selected.registered
-                            ? url({ add: "1", allowance: undefined })
-                            : url({ edit: "1" })
-                        }
-                      >
-                        <Plus size={16} />
-                        활동·수당 등록
-                      </Link>
+                      {selected.document_access && (
+                        <DocumentPopup
+                          className="btn-secondary !px-3 !py-2 text-xs"
+                          href={docUrl(selected.id)}
+                        >
+                          비공개 서류함
+                        </DocumentPopup>
+                      )}
+                      {!selected.removed && (
+                        <>
+                          <Link
+                            className="btn-secondary !px-3 !py-2 text-xs"
+                            href={url({ edit: "1", new: undefined })}
+                          >
+                            기본정보 수정
+                          </Link>
+                          <Link
+                            className="btn-primary !px-3 !py-2 text-xs"
+                            href={
+                              selected.registered
+                                ? url({ add: "1", allowance: undefined })
+                                : url({ edit: "1" })
+                            }
+                          >
+                            <Plus size={16} />
+                            활동·수당 등록
+                          </Link>
+                        </>
+                      )}
+                      {selected.removed && (
+                        <span className="text-sm text-slate-500">
+                          대장에서 삭제된 강사 · 기존 지급 이력 보존
+                        </span>
+                      )}
                     </div>
                     <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
                       <h3 className="flex items-center gap-2 text-sm font-bold text-emerald-800">
@@ -671,7 +685,26 @@ export function PoolDashboard({
                     </details>
                     <div className="mt-5 rounded-xl border border-slate-200 p-4">
                       <h3 className="mb-3 text-sm font-bold">서류 준비 현황</h3>
-                      <Documents person={selected} />
+                      <div className="flex flex-wrap gap-4">
+                        <div>
+                          <p className="mb-2 text-xs text-slate-500">
+                            신분증·통장사본
+                          </p>
+                          <DocumentCell
+                            person={selected}
+                            org={org}
+                            kind="identity"
+                          />
+                        </div>
+                        <div>
+                          <p className="mb-2 text-xs text-slate-500">이력서</p>
+                          <DocumentCell
+                            person={selected}
+                            org={org}
+                            kind="resume"
+                          />
+                        </div>
+                      </div>
                       <p className="mt-3 text-xs text-slate-500">
                         {selected.phone || "연락처 미등록"} ·{" "}
                         {selected.email || "이메일 미등록"}
@@ -698,7 +731,7 @@ export function PoolDashboard({
               </section>
             </div>
           )}
-          {((query.add === "1" && selected) ||
+          {((query.add === "1" && selected && !selected.removed) ||
             (allowance &&
               selected &&
               allowance.status === "PLANNED" &&
@@ -949,12 +982,15 @@ export function PoolDashboard({
                   >
                     활동·산출 내역 수정 →
                   </Link>
-                  {selected && !documentReady(selected) && (
+                  {selected?.document_access && !documentReady(selected) && (
                     <p className="mb-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
                       필수 서류를 준비해 주세요.{" "}
-                      <Link className="underline" href={docUrl(selected.id)}>
+                      <DocumentPopup
+                        className="underline"
+                        href={docUrl(selected.id)}
+                      >
                         서류 확인·입력
-                      </Link>
+                      </DocumentPopup>
                     </p>
                   )}
                   <PaymentForm org={org} allowance={allowance} action="PAY" />

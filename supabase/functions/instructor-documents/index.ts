@@ -1401,6 +1401,11 @@ async function sessionRecord(token: string) {
   if (!data || data.revoked_at || Date.parse(data.expires_at) <= Date.now()) {
     throw new VoteFunctionError("FORBIDDEN", "DOCUMENT_SESSION_EXPIRED", 403);
   }
+  if (data.invite_id) {
+    const {data: member,error: inviteError}=await service.rpc("life_instructor_document_invite_access",{i:data.invite_id});
+    if(inviteError || !member || member.id!==data.person_id || member.org_id!==data.org_id) throw new VoteFunctionError("FORBIDDEN","FORBIDDEN",403);
+    return {...data,invite_member:member};
+  }
   return data;
 }
 
@@ -1410,14 +1415,14 @@ async function getAdvisorySession(token: string) {
   if (error || !person?.active) throw new VoteFunctionError("FORBIDDEN", "DOCUMENT_PERSON_UNAVAILABLE", 403);
   return {
     session: {...record, member_id: person.id, meeting_id: `instructor-${person.id}`},
-    member: {id: person.id, person_id: person.id, name: person.name, org:"울산과학대학교", dept:"", rank:""},
+    member: {id: person.id, person_id: person.id, name: person.name, org:record.invite_member?.organization??"울산과학대학교", dept:record.invite_member?.department??"", rank:record.invite_member?.position??""},
     meeting: {id:`instructor-${person.id}`, title:"강사 장기보관 서류 제출", committee_id:"instructor-documents", meeting_date:null, meeting_end_date:null, submission_deadline:record.expires_at, closes_at:record.expires_at, status:"ACTIVE"},
     ownerKind: "expert" as string,
   };
 }
 
 const DOCUMENT_ACTIONS = new Set([
-  "session", "logout", "downloads", "advisory-intake-context", "advisory-intake-save-profile",
+  "session", "invite-auth", "logout", "downloads", "advisory-intake-context", "advisory-intake-save-profile",
   "advisory-intake-save-profile-draft", "advisory-intake-analyze-resume",
   "advisory-intake-analyze-document-layout", "advisory-intake-upload",
   "advisory-intake-verify-document-names", "expert-document-save-generated",
@@ -1431,8 +1436,6 @@ Deno.serve(async (request: Request) => {
     if (origin && !ALLOWED_ORIGINS.includes(origin)) throw new VoteFunctionError("FORBIDDEN","FORBIDDEN",403);
     const authorization = request.headers.get("authorization") ?? "";
     const jwt = authorization.replace(/^Bearer\s+/i, "");
-    const {data: authData, error: authError} = await service.auth.getUser(jwt);
-    if (authError || !authData.user) throw new VoteFunctionError("FORBIDDEN","FORBIDDEN",403);
     if (Number(request.headers.get("content-length")) > 15 * 1024 * 1024) throw new VoteFunctionError("DOCUMENT_TOO_LARGE","DOCUMENT_TOO_LARGE",413);
     const raw = await request.text();
     if (raw.length > 15 * 1024 * 1024) throw new VoteFunctionError("DOCUMENT_TOO_LARGE","DOCUMENT_TOO_LARGE",413);
@@ -1441,24 +1444,41 @@ Deno.serve(async (request: Request) => {
     if (!body || typeof body!=="object" || Array.isArray(body)) throw new VoteFunctionError("INVALID_DOCUMENT","INVALID_DOCUMENT");
     const action = String(body.action ?? "");
     if (!DOCUMENT_ACTIONS.has(action)) throw new VoteFunctionError("NOT_FOUND","NOT_FOUND",404);
+    if (action === "invite-auth") {
+      const {data: verified,error}=await service.rpc("life_instructor_document_invite_verify",{
+        code:String(body.public_code??""),person_name:String(body.name??"").normalize("NFKC").trim(),pin:String(body.pin??"")
+      });
+      if(error) throw mapDatabaseError(error);
+      if(!verified?.member) throw new VoteFunctionError(verified?.error==="LOCKED"?"LOCKED":"INVALID_CREDENTIALS",verified?.error??"INVALID_CREDENTIALS",verified?.error==="LOCKED"?429:403);
+      const member=verified.member,sessionToken=randomToken();
+      const expiresAt=new Date(Math.min(Date.now()+30*60*1000,Date.parse(member.expires_at))).toISOString();
+      const {error: sessionError}=await service.from("life_instructor_document_sessions").insert({person_id:member.id,org_id:member.org_id,invite_id:member.invite_id,actor_user_id:null,token_hash:await sha256(sessionToken),expires_at:expiresAt});
+      if(sessionError) throw mapDatabaseError(sessionError);
+      return respond(request,200,{ok:true,data:{token:sessionToken,member,expires_at:expiresAt}});
+    }
     const token = String(body.voter_token ?? "");
     const session = action === "session" ? null : await sessionRecord(token);
-    if (session && session.actor_user_id !== authData.user.id) throw new VoteFunctionError("FORBIDDEN","FORBIDDEN",403);
-    const caller = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY") ?? "", {
-      global:{headers:{Authorization:authorization}},auth:{persistSession:false,autoRefreshToken:false},
-    });
-    const {data: access,error: accessError} = await caller.rpc("life_instructor_document_access",{
-      p_person:session?.person_id ?? body.person_id ?? null,
-      p_org:session?.org_id ?? body.org_id ?? null,
-    });
-    if (accessError || !access || access.actor_user_id !== authData.user.id) throw new VoteFunctionError("FORBIDDEN","DOCUMENT_ACCESS_DENIED",403);
+    let access: {id:string;org_id:string;actor_user_id?:string;[key:string]:unknown};
+    let actorUserId: string | null=null;
+    if(session?.invite_id) {
+      access=session.invite_member;
+    } else {
+      const {data: authData,error: authError}=await service.auth.getUser(jwt);
+      if(authError || !authData.user) throw new VoteFunctionError("FORBIDDEN","FORBIDDEN",403);
+      actorUserId=authData.user.id;
+      if(session && session.actor_user_id!==actorUserId) throw new VoteFunctionError("FORBIDDEN","FORBIDDEN",403);
+      const caller=createClient(SUPABASE_URL,Deno.env.get("SUPABASE_ANON_KEY")??"",{global:{headers:{Authorization:authorization}},auth:{persistSession:false,autoRefreshToken:false}});
+      const {data: authorized,error: accessError}=await caller.rpc("life_instructor_document_access",{p_person:session?.person_id??body.person_id??null,p_org:session?.org_id??body.org_id??null});
+      if(accessError || !authorized || authorized.actor_user_id!==actorUserId) throw new VoteFunctionError("FORBIDDEN","DOCUMENT_ACCESS_DENIED",403);
+      access=authorized;
+    }
     let data: unknown;
     if (action === "session") {
       // Expired sessions contain hashes only; prune for this actor on entry.
-      const {error: pruneError} = await service.from("life_instructor_document_sessions").delete().eq("actor_user_id",authData.user.id).lt("expires_at",new Date().toISOString());
+      const {error: pruneError} = await service.from("life_instructor_document_sessions").delete().eq("actor_user_id",actorUserId!).lt("expires_at",new Date().toISOString());
       if (pruneError) throw mapDatabaseError(pruneError);
       const sessionToken = randomToken(), expiresAt = new Date(Date.now()+30*60*1000).toISOString();
-      const {error} = await service.from("life_instructor_document_sessions").insert({person_id:access.id,org_id:access.org_id,actor_user_id:authData.user.id,token_hash:await sha256(sessionToken),expires_at:expiresAt});
+      const {error} = await service.from("life_instructor_document_sessions").insert({person_id:access.id,org_id:access.org_id,actor_user_id:actorUserId,token_hash:await sha256(sessionToken),expires_at:expiresAt});
       if (error) throw mapDatabaseError(error);
       data={token:sessionToken,member:access,expires_at:expiresAt};
     } else if (action === "logout") {
@@ -1484,7 +1504,7 @@ Deno.serve(async (request: Request) => {
     return respond(request,200,{ok:true,data});
   } catch (error) {
     const known=error instanceof VoteFunctionError?error:new VoteFunctionError("SERVER_ERROR","SERVER_ERROR",500);
-    console.error("instructor-documents",known.code);
+    if(known.status>=500) console.error("instructor-documents",known.code);
     return respond(request,known.status,{ok:false,error:{code:known.code,message:known.message}});
   }
 });

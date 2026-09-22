@@ -1,3 +1,6 @@
+/* Keep the separate document window focused on its own header and editor. */
+body:has(.instructor-document-portal) > header,
+body:has(.instructor-document-portal) > footer { display:none; }
 .instructor-document-portal { --bg-color:#f8fafc; --text-primary:#0f172a; --text-secondary:#475569; --border-color:#cbd5e1; --card-bg:#fff; --panel-bg:#f8fafc; --accent-color:#2563eb; --success-color:#047857; --advisory-status-danger:#b91c1c; color-scheme:light; }
 .instructor-document-portal button:disabled { opacity:.55; cursor:not-allowed; }
 .instructor-document-portal .form-input { width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:.65rem; color:#0f172a; background:#fff; }

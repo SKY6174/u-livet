@@ -234,3 +234,38 @@ export async function exportPoolData(
   }
   return { items: board.items, allowances: board.allowances };
 }
+
+export async function createDocumentInvite(o: string, p: string) {
+  if (!UUID.test(o) || !UUID.test(p) || !(await getSessionIdentity()))
+    return { error: "로그인과 담당 기관을 확인해 주세요." };
+  const { data, error } = await (
+    await createServerSupabaseClient()
+  ).rpc("life_instructor_document_invite_create", { o, p });
+  if (error || !data)
+    return {
+      error:
+        messages[error?.message ?? ""] ??
+        "입력 링크를 발급하지 못했습니다. 강사 기본정보와 활동 상태를 확인해 주세요.",
+    };
+  return {
+    invite: data as { public_code: string; pin: string; expires_at: string },
+  };
+}
+export async function removePoolPerson(
+  o: string,
+  p: string,
+  revision: number,
+): Promise<ActionState> {
+  if (
+    !UUID.test(o) ||
+    !UUID.test(p) ||
+    !Number.isSafeInteger(revision) ||
+    revision < 0
+  )
+    return { message: "삭제할 강사를 확인해 주세요." };
+  return run("life_instructor_pool_remove", {
+    o,
+    p,
+    expected_revision: revision,
+  });
+}
