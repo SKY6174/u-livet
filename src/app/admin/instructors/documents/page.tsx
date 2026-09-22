@@ -6,7 +6,7 @@ import { DocumentPortal } from "@/components/instructor-documents/document-porta
 import Link from "next/link";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { Empty, PageIntro } from "@/components/portal/ui";
-import type { InstructorOptions } from "@/lib/instructors/types";
+import { getManagedInstructorOrganizations } from "@/lib/instructors/organizations";
 
 type DocumentRow = {
   id: string;
@@ -24,15 +24,12 @@ export default async function InstructorDocumentAdmin({
 }: {
   searchParams: Promise<{ person?: string; org?: string; document?: string }>;
 }) {
-  await requireIdentity("/admin/instructors");
+  const identity = await requireIdentity("/admin/instructors");
   const { person, org, document } = await searchParams;
   const db = await createServerSupabaseClient();
   if (!person) {
-    const optionsResult = await db.rpc("life_instructor_options");
-    const orgs =
-      (optionsResult.data as InstructorOptions | null)?.organizations.filter(
-        (o) => o.manager,
-      ) ?? [];
+    const { organizations: orgs, unavailable } =
+      await getManagedInstructorOrganizations(identity);
     const selected = orgs.find((o) => o.id === org) ?? orgs[0];
     const result = selected
       ? await db.rpc("life_instructor_document_directory", {
@@ -68,7 +65,7 @@ export default async function InstructorDocumentAdmin({
           </label>
           <button className="btn-secondary">기관 선택</button>
         </form>
-        {optionsResult.error || result?.error || !selected ? (
+        {unavailable || result?.error || !selected ? (
           <Empty title="담당 기관 서류 현황을 불러오지 못했습니다" />
         ) : !rows.length ? (
           <Empty title="등록된 강사가 없습니다" />

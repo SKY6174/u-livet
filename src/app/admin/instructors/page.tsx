@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
+import { getManagedInstructorOrganizations } from "@/lib/instructors/organizations";
 import { Empty } from "@/components/portal/ui";
 import { DossierDetail } from "@/components/portal/instructor-detail";
 import {
   reviewLabels,
   type Dossier,
   type InstructorOptions,
+  type InstructorPolicy,
 } from "@/lib/instructors/types";
 import {
   pageNumber,
@@ -21,11 +23,11 @@ import {
 } from "@/components/instructors/pool-dashboard";
 async function Review({
   org,
-  options,
+  policies,
   d,
 }: {
   org: string;
-  options: InstructorOptions;
+  policies: InstructorPolicy[];
   d?: string;
 }) {
   const db = await createServerSupabaseClient();
@@ -48,7 +50,7 @@ async function Review({
         >
           비공개 서류 확인
         </Link>
-        <DossierDetail dossier={data as Dossier} policies={options.policies} />
+        <DossierDetail dossier={data as Dossier} policies={policies} />
       </>
     );
   }
@@ -103,23 +105,20 @@ export default async function InstructorPoolPage({
 }: {
   searchParams: Promise<PoolQuery>;
 }) {
-  await requireIdentity("/admin/instructors");
+  const identity = await requireIdentity("/admin/instructors");
   const query = await searchParams,
     db = await createServerSupabaseClient();
-  const { data, error } = await db.rpc("life_instructor_options");
-  const options = data as InstructorOptions | null;
-  const orgs =
-    options?.organizations
-      .filter((o) => o.manager)
-      .sort((a, b) => a.name.localeCompare(b.name, "ko")) ?? [];
+  const { organizations: orgs, unavailable } =
+    await getManagedInstructorOrganizations(identity);
   const org = orgs.find((o) => o.id === query.org) ?? orgs[0];
-  if (error || !org || !options)
+  if (unavailable || !org)
     return (
       <div className="page-shell">
         <Empty title="전문가 관리 권한이 있는 담당 기관을 확인해 주세요" />
       </div>
     );
   if (query.person && !UUID.test(query.person)) notFound();
+  if (query.d && !UUID.test(query.d)) notFound();
   let detail: Allowance | undefined;
   if (query.allowance) {
     if (!UUID.test(query.allowance)) notFound();
@@ -136,14 +135,17 @@ export default async function InstructorPoolPage({
   )
     ? query.kind!
     : "ALL";
-  const result = await db.rpc("life_instructor_pool_board", {
-    o: org.id,
-    q: (query.q ?? "").slice(0, 100),
-    kind,
-    page: pageNumber(query.page),
-    p: query.person ?? null,
-    activity_page: pageNumber(query.activity_page),
-  });
+  const [result, optionsResult] = await Promise.all([
+    db.rpc("life_instructor_pool_board", {
+      o: org.id,
+      q: (query.q ?? "").slice(0, 100),
+      kind,
+      page: pageNumber(query.page),
+      p: query.person ?? null,
+      activity_page: pageNumber(query.activity_page),
+    }),
+    query.d ? db.rpc("life_instructor_options") : Promise.resolve(null),
+  ]);
   if (result.error || !result.data)
     return (
       <div className="page-shell">
@@ -153,6 +155,14 @@ export default async function InstructorPoolPage({
         <Empty title="강사 대장을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요." />
       </div>
     );
+  if (query.d && (optionsResult?.error || !optionsResult?.data))
+    return (
+      <div className="page-shell">
+        <Empty title="심사 기준을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요." />
+      </div>
+    );
+  const policies =
+    (optionsResult?.data as InstructorOptions | null)?.policies ?? [];
   const normalized = { ...query, kind, tab: query.d ? "review" : query.tab };
   return (
     <PoolDashboard
@@ -162,7 +172,7 @@ export default async function InstructorPoolPage({
       query={normalized}
       review={
         normalized.tab === "review" ? (
-          <Review org={org.id} options={options} d={query.d} />
+          <Review org={org.id} policies={policies} d={query.d} />
         ) : undefined
       }
     />

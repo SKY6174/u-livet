@@ -1,6 +1,7 @@
 // Read-only latency probe. Never prints keys, cookies, or response bodies.
 import { existsSync, readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
+import { isExpectedLoginRedirect } from './lib/db-performance.mjs';
 
 const env = {
   ...(existsSync('.env.local') ? parseEnv(readFileSync('.env.local', 'utf8')) : {}),
@@ -46,16 +47,20 @@ try {
         const body = await response.arrayBuffer();
         const healthy = target.label !== '/api/health' ||
           (response.ok && JSON.parse(new TextDecoder().decode(body)).status === 'healthy');
+        const loginRedirect = isExpectedLoginRedirect(target.label, target.url,
+          response.status, response.headers.get('location'));
+        const success = healthy && (response.ok || loginRedirect);
         samples.push({ status: response.status, ttfb_ms: Math.round(ttfb),
           total_ms: Math.round(performance.now() - start), bytes: body.byteLength,
-          region: response.headers.get('x-vercel-id')?.split('::').slice(0, -1).join('::') ?? null, healthy });
-        if (!response.ok || !healthy) process.exitCode = 1;
+          region: response.headers.get('x-vercel-id')?.split('::').slice(0, -1).join('::') ?? null,
+          healthy, success, login_redirect: loginRedirect });
+        if (!success) process.exitCode = 1;
       } catch {
         samples.push({ error: 'REQUEST_FAILED', total_ms: Math.round(performance.now() - start) });
         process.exitCode = 1;
       }
     }
-    const warm = samples.slice(1).filter(s => s.status === 200 && s.healthy);
+    const warm = samples.slice(1).filter(s => s.success);
     const totals = warm.map(s => s.total_ms).sort((a, b) => a - b);
     const ttfbs = warm.map(s => s.ttfb_ms).sort((a, b) => a - b);
     console.log(JSON.stringify({ target: target.label, first: samples[0], warm_successes: warm.length,
