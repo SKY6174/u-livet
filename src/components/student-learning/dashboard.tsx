@@ -17,6 +17,7 @@ import {
   Plus,
   Settings2,
   Sparkles,
+  Ticket,
   UserRound,
   Wallet,
 } from "lucide-react";
@@ -941,6 +942,12 @@ export function StudentDashboard({
             </div>
           </div>
           <div className="space-y-3">
+            <ServiceLink
+              href="/parking"
+              icon={Ticket}
+              title="무료 주차권 신청"
+              description="교육일 주차권 신청과 승인 상태 확인"
+            />
             <ServiceLink
               href="/mypage/payments"
               icon={Wallet}

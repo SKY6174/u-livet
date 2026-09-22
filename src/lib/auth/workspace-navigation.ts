@@ -39,6 +39,7 @@ export function officeSections(member: Member) {
       ] : []),
     ] },
     { title: "사업단 지원", links: [
+      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [{ label: "무료 주차권 관리", href: "/admin/parking", description: "과정별 담당 센터, 발급 신청·승인, 재고와 사용대장을 관리합니다." }] : []),
       ...(hasRole(member, "FINANCE") ? [{ label: "수납·환불", href: "/finance", description: "교육비 수납과 환불 처리 내역을 확인합니다." }] : []),
       ...(hasRole(member, "COURSE_MANAGER", "PERFORMANCE") ? [{ label: "연차 평가·성과", href: "/performance", description: "사업연도별 운영 통계와 성과 보고를 관리합니다." }] : []),
       ...((hasRole(member, "SYSTEM_ADMIN") || !!member.member_entry_orgs?.length) ? [{ label: "구성원 관리", href: "/admin/accounts", description: "사업단·강사·수강생의 정보와 활동 이력을 관리합니다." }] : []),
@@ -57,7 +58,7 @@ const within = (path: string, base: string) => path === base || path.startsWith(
 export function officeActiveHref(path: string) {
   if (within(path, "/operation-documents")) return "/operation-documents";
   if (within(path, "/admin/reports") || /^\/admin\/offerings\/[^/]+\/reports(?:\/|$)/.test(path)) return "/admin/reports";
-  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/instructors"])
+  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/instructors", "/admin/parking"])
     if (within(path, href)) return href;
   return path === "/admin" ? "/admin" : "/admin/courses";
 }

@@ -60,6 +60,7 @@ export default async function InstructorRoom() {
           <p className="mt-1 break-all text-base text-slate-600">{me.email}</p>
 
           <div className="mt-6 flex flex-wrap gap-3">
+            {isExternal && <Link className="btn-primary text-sm" href="/parking">무료 주차권 신청</Link>}
             <Link className="btn-primary text-sm" href="/mypage/instructor/documents">
               강사 서류 제출
             </Link>
