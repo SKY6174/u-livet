@@ -86,6 +86,7 @@ export function ConsentEditor({
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [bytes, setBytes] = useState<Uint8Array | null>(null),
+    [previewPending, setPreviewPending] = useState(true),
     [previewError, setPreviewError] = useState("");
   const requestId = useRef<string | null>(null),
     dirty = useRef(false);
@@ -125,7 +126,7 @@ export function ConsentEditor({
   useEffect(() => {
     if (loading) return;
     let active = true;
-    setBytes(null);
+    setPreviewPending(true);
     setPreviewError("");
     const timer = setTimeout(() => {
       void loadAssets()
@@ -133,10 +134,16 @@ export function ConsentEditor({
           renderConsentPdf(type, normalizeConsent(type, form, name), a),
         )
         .then((b) => {
-          if (active) setBytes(b);
+          if (active) {
+            setBytes(b);
+            setPreviewPending(false);
+          }
         })
         .catch((e) => {
-          if (active) setPreviewError(e.message);
+          if (active) {
+            setPreviewError(e.message);
+            setPreviewPending(false);
+          }
         });
     }, 300);
     return () => {
@@ -161,6 +168,7 @@ export function ConsentEditor({
     dirty.current = true;
     onDirtyChange(true);
     requestId.current = null;
+    setPreviewPending(true);
     setForm((f) => ({ ...f, [key]: value }));
   };
   const input = (
@@ -217,7 +225,7 @@ export function ConsentEditor({
     }
   };
   const download = () => {
-    if (!bytes) return;
+    if (!bytes || previewPending || previewError) return;
     const url = URL.createObjectURL(
       new Blob([bytes.slice().buffer as ArrayBuffer], {
         type: "application/pdf",
@@ -437,19 +445,18 @@ export function ConsentEditor({
             <h3 className="font-bold">PDF 결과 미리보기</h3>
             <button
               className="btn-secondary !py-2 text-sm"
-              disabled={!bytes}
+              disabled={!bytes || previewPending || !!previewError}
               onClick={download}
             >
               작성 중 PDF 다운로드
             </button>
           </div>
-          {previewError ? (
+          {previewError && (
             <p role="alert" className="notice">
               {previewError}
             </p>
-          ) : (
-            <PdfPreview bytes={bytes} />
           )}
+          <PdfPreview bytes={bytes} errorMessage={previewError} />
           <p className="text-xs text-slate-500">
             A4 · PDF 1.7 · KoPub Dotum / 최종 제출 전 미확정 문서
           </p>

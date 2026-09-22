@@ -1,6 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-export function PdfPreview({ bytes }: { bytes: Uint8Array | null }) {
+export function PdfPreview({
+  bytes,
+  errorMessage = "",
+}: {
+  bytes: Uint8Array | null;
+  errorMessage?: string;
+}) {
   const host = useRef<HTMLDivElement>(null),
     [error, setError] = useState("");
   useEffect(() => {
@@ -66,11 +72,12 @@ export function PdfPreview({ bytes }: { bytes: Uint8Array | null }) {
   return (
     <div className="min-h-64 rounded-xl bg-slate-200 p-3 shadow-inner">
       <div ref={host} />
-      {(!bytes || error) && (
+      {(!bytes && !error && !errorMessage) && (
         <p className="p-8 text-sm" role="status">
-          {error || "PDF를 생성하고 있습니다…"}
+          PDF를 생성하고 있습니다…
         </p>
       )}
+      {error && <p className="p-8 text-sm" role="alert">{error}</p>}
     </div>
   );
 }
