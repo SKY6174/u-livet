@@ -6,6 +6,17 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { DOCUMENTS } from "@/lib/reports/types";
 import { detectFileMime, MAX_FILE_SIZE } from "@/lib/reports/validation";
 export const runtime = "nodejs";
+export async function GET(
+  _: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  if (!UUID.test(id) || !(await getSessionIdentity())) return new NextResponse(null, { status: 401 });
+  const { data, error } = await (await createServerSupabaseClient()).rpc("life_course_report", { f: id });
+  if (error || !data) return new NextResponse(null, { status: 403 });
+  const original = (Array.isArray(data.files) ? data.files : []).find((file: { kind: string }) => file.kind === "result");
+  return NextResponse.json({ original: original ? { id: original.id, filename: original.filename, size: original.size } : null }, { headers: { "Cache-Control": "private, no-store" } });
+}
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

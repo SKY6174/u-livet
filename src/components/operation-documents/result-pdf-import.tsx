@@ -1,6 +1,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- PDF photographs are private local previews. */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { extractResultPdf } from "@/lib/operation-documents/pdf-import";
 import type { Content } from "@/lib/operation-documents/model";
 import { fields } from "@/lib/operation-documents/schema";
@@ -25,6 +25,16 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [includePhotos, setIncludePhotos] = useState(true);
   const [includeSchedule, setIncludeSchedule] = useState(false);
+  const [existingFile, setExistingFile] = useState<{ id: string; filename: string; size: number } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/course-reports/${courseId}/files`, { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((result) => { if (active) setExistingFile(result?.original ?? null); })
+      .catch(() => { if (active) setExistingFile(null); });
+    return () => { active = false; };
+  }, [courseId]);
 
   async function analyze(text: string) {
     const response = await fetch(`/api/operation-documents/${courseId}/import-ai`, {
@@ -44,6 +54,35 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
     setMessage("AI 제안이 준비되었습니다. 원본과 비교한 뒤 반영할 항목을 선택해 주세요.");
   }
 
+  async function process(file: File) {
+    setMessage("원본 PDF의 내용과 사진을 읽고 있습니다.");
+    let extracted: Awaited<ReturnType<typeof extractResultPdf>>;
+    try { extracted = await extractResultPdf(file); }
+    catch (cause) {
+      setError(`${cause instanceof Error ? cause.message : "PDF를 읽지 못했습니다."} 원본은 보관되어 있습니다.`);
+      return;
+    }
+    setSourceText(extracted.text);
+    setPhotos(extracted.photos);
+    setMessage(`${extracted.pages}쪽을 읽고 사진 ${extracted.photos.length}장을 찾았습니다. AI가 내용 제안을 작성 중입니다.`);
+    try { await analyze(extracted.text); }
+    catch (cause) { setError(`${cause instanceof Error ? cause.message : "AI 분석 실패"} 사진은 아래에서 따로 반영할 수 있습니다.`); }
+  }
+
+  async function loadExisting() {
+    if (!existingFile) return;
+    setBusy(true); setError(""); setMessage(""); setSuggested({}); setPhotos([]); setSchedule([]);
+    try {
+      const response = await fetch(`/api/course-reports/${courseId}/files/${existingFile.id}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("보관된 원본 PDF를 불러오지 못했습니다.");
+      const bytes = await response.blob();
+      if (bytes.size > 4_194_304 || bytes.type !== "application/pdf") throw new Error("보관된 PDF 형식이나 크기를 확인해 주세요.");
+      setFileId(existingFile.id);
+      await process(new File([bytes], existingFile.filename, { type: "application/pdf" }));
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "원본을 불러오지 못했습니다."); }
+    finally { setBusy(false); }
+  }
+
   async function upload(file: File) {
     setBusy(true); setError(""); setMessage(""); setFileId(""); setSuggested({}); setPhotos([]); setSchedule([]);
     try {
@@ -55,18 +94,8 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
       const savedBody = await saved.json().catch(() => null);
       if (!saved.ok || !savedBody?.fileId) throw new Error(savedBody?.message || "PDF를 보관하지 못했습니다.");
       setFileId(savedBody.fileId);
-      setMessage("원본 PDF를 보관했습니다. 내용과 사진을 읽고 있습니다.");
-      let extracted: Awaited<ReturnType<typeof extractResultPdf>>;
-      try { extracted = await extractResultPdf(file); }
-      catch (cause) {
-        setError(`${cause instanceof Error ? cause.message : "PDF를 읽지 못했습니다."} 원본은 보관되어 있습니다.`);
-        return;
-      }
-      setSourceText(extracted.text);
-      setPhotos(extracted.photos);
-      setMessage(`${extracted.pages}쪽을 읽고 사진 ${extracted.photos.length}장을 찾았습니다. AI가 내용 제안을 작성 중입니다.`);
-      try { await analyze(extracted.text); }
-      catch (cause) { setError(`${cause instanceof Error ? cause.message : "AI 분석 실패"} 사진은 아래에서 따로 반영할 수 있습니다.`); }
+      setExistingFile({ id: savedBody.fileId, filename: file.name, size: file.size });
+      await process(file);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "업로드하지 못했습니다.");
     } finally { setBusy(false); }
@@ -77,6 +106,10 @@ export function ResultPdfImport({ courseId, disabled, content, onApply }: {
     <section className="mb-5 rounded-2xl border border-teal-200 bg-white p-5" aria-label="기존 결과보고서 가져오기">
       <h2 className="text-lg font-bold">제출 완료된 결과보고서 PDF 가져오기</h2>
       <p className="mt-1 text-sm text-slate-600">원본을 보관하고 본문·사진을 읽어 현재 양식에 반영할 내용을 제안합니다. AI는 gpt-5.6-terra를 사용하며, 예산·장학금·서명은 가져오지 않습니다. 최종 반영과 제출은 작성자가 확인합니다.</p>
+      {existingFile && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg bg-slate-50 p-3 text-sm">
+        <span className="min-w-0 flex-1 truncate">보관된 원본: {existingFile.filename}</span>
+        <button type="button" className="btn-secondary" disabled={disabled || busy} onClick={() => void loadExisting()}>이 원본으로 초안 만들기</button>
+      </div>}
       <input className="mt-4 block w-full text-sm" type="file" accept="application/pdf,.pdf" disabled={disabled || busy}
         aria-label="제출된 결과보고서 PDF 업로드"
         onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file); event.target.value = ""; }} />
