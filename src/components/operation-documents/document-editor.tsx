@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- Local embedded images are private form values. */
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   FileText,
@@ -16,6 +17,7 @@ import { DocumentPreview } from "./document-preview";
 import {
   sections,
   documentLabel,
+  ACADEMIES,
   type DocumentKind,
   type Field,
   type Table,
@@ -29,6 +31,7 @@ import {
   emptyBudget,
   STATUS_LABELS,
   type DocumentContext,
+  type CourseInfo,
   type Content,
   type Budget,
 } from "@/lib/operation-documents/model";
@@ -65,10 +68,13 @@ async function photoData(file: File): Promise<string> {
 export function DocumentEditor({
   initial,
   kind,
+  courseOptions,
 }: {
   initial: DocumentContext;
   kind: DocumentKind;
+  courseOptions: Pick<CourseInfo, "id" | "name" | "starts_on">[];
 }) {
+  const router = useRouter();
   const [context, setContext] = useState(initial),
     first = initialDocument(initial, kind);
   const [doc, setDoc] = useState(first),
@@ -411,15 +417,67 @@ export function DocumentEditor({
           </nav>
           <section className="rounded-2xl border bg-white p-5 sm:p-6">
             <h2 className="mb-4 text-lg font-bold">{selected.label}</h2>
+            {selected.fields?.some((field) => field.key === "title") && (
+              <div className="field mb-5">
+                <label htmlFor="operation-course-select">과정명</label>
+                <span className="text-xs font-normal text-slate-400">검토 요청 시 필수</span>
+                <select
+                  id="operation-course-select"
+                  value={context.course.id}
+                  onChange={(event) => {
+                    const nextId = event.target.value;
+                    if (nextId === context.course.id) return;
+                    if (dirty) {
+                      setError("다른 과정으로 이동하기 전에 변경사항을 저장해 주세요.");
+                      return;
+                    }
+                    router.push(`/operation-documents/${nextId}/${kind}`);
+                  }}
+                >
+                  {courseOptions.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.name} · {course.starts_on}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs font-normal text-slate-500">
+                  다른 과정을 선택하면 해당 과정의 {documentLabel(kind)}로 이동합니다.
+                </span>
+                {content.fields.title !== context.course.name && (
+                  <span className="text-xs font-normal text-amber-800">
+                    저장된 표기: {content.fields.title || "없음"}.{" "}
+                    {!readonly && (
+                      <button
+                        type="button"
+                        className="underline"
+                        onClick={() =>
+                          change({
+                            ...content,
+                            fields: { ...content.fields, title: context.course.name },
+                          })
+                        }
+                      >
+                        등록 과정명으로 맞추기
+                      </button>
+                    )}
+                  </span>
+                )}
+              </div>
+            )}
             <fieldset
               disabled={readonly}
               className="space-y-5 disabled:opacity-80"
             >
-              {selected.fields?.map((f) => (
+              {selected.fields?.filter((field) => field.key !== "title").map((f) => (
                 <Input
                   key={f.key}
                   field={f}
                   value={content.fields[f.key]}
+                  options={
+                    f.key === "academy"
+                      ? Array.from(new Set([context.course.academy, ...ACADEMIES])).filter(Boolean)
+                      : undefined
+                  }
                   onChange={(value) =>
                     change({
                       ...content,
@@ -831,10 +889,12 @@ function Input({
   field: f,
   value,
   onChange,
+  options,
 }: {
   field: Field;
   value: string;
   onChange: (value: string) => void;
+  options?: string[];
 }) {
   return (
     <label className="field">
@@ -844,7 +904,16 @@ function Input({
           검토 요청 시 필수
         </span>
       )}
-      {f.type === "long" ? (
+      {options ? (
+        <select value={value} onChange={(e) => onChange(e.target.value)}>
+          <option value="">{f.label} 선택</option>
+          {Array.from(new Set(value ? [value, ...options] : options)).map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : f.type === "long" ? (
         <textarea
           rows={5}
           maxLength={f.max}
@@ -962,12 +1031,12 @@ export function OperationPrintControls({ title }: { title: string }) {
             window.print();
           }}
         >
-          인쇄
+          종이 인쇄
         </button>
       </div>
       <p className="text-sm text-slate-500">
-        A4 · 머리글/바닥글 끄기 · 배율 100%. 최종 제출 전 문서는 검토용 초안으로
-        표시됩니다.
+        PDF 파일은 PDF 1.7 다운로드를 사용해 주세요. 종이 인쇄의 브라우저 PDF
+        저장은 버전을 보장하지 않습니다. 최종 제출 전 문서는 검토용 초안으로 표시됩니다.
       </p>
       {error && (
         <p role="alert" className="text-red-700">

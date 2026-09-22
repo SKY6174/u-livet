@@ -23,6 +23,12 @@
 
 ## 검증 증거
 
+### 2026-09-22 과정명·영역 선택 및 PDF 1.7 보완
+
+추가 설계 항목 3개 중 3개 확인(100%). 과정명은 `life_operation_list`가 반환하는 접근 가능 과정으로 제한하고, 다른 과정을 선택하면 같은 종류의 문서로 이동한다. 미저장 변경이 있을 때는 이동을 멈춘다. 영역은 공식 아카데미 목록에서 선택하며 기존 비표준 저장값도 선택 항목에 유지한다. 계획서와 결과보고서는 동일한 `OperationPrintControls`와 PDF 1.7 생성기를 사용하고, 종이 인쇄 버튼을 파일 다운로드와 구별했다.
+
+이번 변경에서 `npm run build`, `npx tsc --noEmit`, `git diff --check`를 통과했다. 설치된 jsPDF 생성 결과를 PDF 검사 도구로 읽어 PDF version 1.7과 A4 용지를 확인했다.
+
 - `node scripts/verify-operation-documents.mjs`: 로컬 실제 Auth/PostgREST 합성 계정으로 권한·예산 변조·충돌·상태 전이·불변 제출본·비정상 이미지·계획 예산 승계 모두 통과. SUBMISSION_IMMUTABLE 로그는 의도한 거부를 검증한 결과.
 - `node scripts/verify-role-navigation.mjs`: 19개 통과.
 - `node scripts/verify-pdf-17.mjs`: 6개 통과.
