@@ -76,6 +76,7 @@ export function DocumentPreview({
 }) {
   const v = content.fields,
     tt = content.tables;
+  const photos = kind === "result" ? content.photos.filter((photo) => !!photo.image) : [];
   const pages: ReactNode[] = [];
   pages.push(
     <div
@@ -310,10 +311,18 @@ export function DocumentPreview({
         <h3>가. 성과</h3>
         <Grid headers={labels} rows={[vals]} />
         <h3>나. 운영 사진</h3>
-        <Photos photos={content.photos.slice(0, 4)} />
+        <Photos photos={photos.slice(0, 4)} />
         <p className="op-photo-note">{v.photoNote}</p>
       </div>,
     );
+  }
+  if (kind === "result" && photos.length > 6) {
+    groups(photos.slice(4), 4).forEach((part, index) => pages.push(
+      <div key={`photos-${index}`}>
+        <h2>3. 운영 성과 · 운영 사진 (계속)</h2>
+        <Photos photos={part} />
+      </div>,
+    ));
   }
   const schedule = tt.schedule ?? [],
     columns =
@@ -327,8 +336,8 @@ export function DocumentPreview({
   groups(schedule, 15).forEach((rows, group) =>
     pages.push(
       <div key={`schedule-${group}`}>
-        {kind === "result" && group === 0 && (
-          <Photos photos={content.photos.slice(4)} />
+        {kind === "result" && group === 0 && photos.length <= 6 && photos.length > 4 && (
+          <Photos photos={photos.slice(4)} />
         )}
         <h2>
           {kind === "plan" ? "5. 강의계획" : "4. 강사별 교육시간 상세 내역"}
@@ -546,12 +555,13 @@ export function DocumentPreview({
   );
 }
 function Photos({ photos }: { photos: Content["photos"] }) {
+  if (!photos.length) return null;
   return (
     <div className="op-photos">
       {photos.map((p, i) => (
         <figure key={i}>
           <figcaption>
-            {p.caption}({date(p.date)})
+            {p.caption}{p.date ? `(${date(p.date)})` : ""}
           </figcaption>
           <div>{p.image && <img src={p.image} alt={p.caption} />}</div>
         </figure>

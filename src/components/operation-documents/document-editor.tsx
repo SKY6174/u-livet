@@ -18,6 +18,8 @@ import {
   sections,
   documentLabel,
   ACADEMIES,
+  MAX_OPERATION_PHOTOS,
+  PHOTO_CAPTIONS,
   type DocumentKind,
   type Field,
   type Table,
@@ -519,10 +521,28 @@ export function DocumentEditor({
                 />
               ))}
               {kind === "result" && section === "performance" && (
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm text-slate-600">운영사진 칸 {content.photos.length - PHOTO_CAPTIONS.length}/{MAX_OPERATION_PHOTOS}</p>
+                    <button type="button" className="btn-secondary" disabled={content.photos.length >= PHOTO_CAPTIONS.length + MAX_OPERATION_PHOTOS}
+                      onClick={() => change((previous) => ({ ...previous, photos: [
+                        ...previous.photos,
+                        { caption: `운영사진${previous.photos.length - PHOTO_CAPTIONS.length + 1}`, date: "", image: "" },
+                      ] }))}>
+                      <Plus size={16} /> 운영사진 추가
+                    </button>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
                   {content.photos.map((p, i) => (
                     <div className="rounded-xl border p-3" key={i}>
-                      <p className="font-semibold">{p.caption}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-semibold">{p.caption}</p>
+                        {i >= PHOTO_CAPTIONS.length && <button type="button" className="text-xs text-red-700" aria-label={`${p.caption} 칸 삭제`}
+                          onClick={() => change((previous) => ({ ...previous, photos: previous.photos
+                            .filter((_, index) => index !== i)
+                            .map((photo, index) => index < PHOTO_CAPTIONS.length ? photo : { ...photo, caption: `운영사진${index - PHOTO_CAPTIONS.length + 1}` }),
+                          }))}>사진 칸 삭제</button>}
+                      </div>
                       <input
                         aria-label={`${p.caption} 촬영일`}
                         type="date"
@@ -582,11 +602,12 @@ export function DocumentEditor({
                             })
                           }
                         >
-                          사진 삭제
+                          사진 파일 제거
                         </button>
                       )}
                     </div>
                   ))}
+                  </div>
                 </div>
               )}
               {section === "cover" && kind === "plan" && (

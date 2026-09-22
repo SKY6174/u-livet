@@ -1,6 +1,7 @@
 import {
   BUDGET_CATEGORIES,
   PHOTO_CAPTIONS,
+  MAX_OPERATION_PHOTOS,
   RECRUITMENT,
   fields,
   tables,
@@ -295,7 +296,10 @@ export function validContent(
     return false;
   if (
     !Array.isArray(value.photos) ||
-    value.photos.length !== (kind === "result" ? 6 : 0) ||
+    (kind === "result"
+      ? value.photos.length < PHOTO_CAPTIONS.length ||
+        value.photos.length > PHOTO_CAPTIONS.length + MAX_OPERATION_PHOTOS
+      : value.photos.length !== 0) ||
     value.photos.some(
       (p) =>
         !record(p) ||

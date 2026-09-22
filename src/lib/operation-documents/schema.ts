@@ -296,11 +296,8 @@ export const BUDGET_CATEGORIES = {
 export const PHOTO_CAPTIONS = [
   "개강식",
   "수료식",
-  "운영사진1",
-  "운영사진2",
-  "운영사진3",
-  "운영사진4",
 ];
+export const MAX_OPERATION_PHOTOS = 12;
 export const sections = (kind: DocumentKind) =>
   kind === "plan" ? PLAN_SECTIONS : RESULT_SECTIONS;
 export const fields = (kind: DocumentKind) =>
