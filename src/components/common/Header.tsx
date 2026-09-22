@@ -43,7 +43,14 @@ export default function Header() {
   const [openAdminMenu, setOpenAdminMenu] = useState(false);
   const [openMobileAdminMenu, setOpenMobileAdminMenu] = useState(false);
   const [previewHref, setPreviewHref] = useState<string | null>(null);
-  const adminMenuRef = useRef<HTMLDivElement>(null);
+  const adminSubmenuRef = useRef<HTMLDivElement>(null);
+  const adminMenuToggleRef = useRef<HTMLButtonElement>(null);
+  const closeAdminMenu = () => {
+    if (adminSubmenuRef.current?.contains(document.activeElement)) {
+      adminMenuToggleRef.current?.focus({ preventScroll: true });
+    }
+    setOpenAdminMenu(false);
+  };
   const userLabel = identity ? (
     <span className="inline-flex items-center gap-2 whitespace-nowrap">
       <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
@@ -80,7 +87,6 @@ export default function Header() {
     return (
       <div
         key={href}
-        ref={adminMenuRef}
         className="relative"
         onMouseEnter={() => {
           setPreviewHref(null);
@@ -98,8 +104,8 @@ export default function Header() {
           if (event.key === "Escape") {
             event.preventDefault();
             event.stopPropagation();
-            adminMenuRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
-            setOpenAdminMenu(false);
+            adminMenuToggleRef.current?.focus({ preventScroll: true });
+            closeAdminMenu();
           }
         }}
       >
@@ -112,24 +118,26 @@ export default function Header() {
               setPreviewHref(null);
               setOpenAdminMenu(true);
             }}
-            onClick={() => setOpenAdminMenu(false)}
+            onClick={closeAdminMenu}
           >
             {label}
           </Link>
           <button
+            ref={adminMenuToggleRef}
             type="button"
             aria-label="사업단 관리 하위 메뉴"
             aria-expanded={openAdminMenu}
             aria-controls="desktop-admin-submenu"
             className="inline-flex min-h-11 w-8 items-center justify-center rounded-lg text-slate-600 hover:text-teal-900"
-            onClick={() => setOpenAdminMenu((current) => !current)}
+            onClick={() => openAdminMenu ? closeAdminMenu() : setOpenAdminMenu(true)}
           >
             <ChevronDown aria-hidden="true" className={`h-4 w-4 motion-safe:transition-transform ${openAdminMenu ? "rotate-180" : ""}`} />
           </button>
         </div>
         <div
+          ref={adminSubmenuRef}
           id="desktop-admin-submenu"
-          aria-hidden={!openAdminMenu}
+          inert={!openAdminMenu}
           className={`absolute left-1/2 top-full z-50 w-[32rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
         >
           <div className="grid grid-cols-[13rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
@@ -143,7 +151,7 @@ export default function Header() {
                   className={submenuLinkClass(previewLink.href === link.href)}
                   onMouseEnter={() => setPreviewHref(link.href)}
                   onFocus={() => setPreviewHref(link.href)}
-                  onClick={() => setOpenAdminMenu(false)}
+                  onClick={closeAdminMenu}
                 >
                   <span>{link.label}<span className="sr-only"> — {link.description}</span></span>
                   <ChevronRight aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 ${previewLink.href === link.href ? "opacity-100" : "opacity-0"}`} />
