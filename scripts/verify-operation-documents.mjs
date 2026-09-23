@@ -99,6 +99,14 @@ assert.deepEqual(
   { name: "실습실", room: "(G-110)" },
 );
 assert.deepEqual(
+  JSON.parse(JSON.stringify(schedulePrint.splitScheduleTopic("파크골프 이론(1) (장비/코스/에티켓/규정)"))),
+  { main: "파크골프 이론(1)", detail: "(장비/코스/에티켓/규정)" },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(schedulePrint.splitScheduleTopic("파크골프 이론(1)"))),
+  { main: "파크골프 이론(1)", detail: "" },
+);
+assert.deepEqual(
   JSON.parse(JSON.stringify(photoCrop.centerCropRect(1600, 900))),
   { x: 0, y: 0, width: 1600, height: 900 },
 );

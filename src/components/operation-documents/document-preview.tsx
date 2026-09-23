@@ -18,6 +18,7 @@ import {
   formatScheduleDate,
   formatScheduleTime,
   splitScheduleLocation,
+  splitScheduleTopic,
 } from "@/lib/operation-documents/schedule-print";
 import "./documents.css";
 const sum = (rows: Record<string, string>[], key: string) =>
@@ -100,6 +101,20 @@ function ScheduleLocationCell({ value }: { value?: string }) {
         </>
       ) : (
         "\u00a0"
+      )}
+    </td>
+  );
+}
+function ScheduleTopicCell({ value }: { value?: string }) {
+  const topic = splitScheduleTopic(value || "");
+  return (
+    <td className="op-schedule-topic">
+      {topic.main || "\u00a0"}
+      {topic.detail && (
+        <>
+          <br />
+          <span className="op-schedule-topic-detail">{topic.detail}</span>
+        </>
       )}
     </td>
   );
@@ -392,15 +407,15 @@ export function DocumentPreview({
         <table className="op-table op-schedule">
           <colgroup>
             {(kind === "plan"
-              ? [4, 16, 23, 8, 6, 8, 6, 13, 7, 9]
-              : [4, 19, 29, 8, 6, 8, 6, 20]
+              ? [5, 15, 24.5, 8, 6, 8, 6, 11.5, 7, 9]
+              : [5, 18, 31, 8, 6, 8, 6, 18]
             ).map((width, index) => (
               <col key={index} style={{ width: `${width}%` }} />
             ))}
           </colgroup>
           <thead>
             <tr>
-              <th rowSpan={2}>회차</th>
+              <th rowSpan={2} className="op-schedule-round">회차</th>
               <th rowSpan={2} className="op-schedule-datetime">
                 일자
                 <br />
@@ -441,7 +456,7 @@ export function DocumentPreview({
               <tr key={i}>
                 <td>{group * 15 + i + 1}</td>
                 <ScheduleDateTimeCell row={rows[i]} />
-                <td className="op-schedule-topic">{rows[i]?.topic || "\u00a0"}</td>
+                <ScheduleTopicCell value={rows[i]?.topic} />
                 <td className="op-schedule-instructor">{rows[i]?.instructor || "\u00a0"}</td>
                 <td>{rows[i]?.hours || "\u00a0"}</td>
                 <td className="op-schedule-instructor">{rows[i]?.assistant || "\u00a0"}</td>

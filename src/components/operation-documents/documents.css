@@ -200,6 +200,7 @@
   padding: 1.1mm;
 }
 .op-schedule-datetime,
+.op-schedule-round,
 .op-schedule-date,
 .op-schedule-time,
 .op-schedule-instructor,
@@ -214,6 +215,13 @@
   line-height: 1.45;
   overflow-wrap: break-word;
   word-break: keep-all;
+}
+.op-schedule-topic-detail {
+  display: inline-block;
+  margin-top: 0.3mm;
+  font-size: 7.8pt;
+  letter-spacing: -0.1mm;
+  white-space: nowrap;
 }
 .op-schedule-instructor {
   letter-spacing: -0.15mm;
