@@ -60,8 +60,9 @@ export default function Header() {
     </span>
   ) : null;
   const links = primaryLinks(identity, isLoginPage);
+  const adminSections = identity && isOfficeMember(identity) ? officeSections(identity) : [];
   const adminLinks = identity && isOfficeMember(identity)
-    ? [OFFICE_HOME_LINK, ...officeSections(identity).flatMap((section) => section.links)]
+    ? [OFFICE_HOME_LINK, ...adminSections.flatMap((section) => section.links)]
     : [];
   const adminActive = primaryActive(pathname, "/admin");
   const activeAdminHref = adminActive ? officeActiveHref(pathname) : null;
@@ -138,25 +139,46 @@ export default function Header() {
           ref={adminSubmenuRef}
           id="desktop-admin-submenu"
           inert={!openAdminMenu}
-          className={`absolute left-1/2 top-full z-50 w-[32rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
+          className={`absolute left-1/2 top-full z-50 w-[42rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 xl:w-[56rem] motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
         >
-          <div className="grid grid-cols-[13rem_minmax(0,1fr)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
-            <div className="space-y-1 p-2">
-              {adminLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  tabIndex={openAdminMenu ? 0 : -1}
-                  aria-current={activeAdminHref === link.href ? "page" : undefined}
-                  className={submenuLinkClass(previewLink.href === link.href)}
-                  onMouseEnter={() => setPreviewHref(link.href)}
-                  onFocus={() => setPreviewHref(link.href)}
-                  onClick={closeAdminMenu}
-                >
-                  <span>{link.label}<span className="sr-only"> — {link.description}</span></span>
-                  <ChevronRight aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 ${previewLink.href === link.href ? "opacity-100" : "opacity-0"}`} />
-                </Link>
-              ))}
+          <div className="grid max-h-[calc(100dvh-9rem)] grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
+            <div className="min-h-0 overflow-y-auto p-3">
+              <Link
+                href={OFFICE_HOME_LINK.href}
+                tabIndex={openAdminMenu ? 0 : -1}
+                aria-current={activeAdminHref === OFFICE_HOME_LINK.href ? "page" : undefined}
+                className={submenuLinkClass(previewLink.href === OFFICE_HOME_LINK.href)}
+                onMouseEnter={() => setPreviewHref(OFFICE_HOME_LINK.href)}
+                onFocus={() => setPreviewHref(OFFICE_HOME_LINK.href)}
+                onClick={closeAdminMenu}
+              >
+                <span>{OFFICE_HOME_LINK.label}<span className="sr-only"> — {OFFICE_HOME_LINK.description}</span></span>
+                <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+              </Link>
+              <div className="mt-3 grid grid-cols-2 gap-3 xl:grid-cols-3">
+                {adminSections.map(({ title, links: sectionLinks }, sectionIndex) => (
+                  <section key={title} aria-labelledby={`desktop-office-category-${sectionIndex}`} className="rounded-xl border border-slate-200 p-2">
+                    <h3 id={`desktop-office-category-${sectionIndex}`} className="px-2 py-2 text-sm font-bold text-slate-900">{title}</h3>
+                    <div className="divide-y divide-slate-100">
+                      {sectionLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          tabIndex={openAdminMenu ? 0 : -1}
+                          aria-current={activeAdminHref === link.href ? "page" : undefined}
+                          className={submenuLinkClass(previewLink.href === link.href)}
+                          onMouseEnter={() => setPreviewHref(link.href)}
+                          onFocus={() => setPreviewHref(link.href)}
+                          onClick={closeAdminMenu}
+                        >
+                          <span>{link.label}<span className="sr-only"> — {link.description}</span></span>
+                          <ChevronRight aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 ${previewLink.href === link.href ? "opacity-100" : "opacity-0"}`} />
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
             </div>
             <div aria-hidden="true" className="flex flex-col border-l border-teal-100/70 bg-gradient-to-br from-teal-50 to-slate-50 p-6">
               <span className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-teal-800 shadow-sm ring-1 ring-teal-100"><ArrowUpRight className="h-5 w-5" /></span>
@@ -273,24 +295,43 @@ export default function Header() {
                 </div>
                 {openMobileAdminMenu && (
                   <div id="mobile-admin-submenu" className="border-t border-slate-100 px-2 py-2">
-                    {adminLinks.map((link) => {
-                      const active = activeAdminHref === link.href;
-                      return (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          aria-current={active ? "page" : undefined}
-                          className={submenuLinkClass(active)}
-                          onClick={() => {
-                            setOpenMobileAdminMenu(false);
-                            setOpen(false);
-                          }}
-                        >
-                          <span>{link.label}<span className="sr-only"> — {link.description}</span></span>
-                          <ChevronRight aria-hidden="true" className="h-4 w-4 text-slate-400" />
-                        </Link>
-                      );
-                    })}
+                    <Link
+                      href={OFFICE_HOME_LINK.href}
+                      aria-current={activeAdminHref === OFFICE_HOME_LINK.href ? "page" : undefined}
+                      className={submenuLinkClass(activeAdminHref === OFFICE_HOME_LINK.href)}
+                      onClick={() => {
+                        setOpenMobileAdminMenu(false);
+                        setOpen(false);
+                      }}
+                    >
+                      <span>{OFFICE_HOME_LINK.label}<span className="sr-only"> — {OFFICE_HOME_LINK.description}</span></span>
+                      <ChevronRight aria-hidden="true" className="h-4 w-4 text-slate-400" />
+                    </Link>
+                    {adminSections.map(({ title, links: sectionLinks }, sectionIndex) => (
+                      <section key={title} aria-labelledby={`mobile-office-category-${sectionIndex}`} className="mt-3 rounded-xl border border-slate-200 p-2">
+                        <h3 id={`mobile-office-category-${sectionIndex}`} className="px-2 py-2 text-sm font-bold text-slate-900">{title}</h3>
+                        <div className="divide-y divide-slate-100">
+                          {sectionLinks.map((link) => {
+                            const active = activeAdminHref === link.href;
+                            return (
+                              <Link
+                                key={link.href}
+                                href={link.href}
+                                aria-current={active ? "page" : undefined}
+                                className={submenuLinkClass(active)}
+                                onClick={() => {
+                                  setOpenMobileAdminMenu(false);
+                                  setOpen(false);
+                                }}
+                              >
+                                <span>{link.label}<span className="sr-only"> — {link.description}</span></span>
+                                <ChevronRight aria-hidden="true" className="h-4 w-4 text-slate-400" />
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    ))}
                   </div>
                 )}
               </div>
