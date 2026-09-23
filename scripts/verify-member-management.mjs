@@ -64,5 +64,12 @@ for (const [group, columns] of [['office', ['직책', '사무실 전화번호', 
   const before = reads; const html = renderToStaticMarkup(await page({ searchParams: Promise.resolve({ group }) }));
   for (const column of columns) assert(html.includes(column)); assert(html.includes('수정') && html.includes('삭제')); assert(!html.includes('<script>')); assert.equal(reads - before, 1);
 });
+await test('chief is rendered from existing member data without write controls when read only', async () => {
+  directory = {...directory, items:[{...directory.items[0],name:'송경영',is_super_admin:true,can_manage:false}], counts:{office:1,instructor:0,learner:0}};
+  const html=renderToStaticMarkup(await page({searchParams:Promise.resolve({group:'office'})}));
+  assert(html.includes('송경영') && html.includes('최고 관리자') && html.includes('단장'));
+  assert(html.includes('사업단 목록') && html.includes('1명'));
+  assert(!html.includes('aria-label="송경영 수정"') && !html.includes('aria-label="송경영 삭제"'));
+});
 await test('failed list is not presented as an empty member database', async () => { directory = null; assert.match(renderToStaticMarkup(await page({ searchParams: Promise.resolve({}) })), /목록을 불러오지 못했습니다/); });
 console.log(`${checks} member management checks passed.`);

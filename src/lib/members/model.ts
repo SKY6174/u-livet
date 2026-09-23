@@ -10,7 +10,7 @@ export type Member = {
   id: string; name: string; email: string | null; office_position: OfficePosition | null;
   instructor_kind: "INTERNAL" | "EXTERNAL" | null; office_phone: string | null;
   mobile_phone: string | null; instructor_phone: string | null; birth_date: string | null;
-  is_manual?: boolean; account_verified?: boolean; can_manage?: boolean; current_courses?: { id: string; name: string }[];
+  is_super_admin?: boolean; is_manual?: boolean; account_verified?: boolean; can_manage?: boolean; current_courses?: { id: string; name: string }[];
   notes: string; revision: number; is_office: boolean; is_instructor: boolean; is_learner: boolean;
 };
 export type MemberDirectory = { current_year?: number; items: Member[]; total: number; page: number; page_size: number; counts: Record<MemberGroup, number> };
