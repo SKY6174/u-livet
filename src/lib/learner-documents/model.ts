@@ -1,10 +1,19 @@
 export const DOCUMENT_TITLES = {
   application: "수강신청원서",
   scholarship: "학습활동 우수 장학금 지급신청서",
+  refund: "수강료환불신청서",
 } as const;
 export type LearnerDocumentType = keyof typeof DOCUMENT_TITLES;
 export type ConsentChoice = "" | "yes" | "no";
 export const PURPOSES = ["취업", "창업", "재교육", "자기계발", "기타"] as const;
+export const REFUND_OCCURRENCES = [
+  ["before-start", "수업 전"],
+  ["before-sixth", "수업일 1/6 전"],
+  ["before-third", "수업일 1/3 전"],
+  ["before-half", "수업일 1/2 전"],
+  ["after-half", "수업일 1/2 후 (반환하지 않음)"],
+] as const;
+export type RefundOccurrence = "" | typeof REFUND_OCCURRENCES[number][0];
 export type LearnerDocumentValues = {
   courseName: string;
   name: string;
@@ -22,6 +31,11 @@ export type LearnerDocumentValues = {
   bank: string;
   account: string;
   accountHolder: string;
+  homePhone: string;
+  refundOccurrence: RefundOccurrence;
+  tuitionFee: string;
+  deductionAmount: string;
+  refundAmount: string;
   signedOn: string;
   signature: string;
 };
@@ -32,10 +46,11 @@ export function initialValues(name = "", email = "", courseName = ""): LearnerDo
   return { courseName, name, phone: "", gender: "", birthDate: "", email,
     address: "", purposes: [], privacy: "", publicity: "", portrait: "",
     residentFront: "", residentBack: "", bank: "", account: "", accountHolder: name,
+    homePhone: "", refundOccurrence: "", tuitionFee: "", deductionAmount: "", refundAmount: "",
     signedOn: koreaToday(), signature: "" };
 }
 export function isDocumentType(value: string): value is LearnerDocumentType {
-  return value === "application" || value === "scholarship";
+  return value === "application" || value === "scholarship" || value === "refund";
 }
 function validDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -44,10 +59,12 @@ function validDate(value: string) {
 }
 export function documentErrors(type: LearnerDocumentType, v: LearnerDocumentValues) {
   const errors: Partial<Record<keyof LearnerDocumentValues, string>> = {};
-  const required: (keyof LearnerDocumentValues)[] = ["courseName", "name", "phone", "gender", "privacy", "signedOn", "signature"];
+  const required: (keyof LearnerDocumentValues)[] = ["courseName", "name", "phone", "signedOn", "signature"];
   required.push(...(type === "application"
-    ? ["birthDate", "address", "purposes", "publicity", "portrait"] as const
-    : ["residentFront", "residentBack", "bank", "account", "accountHolder"] as const));
+    ? ["gender", "birthDate", "address", "purposes", "privacy", "publicity", "portrait"] as const
+    : type === "scholarship"
+      ? ["gender", "privacy", "residentFront", "residentBack", "bank", "account", "accountHolder"] as const
+      : ["address", "residentFront", "residentBack", "bank", "account", "accountHolder", "refundOccurrence", "tuitionFee", "deductionAmount", "refundAmount"] as const));
   for (const field of required) {
     if (!v[field].length || (typeof v[field] === "string" && !v[field].trim())) errors[field] = "이 항목을 작성해 주세요.";
   }
@@ -65,6 +82,13 @@ export function documentErrors(type: LearnerDocumentType, v: LearnerDocumentValu
       if (!validDate(date) || date > koreaToday()) errors.residentFront = "주민등록번호의 생년월일을 확인해 주세요.";
     }
     if (!/^[\d -]{8,30}$/.test(v.account) || v.account.replace(/\D/g, "").length < 8) errors.account = "계좌번호를 확인해 주세요. 숫자와 하이픈으로 입력합니다.";
+    if (type === "refund") {
+      if (v.homePhone && (!/^[\d -]{7,15}$/.test(v.homePhone) || v.homePhone.replace(/\D/g, "").length < 7)) errors.homePhone = "자택전화 번호를 확인해 주세요.";
+      for (const field of ["tuitionFee", "deductionAmount", "refundAmount"] as const) {
+        const amount = v[field].replace(/[\s,]/g, "");
+        if (!/^\d{1,12}$/.test(amount)) errors[field] = "금액은 숫자로 입력해 주세요.";
+      }
+    }
   }
   return errors;
 }

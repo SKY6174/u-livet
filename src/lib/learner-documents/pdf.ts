@@ -54,7 +54,7 @@ export async function renderLearnerDocument(type: LearnerDocumentType, v: Learne
     consent(v.publicity, 396.2, 463.6, 557);
     consent(v.portrait, 394.6, 462, 616.6);
     text(v.name, 267, 720.5, 88, 16, 12);
-  } else {
+  } else if (type === "scholarship") {
     text(v.courseName, 145.6, 143, 406.8, 34.6, 12, true);
     text(v.name, 206.9, 183.6, 109, 34.4);
     text(v.phone, 206.9, 218.2, 109, 34.3, 10);
@@ -66,20 +66,53 @@ export async function renderLearnerDocument(type: LearnerDocumentType, v: Learne
     text(v.accountHolder, 447.6, 279.4, 104.8, 43.6, 11);
     consent(v.privacy, 353.3, 411.7, 540.8, 6.4);
     text(v.name, 258, 691, 88, 16, 12);
+  } else {
+    const money = (value: string) => value.replace(/[\s,]/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    text(v.courseName, 129, 145.3, 416, 25.2, 11, true);
+    text(v.name, 129, 170.5, 167, 25.3, 10.5);
+    text(v.residentFront, 376, 170.5, 78, 25.3, 10.5);
+    text(v.residentBack, 469, 170.5, 76, 25.3, 10.5);
+    text(v.phone, 129, 195.8, 167, 25.3, 10);
+    text(v.homePhone, 376, 195.8, 169, 25.3, 10);
+    text(v.address, 129, 221.2, 416, 25.3, 9.5);
+    text(v.bank, 129, 297, 115.7, 25.3, 9.5);
+    text(v.account, 296.2, 297, 123.1, 25.3, 9.5);
+    text(v.accountHolder, 458.2, 297, 86.8, 25.3, 9.5);
+    const occurrenceChecks = {
+      "before-start": 153,
+      "before-sixth": 189,
+      "before-third": 258.5,
+      "before-half": 327,
+      "after-half": 395.5,
+    } as const;
+    if (v.refundOccurrence) check(occurrenceChecks[v.refundOccurrence], 329, 6.5);
+    text(money(v.tuitionFee), 233, 347.6, 84, 25.2, 10);
+    text(money(v.deductionAmount), 441, 347.6, 84, 25.2, 10);
+    text(money(v.refundAmount), 184, 372.8, 135, 25.3, 10.5);
+    text(v.name, 255, 483, 80, 24, 11);
   }
   if (/^\d{4}-\d{2}-\d{2}$/.test(v.signedOn)) {
     const [year, month, day] = v.signedOn.split("-");
     if (type === "application") text(`${year}년     ${Number(month)}월     ${Number(day)}일`, 227, 690.3, 140, 14.7, 11.04);
-    else text(`${year}년       ${Number(month)}월       ${Number(day)}일`, 225, 652.5, 180, 16, 12);
+    else if (type === "scholarship") text(`${year}년       ${Number(month)}월       ${Number(day)}일`, 225, 652.5, 180, 16, 12);
+    else {
+      text(year, 395.5, 271.7, 45, 25.3, 10);
+      text(String(Number(month)), 450.5, 271.7, 25, 25.3, 10);
+      text(String(Number(day)), 485.5, 271.7, 30, 25.3, 10);
+      text(`${year}년     ${Number(month)}월     ${Number(day)}일`, 220, 456, 150, 25, 12);
+    }
   }
   if (v.signature) {
     if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(v.signature) || v.signature.length > 3_000_000) throw new Error("서명 이미지를 다시 입력해 주세요.");
     const signature = await pdf.embedPng(v.signature);
     if (signature.width > 4096 || signature.height > 4096) throw new Error("서명 이미지가 너무 큽니다.");
-    const { width, height } = signature.scaleToFit(88, 25);
-    page.drawImage(signature, { x: (type === "application" ? 387 : 378) + (88 - width) / 2,
-      y: 842 - (type === "application" ? 719 : 689) - height,
-      width, height, blendMode: BlendMode.Multiply });
+    const signatureBox = type === "application" ? { x: 387, top: 719, width: 88, height: 25 }
+      : type === "scholarship" ? { x: 378, top: 689, width: 88, height: 25 }
+        : { x: 381, top: 480, width: 59, height: 25 };
+    const fitted = signature.scaleToFit(signatureBox.width, signatureBox.height);
+    page.drawImage(signature, { x: signatureBox.x + (signatureBox.width - fitted.width) / 2,
+      y: 842 - signatureBox.top - fitted.height,
+      width: fitted.width, height: fitted.height, blendMode: BlendMode.Multiply });
   }
   pdf.setTitle(DOCUMENT_TITLES[type]);
   pdf.setProducer("U-LIFE / PDF 1.7");

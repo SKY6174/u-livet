@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { Download, FileCheck2, FileText, ShieldCheck } from "lucide-react";
 import { PdfPreview } from "@/components/instructor-documents/pdf-preview";
-import { DOCUMENT_TITLES, PURPOSES, documentErrors, initialValues, koreaToday,
+import { DOCUMENT_TITLES, PURPOSES, REFUND_OCCURRENCES, documentErrors, initialValues, koreaToday,
   type ConsentChoice, type LearnerDocumentType, type LearnerDocumentValues } from "@/lib/learner-documents/model";
 import type { LearnerPdfAssets } from "@/lib/learner-documents/pdf";
 import "./editor.css";
@@ -61,6 +61,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
   const [forms, setForms] = useState(() => ({
     application: initialValues(name, email, initialCourse),
     scholarship: initialValues(name, email, initialCourse),
+    refund: initialValues(name, email, initialCourse),
   }));
   const values = forms[type];
   const [rendered, setRendered] = useState<{ type: LearnerDocumentType; values: LearnerDocumentValues; bytes: Uint8Array } | null>(null);
@@ -73,6 +74,8 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
   const activeType = useRef(initialType);
   const signatureJob = useRef(0);
   const application = type === "application";
+  const scholarship = type === "scholarship";
+  const refund = type === "refund";
   const pending = rendered?.type !== type || rendered?.values !== values;
   function update<K extends keyof LearnerDocumentValues>(key: K, value: LearnerDocumentValues[K]) {
     setForms(old => ({ ...old, [type]: { ...old[type], [key]: value } }));
@@ -92,7 +95,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
   }
   useEffect(() => {
     const beforeUnload = (event: BeforeUnloadEvent) => {
-      if (savedValues.current.application !== forms.application || savedValues.current.scholarship !== forms.scholarship) {
+      if (savedValues.current.application !== forms.application || savedValues.current.scholarship !== forms.scholarship || savedValues.current.refund !== forms.refund) {
         event.preventDefault(); event.returnValue = "";
       }
     };
@@ -148,7 +151,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     setErrors(nextErrors);
     const first = Object.keys(nextErrors)[0];
     if (first) {
-      setNotice("표시된 항목을 확인해 주세요. 동의하지 않는 항목은 ‘동의하지 않음’을 선택할 수 있습니다.");
+      setNotice("표시된 항목을 확인해 주세요.");
       document.getElementById(first)?.focus();
       return;
     }
@@ -173,7 +176,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-8">
       <div className="mb-6">
         <div className="mb-4 flex flex-wrap gap-3" role="group" aria-label="작성할 서식 선택">
-          {([ ["application", "수강신청원서"], ["scholarship", "장학금 지급신청서"] ] as const).map(([documentType, label]) => (
+          {([ ["application", "수강신청원서"], ["scholarship", "장학금 지급신청서"], ["refund", "수강료환불신청서"] ] as const).map(([documentType, label]) => (
             <button key={documentType} type="button" aria-pressed={type === documentType} aria-controls="learner-document-fields"
               onClick={() => selectDocument(documentType)}
               className={`inline-flex min-h-12 items-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition ${type === documentType ? "border-[#123353] bg-[#123353] text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-800"}`}>
@@ -181,7 +184,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
             </button>
           ))}
         </div>
-        <p className="text-sm text-slate-600">같은 창에서 두 서식을 작성하세요. 서식을 전환해도 입력한 내용은 유지됩니다.</p>
+        <p className="text-sm text-slate-600">같은 창에서 세 서식을 작성하세요. 서식을 전환해도 입력한 내용은 유지됩니다.</p>
       </div>
       <div id="learner-document-fields" role="region" aria-label={`${DOCUMENT_TITLES[type]} 작성`} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <div className="min-w-0 space-y-5">
@@ -193,10 +196,11 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
                 <Field {...input("name")} label="성명" maxLength={30} autoComplete="name" />
                 <Field {...input("phone")} label="휴대전화" type="tel" maxLength={14} autoComplete="tel" placeholder="010-0000-0000" />
                 {application && <Field {...input("birthDate")} label="생년월일" type="date" max={koreaToday()} hint="PDF에는 생년월일 6자리로 표시됩니다." />}
-                <fieldset id="gender" tabIndex={-1}><legend className="mb-2 text-sm font-semibold text-slate-700">성별</legend>
+                {(application || scholarship) && <fieldset id="gender" tabIndex={-1}><legend className="mb-2 text-sm font-semibold text-slate-700">성별</legend>
                   <div className="flex min-h-11 gap-5">{([ ["male", "남"], ["female", "여"] ] as const).map(([value, label]) => <label key={value} className="flex items-center gap-2"><input type="radio" name="gender" checked={values.gender === value} onChange={() => update("gender", value)} />{label}</label>)}</div>
                   {errors.gender && <p className="mt-1 text-xs text-red-700">{errors.gender}</p>}
-                </fieldset>
+                </fieldset>}
+                {refund && <Field {...input("homePhone")} label="자택전화 (선택)" type="tel" maxLength={15} autoComplete="tel-national" placeholder="052-000-0000" />}
               </div>
               {application ? <>
                 <Field {...input("email")} label="이메일 (선택)" type="email" maxLength={100} autoComplete="email" />
@@ -205,21 +209,46 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
                   <div className="flex flex-wrap gap-2">{PURPOSES.map(purpose => <label key={purpose} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm"><input type="checkbox" checked={values.purposes.includes(purpose)} onChange={e => update("purposes", e.target.checked ? [...values.purposes, purpose] : values.purposes.filter(p => p !== purpose))} />{purpose}</label>)}</div>
                   {errors.purposes && <p className="mt-2 text-xs text-red-700">{errors.purposes}</p>}
                 </fieldset>
-              </> : <div className="rounded-xl bg-slate-50 p-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <Field {...input("residentFront")} label="주민등록번호 앞자리" inputMode="numeric" maxLength={6} autoComplete="off" placeholder="6자리" />
-                  <Field {...input("residentBack")} label="주민등록번호 뒷자리" type={showResident ? "text" : "password"} inputMode="numeric" maxLength={7} autoComplete="off" placeholder="7자리" />
+              </> : <>
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field {...input("residentFront")} label="주민등록번호 앞자리" inputMode="numeric" maxLength={6} autoComplete="off" placeholder="6자리" />
+                    <Field {...input("residentBack")} label="주민등록번호 뒷자리" type={showResident ? "text" : "password"} inputMode="numeric" maxLength={7} autoComplete="off" placeholder="7자리" />
+                  </div>
+                  <label className="mt-3 flex min-h-10 items-center gap-2 text-xs"><input type="checkbox" checked={showResident} onChange={e => setShowResident(e.target.checked)} />입력란의 뒷자리 표시</label>
+                  <p className="text-xs leading-5 text-slate-500">원본 양식에 따라 PDF 미리보기와 다운로드 파일에는 주민등록번호 전체가 표시됩니다.</p>
                 </div>
-                <label className="mt-3 flex min-h-10 items-center gap-2 text-xs"><input type="checkbox" checked={showResident} onChange={e => setShowResident(e.target.checked)} />입력란의 뒷자리 표시</label>
-                <p className="text-xs leading-5 text-slate-500">원본 양식에 따라 PDF 미리보기와 다운로드 파일에는 주민등록번호 전체가 표시됩니다.</p>
-              </div>}
+                {refund && <Field {...input("address")} label="주소" maxLength={100} autoComplete="street-address" />}
+              </>}
             </div>
           </Section>
-          {!application && <Section number="02" title="장학금 계좌">
+          {scholarship && <Section number="02" title="장학금 계좌">
             <div className="grid gap-5 sm:grid-cols-2"><Field {...input("bank")} label="은행명" maxLength={20} /><Field {...input("accountHolder")} label="예금주" maxLength={30} /></div>
             <div className="mt-5"><Field {...input("account")} label="계좌번호 (본인명의)" maxLength={30} inputMode="numeric" autoComplete="off" hint="은행명과 계좌번호를 정확하게 확인해 주세요." /></div>
           </Section>}
-          <Section number={application ? "02" : "03"} title="동의 내용 확인">
+          {refund && <>
+            <Section number="02" title="반환 정보">
+              <div className="mb-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-700"><span className="font-semibold">반환사유</span><span className="ml-4">개인사유</span></div>
+              <fieldset id="refundOccurrence" tabIndex={-1} aria-describedby={errors.refundOccurrence ? "refundOccurrence-error" : undefined}>
+                <legend className="mb-3 text-sm font-semibold text-slate-700">발생시점</legend>
+                <div className="grid gap-2 sm:grid-cols-2">{REFUND_OCCURRENCES.map(([value, label]) => <label key={value} className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 text-sm ${values.refundOccurrence === value ? "border-teal-600 bg-teal-50 text-teal-900" : "border-slate-200"}`}>
+                  <input type="radio" name="refundOccurrence" value={value} checked={values.refundOccurrence === value} onChange={() => update("refundOccurrence", value)} />{label}
+                </label>)}</div>
+                {errors.refundOccurrence && <p id="refundOccurrence-error" className="mt-2 text-xs text-red-700">{errors.refundOccurrence}</p>}
+              </fieldset>
+              <div className="mt-5 grid gap-5 sm:grid-cols-3">
+                <Field {...input("tuitionFee")} label="수강료 (원)" inputMode="numeric" maxLength={16} placeholder="0" />
+                <Field {...input("deductionAmount")} label="공제금액 (원)" inputMode="numeric" maxLength={16} placeholder="0" />
+                <Field {...input("refundAmount")} label="반환액 (원)" inputMode="numeric" maxLength={16} placeholder="0" />
+              </div>
+              <p className="mt-3 text-xs leading-5 text-slate-500">원본의 학습비 반환기준을 확인한 뒤 금액을 입력해 주세요. 금액은 자동 계산되지 않습니다.</p>
+            </Section>
+            <Section number="03" title="환불 계좌">
+              <div className="grid gap-5 sm:grid-cols-2"><Field {...input("bank")} label="은행명" maxLength={20} /><Field {...input("accountHolder")} label="예금주" maxLength={30} /></div>
+              <div className="mt-5"><Field {...input("account")} label="계좌번호 (본인명의)" maxLength={30} inputMode="numeric" autoComplete="off" hint="은행명과 계좌번호를 정확하게 확인해 주세요." /></div>
+            </Section>
+          </>}
+          {!refund && <Section number={application ? "02" : "03"} title="동의 내용 확인">
             <p className="mb-5 text-sm leading-6 text-slate-500">각 항목의 내용을 확인하고 직접 선택해 주세요. 전체 원문은 PDF 미리보기에서 확인할 수 있습니다.</p>
             <div className="space-y-5">
               <Consent id="privacy" title="개인정보 수집 및 이용에 대한 동의" value={values.privacy} onChange={v => update("privacy", v)} error={errors.privacy}>
@@ -230,13 +259,13 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
                 <Consent id="portrait" title="초상권 활용 동의" value={values.portrait} onChange={v => update("portrait", v)} error={errors.portrait}>활동사진 및 영상물은 앵커사업단 교육과정 관련 홍보 및 정보 전달 목적으로 사용할 수 있습니다.</Consent>
               </>}
             </div>
-          </Section>
+          </Section>}
           <Section number={application ? "03" : "04"} title="작성일과 서명">
             <Field {...input("signedOn")} label="작성일" type="date" />
             <div id="signature" tabIndex={-1}><SignaturePad key={type} signatureUrl={values.signature} strokeWidth={4.8} onChange={dataUrl => void setSignature(dataUrl)} /></div>
             {errors.signature && <p className="mt-2 text-sm text-red-700">서명을 작성해 주세요.</p>}
           </Section>
-          <p className="flex items-start gap-2 px-1 text-xs leading-5 text-slate-500"><ShieldCheck className="mt-0.5 shrink-0" size={16} />입력 내용은 서버에 자동 저장되지 않습니다. 창을 닫기 전에 PDF를 내려받아 주세요. PDF 다운로드만으로 수강신청이나 장학금 접수가 완료되지는 않습니다.</p>
+          <p className="flex items-start gap-2 px-1 text-xs leading-5 text-slate-500"><ShieldCheck className="mt-0.5 shrink-0" size={16} />입력 내용은 서버에 자동 저장되지 않습니다. 창을 닫기 전에 PDF를 내려받아 주세요. PDF 다운로드만으로 서류 접수가 완료되지는 않습니다.</p>
         </div>
         <aside className="min-w-0 lg:sticky lg:top-5" aria-label="PDF 미리보기 및 다운로드">
           <div className="mb-3 flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-bold"><FileText size={18} className="text-teal-700" />PDF 미리보기</h2><span className="text-xs text-slate-500" role="status">{previewError ? "입력 확인 필요" : pending ? "반영 중…" : "최신 내용 반영됨"}</span></div>
