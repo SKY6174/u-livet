@@ -1,21 +1,21 @@
 # U-LIFE 운영대상별 매뉴얼
 
-웹 진입점: `/manuals`. 현재 판: **1.0.0 (2026-09-22)**. 제작 상태: 소스 기준 제작본, 실제 운영 검수 전.
+웹 진입점: `/manuals`. 현재 판: **1.1.0 (2026-09-23)**. 제작 상태: 소스 기준 제작본, 실제 운영 검수 전.
 
 ## 문서 대장
 
 | 번호 | 대상 | 고정 웹 주소 | 배포 파일 |
 |---|---|---|---|
-| UL-M01 | 수강생 | `/manuals/learner/1.0.0` | [PDF](../../public/manuals/1.0.0/learner.pdf) |
-| UL-M02 | 교내 강사 | `/manuals/internal-instructor/1.0.0` | [PDF](../../public/manuals/1.0.0/internal-instructor.pdf) |
-| UL-M03 | 교외·보조강사 | `/manuals/external-instructor/1.0.0` | [PDF](../../public/manuals/1.0.0/external-instructor.pdf) |
-| UL-M04 | 과정 운영 | `/manuals/course-operator/1.0.0` | [PDF](../../public/manuals/1.0.0/course-operator.pdf) |
-| UL-M05 | 수료·증명 | `/manuals/certification/1.0.0` | [PDF](../../public/manuals/1.0.0/certification.pdf) |
-| UL-M06 | 수납·환불 | `/manuals/finance/1.0.0` | [PDF](../../public/manuals/1.0.0/finance.pdf) |
-| UL-M07 | 성과·평가 | `/manuals/performance/1.0.0` | [PDF](../../public/manuals/1.0.0/performance.pdf) |
-| UL-M08 | 사업단·시스템 관리자 | `/manuals/administrator/1.0.0` | [PDF](../../public/manuals/1.0.0/administrator.pdf) |
+| UL-M01 | 수강생 | `/manuals/learner/1.1.0` | [PDF](../../public/manuals/1.1.0/learner.pdf) |
+| UL-M02 | 교내 강사 | `/manuals/internal-instructor/1.1.0` | [PDF](../../public/manuals/1.1.0/internal-instructor.pdf) |
+| UL-M03 | 교외·보조강사 | `/manuals/external-instructor/1.1.0` | [PDF](../../public/manuals/1.1.0/external-instructor.pdf) |
+| UL-M04 | 과정 운영 | `/manuals/course-operator/1.1.0` | [PDF](../../public/manuals/1.1.0/course-operator.pdf) |
+| UL-M05 | 수료·증명 | `/manuals/certification/1.1.0` | [PDF](../../public/manuals/1.1.0/certification.pdf) |
+| UL-M06 | 수납·환불 | `/manuals/finance/1.1.0` | [PDF](../../public/manuals/1.1.0/finance.pdf) |
+| UL-M07 | 성과·평가 | `/manuals/performance/1.1.0` | [PDF](../../public/manuals/1.1.0/performance.pdf) |
+| UL-M08 | 사업단·시스템 관리자 | `/manuals/administrator/1.1.0` | [PDF](../../public/manuals/1.1.0/administrator.pdf) |
 
-[전체 합본 PDF](../../public/manuals/1.0.0/all.pdf). 대상별 Markdown도 같은 폴더의 `.md` 파일로 제공한다. 웹 footer의 **이용 매뉴얼**에서 접근한다.
+[전체 합본 PDF](../../public/manuals/1.1.0/all.pdf). 대상별 Markdown도 같은 폴더의 `.md` 파일로 제공한다. 웹 footer의 **이용 매뉴얼**에서 접근한다. 초판은 `public/manuals/1.0.0`과 버전 고정 웹 주소에서 그대로 보존한다.
 
 ## 관리 원칙
 
@@ -53,6 +53,6 @@ npm run test:manuals
 
 생성에는 Node.js와 프로젝트의 pdf-lib/fontkit, `assets/fonts/NanumGothic-Regular.ttf`를 사용한다. 네트워크·DB·실제 사용자 자료가 필요 없다. 버전 검증은 무결성과 구조를 확인하며 실제 운영 승인이나 모든 업무 권한 검수를 대신하지 않는다.
 
-## 초판 검토 근거
+## v1.1.0 검토 근거
 
-각 JSON 문서의 `sources`와 배포 Markdown의 작성 근거에 실제 화면/설계 경로를 기록했다. 특히 PDF 작성과 접수, QR 입실과 출석 확정, 저장과 최종 제출, 입금 신고와 대사, 환불 기록과 실제 송금을 구분했다.
+각 JSON 문서의 `sources`와 배포 Markdown의 작성 근거에 실제 화면/설계 경로를 기록했다. v1.1.0은 `manuals-v1.0.0` 이후 변경을 감사해 수강생 문서 탭, 책임강사 지정, 분리된 계획·결과 목록, 강의날인·QR 출석 증빙, 예산 선확정, PDF·AI 검토 초안, 일정 날짜·시간 분리, 장학금 세부내역, 첨부 1~5, 16:9 사진과 페이지당 8장 출력 기준을 반영했다. 특히 PDF 작성과 접수, QR 입실과 출석 확정, 저장·서명·검토 요청·최종 제출, 원본 근거와 현재 승인 값을 구분한다.
