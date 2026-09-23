@@ -100,12 +100,6 @@ export function CoursePlanView({ plan, filters }: {
       <p className="mt-3 text-slate-600">
         아카데미별 연간 계획의 과정·인력·일정·예산을 확인하세요. 실제 운영은 과정 운영 관리에서 확인합니다.
       </p>
-      <p className="mt-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-950">
-        개별 운영계획서에서 확인한 교내·교외 강사, 교육내용과 개설 전 확인 사항은
-        {" "}<Link className="font-semibold underline" href="/admin/course-plan/opening">2026 개설 준비</Link>에서 확인하세요.
-        이 화면은 기존 현황표 14개 과정의 원문을 유지합니다.
-      </p>
-
       <section aria-label="세부 과정 전체 합산" className="my-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           ["세부 과정", total.count.toLocaleString("ko-KR"), "개"],
