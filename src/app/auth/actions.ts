@@ -107,6 +107,8 @@ export async function register(
 ): Promise<ActionState> {
   if (!publicSignupEnabled()) return { message: PUBLIC_SIGNUP_PENDING };
   if (!authEmailEnabled()) return { message: AUTH_EMAIL_PENDING };
+  const audience = loginAudience(form.get("audience")) ?? "learner";
+  if (audience === "internal" && !isSchoolEmail(String(form.get("email") ?? ""))) return { message: "교내 강사는 학교 이메일(@uc.ac.kr)을 입력해 주세요." };
   const phone = normalizeMobilePhone(form.get("phone"));
   if (!phone) return { message: MOBILE_GUIDANCE };
   const name = String(form.get("name") ?? "").trim();
@@ -135,7 +137,7 @@ export async function register(
       password,
       options: {
         captchaToken: guard.captchaToken,
-        data: { name, mobile_phone: phone, privacy_policy_id: policy.id, privacy_accepted: true },
+        data: { name, mobile_phone: phone, privacy_policy_id: policy.id, privacy_accepted: true, member_audience: audience },
       },
     });
     if (error)

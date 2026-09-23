@@ -5,16 +5,19 @@ export const LOGIN_AUDIENCES = [
   { id: "learner", label: "수강생", description: "간편 로그인 · 회원가입" },
 ] as const;
 export type LoginAudience = typeof LOGIN_AUDIENCES[number]["id"];
-export type OfficePosition = "DIRECTOR" | "CENTER_HEAD" | "RESEARCHER";
+export type OfficePosition = keyof typeof OFFICE_POSITIONS;
 export type LoginContext = {
   audience: LoginAudience;
   office_position: OfficePosition | null;
   instructor_kind: "INTERNAL" | "EXTERNAL" | null;
   roles: string[];
 };
-export const OFFICE_POSITIONS: Record<OfficePosition, string> = {
-  DIRECTOR: "단장", CENTER_HEAD: "센터장", RESEARCHER: "연구원",
-};
+export const OFFICE_POSITIONS = {
+  DIRECTOR: "단장", DIVISION_HEAD: "본부장", CENTER_HEAD: "센터장", OPERATIONS_HEAD: "운영팀장",
+  PRINCIPAL_RESEARCHER: "책임연구원", SENIOR_RESEARCHER: "선임연구원", RESEARCHER: "연구원",
+} as const;
+export const isOfficePosition = (value: string): value is OfficePosition =>
+  Object.hasOwn(OFFICE_POSITIONS, value);
 export function loginAudience(value: unknown): LoginAudience | null {
   return LOGIN_AUDIENCES.find(item => item.id === value)?.id ?? null;
 }

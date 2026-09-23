@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
 import { memberAdmin, memberEntryOperator } from "@/lib/members/data";
+import { isOfficePosition } from "@/lib/auth/login-audience";
 import { memberInput, newMemberInput } from "@/lib/members/model";
 import type { ActionState } from "@/lib/portal/types";
 
@@ -47,7 +48,7 @@ export async function saveAccountClassification(_: ActionState, form: FormData):
   const person = String(form.get("person_id") ?? "");
   const position = String(form.get("office_position") ?? "");
   const kind = String(form.get("instructor_kind") ?? "");
-  if (!UUID.test(person) || !["", "DIRECTOR", "CENTER_HEAD", "RESEARCHER"].includes(position) || !["", "INTERNAL", "EXTERNAL"].includes(kind)) return { message: "계정 구분을 확인해 주세요." };
+  if (!UUID.test(person) || (position !== "" && !isOfficePosition(position)) || !["", "INTERNAL", "EXTERNAL"].includes(kind)) return { message: "계정 구분을 확인해 주세요." };
   const { error } = await (await createServerSupabaseClient()).rpc("life_set_account_classification", { p_person: person, p_position: position || null, p_kind: kind || null });
   if (error) return { message: memberError(error.message) };
   revalidatePath("/", "layout");
