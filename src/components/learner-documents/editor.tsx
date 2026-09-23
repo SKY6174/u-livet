@@ -2,11 +2,20 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
-import { Download, FileCheck2, FileText, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Clock3, Download, FileCheck2, FileText, Send, ShieldCheck, XCircle } from "lucide-react";
 import { PdfPreview } from "@/components/instructor-documents/pdf-preview";
-import { DOCUMENT_TITLES, PURPOSES, REFUND_OCCURRENCES, documentErrors, initialValues, koreaToday,
+import { BANKS, DOCUMENT_TITLES, PURPOSES, REFUND_OCCURRENCES, documentErrors, initialValues, koreaToday, refundAmounts,
   type ConsentChoice, type LearnerDocumentType, type LearnerDocumentValues } from "@/lib/learner-documents/model";
 import type { LearnerPdfAssets } from "@/lib/learner-documents/pdf";
+import {
+  DOCUMENT_KIND_LABELS,
+  DOCUMENT_STATUS_LABELS,
+  DOCUMENT_STATUS_TONES,
+  documentDate,
+  type LearnerDocumentRequest,
+} from "@/lib/learner-document-workflow/types";
+import { cancelLearnerDocument, submitLearnerDocument } from "@/app/mypage/documents/actions";
 import "./editor.css";
 
 const SignaturePad = dynamic(() => import("@/features/instructor-documents/components/advisory/advisory-signature-pad").then(m => m.AdvisorySignaturePad), { ssr: false });
@@ -33,6 +42,16 @@ function Field({ label, error, hint, ...props }: InputHTMLAttributes<HTMLInputEl
     {(error || hint) && <p id={`${props.id}-help`} className={`mt-1.5 text-xs leading-5 ${error ? "text-red-700" : "text-slate-500"}`}>{error || hint}</p>}
   </div>;
 }
+function BankField({ value, error, onChange }: { value: string; error?: string; onChange: (value: string) => void }) {
+  return <div className="min-w-0">
+    <label htmlFor="bank" className="mb-2 block text-sm font-semibold text-slate-700">은행명</label>
+    <select id="bank" name="bank" value={value} onChange={e => onChange(e.target.value)} className="learner-field" aria-invalid={!!error} aria-describedby={error ? "bank-help" : undefined}>
+      <option value="">은행을 선택해 주세요</option>
+      {BANKS.map(bank => <option key={bank} value={bank}>{bank}</option>)}
+    </select>
+    {error && <p id="bank-help" className="mt-1.5 text-xs leading-5 text-red-700">{error}</p>}
+  </div>;
+}
 function Section({ number, title, children }: { number: string; title: string; children: ReactNode }) {
   return <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
     <h2 className="mb-5 flex items-center gap-3 text-lg font-bold"><span className="text-xs font-semibold text-teal-700">{number}</span>{title}</h2>
@@ -54,14 +73,18 @@ function Consent({ id, title, value, onChange, children, error }: {
   </fieldset>;
 }
 
-export function LearnerDocumentEditor({ type: initialType, name, email, courses, initialCourse = "" }: {
-  type: LearnerDocumentType; name: string; email: string; courses: { id: string; name: string }[]; initialCourse?: string;
+type DocumentCourse = { id: string; name: string; offeringId: string | null; tuition: number | null };
+
+export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, initialCourse }: {
+  type: LearnerDocumentType; name: string; email: string; courses: DocumentCourse[];
+  requests: LearnerDocumentRequest[]; initialCourse?: DocumentCourse;
 }) {
+  const router = useRouter();
   const [type, setType] = useState(initialType);
   const [forms, setForms] = useState(() => ({
-    application: initialValues(name, email, initialCourse),
-    scholarship: initialValues(name, email, initialCourse),
-    refund: initialValues(name, email, initialCourse),
+    application: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null),
+    scholarship: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null),
+    refund: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null),
   }));
   const values = forms[type];
   const [rendered, setRendered] = useState<{ type: LearnerDocumentType; values: LearnerDocumentValues; bytes: Uint8Array } | null>(null);
@@ -70,7 +93,11 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
   const [notice, setNotice] = useState("");
   const [retry, setRetry] = useState(0);
   const [showResident, setShowResident] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [cancelling, setCancelling] = useState("");
   const savedValues = useRef(forms);
+  const submittedValues = useRef<Partial<Record<LearnerDocumentType, LearnerDocumentValues>>>({});
+  const requestKeys = useRef<Partial<Record<LearnerDocumentType, string>>>({});
   const activeType = useRef(initialType);
   const signatureJob = useRef(0);
   const application = type === "application";
@@ -81,6 +108,21 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     setForms(old => ({ ...old, [type]: { ...old[type], [key]: value } }));
     setErrors({});
     setNotice("");
+    requestKeys.current[type] = undefined;
+  }
+  function updateCourse(courseName: string) {
+    const course = courses.find(item => item.name === courseName);
+    setForms(old => {
+      const next = { ...old[type], courseName, offeringId: course?.offeringId ?? "" };
+      if (type === "refund") Object.assign(next, refundAmounts(course?.tuition ?? null, next.refundOccurrence));
+      return { ...old, [type]: next };
+    });
+    setErrors({}); setNotice(""); requestKeys.current[type] = undefined;
+  }
+  function updateRefundOccurrence(value: LearnerDocumentValues["refundOccurrence"]) {
+    const course = courses.find(item => item.offeringId === values.offeringId);
+    setForms(old => ({ ...old, refund: { ...old.refund, refundOccurrence: value, ...refundAmounts(course?.tuition ?? null, value) } }));
+    setErrors({}); setNotice(""); requestKeys.current.refund = undefined;
   }
   function selectDocument(nextType: LearnerDocumentType) {
     if (nextType === type) return;
@@ -162,7 +204,38 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     document.body.appendChild(link); link.click(); link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 30000);
     savedValues.current = { ...savedValues.current, [type]: values };
-    setNotice("PDF를 내려받았습니다. 작성한 파일은 담당자가 안내한 방법으로 제출해 주세요.");
+    setNotice("PDF를 내려받았습니다. 신청처리는 별도 버튼으로 접수할 수 있습니다.");
+  }
+  async function submit() {
+    const nextErrors = documentErrors(type, values);
+    setErrors(nextErrors);
+    const first = Object.keys(nextErrors)[0];
+    if (first) {
+      setNotice("표시된 항목을 확인해 주세요.");
+      document.getElementById(first)?.focus();
+      return;
+    }
+    if (pending || previewError || submitting) return;
+    const requestKey = requestKeys.current[type] ?? crypto.randomUUID();
+    requestKeys.current[type] = requestKey;
+    const submitted = values;
+    setSubmitting(true);
+    const result = await submitLearnerDocument({ type, requestKey, values: submitted });
+    setSubmitting(false);
+    if (result.fieldErrors) setErrors(result.fieldErrors);
+    setNotice(result.message);
+    if (!result.ok) return;
+    submittedValues.current[type] = submitted;
+    savedValues.current = { ...savedValues.current, [type]: submitted };
+    router.refresh();
+  }
+  async function cancelRequest(requestId: string) {
+    if (cancelling) return;
+    setCancelling(requestId);
+    const result = await cancelLearnerDocument(requestId);
+    setCancelling("");
+    setNotice(result.message);
+    if (result.ok) router.refresh();
   }
   const input = (key: keyof LearnerDocumentValues) => ({ id: key, name: key, value: typeof values[key] === "string" ? values[key] as string : "", onChange: (e: React.ChangeEvent<HTMLInputElement>) => update(key, e.target.value), error: errors[key] });
   return <div className="learner-document-editor min-h-screen bg-[#f3f6f8]">
@@ -186,11 +259,38 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
         </div>
         <p className="text-sm text-slate-600">같은 창에서 세 서식을 작성하세요. 서식을 전환해도 입력한 내용은 유지됩니다.</p>
       </div>
+      <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="learner-document-history">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div><p className="text-xs font-semibold tracking-wide text-teal-700">MY REQUESTS</p><h2 id="learner-document-history" className="mt-1 text-lg font-bold">내 서류 처리 현황</h2></div>
+          <span className="text-sm text-slate-500">접수 {requests.length}건</span>
+        </div>
+        {requests.length ? <div className="mt-4 grid gap-3 xl:grid-cols-2">{requests.map(request => <details key={request.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <summary className="cursor-pointer list-none">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div><p className="font-semibold text-slate-900">{DOCUMENT_KIND_LABELS[request.kind]}</p><p className="mt-1 text-sm text-slate-600">{request.course_name} · {documentDate(request.submitted_at)}</p></div>
+              <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${DOCUMENT_STATUS_TONES[request.status]}`}>{DOCUMENT_STATUS_LABELS[request.status]}</span>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-slate-700">{request.current_note}</p>
+          </summary>
+          <ol className="mt-4 space-y-3 border-t border-slate-200 pt-4">{request.events.map(event => <li key={event.id} className="flex gap-3 text-sm"><Clock3 className="mt-0.5 shrink-0 text-teal-700" size={16} /><div><p className="font-semibold">{DOCUMENT_STATUS_LABELS[event.to_status]} <span className="font-normal text-slate-500">· {documentDate(event.created_at)}</span></p><p className="mt-1 text-slate-600">{event.note}</p></div></li>)}</ol>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a href={`/api/learner-documents/${request.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700"><Download size={15} />제출 원본</a>
+            {request.status === "RECEIVED" && <button type="button" onClick={() => void cancelRequest(request.id)} disabled={cancelling === request.id} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-rose-700 disabled:opacity-50"><XCircle size={15} />{cancelling === request.id ? "취소 중…" : "접수 취소"}</button>}
+          </div>
+        </details>)}</div> : <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">아직 접수한 서류가 없습니다. 서식을 작성한 뒤 입력완료 또는 신청처리 버튼을 눌러 주세요.</p>}
+      </section>
       <div id="learner-document-fields" role="region" aria-label={`${DOCUMENT_TITLES[type]} 작성`} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <div className="min-w-0 space-y-5">
           <Section number="01" title="과정과 인적사항">
             <div className="space-y-5">
-              <Field {...input("courseName")} label={application ? "신청과정명" : "과정명"} list="learner-courses" maxLength={100} hint="과정 목록에서 선택하거나 과정명을 직접 입력해 주세요." />
+              {refund ? <div>
+                <label htmlFor="courseName" className="mb-2 block text-sm font-semibold text-slate-700">과정명</label>
+                <select id="courseName" name="courseName" value={values.courseName} onChange={e => updateCourse(e.target.value)} className="learner-field" aria-invalid={!!errors.courseName}>
+                  <option value="">수강료가 등록된 과정을 선택해 주세요</option>
+                  {courses.filter(course => course.offeringId).map(course => <option key={course.id} value={course.name}>{course.name}{course.tuition === null ? " · 수강료 미등록" : ` · ${course.tuition.toLocaleString("ko-KR")}원`}</option>)}
+                </select>
+                {errors.courseName && <p className="mt-1.5 text-xs leading-5 text-red-700">{errors.courseName}</p>}
+              </div> : <Field {...input("courseName")} onChange={e => updateCourse(e.target.value)} label={application ? "신청과정명" : "과정명"} list="learner-courses" maxLength={100} hint="과정 목록에서 선택하거나 과정명을 직접 입력해 주세요." />}
               <datalist id="learner-courses">{courses.map(c => <option key={c.id} value={c.name} />)}</datalist>
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field {...input("name")} label="성명" maxLength={30} autoComplete="name" />
@@ -223,7 +323,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
             </div>
           </Section>
           {scholarship && <Section number="02" title="장학금 계좌">
-            <div className="grid gap-5 sm:grid-cols-2"><Field {...input("bank")} label="은행명" maxLength={20} /><Field {...input("accountHolder")} label="예금주" maxLength={30} /></div>
+            <div className="grid gap-5 sm:grid-cols-2"><BankField value={values.bank} error={errors.bank} onChange={value => update("bank", value)} /><Field {...input("accountHolder")} label="예금주" maxLength={30} /></div>
             <div className="mt-5"><Field {...input("account")} label="계좌번호 (본인명의)" maxLength={30} inputMode="numeric" autoComplete="off" hint="은행명과 계좌번호를 정확하게 확인해 주세요." /></div>
           </Section>}
           {refund && <>
@@ -232,19 +332,19 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
               <fieldset id="refundOccurrence" tabIndex={-1} aria-describedby={errors.refundOccurrence ? "refundOccurrence-error" : undefined}>
                 <legend className="mb-3 text-sm font-semibold text-slate-700">발생시점</legend>
                 <div className="grid gap-2 sm:grid-cols-2">{REFUND_OCCURRENCES.map(([value, label]) => <label key={value} className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 text-sm ${values.refundOccurrence === value ? "border-teal-600 bg-teal-50 text-teal-900" : "border-slate-200"}`}>
-                  <input type="radio" name="refundOccurrence" value={value} checked={values.refundOccurrence === value} onChange={() => update("refundOccurrence", value)} />{label}
+                  <input type="radio" name="refundOccurrence" value={value} checked={values.refundOccurrence === value} onChange={() => updateRefundOccurrence(value)} />{label}
                 </label>)}</div>
                 {errors.refundOccurrence && <p id="refundOccurrence-error" className="mt-2 text-xs text-red-700">{errors.refundOccurrence}</p>}
               </fieldset>
               <div className="mt-5 grid gap-5 sm:grid-cols-3">
-                <Field {...input("tuitionFee")} label="수강료 (원)" inputMode="numeric" maxLength={16} placeholder="0" />
-                <Field {...input("deductionAmount")} label="공제금액 (원)" inputMode="numeric" maxLength={16} placeholder="0" />
-                <Field {...input("refundAmount")} label="반환액 (원)" inputMode="numeric" maxLength={16} placeholder="0" />
+                <Field {...input("tuitionFee")} value={values.tuitionFee ? Number(values.tuitionFee).toLocaleString("ko-KR") : ""} label="수강료 (원)" readOnly placeholder="과정 선택 필요" />
+                <Field {...input("deductionAmount")} value={values.deductionAmount ? Number(values.deductionAmount).toLocaleString("ko-KR") : ""} label="공제금액 (원)" readOnly placeholder="자동 계산" />
+                <Field {...input("refundAmount")} value={values.refundAmount ? Number(values.refundAmount).toLocaleString("ko-KR") : values.refundAmount} label="반환액 (원)" readOnly placeholder="자동 계산" />
               </div>
-              <p className="mt-3 text-xs leading-5 text-slate-500">원본의 학습비 반환기준을 확인한 뒤 금액을 입력해 주세요. 금액은 자동 계산되지 않습니다.</p>
+              <p className="mt-3 text-xs leading-5 text-slate-500">과정에 등록된 수강료와 원본 학습비 반환기준으로 자동 계산됩니다. 수강료 정보가 없으면 금액은 비어 있고 신청할 수 없습니다.</p>
             </Section>
             <Section number="03" title="환불 계좌">
-              <div className="grid gap-5 sm:grid-cols-2"><Field {...input("bank")} label="은행명" maxLength={20} /><Field {...input("accountHolder")} label="예금주" maxLength={30} /></div>
+              <div className="grid gap-5 sm:grid-cols-2"><BankField value={values.bank} error={errors.bank} onChange={value => update("bank", value)} /><Field {...input("accountHolder")} label="예금주" maxLength={30} /></div>
               <div className="mt-5"><Field {...input("account")} label="계좌번호 (본인명의)" maxLength={30} inputMode="numeric" autoComplete="off" hint="은행명과 계좌번호를 정확하게 확인해 주세요." /></div>
             </Section>
           </>}
@@ -265,13 +365,16 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
             <div id="signature" tabIndex={-1}><SignaturePad key={type} signatureUrl={values.signature} strokeWidth={4.8} onChange={dataUrl => void setSignature(dataUrl)} /></div>
             {errors.signature && <p className="mt-2 text-sm text-red-700">서명을 작성해 주세요.</p>}
           </Section>
-          <p className="flex items-start gap-2 px-1 text-xs leading-5 text-slate-500"><ShieldCheck className="mt-0.5 shrink-0" size={16} />입력 내용은 서버에 자동 저장되지 않습니다. 창을 닫기 전에 PDF를 내려받아 주세요. PDF 다운로드만으로 서류 접수가 완료되지는 않습니다.</p>
+          <p className="flex items-start gap-2 px-1 text-xs leading-5 text-slate-500"><ShieldCheck className="mt-0.5 shrink-0" size={16} />PDF 다운로드는 개인 보관용입니다. 입력완료 또는 신청처리 버튼을 눌러야 담당자에게 접수되며, 이후 상태와 안내는 위 처리 현황에서 확인할 수 있습니다.</p>
         </div>
         <aside className="min-w-0 lg:sticky lg:top-5" aria-label="PDF 미리보기 및 다운로드">
           <div className="mb-3 flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-bold"><FileText size={18} className="text-teal-700" />PDF 미리보기</h2><span className="text-xs text-slate-500" role="status">{previewError ? "입력 확인 필요" : pending ? "반영 중…" : "최신 내용 반영됨"}</span></div>
           <div className="learner-pdf-preview"><PdfPreview bytes={rendered?.bytes ?? null} errorMessage={previewError} /></div>
           {previewError && <div role="alert" className="mt-3 rounded-xl bg-red-50 p-4 text-sm text-red-800">{previewError}<button type="button" className="ml-2 underline" onClick={() => setRetry(v => v + 1)}>다시 시도</button></div>}
-          <button type="button" onClick={download} disabled={pending || !!previewError} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#123353] px-5 py-3 font-semibold text-white hover:bg-[#1d476d] disabled:cursor-wait disabled:opacity-50"><Download size={18} />작성한 PDF 다운로드</button>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button type="button" onClick={download} disabled={pending || !!previewError} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#123353] bg-white px-5 py-3 font-semibold text-[#123353] hover:bg-slate-50 disabled:cursor-wait disabled:opacity-50"><Download size={18} />PDF 다운로드</button>
+            <button type="button" onClick={() => void submit()} disabled={pending || !!previewError || submitting || submittedValues.current[type] === values} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#123353] px-5 py-3 font-semibold text-white hover:bg-[#1d476d] disabled:cursor-wait disabled:opacity-50"><Send size={18} />{submitting ? "처리 중…" : application ? "입력완료" : "신청처리"}</button>
+          </div>
           <p className="mt-2 text-center text-xs text-slate-500">A4 · 1페이지 · PDF 1.7</p>
           {notice && <p role="status" className="mt-3 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm leading-6 text-teal-900">{notice}</p>}
         </aside>

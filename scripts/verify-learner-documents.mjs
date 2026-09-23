@@ -17,16 +17,17 @@ function load(file) {
     ? load(path.resolve(path.dirname(file), name + ".ts")) : require(name), loadedModule, loadedModule.exports);
   return loadedModule.exports;
 }
-const { initialValues, documentErrors } = load("src/lib/learner-documents/model.ts");
+const { initialValues, documentErrors, refundAmounts } = load("src/lib/learner-documents/model.ts");
 const { renderLearnerDocument } = load("src/lib/learner-documents/pdf.ts");
 const output = "tmp/pdfs/learner-output";
 mkdirSync(output, { recursive: true });
 const signature = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAADElEQVR4nGNgGAUAAADIAAGpfRGwAAAAAElFTkSuQmCC";
 const values = { ...initialValues("가상수강생", "learner@example.invalid", "실버푸드전문가양성과정"),
+  offeringId: "10000000-0000-4000-8000-000000000099",
   phone: "010-0000-0000", gender: "female", birthDate: "1990-02-28", address: "울산광역시 동구 가상로 123, 101동 1001호",
   purposes: ["취업", "재교육", "기타"], privacy: "yes", publicity: "no", portrait: "yes",
   residentFront: "900228", residentBack: "2000000", bank: "가상은행", account: "000-000000-00000", accountHolder: "가상수강생",
-  homePhone: "052-000-0000", refundOccurrence: "before-third", tuitionFee: "1,000,000", deductionAmount: "250000", refundAmount: "750000",
+  homePhone: "052-000-0000", refundOccurrence: "before-third", tuitionFee: "1000000", deductionAmount: "333334", refundAmount: "666666",
   signedOn: "2026-09-22", signature };
 for (const type of ["application", "scholarship", "refund"]) {
   const assets = { template: readFileSync(`public/forms/learner-${type}.pdf`), regular: readFileSync("public/fonts/KoPubDotum-Medium.ttf"), bold: readFileSync("public/fonts/KoPubDotum-Bold.ttf") };
@@ -60,5 +61,11 @@ assert(documentErrors("refund", { ...values, refundOccurrence: "" }).refundOccur
 assert(documentErrors("refund", { ...values, tuitionFee: "10만원" }).tuitionFee);
 assert(documentErrors("refund", { ...values, deductionAmount: "" }).deductionAmount);
 assert(documentErrors("refund", { ...values, refundAmount: "-1" }).refundAmount);
+assert.deepEqual(refundAmounts(300000, "before-start"), { tuitionFee: "300000", deductionAmount: "0", refundAmount: "300000" });
+assert.deepEqual(refundAmounts(300000, "before-sixth"), { tuitionFee: "300000", deductionAmount: "50000", refundAmount: "250000" });
+assert.deepEqual(refundAmounts(300000, "before-third"), { tuitionFee: "300000", deductionAmount: "100000", refundAmount: "200000" });
+assert.deepEqual(refundAmounts(300000, "before-half"), { tuitionFee: "300000", deductionAmount: "150000", refundAmount: "150000" });
+assert.deepEqual(refundAmounts(300000, "after-half"), { tuitionFee: "300000", deductionAmount: "300000", refundAmount: "0" });
+assert.deepEqual(refundAmounts(null, "before-start"), { tuitionFee: "", deductionAmount: "", refundAmount: "" });
 console.log("PASS document-specific date, purpose, resident-number, bank-account, refund occurrence and amount checks");
 console.log(`Synthetic PDFs: ${output}`);

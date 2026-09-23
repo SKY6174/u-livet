@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowUpRight, Award, BookOpen, ChartNoAxesCombined, ClipboardCheck, FileText, Layers3, Ticket, UsersRound, Wallet } from "lucide-react";
+import { ArrowUpRight, Award, BookOpen, ChartNoAxesCombined, ClipboardCheck, Files, FileText, Layers3, Ticket, UsersRound, Wallet } from "lucide-react";
 import { requireIdentity } from "@/lib/auth/session";
 import { hasRole, isOfficeMember, officeSections } from "@/lib/auth/workspace-navigation";
 
@@ -15,6 +15,7 @@ const WORKSPACE_ICONS = {
   "/performance": ChartNoAxesCombined,
   "/admin/accounts": UsersRound,
   "/admin/parking": Ticket,
+  "/admin/learner-documents": Files,
 };
 
 export default async function Admin({ searchParams }: {

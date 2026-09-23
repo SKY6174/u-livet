@@ -68,6 +68,10 @@ export async function renderLearnerDocument(type: LearnerDocumentType, v: Learne
     text(v.name, 258, 691, 88, 16, 12);
   } else {
     const money = (value: string) => value.replace(/[\s,]/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // Remove the source template's redundant shading instruction and the
+    // duplicate application-date cell. The signed date remains at the bottom.
+    page.drawRectangle({ x: 40, y: 842 - 143, width: 260, height: 23, color: rgb(1, 1, 1) });
+    page.drawRectangle({ x: 296.2, y: 842 - 296.4, width: 248.2, height: 24.4, color: rgb(1, 1, 1) });
     text(v.courseName, 129, 145.3, 416, 25.2, 11, true);
     text(v.name, 129, 170.5, 167, 25.3, 10.5);
     text(v.residentFront, 376, 170.5, 78, 25.3, 10.5);
@@ -96,9 +100,6 @@ export async function renderLearnerDocument(type: LearnerDocumentType, v: Learne
     if (type === "application") text(`${year}년     ${Number(month)}월     ${Number(day)}일`, 227, 690.3, 140, 14.7, 11.04);
     else if (type === "scholarship") text(`${year}년       ${Number(month)}월       ${Number(day)}일`, 225, 652.5, 180, 16, 12);
     else {
-      text(year, 395.5, 271.7, 45, 25.3, 10);
-      text(String(Number(month)), 450.5, 271.7, 25, 25.3, 10);
-      text(String(Number(day)), 485.5, 271.7, 30, 25.3, 10);
       text(`${year}년     ${Number(month)}월     ${Number(day)}일`, 220, 456, 150, 25, 12);
     }
   }

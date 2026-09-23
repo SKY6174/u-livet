@@ -6,15 +6,23 @@ export const DOCUMENT_TITLES = {
 export type LearnerDocumentType = keyof typeof DOCUMENT_TITLES;
 export type ConsentChoice = "" | "yes" | "no";
 export const PURPOSES = ["취업", "창업", "재교육", "자기계발", "기타"] as const;
+export const BANKS = [
+  "KB국민은행", "신한은행", "우리은행", "하나은행", "NH농협은행", "지역농축협",
+  "IBK기업은행", "KDB산업은행", "SC제일은행", "수협은행", "한국씨티은행",
+  "iM뱅크", "BNK부산은행", "광주은행", "제주은행", "전북은행", "BNK경남은행",
+  "케이뱅크", "카카오뱅크", "토스뱅크", "우체국", "새마을금고", "신협",
+  "저축은행", "산림조합",
+] as const;
 export const REFUND_OCCURRENCES = [
-  ["before-start", "수업 전"],
-  ["before-sixth", "수업일 1/6 전"],
-  ["before-third", "수업일 1/3 전"],
-  ["before-half", "수업일 1/2 전"],
-  ["after-half", "수업일 1/2 후 (반환하지 않음)"],
+  ["before-start", "수업 시작 전"],
+  ["before-sixth", "수업 시작 ~ 총 수업시간 1/6 전"],
+  ["before-third", "총 수업시간 1/6 이상 ~ 1/3 미만"],
+  ["before-half", "총 수업시간 1/3 이상 ~ 1/2 미만"],
+  ["after-half", "총 수업시간 1/2 이상 (반환 없음)"],
 ] as const;
 export type RefundOccurrence = "" | typeof REFUND_OCCURRENCES[number][0];
 export type LearnerDocumentValues = {
+  offeringId: string;
   courseName: string;
   name: string;
   phone: string;
@@ -42,12 +50,21 @@ export type LearnerDocumentValues = {
 export function koreaToday() {
   return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 }
-export function initialValues(name = "", email = "", courseName = ""): LearnerDocumentValues {
-  return { courseName, name, phone: "", gender: "", birthDate: "", email,
+export function initialValues(name = "", email = "", courseName = "", offeringId = "", tuition: number | null = null): LearnerDocumentValues {
+  const tuitionFee = tuition === null ? "" : String(tuition);
+  return { offeringId, courseName, name, phone: "", gender: "", birthDate: "", email,
     address: "", purposes: [], privacy: "", publicity: "", portrait: "",
     residentFront: "", residentBack: "", bank: "", account: "", accountHolder: name,
-    homePhone: "", refundOccurrence: "", tuitionFee: "", deductionAmount: "", refundAmount: "",
+    homePhone: "", refundOccurrence: "", tuitionFee, deductionAmount: "", refundAmount: "",
     signedOn: koreaToday(), signature: "" };
+}
+export function refundAmounts(tuition: number | null, occurrence: RefundOccurrence) {
+  if (tuition === null || !occurrence) return { tuitionFee: tuition === null ? "" : String(tuition), deductionAmount: "", refundAmount: "" };
+  const refund = occurrence === "before-start" ? tuition
+    : occurrence === "before-sixth" ? Math.floor(tuition * 5 / 6)
+      : occurrence === "before-third" ? Math.floor(tuition * 2 / 3)
+        : occurrence === "before-half" ? Math.floor(tuition / 2) : 0;
+  return { tuitionFee: String(tuition), deductionAmount: String(tuition - refund), refundAmount: String(refund) };
 }
 export function isDocumentType(value: string): value is LearnerDocumentType {
   return value === "application" || value === "scholarship" || value === "refund";
@@ -83,6 +100,7 @@ export function documentErrors(type: LearnerDocumentType, v: LearnerDocumentValu
     }
     if (!/^[\d -]{8,30}$/.test(v.account) || v.account.replace(/\D/g, "").length < 8) errors.account = "계좌번호를 확인해 주세요. 숫자와 하이픈으로 입력합니다.";
     if (type === "refund") {
+      if (!v.offeringId || !v.tuitionFee) errors.courseName = "수강료가 등록된 과정을 선택해 주세요.";
       if (v.homePhone && (!/^[\d -]{7,15}$/.test(v.homePhone) || v.homePhone.replace(/\D/g, "").length < 7)) errors.homePhone = "자택전화 번호를 확인해 주세요.";
       for (const field of ["tuitionFee", "deductionAmount", "refundAmount"] as const) {
         const amount = v[field].replace(/[\s,]/g, "");

@@ -23,7 +23,7 @@ export type CourseGuideSummary = Omit<CourseGuide,
 >;
 export type CatalogCourse = Pick<CourseGuide,
   "id" | "name" | "academy" | "summary" | "mode" | "capacity" | "period_label" | "certificate"
-> & { teaching_hours: number | null; href: string };
+> & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null };
 export type CatalogSearch = { q?: string | string[]; mode?: string | string[]; view?: string | string[] };
 export function catalogFilters(params: CatalogSearch) {
   const q = (typeof params.q === "string" ? params.q : "").trim().slice(0, 100);
@@ -38,11 +38,15 @@ export function catalogHref(filters: ReturnType<typeof catalogFilters>, view: "c
 }
 export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSummary[]): CatalogCourse[] {
   const linked = new Set(guides.map((guide) => guide.offering_id).filter(Boolean));
+  const offeringById = new Map(offerings.map((offering) => [offering.id, offering]));
   return [
-    ...guides.map((guide) => ({ ...guide, href: `/courses/${guide.id}` })),
+    ...guides.map((guide) => {
+      const offering = guide.offering_id ? offeringById.get(guide.offering_id) : null;
+      return { ...guide, offeringId: guide.offering_id, tuition: offering?.tuition ?? null, href: `/courses/${guide.id}` };
+    }),
     ...offerings.filter((offering) => !linked.has(offering.id)).map((offering) => ({
       ...offering, period_label: `${offering.starts_on} ~ ${offering.ends_on}`,
-      certificate: null, teaching_hours: null, href: `/offerings/${offering.id}`,
+      certificate: null, teaching_hours: null, offeringId: offering.id, href: `/offerings/${offering.id}`,
     })),
   ];
 }
