@@ -6,6 +6,7 @@ import { PageIntro, Empty } from "@/components/portal/ui";
 import { MemberNotice } from "@/components/portal/member-notice";
 import { getMembers, memberAdmin } from "@/lib/members/data";
 import { MEMBER_GROUPS, memberGroup, memberPage, displayPhone, type MemberGroup } from "@/lib/members/model";
+import { MemberExcel } from "@/components/members/member-excel";
 
 export default async function Members({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const me = await memberAdmin();
@@ -36,6 +37,7 @@ export default async function Members({ searchParams }: { searchParams: Promise<
     </nav>
       {!!me.member_entry_orgs?.length && <Link className="btn-primary ml-auto min-h-12 shrink-0 gap-2" href={`/admin/accounts/new?group=${group}`}><Plus aria-hidden="true" className="h-4 w-4" />구성원 수동 등록</Link>}
     </div>
+    <MemberExcel key={group} group={group} query={query} orgs={me.member_entry_orgs ?? []} canEdit={me.roles.some(role => role.role === "SYSTEM_ADMIN")} />
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2"><UsersRound aria-hidden="true" className="h-5 w-5 text-teal-700" /><h2 className="font-bold">{MEMBER_GROUPS[group]} 목록</h2><span className="text-sm text-slate-500">{data ? `${data.total}명` : ""}</span></div>
