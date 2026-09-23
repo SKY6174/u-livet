@@ -123,6 +123,21 @@ const Header = load('src/components/common/Header.tsx', { ...common, react: { ..
   'next/image': ({ priority, ...props }) => React.createElement('img', props),
   '@/lib/auth/roleContext': { useRole: () => me }, '@/app/auth/actions': { signOut: '/sign-out' },
 }).default;
+await test('desktop and mobile office menus group links by visible workflow category', () => {
+  for (const roles of [['COURSE_MANAGER', 'FINANCE'], ['FINANCE'], ['CERTIFIER']]) {
+    me = member(...roles);
+    const sections = nav.officeSections(me);
+    const output = renderToStaticMarkup(React.createElement(Header));
+    for (const surface of ['desktop', 'mobile']) {
+      const cards = output.match(new RegExp(`<section\\b[^>]*aria-labelledby="${surface}-office-category-\\d+"[^>]*>[\\s\\S]*?<\\/section>`, 'g')) ?? [];
+      assert.equal(cards.length, sections.length, `${surface}: ${roles.join(',')}`);
+      sections.forEach(({ title, links }, index) => {
+        assert(cards[index].includes(`>${title}</h3>`), `${surface}: ${title}`);
+        for (const link of links) assert(cards[index].includes(`href="${link.href}"`), `${surface}: ${title} / ${link.label}`);
+      });
+    }
+  }
+});
 await test('desktop and expanded mobile header share exactly the same authorized links', () => {
   for (const [roles] of roleCases) {
     me = member(...roles);
