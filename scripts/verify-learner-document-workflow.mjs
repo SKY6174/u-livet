@@ -60,6 +60,12 @@ const args = { k: "REFUND", f: offering, request_key: requestKey, course_name: "
 const request = ok(await learner.client.rpc("life_submit_learner_document", args));
 assert.equal(ok(await learner.client.rpc("life_submit_learner_document", args)), request, "idempotent retry must return same id");
 deny(await learner.client.rpc("life_submit_learner_document", { ...args, request_key: crypto.randomUUID(), amount: 249999 }), "REFUND_AMOUNT_MISMATCH");
+assert.equal(sql("select to_regclass('public.life_learner_documents_queue_kind')"), "life_learner_documents_queue_kind");
+assert.equal(sql("select to_regclass('public.life_learner_documents_course_search')"), "life_learner_documents_course_search");
+assert.equal(sql("select to_regclass('public.life_learner_documents_applicant_search')"), "life_learner_documents_applicant_search");
+const adminFunction = sql("select pg_get_functiondef('life_private.admin_learner_documents(text,text,text)'::regprocedure)");
+assert.match(adminFunction, /authorized_orgs as materialized/i);
+assert.match(adminFunction, /limit 500/i);
 
 const mine = ok(await learner.client.rpc("life_my_learner_documents"));
 assert.equal(mine.length, 1);
@@ -86,6 +92,8 @@ row = dashboard.requests.find(item => item.id === request);
 assert.equal(row.status, "COMPLETED");
 assert.equal(row.revision, 4);
 assert.equal(row.events.length, 4);
+dashboard = ok(await manager.client.rpc("life_admin_learner_documents", { k: "REFUND", s: "COMPLETED", q: "환불" }));
+assert.equal(dashboard.requests.find(item => item.id === request)?.id, request, "combined queue filters must preserve the request");
 
 const cancelId = ok(await learner.client.rpc("life_submit_learner_document", { ...args, k: "APPLICATION", f: null,
   request_key: crypto.randomUUID(), course_name: "직접 입력 과정", occurrence: null, amount: null }));
@@ -103,4 +111,4 @@ for (const [label, actor] of [["learner", learner], ["manager", manager]]) {
 }
 writeFileSync("tmp/learner-document-workflow/fixture.json", JSON.stringify({ request, pendingId, offering }), { mode: 0o600 });
 
-console.log("PASS idempotent submission, refund calculation, tenant isolation, immutable PDF, status history, optimistic locking and table isolation");
+console.log("PASS idempotent submission, refund calculation, tenant isolation, immutable PDF, optimized queue filters, status history, optimistic locking and table isolation");

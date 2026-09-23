@@ -37,6 +37,27 @@ export async function renderLearnerDocument(type: LearnerDocumentType, v: Learne
     page.drawLine({ start: point(x, top + size * .45), end: point(x + size * .35, top + size), thickness: 1.25 });
     page.drawLine({ start: point(x + size * .35, top + size), end: point(x + size, top - 1), thickness: 1.25 });
   }
+  function leftText(value: string, x: number, top: number, height: number, size = 8.6) {
+    const metric = metrics[0];
+    const run = metric.layout(value);
+    if (run.glyphs.some(g => g.id === 0)) throw new Error("PDF에서 지원하지 않는 문자가 있습니다.");
+    const visible = run.glyphs.filter(g => g.bbox.maxY > g.bbox.minY);
+    const low = Math.min(...visible.map(g => g.bbox.minY)) * size / metric.unitsPerEm;
+    const high = Math.max(...visible.map(g => g.bbox.maxY)) * size / metric.unitsPerEm;
+    page.drawText(value, { x, y: 842 - top - height / 2 - (high + low) / 2, size, font: regular, color: rgb(0, 0, 0) });
+  }
+  function boxedChoice(x: number, label: string, selected: boolean) {
+    const top = 330.7;
+    const size = 7;
+    const point = (px: number, py: number) => ({ x: px, y: 842 - py });
+    page.drawRectangle({ x, y: 842 - top - size, width: size, height: size,
+      borderWidth: .65, borderColor: rgb(0, 0, 0) });
+    if (selected) {
+      page.drawLine({ start: point(x + 1.2, top + size * .55), end: point(x + size * .42, top + size - 1.2), thickness: 1.05 });
+      page.drawLine({ start: point(x + size * .42, top + size - 1.2), end: point(x + size - 1, top + 1.1), thickness: 1.05 });
+    }
+    leftText(label, x + size + 3, 326.5, 15.6);
+  }
   function consent(value: string, yes: number, no: number, top: number, size = 7) {
     if (value) check(value === "yes" ? yes : no, top, size);
   }
@@ -82,14 +103,17 @@ export async function renderLearnerDocument(type: LearnerDocumentType, v: Learne
     text(v.bank, 129, 297, 115.7, 25.3, 9.5);
     text(v.account, 296.2, 297, 123.1, 25.3, 9.5);
     text(v.accountHolder, 458.2, 297, 86.8, 25.3, 9.5);
-    const occurrenceChecks = {
-      "before-start": 153,
-      "before-sixth": 189,
-      "before-third": 258.5,
-      "before-half": 327,
-      "after-half": 395.5,
-    } as const;
-    if (v.refundOccurrence) check(occurrenceChecks[v.refundOccurrence], 329, 6.5);
+    // The source PDF uses zero-advance square glyphs, so each label touches its
+    // square. Redraw this one row with a fixed gap and a contained check mark.
+    page.drawRectangle({ x: 148, y: 842 - 343.5, width: 377, height: 18, color: rgb(1, 1, 1) });
+    const occurrenceChoices = [
+      ["before-start", 153, "수업전"],
+      ["before-sixth", 189, "수업일 1/6(전)"],
+      ["before-third", 258.5, "수업일 1/3(전)"],
+      ["before-half", 327, "수업일 1/2(전)"],
+      ["after-half", 395.5, "수업일 1/2(후): 반환하지 않음"],
+    ] as const;
+    occurrenceChoices.forEach(([value, x, label]) => boxedChoice(x, label, v.refundOccurrence === value));
     text(money(v.tuitionFee), 233, 347.6, 84, 25.2, 10);
     text(money(v.deductionAmount), 441, 347.6, 84, 25.2, 10);
     text(money(v.refundAmount), 184, 372.8, 135, 25.3, 10.5);
