@@ -22,6 +22,7 @@ const registration = load('src/lib/auth/registration.ts', {});
 const audiences = load('src/lib/auth/login-audience.ts', {});
 const navigation = load('src/lib/auth/workspace-navigation.ts', { './login-audience': audiences });
 const Link = ({ children, ...props }) => React.createElement('a', props, children);
+const menuHint = load('src/components/navigation/menu-hint.tsx', { 'react/jsx-runtime': jsx });
 let currentIdentity = null;
 let security = null;
 let learnerReads = 0;
@@ -62,11 +63,13 @@ const Home = load('src/app/page.tsx', {
   '@/lib/learner-document-workflow/data': { getAdminLearnerDocuments: async () => { requestReads++; return requestContext; } },
   '@/lib/learner-document-workflow/types': { DOCUMENT_KIND_LABELS: { APPLICATION: '수강신청원서', SCHOLARSHIP: '장학금 지급신청서', REFUND: '수강료환불신청서' } },
   '@/components/portal/ui': { Empty: ({ title }) => React.createElement('p', null, title) },
+  '@/components/navigation/menu-hint': menuHint,
 }).default;
 const Login = load('src/app/auth/login/page.tsx', {
   'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'next/navigation': { redirect },
   '@/lib/auth/session': session, '@/lib/auth/registration': registration,
   '@/lib/auth/login-audience': audiences, '@/components/auth/auth-form': { AuthForm: () => React.createElement('form') },
+  '@/components/navigation/menu-hint': menuHint,
 }).default;
 let checks = 0;
 const pass = name => { checks++; console.log('PASS ' + name); };
@@ -103,6 +106,8 @@ for (const [roles, expected, hidden] of [
   for (const item of hidden) assert.ok(!html.includes(item), `unexpected ${item}`);
   if (kind === 'office') {
     assert.ok(html.includes('사업단 운영 현황'));
+    assert.ok(!html.includes('담당 권한에 맞는 요청과 관리 업무를 확인하세요.'));
+    assert.ok(html.includes('role="tooltip"'));
     assert.ok(!html.includes('다른 과정 추천'));
     assert.equal(learnerReads, beforeLearnerReads, 'office home should not query learner data');
     if (navigation.hasRole(currentIdentity, 'SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE')) {

@@ -16,6 +16,7 @@ import { LearnerHeroSummary, LearnerHome } from "@/components/student-learning/h
 import { getAdminLearnerDocuments } from "@/lib/learner-document-workflow/data";
 import { DOCUMENT_KIND_LABELS } from "@/lib/learner-document-workflow/types";
 import { Empty } from "@/components/portal/ui";
+import { MenuHint } from "@/components/navigation/menu-hint";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 const REQUEST_KINDS = ["APPLICATION", "SCHOLARSHIP", "REFUND"] as const;
 const OPEN_REQUEST_STATUSES = new Set(["RECEIVED", "REVIEWING", "APPROVED"]);
@@ -92,12 +93,9 @@ export default async function Home() {
             <div className="self-center space-y-3">
               {shortcuts.map(({ href, title, description, icon: Icon }) => (
                 <Link key={title} href={href}
-                  className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-200">
+                  className="group relative flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 hover:z-10 hover:bg-white/15 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-200">
                   <Icon className="h-7 w-7 shrink-0 text-teal-200" aria-hidden="true" />
-                  <div>
-                    <strong className="block text-lg">{title}</strong>
-                    <span className="text-sm text-slate-200">{description}</span>
-                  </div>
+                  <strong className="text-lg"><MenuHint label={title} description={description} /></strong>
                   <span className="ml-auto" aria-hidden="true">→</span>
                 </Link>
               ))}
@@ -111,7 +109,6 @@ export default async function Home() {
             <div>
               <p className="eyebrow">OFFICE WORKSPACE</p>
               <h2 className="text-3xl font-bold">사업단 운영 현황</h2>
-              <p className="mt-2 text-sm text-slate-600">담당 권한에 맞는 요청과 관리 업무를 확인하세요.</p>
             </div>
             <Link href="/admin" className="text-sm font-semibold text-teal-800">업무 홈 전체 보기 →</Link>
           </div>
@@ -149,11 +146,8 @@ export default async function Home() {
                   <ul className="divide-y divide-slate-100">
                     {section.links.map((link) => (
                       <li key={link.href}>
-                        <Link href={link.href} className="flex items-start justify-between gap-3 py-3 text-sm hover:text-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700">
-                          <span>
-                            <strong className="block">{link.label}</strong>
-                            <span className="mt-1 block leading-5 text-slate-600">{link.description}</span>
-                          </span>
+                        <Link href={link.href} className="group relative flex items-start justify-between gap-3 py-3 text-sm hover:z-10 hover:text-teal-800 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700">
+                          <strong><MenuHint label={link.label} description={link.description} /></strong>
                           <ArrowUpRight aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
                         </Link>
                       </li>

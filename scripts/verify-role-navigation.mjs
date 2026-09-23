@@ -17,6 +17,7 @@ let checks = 0;
 async function test(name, run) { await run(); checks++; console.log('PASS ' + name); }
 const audience = load('src/lib/auth/login-audience.ts');
 const nav = load('src/lib/auth/workspace-navigation.ts', { './login-audience': audience });
+const menuHint = load('src/components/navigation/menu-hint.tsx');
 const member = (...roles) => ({ id: 'self', name: '검증 회원', email: 'synthetic@example.invalid', roles: roles.map(role => ({ role, org_id: 'own-org' })) });
 let me = member();
 let path = '/admin';
@@ -29,6 +30,7 @@ const common = {
   '@/lib/auth/workspace-navigation': nav,
   '@/lib/learner-document-workflow/data': { getAdminLearnerDocuments: async () => { learnerRequestReads++; return { organizations: [], requests: [] }; } },
   '@/components/admin/learner-request-alerts': { LearnerRequestAlerts: () => React.createElement('section', null, '실시간 수강생 요청') },
+  '@/components/navigation/menu-hint': menuHint,
 };
 // This .mjs uses React.createElement so it needs no JSX runtime in Node.
 common['@/components/portal/ui'] = {
@@ -150,6 +152,7 @@ await test('office hub rejects guests/learners/teachers and permits each actual 
     me = member(...roles);
     const readsBefore = learnerRequestReads;
     const output = renderToStaticMarkup(await Admin({ searchParams: Promise.resolve({}) }));
+    assert(output.includes('role="tooltip"'));
     for (const href of expected) assert(output.includes(`href="${href}"`), href + kind);
     assert.equal(output.includes('실시간 수강생 요청'), roles.some(role => ['SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE'].includes(role)));
     assert.equal(learnerRequestReads - readsBefore, roles.some(role => ['SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE'].includes(role)) ? 1 : 0);
