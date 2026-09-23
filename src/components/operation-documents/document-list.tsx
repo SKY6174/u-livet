@@ -12,7 +12,10 @@ import { hasRole } from "@/lib/auth/workspace-navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getCourseWorkspaces } from "@/lib/course-workspace/data";
 import { STATUS_LABELS, RESULT_STATUS_LABELS } from "@/lib/operation-documents/model";
-import { PREFILLED_COURSES } from "@/lib/operation-documents/prefilled-data";
+import {
+  PREFILLED_COURSES,
+  findPrefilledCourse,
+} from "@/lib/operation-documents/prefilled-data";
 import { ReportList } from "@/components/course-workspace/report-list";
 import { Empty, PageIntro } from "@/components/portal/ui";
 import { DocumentListView, type DocumentCourseItem } from "./document-list-view";
@@ -59,56 +62,95 @@ export async function DocumentList({
       const response = await client.rpc("life_operation_list");
       if (!response.error && Array.isArray(response.data)) {
         dbCourses = response.data as DbCourseRow[];
+      } else {
+        dbError = true;
       }
     } catch {
-      // 로컬 네트워크 격리 환경 등에서는 사전 채움 16개 과정 데이터로 안전하게 대체
-      dbError = false;
+      dbError = true;
     }
   }
 
   const legacy = evidence ? await getCourseWorkspaces() : null;
   const label = result ? "결과보고서" : "운영계획서";
 
-  // 3. 2026년 RISE사업 16개 전체 과정과 DB 실데이터 통합 매핑
-  //    DB에 존재하는 과정은 실제 ID와 상태값을 사용하고,
-  //    DB에 아직 등록되지 않은 과정은 사전 채움(PREFILLED_COURSES) 데이터를 유지하여
-  //    항상 16개 과정 전체가 누락 없이 대시보드에 표시되도록 보장합니다.
-  const mergedCourses: DocumentCourseItem[] = PREFILLED_COURSES.map((prefilled, idx) => {
-    // 과정명 또는 ID로 DB 항목 검색
-    const matchedDb = dbCourses.find(
-      (db) => db.name === prefilled.title || db.id === prefilled.id,
+  // 3. 관리자는 16개 원문 이관 현황을 모두 보고, 책임강사는 DB에서
+  //    접근이 허용된 실제 과정만 봅니다. 작성 링크와 상태는 DB 행에만 부여합니다.
+  const mergedCourses: DocumentCourseItem[] = PREFILLED_COURSES.flatMap(
+    (prefilled, idx) => {
+      const matchedDb = dbCourses.find(
+        (db) =>
+          db.name === prefilled.title ||
+          findPrefilledCourse(db.name)?.id === prefilled.id,
+      );
+      if (!manager && !matchedDb) return [];
+
+      return [
+        {
+          id: matchedDb ? matchedDb.id : prefilled.id,
+          registered: Boolean(matchedDb),
+          sort_order: idx + 1,
+          program_id: prefilled.programId,
+          name: prefilled.title,
+          academy: prefilled.academy,
+          capacity: prefilled.capacity,
+          teaching_hours: prefilled.teachingHours,
+          starts_on: matchedDb?.starts_on || prefilled.startsOn,
+          ends_on: matchedDb?.ends_on || prefilled.endsOn,
+          period_label: `${matchedDb?.starts_on || prefilled.startsOn} ~ ${matchedDb?.ends_on || prefilled.endsOn}`,
+          time_label: prefilled.timeLabel,
+          location: prefilled.location,
+          teachers: prefilled.teachers,
+          responsible: matchedDb?.responsible || "",
+          source_coordinator: prefilled.facultyCoordinator,
+          assistants: prefilled.assistants,
+          support_staff: prefilled.supportStaff,
+          plan_status: matchedDb?.plan_status ?? null,
+          result_status: matchedDb?.result_status ?? null,
+          enrolled_completed: prefilled.hasResultReport
+            ? "원문 확인 필요"
+            : "미집계",
+          has_source_report: prefilled.hasResultReport,
+        },
+      ];
+    },
+  );
+
+  // 원문 16개 목록에 없는 실제 DB 과정도 책임강사의 작업 목록에서 누락하지 않습니다.
+  // 관리자 화면은 2026년 원문 이관 대상 16개 과정에 집중하고, 책임강사 화면에서는
+  // Supabase가 허용한 모든 실제 과정이 최종 권한 기준입니다.
+  if (!manager) {
+    const matchedDbIds = new Set(
+      mergedCourses.filter((course) => course.registered).map((course) => course.id),
     );
+    const unmatchedDbCourses = dbCourses.filter((course) => !matchedDbIds.has(course.id));
 
-    // 모집 / 수료 실적 표기 (결과보고서 보유 과정은 정원 기준 기본 실적 제공)
-    const enrolledCompleted = prefilled.hasResultReport
-      ? `${prefilled.capacity} / ${prefilled.capacity}명`
-      : "미등록";
-
-    return {
-      id: matchedDb ? matchedDb.id : prefilled.id,
-      sort_order: idx + 1,
-      program_id: prefilled.programId,
-      name: prefilled.title,
-      academy: prefilled.academy,
-      capacity: prefilled.capacity,
-      teaching_hours: prefilled.teachingHours,
-      starts_on: matchedDb?.starts_on || prefilled.startsOn,
-      ends_on: matchedDb?.ends_on || prefilled.endsOn,
-      period_label: `${matchedDb?.starts_on || prefilled.startsOn} ~ ${matchedDb?.ends_on || prefilled.endsOn}`,
-      time_label: prefilled.timeLabel,
-      location: prefilled.location,
-      teachers: prefilled.teachers,
-      responsible: matchedDb?.responsible || prefilled.facultyCoordinator || "미지정",
-      assistants: prefilled.assistants,
-      support_staff: prefilled.supportStaff,
-      plan_status: matchedDb?.plan_status || prefilled.planStatus || "DRAFT",
-      result_status:
-        matchedDb?.result_status ||
-        (prefilled.hasResultReport ? "SUBMITTED" : prefilled.resultStatus || "DRAFT"),
-      enrolled_completed: enrolledCompleted,
-      has_result_report: prefilled.hasResultReport,
-    };
-  });
+    unmatchedDbCourses.forEach((course, index) => {
+      mergedCourses.push({
+        id: course.id,
+        registered: true,
+        sort_order: PREFILLED_COURSES.length + index + 1,
+        program_id: "DB",
+        name: course.name,
+        academy: "등록 과정",
+        capacity: null,
+        teaching_hours: null,
+        starts_on: course.starts_on,
+        ends_on: course.ends_on,
+        period_label: `${course.starts_on} ~ ${course.ends_on}`,
+        time_label: "운영정보 확인",
+        location: "운영정보 확인",
+        teachers: course.responsible || "강사 미지정",
+        responsible: course.responsible || "",
+        source_coordinator: "",
+        assistants: "-",
+        support_staff: "-",
+        plan_status: course.plan_status,
+        result_status: course.result_status,
+        enrolled_completed: "미집계",
+        has_source_report: false,
+      });
+    });
+  }
 
   return (
     <div className="page-shell space-y-8">
@@ -187,11 +229,16 @@ export async function DocumentList({
           </div>
 
           {/* 카드형 / 리스트형 인터랙티브 뷰 컴포넌트 */}
-          <DocumentListView
-            kind={kind}
-            courses={mergedCourses}
-            manager={manager}
-          />
+          {dbError ? (
+            <Empty title="문서 현황을 불러오지 못했습니다">
+              추가 인증 상태와 네트워크 연결을 확인한 뒤 다시 시도해 주세요.
+            </Empty>
+          ) : (
+            <DocumentListView
+              kind={kind}
+              courses={mergedCourses}
+            />
+          )}
         </section>
       )}
 

@@ -16,8 +16,10 @@ import { STATUS_LABELS, RESULT_STATUS_LABELS } from "@/lib/operation-documents/m
  * 과정 문서 목록에서 표현할 각 과정의 표준 데이터 타입
  */
 export type DocumentCourseItem = {
-  /** 과정 고유 ID (DB UUID 또는 사전 채움 ID) */
+  /** 과정 고유 ID (DB UUID 또는 원문 이관 식별자) */
   id: string;
+  /** 실제 Supabase offering 등록 여부 */
+  registered: boolean;
   /** 정렬 순번 (1 ~ 16) */
   sort_order: number;
   /** 사업 프로그램 ID (예: C1-POPUP-01, C1-SMART-01) */
@@ -27,9 +29,9 @@ export type DocumentCourseItem = {
   /** 소속 아카데미 구분 (스마트테크, 라이프케어, 로컬창업, 팝업) */
   academy: string;
   /** 모집 정원 (명) */
-  capacity: number;
+  capacity: number | null;
   /** 총 교육 시수 (시간) */
-  teaching_hours: number;
+  teaching_hours: number | null;
   /** 교육 시작일 (YYYY-MM-DD) */
   starts_on: string;
   /** 교육 종료일 (YYYY-MM-DD) */
@@ -44,18 +46,20 @@ export type DocumentCourseItem = {
   teachers: string;
   /** 책임강사 성명 */
   responsible: string;
+  /** 원문 계획서에 기재된 담당 교수 */
+  source_coordinator: string;
   /** 보조강사 명단 */
   assistants: string;
   /** 전담 보조인력 성명 */
   support_staff: string;
   /** 운영계획서 진행 상태 (DRAFT | REVIEW | SUBMITTED) */
-  plan_status: keyof typeof STATUS_LABELS;
+  plan_status: keyof typeof STATUS_LABELS | null;
   /** 결과보고서 진행 상태 (DRAFT | REVIEW | SUBMITTED) */
-  result_status: keyof typeof RESULT_STATUS_LABELS;
+  result_status: keyof typeof RESULT_STATUS_LABELS | null;
   /** 모집 및 수료 인원 실적 표시 (예: "14 / 14명" 또는 "미등록") */
   enrolled_completed: string;
-  /** 결과보고서 및 증빙 사진 보유 여부 */
-  has_result_report: boolean;
+  /** 결과보고서 원문 보유 여부. DB 제출 상태와는 별개입니다. */
+  has_source_report: boolean;
 };
 
 interface DocumentListViewProps {
@@ -63,18 +67,16 @@ interface DocumentListViewProps {
   kind: "plan" | "result";
   /** 표시할 16개 과정 데이터 목록 */
   courses: DocumentCourseItem[];
-  /** 관리자 권한 여부 */
-  manager: boolean;
 }
 
-export function DocumentListView({ kind, courses, manager }: DocumentListViewProps) {
+export function DocumentListView({ kind, courses }: DocumentListViewProps) {
   // 보기 모드 상태: 'cards' (카드형), 'list' (리스트형 테이블)
   const [view, setView] = useState<"cards" | "list">("cards");
   // 검색어 상태 (프로그램 ID, 과정명, 강사명 등)
   const [query, setQuery] = useState("");
   // 아카데미 필터 상태 (전체 또는 특정 아카데미)
   const [academy, setAcademy] = useState("");
-  // 문서 진행 상태 필터 ('all', 'DRAFT', 'REVIEW', 'SUBMITTED')
+  // 문서 진행 상태 필터 ('all', 'DRAFT', 'REVIEW', 'SUBMITTED', 'PENDING')
   const [statusFilter, setStatusFilter] = useState("all");
 
   const isResult = kind === "result";
@@ -82,7 +84,9 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
 
   // 상태 배지 한글 명칭 반환 함수
   const getStatusLabel = (item: DocumentCourseItem) => {
+    if (!item.registered) return "DB 이관 대기";
     const statusKey = isResult ? item.result_status : item.plan_status;
+    if (!statusKey) return "작성 시작";
     if (isResult) {
       return RESULT_STATUS_LABELS[statusKey] || "작성 시작";
     }
@@ -91,6 +95,8 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
 
   // 상태 배지 스타일 클래스 반환 함수
   const getStatusBadgeClass = (item: DocumentCourseItem) => {
+    if (!item.registered)
+      return "bg-slate-100 text-slate-500 border-slate-300";
     const statusKey = isResult ? item.result_status : item.plan_status;
     switch (statusKey) {
       case "SUBMITTED":
@@ -117,11 +123,13 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
       isResult ? c.result_status === "REVIEW" : c.plan_status === "REVIEW",
     ).length;
     const drafting = courses.filter((c) => {
+      if (!c.registered) return false;
       const st = isResult ? c.result_status : c.plan_status;
       return !st || st === "DRAFT";
     }).length;
+    const pending = courses.filter((c) => !c.registered).length;
 
-    return { total, submitted, reviewing, drafting };
+    return { total, submitted, reviewing, drafting, pending };
   }, [courses, isResult]);
 
   // 검색어 및 필터 조건에 맞게 실시간 필터링
@@ -134,13 +142,15 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
       // 2. 상태 필터
       const st = isResult ? c.result_status : c.plan_status;
       if (statusFilter !== "all") {
+        if (statusFilter === "PENDING") return !c.registered;
+        if (!c.registered) return false;
         if (statusFilter === "DRAFT" && st && st !== "DRAFT") return false;
         if (statusFilter !== "DRAFT" && st !== statusFilter) return false;
       }
 
       // 3. 검색어 필터
       if (!q) return true;
-      const combined = `${c.program_id} ${c.name} ${c.teachers} ${c.responsible} ${c.assistants} ${c.support_staff} ${c.location}`
+      const combined = `${c.program_id} ${c.name} ${c.teachers} ${c.responsible} ${c.source_coordinator} ${c.assistants} ${c.support_staff} ${c.location}`
         .toLowerCase()
         .replace(/\s/g, "");
       return combined.includes(q);
@@ -150,7 +160,7 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
   return (
     <div className="space-y-6">
       {/* 1. 상단 운영 지표 통계 카드 (전체, 제출완료, 검토중, 작성준비) */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-semibold text-slate-500">2026 전체 과정</p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">
@@ -170,9 +180,15 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold text-slate-500">작성 시작 / 준비</p>
+          <p className="text-xs font-semibold text-slate-500">작성 시작 / 초안</p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-slate-700">
             {stats.drafting}개
+          </p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold text-slate-500">DB 이관 대기</p>
+          <p className="mt-2 text-2xl font-bold tabular-nums text-slate-700">
+            {stats.pending}개
           </p>
         </div>
       </div>
@@ -221,6 +237,7 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
             <option value="DRAFT">작성 시작 / 준비</option>
             <option value="REVIEW">담당자 검토 중</option>
             <option value="SUBMITTED">최종 제출 완료</option>
+            <option value="PENDING">DB 이관 대기</option>
           </select>
         </label>
 
@@ -297,6 +314,11 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
                 <p className="mt-4 text-xs font-semibold tracking-wide text-slate-400">
                   {c.program_id}
                 </p>
+                {isResult && c.has_source_report && (
+                  <p className="mt-1 text-xs font-semibold text-teal-700">
+                    원문 결과보고서 보유 · DB 제출 상태와 별도
+                  </p>
+                )}
                 <h3 className="mt-1 text-lg font-bold leading-snug text-slate-900">
                   {c.name}
                 </h3>
@@ -314,11 +336,17 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
                 <dl className="my-4 grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3 text-sm">
                   <div>
                     <dt className="text-xs text-slate-500">모집 정원</dt>
-                    <dd className="mt-1 font-bold text-slate-800">{c.capacity}명</dd>
+                    <dd className="mt-1 font-bold text-slate-800">
+                      {c.capacity === null ? "확인 필요" : `${c.capacity}명`}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-xs text-slate-500">교육 시수</dt>
-                    <dd className="mt-1 font-bold text-slate-800">{c.teaching_hours}시간</dd>
+                    <dd className="mt-1 font-bold text-slate-800">
+                      {c.teaching_hours === null
+                        ? "확인 필요"
+                        : `${c.teaching_hours}시간`}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-xs text-slate-500">모집 / 수료</dt>
@@ -337,6 +365,11 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
                     <dd className="text-sm font-bold text-teal-900">
                       {c.responsible || "미지정"}
                     </dd>
+                    {!c.registered && c.source_coordinator && (
+                      <dd className="text-slate-500">
+                        원문 담당 교수: {c.source_coordinator}
+                      </dd>
+                    )}
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-400">보조강사 / 보조인력</dt>
@@ -348,13 +381,21 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
 
                 {/* 문서 작성 및 검토 액션 버튼 */}
                 <div className="mt-auto border-t border-slate-100 pt-4">
-                  <Link
-                    className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/60 p-3 text-sm font-semibold text-teal-900 transition hover:border-teal-400 hover:bg-teal-100/80"
-                    href={`/operation-documents/${c.id}/${kind}`}
-                  >
-                    <span>{label} 작성·검토 →</span>
-                    <span className="text-xs font-bold text-teal-800">{statusText}</span>
-                  </Link>
+                  {c.registered ? (
+                    <Link
+                      className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/60 p-3 text-sm font-semibold text-teal-900 transition hover:border-teal-400 hover:bg-teal-100/80"
+                      href={`/operation-documents/${c.id}/${kind}`}
+                    >
+                      <span>{label} 작성·검토 →</span>
+                      <span className="text-xs font-bold text-teal-800">
+                        {statusText}
+                      </span>
+                    </Link>
+                  ) : (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+                      과정·책임강사를 DB에 등록한 뒤 작성할 수 있습니다.
+                    </div>
+                  )}
                 </div>
               </article>
             );
@@ -420,7 +461,10 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
 
                     {/* 정원 / 시수 */}
                     <td className="whitespace-nowrap p-4 font-medium text-slate-700">
-                      {c.capacity}명 / {c.teaching_hours}시간
+                      {c.capacity === null ? "정원 확인 필요" : `${c.capacity}명`} /{" "}
+                      {c.teaching_hours === null
+                        ? "시수 확인 필요"
+                        : `${c.teaching_hours}시간`}
                     </td>
 
                     {/* 모집 / 수료 */}
@@ -435,6 +479,11 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
                       <strong className="text-sm text-teal-950">
                         책임강사: {c.responsible || "미지정"}
                       </strong>
+                      {!c.registered && c.source_coordinator && (
+                        <span className="block text-slate-500">
+                          원문 담당 교수: {c.source_coordinator}
+                        </span>
+                      )}
                     </td>
 
                     {/* 보조강사 / 보조인력 */}
@@ -461,12 +510,18 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
                         <span className={`inline-block w-fit rounded border px-2 py-0.5 text-xs ${badgeClass}`}>
                           {statusText}
                         </span>
-                        <Link
-                          className="inline-flex items-center gap-1 text-sm font-semibold text-teal-800 hover:text-teal-950 hover:underline"
-                          href={`/operation-documents/${c.id}/${kind}`}
-                        >
-                          {label} 작성·검토 →
-                        </Link>
+                        {c.registered ? (
+                          <Link
+                            className="inline-flex items-center gap-1 text-sm font-semibold text-teal-800 hover:text-teal-950 hover:underline"
+                            href={`/operation-documents/${c.id}/${kind}`}
+                          >
+                            {label} 작성·검토 →
+                          </Link>
+                        ) : (
+                          <span className="text-xs text-slate-500">
+                            과정·책임강사 등록 후 작성 가능
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>

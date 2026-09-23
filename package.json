@@ -22,6 +22,7 @@
     "test:db-latency": "node scripts/verify-db-latency-followup.mjs",
     "test:db-response:local": "node scripts/verify-db-response-local.mjs",
     "test:workspace-queries": "node scripts/verify-workspace-queries.mjs",
+    "test:operation-prefill": "node scripts/verify-prefilled-operation-documents.mjs",
     "test:auth-load": "node scripts/check-auth-load.mjs",
     "build:vercel": "node scripts/build-vercel.mjs",
     "check:release": "node -- scripts/check-release-readiness.mjs",

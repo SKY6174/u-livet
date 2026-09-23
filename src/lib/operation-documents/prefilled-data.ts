@@ -4,8 +4,6 @@
  *              docs/의 운영계획서 MD(16건), 결과보고서 MD(7건) 및 70장의 사진 메타데이터를 통합하여 제공합니다.
  */
 
-import type { Content, Budget, DocumentContext, CourseInfo } from "./model";
-
 export type PrefilledCourse = {
   sourceId: string;
   id: string;
@@ -35,7 +33,7 @@ export type PrefilledCourse = {
   matchingPlanFile?: string;
 };
 
-export const PREFILLED_COURSES: PrefilledCourse[] = [
+const RAW_PREFILLED_COURSES: PrefilledCourse[] = [
   {
     "sourceId": "P01",
     "id": "2026-popup-01",
@@ -1285,7 +1283,7 @@ export const PREFILLED_COURSES: PrefilledCourse[] = [
     "supportStaff": "미정",
     "scheduleRows": [
       {
-        "date": "2025-08-05",
+        "date": "2026-08-05",
         "topic": "사료 영양표준·반려동물 핫도그",
         "instructor": "최수경",
         "hours": "5",
@@ -1296,7 +1294,7 @@ export const PREFILLED_COURSES: PrefilledCourse[] = [
         "holiday": ""
       },
       {
-        "date": "2025-08-07",
+        "date": "2026-08-07",
         "topic": "식재료 소독·손질, 보틀케이크·연어머핀",
         "instructor": "최수경",
         "hours": "5",
@@ -1307,7 +1305,7 @@ export const PREFILLED_COURSES: PrefilledCourse[] = [
         "holiday": ""
       },
       {
-        "date": "2025-08-12",
+        "date": "2026-08-12",
         "topic": "건조간식 식재료·4종 실습",
         "instructor": "최수경",
         "hours": "5",
@@ -1318,7 +1316,7 @@ export const PREFILLED_COURSES: PrefilledCourse[] = [
         "holiday": ""
       },
       {
-        "date": "2025-08-14",
+        "date": "2026-08-14",
         "topic": "오리채소푸딩·함박스테이크·채소고구마타르트",
         "instructor": "최수경",
         "hours": "5",
@@ -1329,7 +1327,7 @@ export const PREFILLED_COURSES: PrefilledCourse[] = [
         "holiday": ""
       },
       {
-        "date": "2025-08-19",
+        "date": "2026-08-19",
         "topic": "반려동물 생리학·피자·치킨세트",
         "instructor": "최수경",
         "hours": "5",
@@ -1340,7 +1338,7 @@ export const PREFILLED_COURSES: PrefilledCourse[] = [
         "holiday": ""
       },
       {
-        "date": "2025-08-21",
+        "date": "2026-08-21",
         "topic": "치킨스쿱쿠키·꼬꼬링쿠키·영양관리",
         "instructor": "최수경",
         "hours": "5",
@@ -3111,78 +3109,38 @@ export const PREFILLED_COURSES: PrefilledCourse[] = [
 ];
 
 /**
+ * 원문 추출 행을 현재 운영문서 스키마에 맞춘다.
+ *
+ * Antigravity 추출본에는 날짜와 교육시간만 있고 시작·종료시간 열이 없었다.
+ * 빈 시간은 저장 가능한 초안 값으로 유지하며, 책임강사가 원문을 확인해
+ * 입력하기 전에는 최종 제출 검증을 통과하지 않는다.
+ */
+export const PREFILLED_COURSES: PrefilledCourse[] = RAW_PREFILLED_COURSES.map(
+  (course) => ({
+    ...course,
+    scheduleRows: course.scheduleRows.map((row) => ({
+      ...row,
+      startTime: row.startTime ?? "",
+      endTime: row.endTime ?? "",
+    })),
+  }),
+);
+
+/**
  * 과정 ID 또는 소스 ID(P01~P16) 또는 과정명으로 사전 채움 과정 정보 조회
  */
 export function findPrefilledCourse(identifier: string): PrefilledCourse | undefined {
   if (!identifier) return undefined;
   const norm = identifier.trim().toLowerCase();
-  const cleanNorm = norm.replace(/[^\w가-힣]/g, "");
+  const clean = (value: string) =>
+    value.toLowerCase().replace(/[^\w가-힣]/g, "").replace(/자격증/g, "");
+  const cleanNorm = clean(norm);
   return PREFILLED_COURSES.find(
     (c) =>
       c.id.toLowerCase() === norm ||
       c.sourceId.toLowerCase() === norm ||
       c.programId.toLowerCase() === norm ||
-      c.title.toLowerCase().replace(/[^\w가-힣]/g, "").includes(cleanNorm) ||
-      cleanNorm.includes(c.title.toLowerCase().replace(/[^\w가-힣]/g, ""))
+      clean(c.title).includes(cleanNorm) ||
+      cleanNorm.includes(clean(c.title)),
   );
-}
-
-/**
- * 16개 전체 과정에 대해 기본 Content 및 Budget을 구성해주는 헬퍼 함수
- */
-export function createPrefilledPlan(course: PrefilledCourse): { content: Content; budget: Budget } {
-  return {
-    content: {
-      fields: {
-        title: course.title,
-        year: "2026",
-        academy: course.academy,
-        program: course.title,
-        professor: course.facultyCoordinator,
-        documentDate: "2026-03-30",
-        startsOn: course.startsOn,
-        endsOn: course.endsOn,
-        audience: "성인학습자 및 지역주민",
-        content: course.summary,
-        method: "집합 교육 (이론 30% 및 실무 실습 70% 진행)",
-        effects: "지역 산업 및 사회 수요 맞춤형 전문 인력 양성 및 취·창업 경쟁력 강화",
-        capacity: String(course.capacity),
-        purposes: "자격증 취득 및 취·창업",
-        partner: "울산 동구 관내 협약기관",
-        partnerField: "평생직업교육 협력",
-        partnerDevelopment: "지역 수요 맞춤형 커리큘럼 공동 개발",
-        partnerEmployment: "수료생 취·창업 연계 및 취업 알선 지원",
-        partnerInternship: "현장 실무 인턴십 프로그램 연계",
-        partnerService: "지역사회 봉사 및 재능기부 활동",
-        partnerFollowUp: "수료 후 동아리 활동 및 사후 멘토링 지속",
-        qualificationNote: "직무 관련 자격증 취득 과정 연계",
-        issuerInfo: "관련 전문 협회 및 공인 인증 기관",
-        refundPolicy: "학습비 반환 기준 준수",
-        staffNote: "주강사 및 보조강사 실습 지원 체계 구축"
-      },
-      tables: {
-        recruitment: [
-          { category: "일반인", count: String(Math.round(course.capacity * 0.7)), ratio: "70" },
-          { category: "재직자", count: String(Math.round(course.capacity * 0.3)), ratio: "30" }
-        ],
-        national: [],
-        private: [
-          { name: course.title, kind: "등록민간자격", registration: "2026-0001", issuer: "한국직업능력연구원 등록기관", cost: "50,000" }
-        ],
-        schedule: course.scheduleRows,
-        instructors: course.instructorRows,
-        assistants: course.assistants !== "미기재" ? [{ affiliation: "교외", position: "보조강사", name: course.assistants.split("(")[0], hours: String(course.teachingHours), note: "실습 보조" }] : [],
-        support: course.supportStaff !== "미기재" ? [{ department: "사업단", studentId: "2026001", name: course.supportStaff, hours: String(course.teachingHours), note: "행정 지원" }] : []
-      },
-      photos: [],
-      signature: ""
-    },
-    budget: {
-      rows: course.budgetRows,
-      scholarshipCount: String(Math.round(course.capacity * 0.8)),
-      scholarshipAmount: String(Math.round(course.capacity * 0.8 * 80000)),
-      scholarshipNote: "출석률 80% 이상 수료생 대상 장학금 지급",
-      scholarships: []
-    }
-  };
 }
