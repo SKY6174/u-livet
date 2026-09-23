@@ -1,4 +1,4 @@
-import type { OfficePosition } from "@/lib/auth/login-audience";
+import { isOfficePosition, isSchoolEmail, type OfficePosition } from "@/lib/auth/login-audience";
 import { normalizeMobilePhone } from "@/lib/auth/registration";
 
 export const MEMBER_GROUPS = { office: "사업단", instructor: "강사", learner: "수강생" } as const;
@@ -10,7 +10,7 @@ export type Member = {
   id: string; name: string; email: string | null; office_position: OfficePosition | null;
   instructor_kind: "INTERNAL" | "EXTERNAL" | null; office_phone: string | null;
   mobile_phone: string | null; instructor_phone: string | null; birth_date: string | null;
-  is_manual?: boolean; can_manage?: boolean; current_courses?: { id: string; name: string }[];
+  is_manual?: boolean; account_verified?: boolean; can_manage?: boolean; current_courses?: { id: string; name: string }[];
   notes: string; revision: number; is_office: boolean; is_instructor: boolean; is_learner: boolean;
 };
 export type MemberDirectory = { current_year?: number; items: Member[]; total: number; page: number; page_size: number; counts: Record<MemberGroup, number> };
@@ -43,7 +43,7 @@ export function memberInput(form: FormData) {
   if (!["office", "instructor", "learner"].includes(group) || !name || name.length > 100 || notes.length > 2000 || !/^(0|[1-9]\d{0,8})$/.test(revision)) return null;
   if ((office && (office.length > 30 || !normalizeContact(office))) || (instructor && (instructor.length > 30 || !normalizeContact(instructor))) || (mobile && !normalizeMobilePhone(mobile))) return null;
   if (birth && (!/^\d{4}-\d{2}-\d{2}$/.test(birth) || !Number.isFinite(Date.parse(birth)) || new Date(birth).toISOString().slice(0, 10) !== birth || birth < "1900-01-01" || birth > new Date().toISOString().slice(0, 10))) return null;
-  if (group === "office" && !["", "DIRECTOR", "CENTER_HEAD", "RESEARCHER"].includes(get("office_position"))) return null;
+  if (group === "office" && get("office_position") && !isOfficePosition(get("office_position"))) return null;
   if (group === "instructor" && !["INTERNAL", "EXTERNAL"].includes(get("instructor_kind"))) return null;
   return { p_person: get("person_id"), p_group: group, p_name: name, p_position: get("office_position") || null,
     p_kind: get("instructor_kind") || null, p_office_phone: office ? normalizeContact(office) : null,
@@ -58,6 +58,7 @@ export function newMemberInput(form: FormData) {
   const parsed = memberInput(copy);
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   if (!parsed || email.length > 254 || !/^[^@\s]+@[^@\s.]+(?:\.[^@\s.]+)+$/.test(email)) return null;
+  if (parsed.p_group === "instructor" && parsed.p_kind === "INTERNAL" && !isSchoolEmail(email)) return null;
   return { p_request: String(form.get("request_id") ?? ""), p_org: String(form.get("org_id") ?? ""),
     p_group: parsed.p_group, p_name: parsed.p_name, p_email: email, p_position: parsed.p_position,
     p_kind: parsed.p_kind, p_office_phone: parsed.p_office_phone, p_mobile_phone: parsed.p_mobile_phone,

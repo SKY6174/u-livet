@@ -1,12 +1,12 @@
 import type { Identity } from "@/lib/portal/types";
 import { OFFICE_POSITIONS } from "./login-audience";
 
-type Member = Pick<Identity, "roles" | "office_position" | "instructor_kind" | "member_entry_orgs" | "is_super_admin">;
+type Member = Pick<Identity, "roles" | "member_group" | "office_position" | "instructor_kind" | "member_entry_orgs" | "is_super_admin">;
 export type WorkspaceLink = { label: string; href: string; description: string };
 const OFFICE_ROLES = ["SYSTEM_ADMIN", "COURSE_MANAGER", "CERTIFIER", "FINANCE", "PERFORMANCE"];
 export const hasRole = (member: Member, ...roles: string[]) =>
   member.roles.some((entry) => roles.includes(entry.role));
-export const isOfficeMember = (member: Member) => hasRole(member, ...OFFICE_ROLES) || !!member.member_entry_orgs?.length;
+export const isOfficeMember = (member: Member) => member.member_group === "office" || hasRole(member, ...OFFICE_ROLES) || !!member.member_entry_orgs?.length;
 export const workspaceKind = (member: Member) =>
   isOfficeMember(member) ? "office" : hasRole(member, "INSTRUCTOR") ? "instructor" : "learner";
 

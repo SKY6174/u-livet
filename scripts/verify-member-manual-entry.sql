@@ -2,7 +2,7 @@
 \set ON_ERROR_STOP on
 begin;
 do $$begin
-  if current_database() <> 'life_members_test_20260921' then
+  if current_database() not in ('life_members_test_20260921','life_member_auth_test_20260923') then
     raise exception 'Use the isolated local life_members_test_20260921 database only';
   end if;
 end$$;
@@ -72,7 +72,7 @@ select pg_temp.check_result(jsonb_array_length(public.life_member_directory('lea
 select pg_temp.check_result((public.life_member_history(md5('member-test-3')::uuid,'learner')->>'total')::int=5,'history retains all years and withdrawn records');
 select pg_temp.check_result(pg_temp.register_member(1)=pg_temp.register_member(1),'retry idempotency returns same member');
 select pg_temp.register_member(2,'office');
-select pg_temp.register_member(3,'instructor');
+select pg_temp.register_member(3,'instructor','manual3@uc.ac.kr');
 select pg_temp.check_result((public.life_member_directory('learner','manual1@')->>'total')::int=1,'created learner persists and is searchable');
 select pg_temp.check_result(public.life_member_directory('learner','manual1@')->'items'->0->>'mobile_phone'='+821012345678','manual profile persisted');
 select pg_temp.check_result(public.life_member_directory('office','manual2@')->'items'->0->>'office_position'='RESEARCHER','office classification saved');
@@ -119,4 +119,7 @@ set local role anon;
 select pg_temp.expect_error($cmd$select pg_temp.register_member(8)$cmd$,'permission denied');
 reset role;
 select pg_temp.check_result(not has_table_privilege('authenticated','life_private.member_entry_operators','select') and not has_table_privilege('authenticated','life_private.manual_members','select'),'private tables inaccessible directly');
+\if :{?member_auth_extension}
+\ir verify-member-auth-link.sql
+\endif
 rollback;

@@ -13,8 +13,9 @@ const load = (file, mocks = {}) => {
 };
 let checks = 0;
 const test = async (name, run) => { await run(); checks++; console.log('PASS ' + name); };
+const audienceValidation = load('src/lib/auth/login-audience.ts');
 const registration = load('src/lib/auth/registration.ts');
-const model = load('src/lib/members/model.ts', { '@/lib/auth/registration': registration });
+const model = load('src/lib/members/model.ts', { '@/lib/auth/login-audience': audienceValidation, '@/lib/auth/registration': registration });
 const form = overrides => { const f = new FormData(); for (const [key, value] of Object.entries({ person_id: '20000000-0000-4000-8000-000000000001', group: 'learner', name: '검증 회원', revision: '0', mobile_phone: '010-1234-5678', birth_date: '1990-03-01', notes: '', ...overrides })) f.set(key, value); return f; };
 await test('valid learner input normalizes mobile and preserves date', () => {
   const input = model.memberInput(form()); assert.equal(input.p_mobile_phone, '+821012345678'); assert.equal(input.p_birth_date, '1990-03-01');
@@ -30,7 +31,7 @@ await test('query parameters cannot inject member group or pagination', () => {
 });
 let allowed = true, rpcCalls = [], rpcError = null;
 const mocks = {
-  'next/cache': { revalidatePath() {} }, 'next/navigation': { redirect(url) { throw Error('REDIRECT ' + url); } },
+  '@/lib/auth/login-audience': audienceValidation, 'next/cache': { revalidatePath() {} }, 'next/navigation': { redirect(url) { throw Error('REDIRECT ' + url); } },
   '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async (name, args) => { rpcCalls.push({ name, args }); return { error: rpcError }; } }) },
   '@/lib/portal/data': { UUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i },
   '@/lib/auth/mfa-message': { MFA_REAUTH_MESSAGE: '추가 인증 필요' }, '@/lib/members/model': model,

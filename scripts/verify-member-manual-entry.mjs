@@ -14,8 +14,9 @@ const load = (file, mocks = {}) => {
 let checks = 0;
 const test = async (name, run) => { await run(); checks++; console.log('PASS ' + name); };
 const id = '20000000-0000-4000-8000-000000000001';
+const audienceValidation = load('src/lib/auth/login-audience.ts');
 const registration = load('src/lib/auth/registration.ts');
-const model = load('src/lib/members/model.ts', { '@/lib/auth/registration': registration });
+const model = load('src/lib/members/model.ts', { '@/lib/auth/login-audience': audienceValidation, '@/lib/auth/registration': registration });
 const audience = load('src/lib/auth/login-audience.ts');
 const form = extra => { const f = new FormData(); Object.entries({request_id:id,org_id:id,group:'learner',name:'수동 회원',email:' NEW@EXAMPLE.INVALID ',notes:'',...extra}).forEach(([k,v])=>f.set(k,v)); return f; };
 await test('manual input normalizes email without requiring existing person or revision',()=> {const input=model.newMemberInput(form());assert.equal(input.p_email,'new@example.invalid');assert.equal(input.p_person,undefined);assert.equal(input.p_revision,undefined);});
@@ -25,7 +26,7 @@ let calls=0, rpcError=null, rpcData=id;
 const next={notFound(){throw Error('NOT_FOUND');},redirect(url){throw Error('REDIRECT '+url);}};
 const client={rpc:async()=>{calls++;return {data:rpcData,error:rpcError};}};
 const data=load('src/lib/members/data.ts',{'server-only':{},'next/navigation':next,'@/lib/auth/session':{requireIdentity:async()=>me},'@/lib/supabase/server':{createServerSupabaseClient:async()=>client}});
-const actions=load('src/app/admin/accounts/actions.ts',{'next/cache':{revalidatePath(){}},'next/navigation':next,'@/lib/members/data':data,'@/lib/members/model':model,'@/lib/supabase/server':{createServerSupabaseClient:async()=>client},'@/lib/portal/data':{UUID:/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i},'@/lib/auth/mfa-message':{MFA_REAUTH_MESSAGE:'추가 인증 필요'}});
+const actions=load('src/app/admin/accounts/actions.ts',{'@/lib/auth/login-audience': audienceValidation, 'next/cache':{revalidatePath(){}},'next/navigation':next,'@/lib/members/data':data,'@/lib/members/model':model,'@/lib/supabase/server':{createServerSupabaseClient:async()=>client},'@/lib/portal/data':{UUID:/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i},'@/lib/auth/mfa-message':{MFA_REAUTH_MESSAGE:'추가 인증 필요'}});
 await test('ordinary SYSTEM_ADMIN cannot create through server action',async()=>{await assert.rejects(actions.createMember({},form()),/NOT_FOUND/);assert.equal(calls,0);});
 me={...me,roles:[],member_entry_orgs:[{org_id:id,org_name:'검증 사업단',is_super_admin:false}]};
 await test('designated operator can read but cannot gain existing edit/delete permission',async()=>{assert.equal((await data.memberAdmin()).id,id);await assert.rejects(data.memberAdmin(true),/NOT_FOUND/);});
@@ -43,4 +44,43 @@ const page=load('src/app/admin/accounts/page.tsx',{...ui,'@/lib/members/data':{m
 await test('current course column precedes full history and operator cannot see edit/delete',async()=>{const html=renderToStaticMarkup(await page({searchParams:Promise.resolve({group:'learner'})}));assert(html.indexOf('올해 수강과목')<html.indexOf('수강이력'));assert(html.includes('올해 실제 과정'));assert(html.includes('구성원 수동 등록'));assert(!html.includes('aria-label="수동 회원 수정"'));assert(html.includes('수동 등록</span>'));});
 me={id,name:'일반 관리자',roles:[{role:'SYSTEM_ADMIN',org_id:id}]};
 await test('manual registration button hidden for unlisted administrator',async()=>{const html=renderToStaticMarkup(await page({searchParams:Promise.resolve({group:'learner'})}));assert(!html.includes('구성원 수동 등록'));await assert.rejects(newPage({searchParams:Promise.resolve({})}),/NOT_FOUND/);});
+
+await test('all seven positions survive create and edit parsing', () => {
+  assert.deepEqual(Object.values(audience.OFFICE_POSITIONS), ['단장','본부장','센터장','운영팀장','책임연구원','선임연구원','연구원']);
+  for (const position of Object.keys(audience.OFFICE_POSITIONS)) {
+    assert.equal(model.newMemberInput(form({group:'office',office_position:position})).p_position, position);
+    assert.equal(model.memberInput(form({group:'office',office_position:position,revision:'0'})).p_position, position);
+  }
+  assert.equal(model.newMemberInput(form({group:'office',office_position:'SYSTEM_ADMIN'})), null);
+  assert.equal(model.newMemberInput(form({group:'office',office_position:'toString'})), null);
+});
+await test('manual internal instructor requires the school address', () => {
+  assert.equal(model.newMemberInput(form({group:'instructor',instructor_kind:'INTERNAL'})), null);
+  assert.equal(model.newMemberInput(form({group:'instructor',instructor_kind:'INTERNAL',email:' Teacher@UC.AC.KR '})).p_email, 'teacher@uc.ac.kr');
+});
+await test('verified manual office classification does not grant staff modules', () => {
+  const office = {roles:[],member_group:'office',office_position:'DIVISION_HEAD'};
+  assert.equal(navigation.memberLabel(office),'관리자 · 본부장');
+  assert.deepEqual(navigation.officeSections(office).flatMap(s=>s.links),[]);
+});
+const authUi = load('src/components/auth/auth-form.tsx', {
+  ...ui, '@/components/common/support-contact': {SupportContact:()=>null}, '@/app/auth/actions': {},
+  './password-field': {PasswordField:()=>null}, './phone-field': {PhoneField:()=>null},
+  './social-login': {SocialLogin:()=>React.createElement('div',null,'SOCIAL_LOGIN')},
+  '@/lib/auth/social-providers': {socialProviderOptions:()=>[]},
+  '@/lib/auth/bot-config': {getBotProtection:()=>undefined},
+  '@/lib/deployment/review-mode': {isReviewOnly:()=>false},
+  '@/lib/auth/email-config': {authEmailEnabled:()=>true},
+  '@/lib/auth/signup-config': {publicSignupEnabled:()=>true},
+});
+for (const audience of ['office','internal']) await test(audience+' offers activation using native email and explicit consent', () => {
+  const login=renderToStaticMarkup(React.createElement(authUi.AuthForm,{audience}));
+  assert(login.includes('href="/auth/signup?audience='+audience+'"'));
+  assert(login.includes('등록된 구성원 계정 활성화'));
+  assert(!login.includes('SOCIAL_LOGIN'));
+  const signup=renderToStaticMarkup(React.createElement(authUi.AuthForm,{audience,signup:true,policy:{id,title:'검증 동의',version:'1',body:'검증'}}));
+  assert(signup.includes('계정 활성화 신청'));
+  assert(signup.includes('name="privacy_accepted"'));
+  assert(signup.includes('name="audience" value="'+audience+'"'));
+});
 console.log(`${checks} manual member checks passed.`);

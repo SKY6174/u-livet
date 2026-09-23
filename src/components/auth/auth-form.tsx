@@ -68,7 +68,7 @@ export function AuthForm({
   const emailForm = (
       <ActionForm
         action={signup ? register : authenticate}
-        label={signup ? "가입 신청" : "로그인"}
+        label={signup ? (audience === "office" || audience === "internal" ? "계정 활성화 신청" : "가입 신청") : "로그인"}
         disabled={reviewOnly}
         botProtection={reviewOnly ? undefined : getBotProtection()}
       >
@@ -143,21 +143,21 @@ export function AuthForm({
             강사·관리자 권한은 사업단의 확인 후 부여됩니다.
           </p>
         )}
-        {(signup || audience === "learner" || audience === "external") && <Link
+        <Link
           className="flex min-h-11 items-center text-base underline"
-          href={signup ? "/auth/login" : "/auth/signup"}
+          href={signup ? `/auth/login?audience=${audience}` : `/auth/signup?audience=${audience}`}
         >
-          {signup ? "로그인으로 이동" : "처음이신가요? 회원가입"}
-        </Link>}
+          {signup ? "로그인으로 이동" : audience === "office" || audience === "internal" ? "등록된 구성원 계정 활성화" : "처음이신가요? 회원가입"}
+        </Link>
       </ActionForm>
   );
   return (
     <div className="[&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
       {showSocialLogin && <SocialLogin next={next} audience={audience} options={socialProviderOptions()}
         emailForm={collapsibleEmail ? emailForm : undefined} />}
-      {audience === "internal" && <div className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">
+      {!signup && audience === "internal" && <div className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">
         <p className="font-semibold">학교 이메일(@uc.ac.kr)로 이용해 주세요.</p>
-        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LIFE 전용 비밀번호가 필요합니다. 처음 이용하시면 사업단의 교내 강사 등록·초대 후, 이메일의 안내에 따라 비밀번호를 설정해 주세요.</p>
+        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LIFE 전용 비밀번호가 필요합니다. 사업단에 수동 등록된 분은 아래 ‘등록된 구성원 계정 활성화’에서 학교 이메일 인증과 비밀번호 설정을 완료해 주세요. 초대받은 분은 초대 이메일의 안내를 이용해 주세요.</p>
         <Link href="/auth/forgot-password" className="mt-3 flex min-h-11 items-center font-semibold underline">초대받은 계정의 비밀번호 설정·재설정</Link>
         <SupportContact className="mt-2" />
       </div>}
