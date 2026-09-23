@@ -31,9 +31,6 @@ export function officeSections(member: Member) {
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
       ] : []),
-      ...(manager ? [
-        { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
-      ] : []),
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "운영계획서", href: "/operation-documents/plan", description: "책임강사 작성, 담당자 예산 검토와 최종 제출" },
       ] : []),
@@ -56,6 +53,9 @@ export function officeSections(member: Member) {
       ...(hasRole(member, "COURSE_MANAGER", "PERFORMANCE") ? [{ label: "연차 평가·성과", href: "/performance", description: "사업연도별 운영 통계와 성과 보고를 관리합니다." }] : []),
     ] },
     { title: "계정·권한", links: [
+      ...(manager ? [
+        { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
+      ] : []),
       ...((hasRole(member, "SYSTEM_ADMIN") || !!member.member_entry_orgs?.length) ? [{ label: "구성원 관리", href: "/admin/accounts", description: "사업단·강사·수강생의 정보와 활동 이력을 관리합니다." }] : []),
     ] },
   ].filter((section) => section.links.length);

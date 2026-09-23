@@ -46,7 +46,7 @@ const LearnerRequestAlerts = load('src/components/admin/learner-request-alerts.t
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
   [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/admin/instructors', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance', '/admin/instructors'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/admin/learner-documents', '/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
@@ -75,15 +75,16 @@ await test('combined roles preserve independent workspaces without duplicate lin
   assert(primary.includes('/admin') && primary.includes('/instructor'));
   const hrefs = nav.officeSections(mixed).flatMap(section => section.links.map(link => link.href));
   assert.equal(new Set(hrefs).size, hrefs.length);
+  assert.deepEqual(hrefs.slice(-2), ['/admin/instructors', '/admin/accounts']);
 });
 await test('office navigation follows the operational workflow', () => {
   const sections = nav.officeSections(member('COURSE_MANAGER', 'FINANCE'));
-  assert.deepEqual(sections.map(section => section.title), ['기획·개설', '접수·운영', '마감·수료', '정산·성과']);
+  assert.deepEqual(sections.map(section => section.title), ['기획·개설', '접수·운영', '마감·수료', '정산·성과', '계정·권한']);
   assert.deepEqual(sections.flatMap(section => section.links.map(link => link.href)), [
-    '/admin/development', '/admin/courses', '/admin/instructors', '/operation-documents/plan',
+    '/admin/development', '/admin/courses', '/operation-documents/plan',
     '/admin/learner-documents', '/admin/parking',
     '/operation-documents/result', '/completion', '/credentials',
-    '/finance', '/performance',
+    '/finance', '/performance', '/admin/instructors',
   ]);
 });
 await test('learner request alerts count only unresolved requests by document type', () => {
