@@ -19,7 +19,11 @@ const nextConfig = {
   },
   // 서버 PDF 생성에서 사용하는 한글 글꼴을 배포 산출물에 포함한다.
   outputFileTracingIncludes: {
-    "/*": ["./assets/fonts/NanumGothic-Regular.ttf"],
+    "/*": [
+      "./assets/fonts/NanumGothic-Regular.ttf",
+      "./public/forms/learner-*.pdf",
+      "./public/fonts/KoPubDotum-*.ttf",
+    ],
     "/api/pdf-assets/**": ["./node_modules/pdfjs-dist/cmaps/**/*", "./node_modules/pdfjs-dist/standard_fonts/**/*", "./node_modules/pdfjs-dist/wasm/**/*"],
   },
   // 빌드에서도 린트·타입 오류를 확인한다.

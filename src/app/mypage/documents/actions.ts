@@ -34,6 +34,28 @@ const ERROR_MESSAGES: Record<string, string> = {
   IDEMPOTENCY_CONFLICT: "같은 제출 요청의 내용이 달라졌습니다. 페이지를 새로 고쳐 주세요.",
 };
 
+const PDF_CREATION_ERROR = "제출 PDF를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.";
+const SAFE_PDF_ERROR_PREFIXES = [
+  "PDF에서 지원하지 않는 문자가 있습니다.",
+  "입력 내용이 서식의 칸보다 깁니다.",
+  "서명 이미지",
+];
+
+function publicPdfError(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  if (SAFE_PDF_ERROR_PREFIXES.some((prefix) => message.startsWith(prefix)))
+    return message;
+  const code =
+    typeof error === "object" && error && "code" in error
+      ? String(error.code)
+      : "UNKNOWN";
+  console.error("Learner document PDF creation failed", {
+    name: error instanceof Error ? error.name : "UnknownError",
+    code,
+  });
+  return PDF_CREATION_ERROR;
+}
+
 async function pdfAssets(type: LearnerDocumentType) {
   const root = process.cwd();
   const [template, regular, bold] = await Promise.all([
@@ -145,10 +167,7 @@ export async function submitLearnerDocument(input: {
   } catch (error) {
     return {
       ok: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "제출 PDF를 만들지 못했습니다. 다시 시도해 주세요.",
+      message: publicPdfError(error),
     };
   }
 }
