@@ -59,7 +59,7 @@ export default async function ReportPreview({ searchParams }: {
             <Link key={key} href={`?document=${key}`} aria-current={document === key ? "page" : undefined}
               className={`group relative panel block border-2 transition-colors hover:z-10 hover:border-blue-400 focus-visible:z-10 ${document === key ? "border-blue-600 bg-blue-50" : "border-transparent"}`}>
               <span className="text-sm font-semibold text-blue-700">{GUIDE[key].owner}</span>
-              <h2 className="mt-2 text-lg font-bold"><MenuHint label={`${index + 1}. ${label}`} description={GUIDE[key].description} align={index % 2 ? "end" : "start"} /></h2>
+              <h2 className="mt-2 text-lg font-bold"><MenuHint label={`${index + 1}. ${label}`} description={GUIDE[key].description} /></h2>
             </Link>
           ))}
         </nav>
