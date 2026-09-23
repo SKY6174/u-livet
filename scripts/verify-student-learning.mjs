@@ -199,6 +199,9 @@ const portal = {
 };
 const Dashboard = load("src/components/student-learning/dashboard.tsx", {
   "next/link": "a",
+  "@/components/instructor-documents/document-popup": {
+    DocumentPopup: ({ children, href }) => React.createElement("a", { href }, children),
+  },
   "@/components/portal/action-form": {
     ActionForm: ({ children, label }) =>
       React.createElement(

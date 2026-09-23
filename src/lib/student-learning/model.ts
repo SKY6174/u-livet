@@ -45,6 +45,7 @@ export function nextClass(courses: LearningCourse[], now: number) {
 export function recommendCourses(
   catalog: CatalogCourse[],
   courses: LearningCourse[],
+  limit = 3,
 ) {
   const academies = new Set(
     courses
@@ -62,7 +63,7 @@ export function recommendCourses(
     )
     .map((course) => ({ ...course, related: academies.has(course.academy) }))
     .sort((a, b) => Number(b.related) - Number(a.related))
-    .slice(0, 3);
+    .slice(0, limit);
 }
 export function courseStage(course: LearningCourse, today: string) {
   if (!course.active) return "application";
