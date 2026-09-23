@@ -58,13 +58,6 @@ export function officeSections(member: Member) {
   ].filter((section) => section.links.length);
 }
 
-export const courseOperationLinks: WorkspaceLink[] = [
-  { label: "2026 과정 현황", href: "/admin/course-plan", description: "연간 교육과정 현황" },
-  { label: "2026 개설 준비", href: "/admin/course-plan/opening", description: "운영계획서 기반 개설 준비" },
-  { label: "과정 개발·심의", href: "/admin/development", description: "제안 과정 개발과 심의" },
-  { label: "안내문자 관리", href: "/admin/messages", description: "안내문 예약·처리 이력" },
-];
-
 const within = (path: string, base: string) => path === base || path.startsWith(base + "/");
 export function officeActiveHref(path: string) {
   if (within(path, "/operation-documents/plan") || /^\/operation-documents\/[^/]+\/plan(?:\/|$)/.test(path)) return "/operation-documents/plan";

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { courseOperationLinks } from "@/lib/auth/workspace-navigation";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { getCourseWorkspaces } from "@/lib/course-workspace/data";
@@ -13,6 +12,9 @@ import { OfferingDraftForm } from "@/components/course-plan/offering-draft-form"
 import { getCourseOpeningPlan } from "@/lib/course-opening/server";
 import { getOpeningWorkingCopy } from "@/lib/course-opening/working-copy-server";
 import { findOpeningCourse } from "@/lib/course-opening/prefill";
+
+const ANCHOR_ORG_ID = "10000000-0000-4000-8000-000000000001";
+
 export default async function CourseOperations({
   searchParams,
 }: {
@@ -21,7 +23,9 @@ export default async function CourseOperations({
   const me = await requireIdentity("/admin/courses");
   if (!me.roles.some((r) => ["COURSE_MANAGER", "SYSTEM_ADMIN"].includes(r.role))) notFound();
   const params = await searchParams;
-  const orgs = Array.from(new Set(me.roles.filter(r => ["COURSE_MANAGER", "SYSTEM_ADMIN"].includes(r.role)).map(r => r.org_id)));
+  const grantedOrgs = Array.from(new Set(me.roles.filter(r => ["COURSE_MANAGER", "SYSTEM_ADMIN"].includes(r.role)).map(r => r.org_id)));
+  const orgs = grantedOrgs.includes(ANCHOR_ORG_ID) ? [ANCHOR_ORG_ID] : grantedOrgs;
+  if (!orgs.length) notFound();
   const org = typeof params.org === "string" && orgs.includes(params.org) ? params.org : orgs[0];
   const manager = me.roles.some(r => r.role === "COURSE_MANAGER" && r.org_id === org);
   const plan =
@@ -55,28 +59,27 @@ export default async function CourseOperations({
       <PageIntro eyebrow="OPERATIONS" title="과정 운영 관리">
         과정 개설부터 모집·강사 배정·출결까지 교육 운영을 관리합니다.
       </PageIntro>
-      {orgs.length > 1 && <form className="mb-5 flex flex-wrap gap-3"><label className="text-sm">사업단<select name="org" defaultValue={org} className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm">{orgs.map((id, i) => <option key={id} value={id}>사업단 {i + 1} · {id.slice(-8)}</option>)}</select></label><button className="btn-secondary">선택</button></form>}
-      {manager && <section className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-teal-100 bg-teal-50/60 p-5">
-        <div>
-          <h2 className="font-bold">개설 준비부터 수업 운영까지</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            과정을 선택해 운영 설정과 신청 심사, 출결 현황을 확인하세요. 운영 후 자료 정리는 결과 보고에서 이어갑니다.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link className="btn-primary" href={`/admin/courses?org=${org}&create=1#new-course`}>
-            새 과정 등록
-          </Link>
-          <Link className="btn-secondary" href="/operation-documents/result">
-            결과보고서로 이동
-          </Link>
-        </div>
-      </section>}
-      {manager && <nav aria-label="과정 운영 업무" className="mb-8 flex flex-wrap gap-3">
-        {courseOperationLinks.map(({ href, label }) => <Link key={href} className="btn-secondary" href={href}>{label}</Link>)}
-      </nav>}
+      {orgs.length > 1 ? <form className="mb-5 flex flex-wrap gap-3"><label className="text-sm">사업단<select name="org" defaultValue={org} className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm">{orgs.map((id, i) => <option key={id} value={id}>사업단 {i + 1} · {id.slice(-8)}</option>)}</select></label><button className="btn-secondary">선택</button></form>
+        : <p className="mb-6 text-sm font-medium text-slate-600">사업단 · {org === ANCHOR_ORG_ID ? "울산과학대학교 앵커사업단" : org.slice(-8)}</p>}
+      {manager && <div className="mb-8 grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]" aria-label="과정 업무 구분">
+        <section className="rounded-2xl border border-teal-200 bg-teal-50/60 p-6">
+          <p className="text-xs font-bold tracking-wide text-teal-800">기존 연간 계획 운영</p>
+          <h2 className="mt-2 text-xl font-bold">연간 계획에서 개설까지</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">과정 현황에서 연간 계획을 확인하고, 개설 준비에서 모집 전 일정·인력·운영 조건을 검토합니다.</p>
+          <nav aria-label="연간 계획과 개설 준비" className="mt-5 grid gap-3 sm:grid-cols-2">
+            <Link className="rounded-xl border border-teal-200 bg-white px-4 py-4 font-semibold text-teal-900 hover:border-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700" href="/admin/course-plan">01 · 과정 현황 확인 →</Link>
+            <Link className="rounded-xl border border-teal-200 bg-white px-4 py-4 font-semibold text-teal-900 hover:border-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700" href="/admin/course-plan/opening">02 · 개설 준비 →</Link>
+          </nav>
+        </section>
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <p className="text-xs font-bold tracking-wide text-slate-500">신규 교육과정 기획</p>
+          <h2 className="mt-2 text-xl font-bold">과정 개발·심의</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">연간 계획의 개설 준비와 별도로 새로운 교육과정을 제안하고 심의 진행 상황을 확인합니다.</p>
+          <Link className="mt-5 inline-flex rounded-xl border border-slate-200 px-4 py-3 font-semibold text-slate-800 hover:border-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700" href="/admin/development">과정 개발·심의로 이동 →</Link>
+        </section>
+      </div>}
       {overview.unavailable || unavailable ? (
-        <Empty title="과정 정보를 불러오지 못했습니다" />
+        <><Empty title="과정 정보를 불러오지 못했습니다" />{manager && <Link className="mt-4 inline-flex rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700" href={`/admin/courses?org=${org}&create=1#new-course`}>새 과정 등록</Link>}</>
       ) : (
         <OperationsDashboard key={org} courses={overview.courses} workbooks={overview.workbooks} org={org} manager={manager} responsibleNames={responsibleNames} />
       )}
