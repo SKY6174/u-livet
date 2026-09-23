@@ -46,6 +46,10 @@ import {
   type Budget,
   type ScholarshipDetail,
 } from "@/lib/operation-documents/model";
+import {
+  drawOperationPhoto,
+  operationPhotoSize,
+} from "@/lib/operation-documents/photo-crop";
 
 async function photoData(file: File): Promise<string> {
   if (
@@ -59,14 +63,19 @@ async function photoData(file: File): Promise<string> {
     img.src = url;
     await img.decode();
     const canvas = document.createElement("canvas"),
-      scale = Math.min(1, 1000 / Math.max(img.width, img.height));
-    canvas.width = Math.round(img.width * scale);
-    canvas.height = Math.round(img.height * scale);
+      size = operationPhotoSize(img.naturalWidth, img.naturalHeight, 960);
+    canvas.width = size.width;
+    canvas.height = size.height;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("사진을 처리하지 못했습니다.");
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    drawOperationPhoto(
+      ctx,
+      img,
+      img.naturalWidth,
+      img.naturalHeight,
+      canvas.width,
+      canvas.height,
+    );
     for (const quality of [0.85, 0.7, 0.55, 0.4]) {
       const image = canvas.toDataURL("image/jpeg", quality);
       if (image.length <= 400_000) return image;

@@ -322,7 +322,7 @@ export function DocumentPreview({
       </div>,
     );
   }
-  if (kind === "result" && photos.length > 6) {
+  if (kind === "result" && photos.length > 4) {
     groups(photos.slice(4), 8).forEach((part, index) => pages.push(
       <div key={`photos-${index}`}>
         <h2>3. 운영 성과 · 운영 사진 (계속)</h2>

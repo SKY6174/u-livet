@@ -1,6 +1,7 @@
 import type { Content } from "./model";
 import { MAX_OPERATION_PHOTOS } from "./schema";
 import { extractPhotoMetadata } from "./pdf-photo-metadata";
+import { drawOperationPhoto, operationPhotoSize } from "./photo-crop";
 
 type PdfImage = { width: number; height: number; data?: Uint8Array; bitmap?: ImageBitmap; kind?: number };
 
@@ -25,14 +26,19 @@ function imageData(image: PdfImage): string | null {
     sourceContext.putImageData(pixels, 0, 0);
   } else return null;
   const target = document.createElement("canvas");
-  const scale = Math.min(1, 680 / Math.max(image.width, image.height));
-  target.width = Math.round(image.width * scale);
-  target.height = Math.round(image.height * scale);
+  const size = operationPhotoSize(image.width, image.height, 672);
+  target.width = size.width;
+  target.height = size.height;
   const context = target.getContext("2d");
   if (!context) return null;
-  context.fillStyle = "white";
-  context.fillRect(0, 0, target.width, target.height);
-  context.drawImage(source, 0, 0, target.width, target.height);
+  drawOperationPhoto(
+    context,
+    source,
+    image.width,
+    image.height,
+    target.width,
+    target.height,
+  );
   source.width = source.height = 0;
   for (const quality of [0.7, 0.55, 0.4, 0.3]) {
     const result = target.toDataURL("image/jpeg", quality);

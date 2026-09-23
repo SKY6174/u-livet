@@ -57,6 +57,35 @@ vm.runInNewContext(
   ).outputText,
   { exports: photoMetadata, Date },
 );
+const photoCrop = {};
+vm.runInNewContext(
+  ts.transpileModule(
+    readFileSync("src/lib/operation-documents/photo-crop.ts", "utf8"),
+    {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+      },
+    },
+  ).outputText,
+  { exports: photoCrop },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(photoCrop.centerCropRect(1600, 900))),
+  { x: 0, y: 0, width: 1600, height: 900 },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(photoCrop.centerCropRect(1600, 1200))),
+  { x: 0, y: 150, width: 1600, height: 900 },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(photoCrop.centerCropRect(2000, 900))),
+  { x: 200, y: 0, width: 1600, height: 900 },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(photoCrop.operationPhotoSize(900, 1600, 960))),
+  { width: 896, height: 504 },
+);
 assert.deepEqual(
   JSON.parse(JSON.stringify(photoMetadata.extractPhotoMetadata(
     "개강식(2026.07.14.) 운영사진 1（2026-7-14） 수료식(2026.02.30.)",
