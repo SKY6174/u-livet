@@ -31,8 +31,10 @@ export function DevelopmentDetail({
   return (
     <div className="space-y-6">
       <p className="notice">
-        {d.name} · 최초 제안: {reviewLabels[d.kind]} ·{" "}
-        {options.years.find((y) => y.id === d.project_year_id)?.label}.
+        {options.organizations.find((o) => o.id === d.org_id)?.name} ·{" "}
+        {options.years.find((y) => y.id === d.project_year_id)?.label} ·{" "}
+        {d.track === "WORKER" ? "재직자 과정" : d.track ?? "미분류"} ·{" "}
+        {d.name} · 최초 제안: {reviewLabels[d.kind]}.
         개발·개편 승인과 실제 기수 개설은 별도 기록입니다.
       </p>
       {d.versions.map((v, i) => (

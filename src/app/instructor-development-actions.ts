@@ -171,18 +171,20 @@ export async function setInstructorPublic(_: ActionState, f: FormData) {
   ).state;
 }
 export async function startDevelopment(_: ActionState, f: FormData) {
+  const continuation = Boolean(value(f, "p"));
   if (
     !ids(f, ["o", "y"]) ||
     (value(f, "p") && !ids(f, ["p"])) ||
-    (value(f, "target") && !ids(f, ["target"]))
+    (value(f, "target") && !ids(f, ["target"])) ||
+    (!continuation && !["RCC", "AID-X", "ECC", "WORKER"].includes(value(f, "track")))
   )
     return invalid();
-  const r = await run("life_start_development", {
+  const r = await run(continuation ? "life_start_development" : "life_start_development_classified", {
     o: value(f, "o"),
     y: value(f, "y"),
     kind: value(f, "kind"),
     target: value(f, "target") || null,
-    p: value(f, "p") || null,
+    ...(continuation ? { p: value(f, "p") } : { track: value(f, "track") }),
   });
   if (r.state.ok && typeof r.data === "string" && UUID.test(r.data))
     redirect("/development/" + r.data);
