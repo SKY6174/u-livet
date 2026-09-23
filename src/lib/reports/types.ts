@@ -14,6 +14,18 @@ export const DOCUMENTS = [
   ["fees", "강사료 지급현황"],
 ] as const;
 export type DocumentKind = (typeof DOCUMENTS)[number][0];
+export const ATTACHMENT_KINDS = [
+  "attendance",
+  "completion",
+  "scholarships",
+  "teaching",
+  "fees",
+] as const satisfies readonly DocumentKind[];
+export function attachmentTitle(kind: DocumentKind) {
+  const label = DOCUMENTS.find(([key]) => key === kind)?.[1] ?? kind;
+  const index = ATTACHMENT_KINDS.indexOf(kind as (typeof ATTACHMENT_KINDS)[number]);
+  return index < 0 ? label : `첨부 ${index + 1}. ${label}`;
+}
 export type BudgetRow = {
   category: string;
   planned: number;

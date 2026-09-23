@@ -1,5 +1,6 @@
 import type { Content } from "./model";
 import { MAX_OPERATION_PHOTOS } from "./schema";
+import { extractPhotoMetadata } from "./pdf-photo-metadata";
 
 type PdfImage = { width: number; height: number; data?: Uint8Array; bitmap?: ImageBitmap; kind?: number };
 
@@ -59,6 +60,8 @@ export async function extractResultPdf(file: File): Promise<{ text: string; phot
       if (photos.length >= MAX_OPERATION_PHOTOS) continue;
       const operations = await page.getOperatorList();
       const seen = new Set<string>();
+      const metadata = extractPhotoMetadata(words);
+      let pagePhotoIndex = 0;
       for (let index = 0; index < operations.fnArray.length && photos.length < MAX_OPERATION_PHOTOS; index++) {
         if (operations.fnArray[index] !== pdfjs.OPS.paintImageXObject) continue;
         const id = operations.argsArray[index][0];
@@ -66,7 +69,14 @@ export async function extractResultPdf(file: File): Promise<{ text: string; phot
         seen.add(id);
         const object = await new Promise<PdfImage>((resolve) => page.objs.get(id, resolve)) as PdfImage;
         const image = imageData(object);
-        if (image) photos.push({ caption: `운영사진${photos.length + 1}`, date: "", image });
+        if (image) {
+          const found = metadata[pagePhotoIndex++];
+          photos.push({
+            caption: found?.caption ?? `운영사진${photos.length + 1}`,
+            date: found?.date ?? "",
+            image,
+          });
+        }
       }
       page.cleanup();
     }

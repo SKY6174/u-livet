@@ -42,7 +42,7 @@ export default async function PrintReport({
       </div>
     );
   const [context, attendance] = await Promise.all([
-    document === "all" ? getOperationContext(id) : Promise.resolve(null),
+    ["all", "scholarships"].includes(document) ? getOperationContext(id) : Promise.resolve(null),
     ["all", "attendance"].includes(document) ? getAttendanceBook(id,"manager") : Promise.resolve(null),
   ]);
   const official = context ? initialDocument(context, "result") : null;
@@ -54,9 +54,9 @@ export default async function PrintReport({
       />
       {document === "all" && official && <>
         <DocumentPreview kind="result" content={official.content} budget={official.budget} status={official.status} revision={official.revision} />
-        {DOCUMENTS.filter(([kind]) => kind !== "result").map(([kind]) => <ReportDocuments key={kind} offering={offering} bundle={bundle} document={kind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />)}
+        {DOCUMENTS.filter(([kind]) => kind !== "result").map(([kind]) => <ReportDocuments key={kind} offering={offering} bundle={bundle} document={kind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} officialScholarships={official.budget.scholarships} />)}
       </>}
-      {document !== "all" && <ReportDocuments offering={offering} bundle={bundle} document={document as DocumentKind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} />}
+      {document !== "all" && <ReportDocuments offering={offering} bundle={bundle} document={document as DocumentKind} attendanceBook={attendance?.book} reveal={query.reveal === "1"} officialScholarships={official?.budget.scholarships} />}
 
     </>
   );

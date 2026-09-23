@@ -44,6 +44,28 @@ vm.runInNewContext(
   ).outputText,
   { exports: model, require: () => schema, Intl, Date, TextEncoder },
 );
+const photoMetadata = {};
+vm.runInNewContext(
+  ts.transpileModule(
+    readFileSync("src/lib/operation-documents/pdf-photo-metadata.ts", "utf8"),
+    {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+      },
+    },
+  ).outputText,
+  { exports: photoMetadata, Date },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(photoMetadata.extractPhotoMetadata(
+    "개강식(2026.07.14.) 운영사진 1（2026-7-14） 수료식(2026.02.30.)",
+  ))),
+  [
+    { caption: "개강식", date: "2026-07-14" },
+    { caption: "운영사진1", date: "2026-07-14" },
+  ],
+);
 const legacySchedule = model.normalizeScheduleRow(
   {
     date: "2026.07.14. (11:00~13:00)",
@@ -67,6 +89,27 @@ assert.equal(
     max: 500,
   }),
   false,
+);
+const mergedPhotos = model.mergeImportedPhotos(
+  [
+    { caption: "개강식", date: "", image: "" },
+    { caption: "수료식", date: "", image: "" },
+    { caption: "운영사진1", date: "", image: "opening-image" },
+    { caption: "운영사진2", date: "", image: "closing-image" },
+  ],
+  [
+    { caption: "개강식", date: "2026-07-14", image: "opening-image" },
+    { caption: "수료식", date: "2026-07-21", image: "closing-image" },
+    { caption: "운영사진1", date: "2026-07-14", image: "class-image" },
+  ],
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(mergedPhotos.map(({ caption, date }) => ({ caption, date })))),
+  [
+    { caption: "개강식", date: "2026-07-14" },
+    { caption: "수료식", date: "2026-07-21" },
+    { caption: "운영사진1", date: "2026-07-14" },
+  ],
 );
 const sql = (q) =>
   execFileSync(
@@ -164,6 +207,9 @@ f = ok(
     ends_on: "2026-09-30",
   }),
 );
+sql(
+  `with application as (insert into public.life_applications(offering_id,person_id,status,policy_id) values('${f}','${learner.p}','ACCEPTED','20000000-0000-4000-8000-000000000012') returning id) insert into public.life_enrollments(application_id,offering_id,person_id) select id,'${f}','${learner.p}' from application;`,
+);
 ok(
   await manager.c.rpc("life_assign_instructor", {
     f,
@@ -178,6 +224,7 @@ const context = (c) => c.rpc("life_operation_context", { f });
 let ctx = ok(await context(manager.c));
 assert.equal(ctx.manager, true);
 assert.equal(ctx.responsible, null);
+assert.deepEqual(ctx.members.map((member) => member.person_id), [learner.p]);
 for (const c of [teacher.c, outsider.c, learner.c, anon])
   deny(await context(c));
 assert.ok(!JSON.stringify(ctx.legacy).includes("account"));
@@ -359,11 +406,29 @@ assert.equal(
 );
 deny(await transition(manager.c, "result", "review", 1), "BUDGET_REQUIRED");
 storedBudget.rows.forEach((row) => { row.planned ||= "0"; row.spent = "0"; });
-storedBudget.scholarshipCount = "0";
-storedBudget.scholarshipAmount = "0";
+storedBudget.scholarships = [{
+  personId: learner.p,
+  name: "테스트 learner",
+  category: "학습활동 우수장학",
+  rate: "100",
+  amount: "84000",
+  bank: "울산은행",
+  account: "123-456",
+  holder: "테스트 learner",
+  paidOn: "2026-09-23",
+  note: "검증 지급",
+}];
+storedBudget.scholarshipCount = "1";
+storedBudget.scholarshipAmount = "84000";
 ctx = ok(await manager.c.rpc("life_operation_save", {
   f, k: "result", c: incomplete, b: storedBudget, expected_revision: 1,
 }));
+const invalidScholarship = structuredClone(storedBudget);
+invalidScholarship.scholarships[0].personId = outsider.p;
+invalidScholarship.scholarships[0].name = "테스트 outsider";
+deny(await manager.c.rpc("life_operation_save", {
+  f, k: "result", c: incomplete, b: invalidScholarship, expected_revision: 2,
+}), "INVALID_PARTICIPANT");
 deny(await transition(teacher.c, "result", "review", 2), "FORBIDDEN");
 ctx = ok(await transition(manager.c, "result", "review", 2));
 assert.equal(ctx.documents.find((d) => d.kind === "result").status, "REVIEW");
@@ -489,8 +554,9 @@ for (const r of result.budget.rows) {
   r.planned = "100000";
   r.spent = "90000";
 }
-result.budget.scholarshipCount = "10";
-result.budget.scholarshipAmount = "300000";
+result.budget.scholarships = storedBudget.scholarships;
+result.budget.scholarshipCount = "1";
+result.budget.scholarshipAmount = "84000";
 ctx = ok(
   await manager.c.rpc("life_operation_save", {
     f,

@@ -6,7 +6,7 @@ import { buildTeachingLedger } from "@/lib/reports/teaching-ledger";
 import type { Offering } from "@/lib/portal/types";
 import {
   attendanceSummary,
-  DOCUMENTS,
+  attachmentTitle,
   emptyReport,
   feeAmount,
   hours,
@@ -16,6 +16,7 @@ import {
   type DocumentKind,
   type ReportBundle,
 } from "@/lib/reports/types";
+import type { ScholarshipDetail } from "@/lib/operation-documents/model";
 const chunk = <T,>(rows: T[], size: number): T[][] =>
   rows.length
     ? Array.from({ length: Math.ceil(rows.length / size) }, (_, i) =>
@@ -110,18 +111,34 @@ export function ReportDocuments({
   document,
   reveal = false,
   attendanceBook,
+  officialScholarships = [],
 }: {
   offering: Offering;
   bundle: ReportBundle;
   document: DocumentKind | "all";
   reveal?: boolean;
   attendanceBook?: AttendanceBook | null;
+  officialScholarships?: ScholarshipDetail[];
 }) {
   const p = b.report?.payload ?? emptyReport(o),
     source = o.status === "ARCHIVED" ? p.sourceReport : undefined,
     members = b.members,
     active = members.filter((m) => m.enrollment_status === "ACTIVE"),
-    completed = members.filter(isCompleted);
+    completed = members.filter(isCompleted),
+    scholarships = officialScholarships.length
+      ? officialScholarships.map((row) => ({
+          personId: row.personId,
+          category: row.category,
+          rate: Number(row.rate || 0),
+          amount: Number(row.amount || 0),
+          bank: row.bank,
+          account: row.account,
+          holder: row.holder,
+          paidOn: row.paidOn,
+          note: row.note,
+        }))
+      : p.scholarships,
+    scholarshipNames = new Map(officialScholarships.map((row) => [row.personId, row.name]));
   const sessions = b.sessions.filter((s) => s.status === "SCHEDULED");
   const teachingRows = document === "teaching" || document === "all"
     ? buildTeachingLedger(sessions, b.teaching)
@@ -134,7 +151,9 @@ export function ReportDocuments({
     0,
   );
   const sumFees = p.fees.reduce((n, r) => n + feeAmount(r), 0),
-    sumScholarships = source?.scholarshipAmount ?? p.scholarships.reduce((n, r) => n + r.amount, 0);
+    sumScholarships = officialScholarships.length
+      ? scholarships.reduce((n, r) => n + r.amount, 0)
+      : source?.scholarshipAmount ?? scholarships.reduce((n, r) => n + r.amount, 0);
   const enrolledCount = source?.enrolled ?? active.length;
   const completedCount = source?.completed ?? completed.length;
   const details = (id: string) => p.participants.find((r) => r.personId === id);
@@ -149,7 +168,7 @@ export function ReportDocuments({
           ? "재검토"
           : "미승인";
   };
-  const title = (key: DocumentKind) => DOCUMENTS.find((d) => d[0] === key)![1];
+  const title = (key: DocumentKind) => attachmentTitle(key);
   const show = (key: DocumentKind) => document === "all" || document === key;
   return (
     <div className="report-output">
@@ -326,8 +345,8 @@ export function ReportDocuments({
         </>
       )}
       {show("attendance") && (attendanceBook
-        ? <AttendancePrint official book={attendanceBook} />
-        : <section className="report-sheet report-form-20"><h1>출석부</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p></section>)}
+        ? <AttendancePrint official book={attendanceBook} title={title("attendance")} />
+        : <section className="report-sheet report-form-20"><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p></section>)}
       {show("completion") &&
         chunk(members, 18).map((people, pi) => (
           <Sheet title={title("completion")} offering={o} wide key={`c-${pi}`}>
@@ -369,7 +388,7 @@ export function ReportDocuments({
           </Sheet>
         ))}
       {show("scholarships") &&
-        chunk(p.scholarships, 14).map((rows, pi) => (
+        chunk(scholarships, 14).map((rows, pi) => (
           <Sheet
             title={title("scholarships")}
             offering={o}
@@ -395,7 +414,7 @@ export function ReportDocuments({
               rows={rows.map((r, i) => [
                 pi * 14 + i + 1,
                 o.name,
-                member(r.personId)?.name,
+                scholarshipNames.get(r.personId) ?? member(r.personId)?.name,
                 details(r.personId)?.birthDate,
                 money(o.tuition),
                 yes(r.personId),

@@ -47,7 +47,7 @@ export async function DocumentStatus({
         <div>
           <h2 className="text-xl font-bold">결과보고서 준비 현황</h2>
           <p className="mt-1 text-sm text-slate-500">
-            저장된 자료 기준 · 원본 PDF {course.document_kinds.length}/6종 보관
+            결과보고서 본문과 첨부 1~5 · 원본 PDF {course.document_kinds.length}/6종 보관
           </p>
         </div>
         {compact && (
@@ -69,7 +69,7 @@ export async function DocumentStatus({
           >
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-bold">
-                <span className="mr-2 text-xs text-slate-400">0{i + 1}</span>
+                <span className="mr-2 text-xs text-slate-400">{i === 0 ? "본문" : `첨부 ${i}`}</span>
                 {d.title}
               </h3>
               <FileText className="shrink-0 text-slate-300" size={18} />
@@ -109,8 +109,8 @@ export async function DocumentStatus({
       </div>
       <p className="mt-3 text-xs leading-relaxed text-slate-500">
         자료 준비 상태는 제출 승인과 다릅니다. 개인별 자료가 없으면 해당
-        출력에는 빈 명단이 표시됩니다. 장학금·강사료는 지급 대상이 있을 때
-        입력하세요.
+        출력에는 빈 명단이 표시됩니다. 출석부·수료자명단·장학금 지급현황·강사
+        강의날인부·강사료 지급현황은 결과보고서의 첨부 1~5로 함께 출력됩니다.
       </p>
     </section>
   );

@@ -26,6 +26,19 @@ export type Budget = {
   scholarshipCount: string;
   scholarshipAmount: string;
   scholarshipNote: string;
+  scholarships: ScholarshipDetail[];
+};
+export type ScholarshipDetail = {
+  personId: string;
+  name: string;
+  category: string;
+  rate: string;
+  amount: string;
+  bank: string;
+  account: string;
+  holder: string;
+  paidOn: string;
+  note: string;
 };
 export type OperationDocument = {
   kind: DocumentKind;
@@ -56,6 +69,7 @@ export type DocumentContext = {
   manager: boolean;
   responsible: { person_id: string; name: string; revision: number } | null;
   candidates: { id: string; name: string }[];
+  members: { person_id: string; name: string }[];
   documents: OperationDocument[];
   legacy: Record<string, unknown> | null;
   sessions: { title: string; starts_at: string; ends_at: string }[];
@@ -162,12 +176,89 @@ export function emptyBudget(kind: DocumentKind): Budget {
     scholarshipCount: "",
     scholarshipAmount: "",
     scholarshipNote: "",
+    scholarships: [],
   };
+}
+export function normalizeBudget(value: Budget | (Omit<Budget, "scholarships"> & { scholarships?: ScholarshipDetail[] })): Budget {
+  return {
+    ...value,
+    scholarships: Array.isArray(value.scholarships) ? value.scholarships : [],
+  };
+}
+export function scholarshipSummary(budget: Budget) {
+  if (!budget.scholarships.length)
+    return {
+      count: budget.scholarshipCount,
+      amount: budget.scholarshipAmount,
+    };
+  return {
+    count: String(new Set(budget.scholarships.map((row) => row.personId)).size),
+    amount: String(
+      budget.scholarships.reduce((total, row) => total + Number(row.amount || 0), 0),
+    ),
+  };
+}
+export function syncScholarshipSummary(budget: Budget): Budget {
+  const summary = scholarshipSummary(budget);
+  return {
+    ...budget,
+    scholarshipCount: summary.count,
+    scholarshipAmount: summary.amount,
+  };
+}
+export function mergeImportedPhotos(
+  existing: Content["photos"],
+  incoming: Content["photos"],
+): Content["photos"] {
+  let photos = existing.map((photo) => ({ ...photo }));
+  for (const caption of PHOTO_CAPTIONS) {
+    const source = incoming.find((photo) => photo.caption === caption && photo.image);
+    if (!source) continue;
+    photos = photos.filter(
+      (photo) => photo.caption === caption || photo.image !== source.image,
+    );
+    const index = photos.findIndex((photo) => photo.caption === caption);
+    const replacement = { ...source, caption };
+    if (index >= 0) photos[index] = replacement;
+    else photos.unshift(replacement);
+  }
+  const special = PHOTO_CAPTIONS.map(
+    (caption) =>
+      photos.find((photo) => photo.caption === caption) ?? {
+        caption,
+        date: "",
+        image: "",
+      },
+  );
+  const operations = photos.filter(
+    (photo) =>
+      !PHOTO_CAPTIONS.includes(photo.caption as (typeof PHOTO_CAPTIONS)[number]) &&
+      (!!photo.image || !!photo.date),
+  );
+  for (const source of incoming.filter(
+    (photo) => !PHOTO_CAPTIONS.includes(photo.caption as (typeof PHOTO_CAPTIONS)[number]),
+  )) {
+    if (!source.image || [...special, ...operations].some((photo) => photo.image === source.image))
+      continue;
+    if (operations.length >= MAX_OPERATION_PHOTOS) break;
+    operations.push({ ...source });
+  }
+  return [
+    ...special,
+    ...operations.slice(0, MAX_OPERATION_PHOTOS).map((photo, index) => ({
+      ...photo,
+      caption: `운영사진${index + 1}`,
+    })),
+  ];
 }
 export function initialDocument(context: DocumentContext, kind: DocumentKind) {
   const saved = context.documents.find((d) => d.kind === kind);
   if (saved)
-    return { ...saved, content: normalizeDocumentContent(saved.content, kind) };
+    return {
+      ...saved,
+      content: normalizeDocumentContent(saved.content, kind),
+      budget: normalizeBudget(saved.budget),
+    };
   const content = emptyContent(kind),
     budget = emptyBudget(kind),
     c = context.course;
@@ -413,10 +504,13 @@ export function validBudget(value: unknown): value is Budget {
       "scholarshipCount",
       "scholarshipAmount",
       "scholarshipNote",
+      "scholarships",
     ]) ||
     !Array.isArray(value.rows) ||
     value.rows.length < 1 ||
-    value.rows.length > 30
+    value.rows.length > 30 ||
+    !Array.isArray(value.scholarships) ||
+    value.scholarships.length > 200
   )
     return false;
   const amount = (v: unknown) =>
@@ -436,7 +530,45 @@ export function validBudget(value: unknown): value is Budget {
         !!r.category &&
         amount(r.planned) &&
         amount(r.spent),
-    )
+    ) &&
+    value.scholarships.every(
+      (r) =>
+        record(r) &&
+        exact(r, [
+          "personId",
+          "name",
+          "category",
+          "rate",
+          "amount",
+          "bank",
+          "account",
+          "holder",
+          "paidOn",
+          "note",
+        ]) &&
+        typeof r.personId === "string" &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(r.personId) &&
+        ["name", "category", "bank", "account", "holder", "note"].every(
+          (key) =>
+            typeof r[key] === "string" &&
+            (r[key] as string).length <= (key === "note" ? 1000 : 200),
+        ) &&
+        !!r.name &&
+        !!r.category &&
+        typeof r.rate === "string" &&
+        /^\d{1,3}(\.\d{1,2})?$/.test(r.rate) &&
+        Number(r.rate) <= 100 &&
+        amount(r.amount) &&
+        r.amount !== "" &&
+        typeof r.paidOn === "string" &&
+        (r.paidOn === "" ||
+          (/^\d{4}-\d{2}-\d{2}$/.test(r.paidOn) &&
+            Number.isFinite(Date.parse(r.paidOn)) &&
+            new Date(r.paidOn).toISOString().slice(0, 10) === r.paidOn)),
+    ) &&
+    (value.scholarships.length === 0 ||
+      (scholarshipSummary(value as unknown as Budget).count === value.scholarshipCount &&
+        scholarshipSummary(value as unknown as Budget).amount === value.scholarshipAmount))
   );
 }
 export function missingContent(content: Content, kind: DocumentKind) {

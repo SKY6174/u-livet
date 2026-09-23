@@ -12,7 +12,7 @@ const time = (value: string) => new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false,
 }).format(new Date(value));
 
-export function AttendancePrint({ book, official = false }: { book: AttendanceBook; official?: boolean }) {
+export function AttendancePrint({ book, official = false, title = "출석부" }: { book: AttendanceBook; official?: boolean; title?: string }) {
   const index = attendanceIndex(book.attendance), now = Date.parse(book.generated_at);
   const sessions = book.sessions.filter((session) => session.status === "SCHEDULED");
   const landscape = sessions.length >= 5;
@@ -27,7 +27,7 @@ export function AttendancePrint({ book, official = false }: { book: AttendanceBo
     {groups.flatMap((part, si) => members.map((people, pi) => <section
       className={`report-sheet report-form-20 ${landscape ? "report-landscape" : "report-portrait"} ${styles.sheet}`}
       key={`${si}:${pi}`}>
-      <h1>출석부</h1>
+      <h1>{title}</h1>
       <table className={`report-table ${styles.meta}`}><tbody>
         <tr><th>과정명</th><td>{book.offering.name}</td><th>교육기간</th><td>{book.offering.starts_on} ~ {book.offering.ends_on}</td></tr>
         <tr><th>교육시간</th><td>{formatMinutes(sessions.reduce((sum,s) => sum+sessionMinutes(s),0))}분</td><th>확정 상태</th><td>{official && finalized && !book.qr_unavailable ? "최종 확정" : "확인 중"}</td></tr>

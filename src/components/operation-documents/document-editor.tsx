@@ -35,12 +35,16 @@ import {
   validField,
   validBudget,
   emptyBudget,
+  mergeImportedPhotos,
+  scholarshipSummary,
+  syncScholarshipSummary,
   STATUS_LABELS,
   RESULT_STATUS_LABELS,
   type DocumentContext,
   type CourseInfo,
   type Content,
   type Budget,
+  type ScholarshipDetail,
 } from "@/lib/operation-documents/model";
 
 async function photoData(file: File): Promise<string> {
@@ -158,6 +162,9 @@ export function DocumentEditor({
     setDirty(true);
     setConfirmed(false);
     setMessage("");
+  }
+  function changeScholarships(rows: ScholarshipDetail[]) {
+    changeBudget(syncScholarshipSummary({ ...budget, scholarships: rows }));
   }
   function adopt(next: DocumentContext) {
     const saved = initialDocument(next, kind);
@@ -377,19 +384,14 @@ export function DocumentEditor({
               const field = allowed.get(key);
               return field && validField(value, field);
             }));
-            const slots = PHOTO_CAPTIONS.length + MAX_OPERATION_PHOTOS - content.photos.length;
-            const existingImages = new Set(content.photos.map((photo) => photo.image).filter(Boolean));
-            const uniquePhotos = photos.filter((photo) => !existingImages.has(photo.image));
+            const mergedPhotos = mergeImportedPhotos(content.photos, photos);
             const columns = documentTables("result").find((table) => table.key === "schedule")!.columns;
             const acceptedSchedule = schedule.filter((row) => columns.every((column) => validField(row[column.key], column)));
             const next: Content = {
               ...content,
               fields: { ...content.fields, ...accepted },
               tables: { ...content.tables, schedule: schedule.length ? acceptedSchedule : content.tables.schedule },
-              photos: [...content.photos, ...uniquePhotos.slice(0, slots).map((photo, index) => ({
-                ...photo,
-                caption: `운영사진${content.photos.length - PHOTO_CAPTIONS.length + index + 1}`,
-              }))],
+              photos: mergedPhotos,
               signature: "",
               ...(sourceSignature ? { sourceSignature } : {}),
             };
@@ -400,7 +402,7 @@ export function DocumentEditor({
             change(next);
             if (importedBudget) changeBudget(importedBudget);
             setError("");
-            if (Object.keys(accepted).length !== Object.keys(proposal).length || uniquePhotos.length > slots || acceptedSchedule.length !== schedule.length)
+            if (Object.keys(accepted).length !== Object.keys(proposal).length || acceptedSchedule.length !== schedule.length)
               setMessage("일부 날짜·숫자 형식, 강의표 행 또는 사진 장수가 한도를 넘어 제외되었습니다. 원본과 비교해 주세요.");
             return true;
           }}
@@ -797,30 +799,48 @@ export function DocumentEditor({
                   {kind === "result" && (
                     <div className="space-y-3 border-t pt-4">
                       <h3 className="font-bold">8. 장학금 지원</h3>
-                      {[
-                        "scholarshipCount",
-                        "scholarshipAmount",
-                        "scholarshipNote",
-                      ].map((key) => (
-                        <label className="field" key={key}>
-                          {
-                            {
-                              scholarshipCount: "인원수",
-                              scholarshipAmount: "장학금액 (원)",
-                              scholarshipNote: "비고",
-                            }[key]
-                          }
-                          <input
-                            type={key === "scholarshipNote" ? "text" : "number"}
-                            min={0}
-                            maxLength={1000}
-                            value={budget[key as keyof Omit<Budget, "rows">]}
-                            onChange={(e) =>
-                              changeBudget({ ...budget, [key]: e.target.value })
-                            }
-                          />
+                      <p className="text-sm text-slate-500">
+                        수강생별 지급내역을 입력하면 인원수와 장학금 합계가 자동으로 계산되고 첨부 3 장학금 지급현황에도 반영됩니다.
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="field">인원수
+                          <input type="number" min={0} value={scholarshipSummary(budget).count} readOnly={budget.scholarships.length > 0} onChange={(e) => changeBudget({ ...budget, scholarshipCount: e.target.value })} />
                         </label>
+                        <label className="field">장학금액 (원)
+                          <input type="number" min={0} value={scholarshipSummary(budget).amount} readOnly={budget.scholarships.length > 0} onChange={(e) => changeBudget({ ...budget, scholarshipAmount: e.target.value })} />
+                        </label>
+                      </div>
+                      {budget.scholarships.map((row, index) => (
+                        <div className="rounded-xl border bg-slate-50 p-4" key={`${row.personId}-${index}`}>
+                          <div className="mb-3 flex items-center justify-between gap-2">
+                            <strong>수강생별 지급내역 {index + 1}</strong>
+                            <button type="button" aria-label={`장학금 지급내역 ${index + 1} 삭제`} onClick={() => changeScholarships(budget.scholarships.filter((_, rowIndex) => rowIndex !== index))}><Trash2 size={15} /></button>
+                          </div>
+                          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <label className="field">수강생
+                              <select value={row.personId} onChange={(e) => {
+                                const selectedMember = (context.members ?? []).find((member) => member.person_id === e.target.value);
+                                changeScholarships(budget.scholarships.map((item, rowIndex) => rowIndex === index ? { ...item, personId: e.target.value, name: selectedMember?.name ?? "" } : item));
+                              }}>
+                                <option value="">수강생 선택</option>
+                                {(context.members ?? []).map((member) => <option key={member.person_id} value={member.person_id}>{member.name}</option>)}
+                              </select>
+                            </label>
+                            {([
+                              ["category", "장학유형", "text"], ["rate", "지급률 (%)", "number"], ["amount", "지급액 (원)", "number"],
+                              ["bank", "은행", "text"], ["account", "계좌번호", "text"], ["holder", "예금주", "text"],
+                              ["paidOn", "지급일", "date"], ["note", "비고", "text"],
+                            ] as const).map(([key, label, type]) => <label className="field" key={key}>{label}
+                              <input type={type} min={type === "number" ? 0 : undefined} max={key === "rate" ? 100 : undefined} step={key === "rate" ? "0.01" : undefined} maxLength={type === "text" ? (key === "note" ? 1000 : 200) : undefined} value={row[key]} onChange={(e) => changeScholarships(budget.scholarships.map((item, rowIndex) => rowIndex === index ? { ...item, [key]: e.target.value } : item))} />
+                            </label>)}
+                          </div>
+                        </div>
                       ))}
+                      <button type="button" className="btn-secondary" disabled={budget.scholarships.length >= 200 || !(context.members ?? []).length} onClick={() => changeScholarships([...budget.scholarships, { personId: "", name: "", category: "학습활동 우수장학", rate: "", amount: "", bank: "", account: "", holder: "", paidOn: "", note: "" }])}>수강생 지급내역 추가</button>
+                      {!(context.members ?? []).length && <p className="text-xs text-amber-800">등록된 수강생이 없어 세부내역을 추가할 수 없습니다. 과정 수강생을 먼저 확인해 주세요.</p>}
+                      <label className="field">비고
+                        <input type="text" maxLength={1000} value={budget.scholarshipNote} onChange={(e) => changeBudget({ ...budget, scholarshipNote: e.target.value })} />
+                      </label>
                     </div>
                   )}
                 </fieldset>

@@ -10,6 +10,7 @@ import {
 import {
   money,
   percentage,
+  scholarshipSummary,
   type Content,
   type Budget,
 } from "@/lib/operation-documents/model";
@@ -544,14 +545,34 @@ export function DocumentPreview({
           rows={[
             [
               "학습활동 우수장학",
-              budget.scholarshipCount,
-              money(budget.scholarshipAmount),
+              scholarshipSummary(budget).count,
+              money(scholarshipSummary(budget).amount),
               budget.scholarshipNote,
             ],
           ]}
         />
       </div>,
     );
+    if (budget.scholarships.length)
+      groups(budget.scholarships, 18).forEach((rows, pageIndex) =>
+        pages.push(
+          <div key={`scholarship-${pageIndex}`}>
+            <h2>8. 장학금 지원 세부내역</h2>
+            <Grid
+              headers={["순번", "성명", "장학유형", "지급률", "지급액", "지급일", "비고"]}
+              rows={rows.map((row, rowIndex) => [
+                pageIndex * 18 + rowIndex + 1,
+                row.name,
+                row.category,
+                `${row.rate}%`,
+                money(row.amount),
+                row.paidOn ? date(row.paidOn) : "미지급",
+                row.note,
+              ])}
+            />
+          </div>,
+        ),
+      );
   }
   return (
     <div
