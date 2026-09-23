@@ -18,6 +18,8 @@ import { STATUS_LABELS, RESULT_STATUS_LABELS } from "@/lib/operation-documents/m
 export type DocumentCourseItem = {
   /** 과정 고유 ID (DB UUID 또는 원문 이관 식별자) */
   id: string;
+  /** 원문 개설 계획서 ID (P01~P16). */
+  source_id: string;
   /** 실제 Supabase offering 등록 여부 */
   registered: boolean;
   /** 정렬 순번 (1 ~ 16) */
@@ -67,9 +69,10 @@ interface DocumentListViewProps {
   kind: "plan" | "result";
   /** 표시할 16개 과정 데이터 목록 */
   courses: DocumentCourseItem[];
+  manager: boolean;
 }
 
-export function DocumentListView({ kind, courses }: DocumentListViewProps) {
+export function DocumentListView({ kind, courses, manager }: DocumentListViewProps) {
   // 보기 모드 상태: 'cards' (카드형), 'list' (리스트형 테이블)
   const [view, setView] = useState<"cards" | "list">("cards");
   // 검색어 상태 (프로그램 ID, 과정명, 강사명 등)
@@ -84,7 +87,7 @@ export function DocumentListView({ kind, courses }: DocumentListViewProps) {
 
   // 상태 배지 한글 명칭 반환 함수
   const getStatusLabel = (item: DocumentCourseItem) => {
-    if (!item.registered) return "DB 이관 대기";
+    if (!item.registered) return "과정 DB 미등록";
     const statusKey = isResult ? item.result_status : item.plan_status;
     if (!statusKey) return "작성 시작";
     if (isResult) {
@@ -392,8 +395,13 @@ export function DocumentListView({ kind, courses }: DocumentListViewProps) {
                       </span>
                     </Link>
                   ) : (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-                      과정·책임강사를 DB에 등록한 뒤 작성할 수 있습니다.
+                    <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+                      <p>원문 자료만 등록되어 있습니다. 실제 과정을 등록하면 관리자가 문서 초안을 작성할 수 있습니다. 책임강사 지정과 본인 인증은 별도로 필요합니다.</p>
+                      {manager && c.source_id && (
+                        <Link className="inline-block font-semibold text-teal-800 underline" href={`/admin/courses?plan=${c.source_id}#offering-draft`}>
+                          원문 확인 후 과정 등록 →
+                        </Link>
+                      )}
                     </div>
                   )}
                 </div>
@@ -518,9 +526,11 @@ export function DocumentListView({ kind, courses }: DocumentListViewProps) {
                             {label} 작성·검토 →
                           </Link>
                         ) : (
-                          <span className="text-xs text-slate-500">
-                            과정·책임강사 등록 후 작성 가능
-                          </span>
+                          manager && c.source_id ? (
+                            <Link className="text-xs font-semibold text-teal-800 underline" href={`/admin/courses?plan=${c.source_id}#offering-draft`}>
+                              원문 확인 후 과정 등록 →
+                            </Link>
+                          ) : <span className="text-xs text-slate-500">과정 등록 후 작성 가능</span>
                         )}
                       </div>
                     </td>

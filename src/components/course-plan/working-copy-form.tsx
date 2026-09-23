@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { createOffering } from "@/app/actions";
 import { saveOpeningWorkingCopy } from "@/app/opening-working-copy-actions";
@@ -39,6 +40,6 @@ export function WorkingCopyForm({ source, copy, children }: { source: string; co
     </fieldset>
     {state.message && <p role={state.ok ? "status" : "alert"} className={state.ok ? "text-teal-800" : "text-red-700"}>{state.message}</p>}
     {state.message === MFA_REAUTH_MESSAGE && <a href={`/auth/security?next=${encodeURIComponent(`/admin/courses?plan=${source}`)}`} target="_blank" rel="noopener noreferrer" className="btn-secondary">추가 인증하기 (새 창)</a>}
-    {created.ok && <p className="notice">실제 기수 초안을 등록했습니다. 임시저장본은 별도로 유지됩니다. <a href="/admin/courses" className="font-semibold text-teal-800 underline">등록한 과정 확인 →</a></p>}
+    {created.ok && <p className="notice">실제 기수 초안을 등록했습니다. 임시저장본은 별도로 유지됩니다. 책임강사 계정 확인과 지정은 별도로 진행해 주세요. <Link href="/operation-documents/plan" className="font-semibold text-teal-800 underline">운영계획서 작성 →</Link> · <Link href="/operation-documents/result" className="font-semibold text-teal-800 underline">결과보고서 작성 →</Link></p>}
   </form>;
 }
