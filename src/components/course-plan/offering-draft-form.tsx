@@ -76,6 +76,7 @@ export function OfferingDraftForm({ orgId, years, plan, copy }: {
             {([["starts_on", "교육 시작일"], ["ends_on", "교육 종료일"]] as const).map(([name, label]) => (
               <label key={name} className="field">{label}<input type="date" name={name} required defaultValue={copy?.payload[name]} /></label>
             ))}
+            <p className="text-sm text-slate-600 md:col-span-2">접수 마감은 접수 시작보다 늦어야 하며, 교육 종료일은 시작일과 같거나 늦어야 합니다.</p>
           </div>
           <label className="field">과정 소개<textarea name="summary" rows={3} maxLength={3000} required defaultValue={defaults?.summary} /></label>
           <label className="field">교육내용·대상·준비사항<textarea name="curriculum" rows={6} maxLength={20000} required defaultValue={defaults?.curriculum} /></label>

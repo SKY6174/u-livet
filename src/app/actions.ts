@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getSessionIdentity } from "@/lib/auth/session";
 import { UUID } from "@/lib/portal/data";
 import type { ActionState } from "@/lib/portal/types";
-import { OPENING_SOURCE } from "@/lib/course-opening/working-copy";
+import { OPENING_SOURCE, openingDateOrderError, openingValues, validOpeningValues } from "@/lib/course-opening/working-copy";
 
 const errors: Record<string, string> = {
   MFA_REAUTH_REQUIRED: MFA_REAUTH_MESSAGE,
@@ -39,6 +39,11 @@ async function mutate(
     if (error)
       return {
         message:
+          (error.code === "23514" && error.message.includes("life_offerings_check1")
+            ? "교육 종료일은 교육 시작일과 같거나 늦어야 합니다."
+            : error.code === "23514" && error.message.includes("life_offerings_check")
+              ? "접수 마감 일시는 접수 시작 일시보다 늦어야 합니다."
+              : null) ??
           errors[error.message] ??
           "처리하지 못했습니다. 입력 내용과 현재 상태를 확인해 주세요.",
       };
@@ -181,6 +186,11 @@ export async function createOffering(
     if (!value(f, key)) return { message: "접수 일시를 입력해 주세요." };
     args[key] = `${value(f, key)}+09:00`;
   }
+  const opening = openingValues(f);
+  if (!validOpeningValues(opening))
+    return { message: "정원·날짜·입력 항목을 확인해 주세요." };
+  const dateError = openingDateOrderError(opening);
+  if (dateError) return { message: dateError.message };
   const source = value(f, "source");
   if (source && !OPENING_SOURCE.test(source))
     return { message: "원문 과정 식별자를 확인해 주세요." };

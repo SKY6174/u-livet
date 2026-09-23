@@ -6,6 +6,14 @@ export const OPENING_FIELDS = {
 export type OpeningValues = Record<keyof typeof OPENING_FIELDS, string>;
 export type OpeningWorkingCopy = { payload: OpeningValues; revision: number; updated_at: string };
 export const OPENING_SOURCE = /^P(0[1-9]|1[0-6])$/;
+export type OpeningDateField = "apply_until" | "ends_on";
+export function openingDateOrderError(values: Pick<OpeningValues, "apply_from" | "apply_until" | "starts_on" | "ends_on">): { field: OpeningDateField; message: string } | null {
+  if (values.apply_from && values.apply_until && values.apply_until <= values.apply_from)
+    return { field: "apply_until", message: "접수 마감 일시는 접수 시작 일시보다 늦어야 합니다." };
+  if (values.starts_on && values.ends_on && values.ends_on < values.starts_on)
+    return { field: "ends_on", message: "교육 종료일은 교육 시작일과 같거나 늦어야 합니다." };
+  return null;
+}
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function validOpeningValues(value: unknown): value is OpeningValues {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
