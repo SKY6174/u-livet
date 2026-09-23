@@ -16,3 +16,5 @@
 - 인증 전에는 로그인 연결·강사 역할을 만들지 않는다. 교내 강사는 @uc.ac.kr을 확인하고 사업단은 기존 MFA를 유지한다. 직책만으로 업무 권한을 부여하지 않는다.
 - 236개 핵심 검사(로컬 SQL 69 + JS 158 + Preview 실제 Auth 9), lint/build 통과. 별도 실행한 오래된 검사 3개의 테스트 설정 불일치는 분석 문서에 기록했다.
 - DB migration: `20260923083920_anchor_member_auth_link.sql`. 신규 private claim 테이블과 인증 트리거, 기존 함수/직책 제약 확장. 기존 사용자·역할을 일괄 병합하거나 생성하지 않는다.
+- Preview·운영 DB 적용 완료. 운영 Auth 7 / person 21 / role 15 건은 적용 전후 동일하고 신규 claim은 0건이다. 두 환경 보안 advisor 경고 없음.
+- 배포 중 기존 `anchor_result_attachments_scholarships`의 원격 이력 번호 불일치 발견: Preview 20260923000604, 운영 20260923000805. 저장소 20260923000234 파일과 양쪽 SQL이 byte 단위로 동일(MD5 1233512fc74d0416346f37cecc4bf0c1)함을 확인하고, 원격 이력 version만 20260923000234로 정규화했다. 업무 데이터나 SQL 재실행 없이 CI 이력 검사를 복구했다.
