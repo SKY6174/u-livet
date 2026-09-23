@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getWorkspaceOfferings } from "@/lib/portal/data";
+import { getInstructorHomeSummary } from "@/lib/classroom-questions/data";
 import { Empty, PageIntro } from "@/components/portal/ui";
 import { AccountSecurity } from "@/components/auth/account-security";
 import { memberLabel } from "@/lib/auth/workspace-navigation";
@@ -22,19 +22,12 @@ export default async function InstructorRoom() {
   const me = await requireIdentity("/instructor");
   if (!me.roles.some((r) => r.role === "INSTRUCTOR")) notFound();
 
-  // 배정된 강좌 목록을 데이터베이스에서 조회합니다.
-  const { data, error } = await (await createServerSupabaseClient())
-    .from("life_offering_instructors")
-    .select("offering_id,valid_until")
-    .eq("person_id", me.id);
-
-  const assigned = (data ?? [])
-    .filter((i) => !i.valid_until || Date.parse(i.valid_until) > Date.now())
-    .map((i) => i.offering_id);
+  const summary = await getInstructorHomeSummary();
+  const assigned = summary?.map((item) => item.offering_id) ?? [];
 
   const { offerings: own, unavailable } = await getWorkspaceOfferings(
     "id",
-    error ? [] : assigned,
+    assigned,
   );
 
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
@@ -85,6 +78,32 @@ export default async function InstructorRoom() {
         <Link className="btn-primary" href="/operation-documents/plan">책임과정 운영계획서 작성 →</Link>
         <Link className="btn-secondary" href="/operation-documents/result">책임과정 결과보고서 작성 →</Link>
       </div>
+      <section className="mb-10" aria-labelledby="my-class-summary">
+        <h2 id="my-class-summary" className="section-title">담당 수업 현황</h2>
+        <p className="mb-5 text-sm text-slate-600">수강생과 종료된 수업의 출결 기록, 답변할 질문을 수업별로 확인하세요.</p>
+        {summary === null || unavailable ? (
+          <Empty title="담당 수업 현황을 불러오지 못했습니다" />
+        ) : !summary.length ? (
+          <Empty title="현재 배정된 수업이 없습니다">사업단의 강사 배정이 완료되면 이곳에 표시됩니다.</Empty>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {summary.map((item) => <article key={item.offering_id} className="panel">
+              <h3 className="text-lg font-bold">{own.find((offering) => offering.id === item.offering_id)?.name ?? "담당 수업"}</h3>
+              <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div><dt className="text-slate-600">수강생</dt><dd className="font-bold">{item.learner_count}명</dd></div>
+                <div><dt className="text-slate-600">미답변 질문</dt><dd className="font-bold">{item.unanswered_questions}건</dd></div>
+                <div><dt className="text-slate-600">종료된 수업</dt><dd className="font-bold">{item.ended_sessions}회</dd></div>
+                <div><dt className="text-slate-600">출결 기록</dt><dd className="font-bold">{item.attendance_records}건</dd></div>
+              </dl>
+              <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold text-teal-800">
+                <Link href={`/instructor/offerings/${item.offering_id}`}>수강생·수업 관리 →</Link>
+                <Link href={`/instructor/offerings/${item.offering_id}/attendance`}>출석부 →</Link>
+                <Link href={`/instructor/offerings/${item.offering_id}#class-questions`}>질문 확인 →</Link>
+              </div>
+            </article>)}
+          </div>
+        )}
+      </section>
       {/* 3. 강사 전주기 라이프사이클 (10대 프로세스 워크플로우 허브) */}
       <section className="mb-10" aria-label="강사 라이프사이클 업무 가이드">
         <h2 className="section-title flex items-center gap-2">
@@ -218,7 +237,7 @@ export default async function InstructorRoom() {
           <span className="text-sm text-slate-600">총 {own.length}개 과정 배정됨</span>
         </div>
 
-        {error || unavailable ? (
+        {summary === null || unavailable ? (
           <Empty title="담당 과정을 불러오지 못했습니다" />
         ) : !own.length ? (
           <Empty title="현재 배정된 교육과정이 없습니다">
