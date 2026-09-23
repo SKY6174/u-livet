@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowUpRight, Award, BookOpen, ChartNoAxesCombined, ClipboardCheck, Files, FileText, Layers3, Ticket, UsersRound, Wallet } from "lucide-react";
 import { requireIdentity } from "@/lib/auth/session";
 import { hasRole, isOfficeMember, officeSections } from "@/lib/auth/workspace-navigation";
+import { getAdminLearnerDocuments } from "@/lib/learner-document-workflow/data";
+import { LearnerRequestAlerts } from "@/components/admin/learner-request-alerts";
 
 const WORKSPACE_ICONS = {
   "/admin/courses": BookOpen,
@@ -36,6 +38,10 @@ export default async function Admin({ searchParams }: {
     }
     redirect(`/admin/courses?${query.toString()}#new-course`);
   }
+  const canReviewLearnerRequests = hasRole(me, "SYSTEM_ADMIN", "COURSE_MANAGER", "FINANCE");
+  const learnerRequests = canReviewLearnerRequests
+    ? await getAdminLearnerDocuments({ kind: null, status: null, query: "" })
+    : undefined;
   return (
     <div className="page-shell">
       <div className="mb-9 flex items-end justify-between gap-4 border-b border-slate-200 pb-7">
@@ -48,6 +54,7 @@ export default async function Admin({ searchParams }: {
         </span>
       </div>
       {hasRole(me, "COURSE_MANAGER") && <Link className="btn-secondary mb-6" href="/admin/course-requests">수강생 희망 과목 제안·검토 →</Link>}
+      {learnerRequests !== undefined && <LearnerRequestAlerts data={learnerRequests} />}
       <div className="space-y-8">
         {officeSections(me).map(({ title, links }, sectionIndex) => (
           <section key={title} aria-labelledby={`workspace-section-${sectionIndex}`}>

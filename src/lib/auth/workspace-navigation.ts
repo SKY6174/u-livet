@@ -24,15 +24,23 @@ export function officeSections(member: Member) {
   const manager = hasRole(member, "COURSE_MANAGER");
   const certifier = hasRole(member, "COURSE_MANAGER", "CERTIFIER");
   return [
-    { title: "과정 운영", links: hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
-      { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
-    ] : [] },
-    { title: "전문가", links: manager ? [
-      { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
-    ] : [] },
-    { title: "결과 보고·수료", links: [
+    { title: "기획·개설", links: [
+      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
+        { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
+      ] : []),
+      ...(manager ? [
+        { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
+      ] : []),
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "운영계획서", href: "/operation-documents/plan", description: "책임강사 작성, 담당자 예산 검토와 최종 제출" },
+      ] : []),
+    ] },
+    { title: "접수·운영", links: [
+      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN", "FINANCE") ? [{ label: "수강생 서류", href: "/admin/learner-documents", description: "수강신청·장학금·환불 서류의 접수 원본과 처리 이력을 관리합니다." }] : []),
+      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [{ label: "무료 주차권 관리", href: "/admin/parking", description: "과정별 담당 센터, 발급 신청·승인, 재고와 사용대장을 관리합니다." }] : []),
+    ] },
+    { title: "마감·수료", links: [
+      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "결과보고서", href: "/operation-documents/result", description: "공식 결과보고서와 과정별 결과 보고·6종 증빙을 관리합니다." },
       ] : []),
       ...(certifier ? [
@@ -40,11 +48,11 @@ export function officeSections(member: Member) {
         { label: "증명 관리", href: "/credentials", description: "증명 신청·발급과 디지털배지를 관리합니다." },
       ] : []),
     ] },
-    { title: "사업단 지원", links: [
-      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN", "FINANCE") ? [{ label: "수강생 서류", href: "/admin/learner-documents", description: "수강신청·장학금·환불 서류의 접수 원본과 처리 이력을 관리합니다." }] : []),
-      ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [{ label: "무료 주차권 관리", href: "/admin/parking", description: "과정별 담당 센터, 발급 신청·승인, 재고와 사용대장을 관리합니다." }] : []),
+    { title: "정산·성과", links: [
       ...(hasRole(member, "FINANCE") ? [{ label: "수납·환불", href: "/finance", description: "교육비 수납과 환불 처리 내역을 확인합니다." }] : []),
       ...(hasRole(member, "COURSE_MANAGER", "PERFORMANCE") ? [{ label: "연차 평가·성과", href: "/performance", description: "사업연도별 운영 통계와 성과 보고를 관리합니다." }] : []),
+    ] },
+    { title: "계정·권한", links: [
       ...((hasRole(member, "SYSTEM_ADMIN") || !!member.member_entry_orgs?.length) ? [{ label: "구성원 관리", href: "/admin/accounts", description: "사업단·강사·수강생의 정보와 활동 이력을 관리합니다." }] : []),
     ] },
   ].filter((section) => section.links.length);

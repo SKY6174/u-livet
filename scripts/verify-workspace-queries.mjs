@@ -19,8 +19,11 @@ function page(path, { roles = [], db = {}, workspace = async () => ({ offerings:
     'next/link': { default: 'a' },
     'next/navigation': { notFound: () => { throw denied; } },
     '@/lib/auth/session': { requireIdentity: async () => ({ id: 'tester', name: 'TEST', roles }) },
+    '@/lib/auth/workspace-navigation': { hasRole: (identity, ...accepted) => identity.roles.some(role => accepted.includes(role.role)) },
+    '@/lib/completion/offerings': { mergeCompletionOfferings: offerings => offerings.map(offering => ({ id: offering.id, registered: true, sourceId: null, name: offering.name, academy: '', capacity: offering.capacity ?? null, yearLabel: offering.year_label ?? '', startsOn: offering.starts_on ?? '', endsOn: offering.ends_on ?? '', status: offering.status ?? null })) },
     '@/lib/supabase/server': { createServerSupabaseClient: async () => db },
-    '@/lib/portal/data': { getWorkspaceOfferings: workspace, dateTime: () => 'date' },
+    '@/lib/operation-documents/prefilled-data': { PREFILLED_COURSES: [], findPrefilledCourse: () => undefined },
+    '@/lib/portal/data': { getWorkspaceOfferings: workspace, dateTime: () => 'date', statusLabel: {} },
     '@/components/portal/ui': {
       PageIntro: ({ title, children }) => createElement('section', null, title, children),
       Empty: ({ title }) => createElement('p', null, title),

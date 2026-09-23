@@ -22,22 +22,31 @@ let me = member();
 let path = '/admin';
 const notFound = () => { throw new Error('NOT_FOUND'); };
 const redirect = destination => { throw Object.assign(new Error('REDIRECT'), { destination }); };
+let learnerRequestReads = 0;
 const common = {
   'next/link': 'a', 'next/navigation': { notFound, redirect, usePathname: () => path },
   '@/lib/auth/session': { requireIdentity: async () => { if (!me) throw new Error('LOGIN_REQUIRED'); return me; } },
   '@/lib/auth/workspace-navigation': nav,
+  '@/lib/learner-document-workflow/data': { getAdminLearnerDocuments: async () => { learnerRequestReads++; return { organizations: [], requests: [] }; } },
+  '@/components/admin/learner-request-alerts': { LearnerRequestAlerts: () => React.createElement('section', null, '실시간 수강생 요청') },
 };
 // This .mjs uses React.createElement so it needs no JSX runtime in Node.
 common['@/components/portal/ui'] = {
   PageIntro: ({ title, children }) => React.createElement('header', null, React.createElement('h1', null, title), children),
   Empty: ({ title, children }) => React.createElement('div', null, title, children),
 };
+const workflowTypes = load('src/lib/learner-document-workflow/types.ts');
+const LearnerRequestAlerts = load('src/components/admin/learner-request-alerts.tsx', {
+  'next/link': 'a',
+  '@/components/admin/admin-live-refresh': { AdminLiveRefresh: () => React.createElement('button', null, '지금 갱신') },
+  '@/lib/learner-document-workflow/types': workflowTypes,
+}).LearnerRequestAlerts;
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
-  [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/operation-documents/result', '/admin/parking', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/courses', '/admin/instructors', '/operation-documents/plan', '/operation-documents/result', '/completion', '/credentials', '/admin/parking', '/performance'], 'office'],
+  [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/admin/accounts'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/courses', '/admin/instructors', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
-  [['FINANCE'], ['/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
+  [['FINANCE'], ['/admin/learner-documents', '/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
 for (const [roles, links, kind] of roleCases) await test('granted role menus: ' + (roles.join(',') || 'learner'), () => {
   const identity = member(...roles);
@@ -64,6 +73,30 @@ await test('combined roles preserve independent workspaces without duplicate lin
   assert(primary.includes('/admin') && primary.includes('/instructor'));
   const hrefs = nav.officeSections(mixed).flatMap(section => section.links.map(link => link.href));
   assert.equal(new Set(hrefs).size, hrefs.length);
+});
+await test('office navigation follows the operational workflow', () => {
+  const sections = nav.officeSections(member('COURSE_MANAGER', 'FINANCE'));
+  assert.deepEqual(sections.map(section => section.title), ['기획·개설', '접수·운영', '마감·수료', '정산·성과']);
+  assert.deepEqual(sections.flatMap(section => section.links.map(link => link.href)), [
+    '/admin/courses', '/admin/instructors', '/operation-documents/plan',
+    '/admin/learner-documents', '/admin/parking',
+    '/operation-documents/result', '/completion', '/credentials',
+    '/finance', '/performance',
+  ]);
+});
+await test('learner request alerts count only unresolved requests by document type', () => {
+  const request = (kind, status, index) => ({ id: String(index), kind, status, course_name: `과정 ${index}`, applicant_name: `신청자 ${index}`, submitted_at: '2026-09-23T12:00:00Z' });
+  const output = renderToStaticMarkup(React.createElement(LearnerRequestAlerts, { data: { organizations: [], requests: [
+    request('APPLICATION', 'RECEIVED', 1), request('APPLICATION', 'COMPLETED', 2),
+    request('SCHOLARSHIP', 'REVIEWING', 3), request('REFUND', 'APPROVED', 4),
+    request('REFUND', 'REJECTED', 5),
+  ] } }));
+  assert(output.includes('미처리 3건'));
+  assert.match(output, /수강신청원서[\s\S]*?1<span[^>]*>건/);
+  assert.match(output, /장학금 지급신청서[\s\S]*?1<span[^>]*>건/);
+  assert.match(output, /수강료환불신청서[\s\S]*?1<span[^>]*>건/);
+  assert(!output.includes('신청자 2'));
+  assert(!output.includes('신청자 5'));
 });
 await test('expert management is an independent office menu with correct nested selection', () => {
   const expert = nav.officeSections(member('COURSE_MANAGER')).flatMap(section => section.links).find(link => link.href === '/admin/instructors');
@@ -115,15 +148,18 @@ await test('office hub rejects guests/learners/teachers and permits each actual 
   }
   for (const [roles, expected, kind] of roleCases.filter(row => row[2] === 'office')) {
     me = member(...roles);
+    const readsBefore = learnerRequestReads;
     const output = renderToStaticMarkup(await Admin({ searchParams: Promise.resolve({}) }));
     for (const href of expected) assert(output.includes(`href="${href}"`), href + kind);
+    assert.equal(output.includes('실시간 수강생 요청'), roles.some(role => ['SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE'].includes(role)));
+    assert.equal(learnerRequestReads - readsBefore, roles.some(role => ['SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE'].includes(role)) ? 1 : 0);
     await AdminLayout({ children: null });
   }
 });
 await test('every pre-existing course subtree retains a manager gate when the hub is widened', async () => {
   const redirectOnly = ['finance', 'performance', 'kpi'];
   for (const dir of readdirSync('src/app/admin', { withFileTypes: true }).filter(dir => dir.isDirectory())) {
-    if (['accounts', 'course-requests', 'parking'].includes(dir.name)) continue; // pages enforce their own role gates
+    if (['accounts', 'course-requests', 'learner-documents', 'parking'].includes(dir.name)) continue; // pages enforce their own role gates
     if (redirectOnly.includes(dir.name)) continue; // no data; destination layout gates it
     const gate = load(`src/app/admin/${dir.name}/layout.tsx`, { '@/components/navigation/office-section': section }).default;
     for (const roles of [[], ['INSTRUCTOR'], ['SYSTEM_ADMIN'], ['CERTIFIER'], ['FINANCE'], ['PERFORMANCE']]) {
@@ -193,6 +229,10 @@ await test('report states/search isolate results and link to the correct report/
 let reportReads = 0;
 let documentFailure = false;
 let legacyFailure = false;
+const documentPrefilled = {
+  PREFILLED_COURSES: [{ id: 'fixture-course', sourceId: 'P01', programId: 'FIXTURE-01', title: '검증 과정', academy: '검증', capacity: 10, teachingHours: 8, startsOn: '2026-01-01', endsOn: '2026-02-01', timeLabel: '검증 시간', location: '검증실', teachers: '책임강사', facultyCoordinator: '책임강사', assistants: '-', supportStaff: '-', hasResultReport: false }],
+  findPrefilledCourse: name => name === '검증 과정' ? { id: 'fixture-course' } : undefined,
+};
 const DocumentList = load('src/components/operation-documents/document-list.tsx', { ...common,
   '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async () => ({
     data: [{ id: 'course-1', name: '검증 과정', starts_on: '2026-01-01', ends_on: '2026-02-01', responsible: '책임강사', plan_status: 'DRAFT', result_status: 'REVIEW' }],
@@ -200,7 +240,9 @@ const DocumentList = load('src/components/operation-documents/document-list.tsx'
   }) }) },
   '@/lib/course-workspace/data': { getCourseWorkspaces: async () => { reportReads++; return { courses: [], unavailable: legacyFailure }; } },
   '@/lib/operation-documents/model': { STATUS_LABELS: { DRAFT: '작성 중', REVIEW: '검토 중' } },
+  '@/lib/operation-documents/prefilled-data': documentPrefilled,
   '@/components/course-workspace/report-list': { ReportList: () => React.createElement('p', null, '기존 결과 보고 목록') },
+  './document-list-view': { DocumentListView: ({ kind, courses }) => React.createElement('div', null, courses.filter(course => course.registered).map(course => React.createElement('a', { key: course.id, href: `/operation-documents/${course.id}/${kind}` }, course.name))) },
 }).DocumentList;
 await test('plan and result menus separate documents and keep legacy reports manager-only', async () => {
   me = member('COURSE_MANAGER');
