@@ -177,7 +177,13 @@ const claims = JSON.parse(
 );
 assert.match(claims.session_id, /^[0-9a-f-]{36}$/);
 sql(
-  `update auth.mfa_amr_claims set updated_at=now()-interval '16 minutes' where session_id='${claims.session_id}' and authentication_method='totp'`,
+  `update auth.mfa_amr_claims set updated_at=now()-interval '119 minutes' where session_id='${claims.session_id}' and authentication_method='totp'`,
+);
+assert.equal(ok(await manager.c.rpc("life_security_status")).fresh_minutes, 120);
+assert.equal(ok(await manager.c.rpc("life_security_status")).recent, true);
+pass("TOTP authentication from 119 minutes ago remains valid");
+sql(
+  `update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id='${claims.session_id}' and authentication_method='totp'`,
 );
 assert.equal(
   ok(await manager.c.rpc("life_security_status")).mfa_verified,
@@ -186,7 +192,7 @@ assert.equal(
 assert.equal(ok(await manager.c.rpc("life_security_status")).recent, false);
 assert.equal(ok(await manager.c.rpc("life_identity")).id, manager.person);
 pass(
-  "expired recent authentication preserves read access but requires step-up",
+  "authentication older than two hours preserves read access but requires step-up",
 );
 const count = sql("select count(*) from public.life_courses");
 assert.equal(

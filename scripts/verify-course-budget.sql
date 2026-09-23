@@ -56,7 +56,7 @@ set local role authenticated;
 select pg_temp.denied($q$select life_course_budget_overview('10000000-0000-4000-8000-000000000001',2026)$q$,'FORBIDDEN');
 select pg_temp.denied($q$select life_save_course_budget('10000000-0000-4000-8000-000000000001','2026-manual-therapy',current_setting('test.payload')::jsonb,3)$q$,'FORBIDDEN');
 reset role;
-update auth.mfa_amr_claims set updated_at=now()-interval '1 hour',created_at=now()-interval '1 hour' where session_id=md5('bs-1')::uuid;
+update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes',created_at=now()-interval '121 minutes' where session_id=md5('bs-1')::uuid;
 select set_config('request.jwt.claims',jsonb_build_object('sub',md5('budget-1')::uuid,'role','authenticated','amr',jsonb_build_array(jsonb_build_object('method','totp','timestamp',floor(extract(epoch from now())))),'aal','aal2','session_id',md5('bs-1')::uuid)::text,true);
 set local role authenticated;
 select pg_temp.denied($q$select life_save_course_budget('10000000-0000-4000-8000-000000000001','2026-manual-therapy',current_setting('test.payload')::jsonb,3)$q$,'MFA_REAUTH_REQUIRED');

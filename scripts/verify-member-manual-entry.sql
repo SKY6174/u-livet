@@ -111,7 +111,7 @@ select pg_temp.check_result((select count(*) from life_private.manual_members)=5
 select pg_temp.check_result((select count(*) from public.life_audit_events where action='MEMBER_CREATED')=5,'one creation audit per member');
 select pg_temp.check_result(not exists(select 1 from public.life_role_assignments r join life_private.manual_members m on m.person_id=r.person_id),'manual entry never grants service roles');
 select pg_temp.check_result((select count(*) from auth.users)=32,'manual entry never creates login accounts');
-update auth.mfa_amr_claims set updated_at=now()-interval '20 minutes' where session_id=md5('session-1')::uuid;
+update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id=md5('session-1')::uuid;
 set local role authenticated;
 select pg_temp.expect_error($cmd$select pg_temp.register_member(9)$cmd$,'MFA_REAUTH_REQUIRED');
 reset role;
@@ -130,5 +130,8 @@ select pg_temp.check_result(not has_table_privilege('authenticated','life_privat
 \endif
 \if :{?member_excel_extension}
 \ir verify-member-excel.sql
+\endif
+\if :{?mfa_two_hour_extension}
+\ir verify-mfa-two-hour.sql
 \endif
 rollback;
