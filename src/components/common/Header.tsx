@@ -181,7 +181,7 @@ export default function Header() {
       </a>
       <div className="bg-uc-navy px-5 py-2 text-xs text-white">
         <div className="mx-auto max-w-7xl">
-          울산과학대학교 앵커사업단 · 평생직업교육
+          울산과학대학교 앵커사업단 | 개방형 평생직업교육
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
