@@ -22,7 +22,7 @@ const registration = load('src/lib/auth/registration.ts', {});
 const audiences = load('src/lib/auth/login-audience.ts', {});
 const navigation = load('src/lib/auth/workspace-navigation.ts', { './login-audience': audiences });
 const Link = ({ children, ...props }) => React.createElement('a', props, children);
-const menuHint = load('src/components/navigation/menu-hint.tsx', { 'react/jsx-runtime': jsx });
+const menuHint = load('src/components/navigation/menu-hint.tsx', { 'react/jsx-runtime': jsx, react: React });
 let currentIdentity = null;
 let security = null;
 let learnerReads = 0;
