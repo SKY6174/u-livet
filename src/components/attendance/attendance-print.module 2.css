@@ -1,8 +1,0 @@
-.sheet h1 { margin: 0 0 4mm; }
-.sheet h2 { margin: 3mm 0; }
-.sheet table th, .sheet table td {
-  padding: 1mm;
-  font-size: 7.5pt;
-  line-height: 1.25;
-  white-space: normal;
-}
