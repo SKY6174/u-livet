@@ -24,7 +24,7 @@ const navigation = load('src/lib/auth/workspace-navigation.ts', { './login-audie
 const Link = ({ children, ...props }) => React.createElement('a', props, children);
 let currentIdentity = null;
 let security = null;
-let courseReads = 0;
+let learnerReads = 0;
 let instructorReads = 0;
 let instructorSummary = [{ offering_id: '10000000-0000-4000-8000-000000000099', learner_count: 7, ended_sessions: 2, attendance_records: 12, unanswered_questions: 3 }];
 let requestReads = 0;
@@ -47,13 +47,21 @@ const Home = load('src/app/page.tsx', {
   'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'lucide-react': icons,
   '@/lib/auth/session': session, '@/lib/auth/workspace-navigation': navigation,
   '@/lib/portal/data': {
-    getCourseCards: async () => { courseReads++; return { offerings: [], unavailable: false }; },
     getWorkspaceOfferings: async () => ({ offerings: [{ id: instructorSummary?.[0]?.offering_id, name: '검증 수업' }], unavailable: false }),
+  },
+  '@/lib/student-learning/data': { getLearnerHomeData: async () => {
+    learnerReads++;
+    return { hub: { courses: [{ id: 'synthetic-course', active: true, ends_on: '2026-12-31' }] }, catalog: { courses: [], unavailable: false }, now: Date.parse('2026-09-23T09:00:00+09:00') };
+  } },
+  '@/lib/student-learning/model': { courseStage: course => course.active ? 'current' : 'application' },
+  '@/components/student-learning/home': {
+    LearnerHeroSummary: () => React.createElement('p', null, '다음 수업'),
+    LearnerHome: ({ current }) => React.createElement('section', null, `내 수업 ${current.length}개 · 다른 과정 추천`),
   },
   '@/lib/classroom-questions/data': { getInstructorHomeSummary: async () => { instructorReads++; return instructorSummary; } },
   '@/lib/learner-document-workflow/data': { getAdminLearnerDocuments: async () => { requestReads++; return requestContext; } },
   '@/lib/learner-document-workflow/types': { DOCUMENT_KIND_LABELS: { APPLICATION: '수강신청원서', SCHOLARSHIP: '장학금 지급신청서', REFUND: '수강료환불신청서' } },
-  '@/components/portal/ui': { CourseCard: () => null, Empty: ({ title }) => React.createElement('p', null, title) },
+  '@/components/portal/ui': { Empty: ({ title }) => React.createElement('p', null, title) },
 }).default;
 const Login = load('src/app/auth/login/page.tsx', {
   'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'next/navigation': { redirect },
@@ -63,18 +71,18 @@ const Login = load('src/app/auth/login/page.tsx', {
 let checks = 0;
 const pass = name => { checks++; console.log('PASS ' + name); };
 await assert.rejects(Home(), e => e.destination === '/auth/login?next=%2F');
-assert.equal(courseReads, 0);
+assert.equal(learnerReads, 0);
 const entry = renderToStaticMarkup(await Login({ searchParams: Promise.resolve({}) }));
 for (const label of ['사업단', '강사(교내)', '강사(교외·보조)', '수강생']) assert.ok(entry.includes(label));
 assert.equal((entry.match(/next=%2F"/g) ?? []).length, 4);
 pass('guest reaches four login choices before personal content is loaded');
 security = { status: { mfa_required: true, mfa_verified: false, needs_reset: false } };
 await assert.rejects(Home(), e => e.destination === '/auth/security?next=%2F');
-assert.equal(courseReads, 0);
+assert.equal(learnerReads, 0);
 pass('MFA-incomplete identity cannot reach personal home');
 security = null;
 for (const [roles, expected, hidden] of [
-  [[], ['나의 강의실', '신청 현황', '수강이력·수료 현황'], ['/instructor', '/admin']],
+  [[], ['내 수업', '다른 과정 추천'], ['/instructor', '/admin']],
   [['INSTRUCTOR'], ['My Room', '강사 이력·등록 심사'], ['/admin', '/finance']],
   [['SYSTEM_ADMIN'], ['구성원 관리', '사업단 관리 시작하기'], ['/instructor', '/finance']],
   [['COURSE_MANAGER'], ['과정 운영'], ['/admin/accounts', '/finance']],
@@ -84,19 +92,19 @@ for (const [roles, expected, hidden] of [
   [['SYSTEM_ADMIN', 'COURSE_MANAGER', 'INSTRUCTOR'], ['사업단 관리 시작하기', '과정 운영', 'My Room'], ['/finance']],
 ]) {
   currentIdentity = { id: 'synthetic', name: '검증 회원', roles: roles.map(role => ({ role, org_id: 'synthetic-org' })) };
-  const beforeCourseReads = courseReads;
+  const beforeLearnerReads = learnerReads;
   const beforeRequestReads = requestReads;
   const beforeInstructorReads = instructorReads;
   const html = renderToStaticMarkup(await Home());
   assert.ok(html.includes('검증 회원 님, 반갑습니다.'));
   const kind = navigation.workspaceKind(currentIdentity);
-  assert.ok(html.includes(kind === 'office' ? '사업단 업무를,' : kind === 'instructor' ? '나의 강의와,' : '지금의 배움이,'));
+  assert.ok(html.includes(kind === 'office' ? '사업단 업무를,' : kind === 'instructor' ? '나의 강의와,' : '나의 수업을,'));
   for (const item of expected) assert.ok(html.includes(item), item);
   for (const item of hidden) assert.ok(!html.includes(item), `unexpected ${item}`);
   if (kind === 'office') {
     assert.ok(html.includes('사업단 운영 현황'));
-    assert.ok(!html.includes('함께 시작할 교육과정'));
-    assert.equal(courseReads, beforeCourseReads, 'office home should not query public courses');
+    assert.ok(!html.includes('다른 과정 추천'));
+    assert.equal(learnerReads, beforeLearnerReads, 'office home should not query learner data');
     if (navigation.hasRole(currentIdentity, 'SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE')) {
       assert.equal(requestReads, beforeRequestReads + 1);
       assert.ok(html.includes('수강신청원서') && html.includes('장학금 지급신청서') && html.includes('수강료환불신청서'));
@@ -110,13 +118,13 @@ for (const [roles, expected, hidden] of [
     assert.ok(html.includes('담당 수업 현황') && html.includes('검증 수업'));
     assert.ok(html.includes('7명') && html.includes('3건'));
     assert.ok(html.includes('#class-questions'));
-    assert.ok(!html.includes('함께 시작할 교육과정'));
-    assert.equal(courseReads, beforeCourseReads, 'instructor home should not query public courses');
+    assert.ok(!html.includes('다른 과정 추천'));
+    assert.equal(learnerReads, beforeLearnerReads, 'instructor home should not query learner data');
     assert.equal(instructorReads, beforeInstructorReads + 1);
     assert.equal(requestReads, beforeRequestReads);
   } else {
-    assert.ok(html.includes('함께 시작할 교육과정'));
-    assert.equal(courseReads, beforeCourseReads + 1);
+    assert.ok(html.includes('내 수업 1개') && html.includes('다른 과정 추천'));
+    assert.equal(learnerReads, beforeLearnerReads + 1);
     assert.equal(requestReads, beforeRequestReads);
     assert.equal(instructorReads, beforeInstructorReads);
   }
