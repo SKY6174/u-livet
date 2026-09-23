@@ -97,9 +97,8 @@ export function CoursePlanView({ plan, filters }: {
     <div className="page-shell">
       <p className="eyebrow">2026 RISE · 연간 교육계획</p>
       <h1 className="page-title">평생직업교육과정 현황</h1>
-      <p className="mt-3 max-w-3xl text-slate-600">
-        아카데미별 교육과정과 강사·보조인력, 일정, 예산을 확인하세요.
-        제공된 연간 계획 기준이며, 실제 모집·운영 현황은 과정 운영 관리에서 확인합니다.
+      <p className="mt-3 text-slate-600">
+        아카데미별 연간 계획의 과정·인력·일정·예산을 확인하세요. 실제 운영은 과정 운영 관리에서 확인합니다.
       </p>
       <p className="mt-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-950">
         개별 운영계획서에서 확인한 교내·교외 강사, 교육내용과 개설 전 확인 사항은
