@@ -306,6 +306,10 @@ ok(
 ctx = ok(await context(teacher.c));
 assert.equal(ctx.manager, false);
 assert.equal(ctx.candidates.length, 0);
+assert.equal(
+  ctx.responsible.affiliation,
+  sql(`select name from public.life_organizations where id='${org}'`),
+);
 deny(
   await teacher.c.rpc("life_operation_assign", {
     f,
@@ -642,6 +646,10 @@ ok(await manager.c.rpc("life_assign_instructor", { f, p: alternate.p, enabled: t
 ok(await manager.c.rpc("life_operation_assign", { f, p: alternate.p, expected_revision: 1 }));
 ctx = ok(await context(manager.c));
 assert.equal(ctx.responsible.name, "테스트 teacher2");
+assert.equal(
+  ctx.responsible.affiliation,
+  sql(`select name from public.life_organizations where id='${org}'`),
+);
 assert.ok(ctx.documents.every((d) => d.content.fields.professor === "테스트 teacher2" && d.status === "DRAFT"));
 deny(await context(teacher.c), "FORBIDDEN");
 assert.equal(ok(await context(alternate.c)).responsible.person_id, alternate.p);

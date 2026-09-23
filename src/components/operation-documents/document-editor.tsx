@@ -1019,6 +1019,7 @@ export function DocumentEditor({
               kind={kind}
               content={content}
               budget={budget}
+              responsibleAffiliation={context.responsible?.affiliation}
               status={dirty ? "DRAFT" : doc.status}
               revision={doc.revision}
             />

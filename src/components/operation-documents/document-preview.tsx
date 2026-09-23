@@ -123,17 +123,20 @@ export function DocumentPreview({
   kind,
   content,
   budget,
+  responsibleAffiliation = "",
   status = "DRAFT",
   revision = 0,
 }: {
   kind: DocumentKind;
   content: Content;
   budget: Budget;
+  responsibleAffiliation?: string;
   status?: string;
   revision?: number;
 }) {
   const v = content.fields,
     tt = content.tables;
+  const responsibleSignature = content.signature || content.sourceSignature?.image;
   const photos = kind === "result" ? content.photos.filter((photo) => !!photo.image) : [];
   const pages: ReactNode[] = [];
   pages.push(
@@ -184,23 +187,22 @@ export function DocumentPreview({
             rows={[
               ["영 역", v.academy],
               ["세 부 프 로 그 램 명", v.program],
-              ["담 당 교 수", v.professor],
               ["교 육 기 간", `${date(v.startsOn)} ~ ${date(v.endsOn)}`],
+              [
+                "책 임 강 사",
+                <div className="op-result-responsible" key="responsible">
+                  <span>{responsibleAffiliation || "소속 미등록"}</span>
+                  <b>{v.professor || "성함"}</b>
+                  <span className="op-result-responsible-signature">
+                    (서명)
+                    {responsibleSignature && (
+                      <img src={responsibleSignature} alt="책임강사 서명" />
+                    )}
+                  </span>
+                </div>,
+              ],
             ]}
           />
-          <div className="op-signature op-result-signature">
-            <b>책임강사</b>
-            <b>{v.professor || "성함"}</b>
-            <span>
-              서명 {content.signature && <img src={content.signature} alt="책임강사 서명" />}
-            </span>
-          </div>
-          {content.sourceSignature && (
-            <div className="op-source-signature">
-              <span>원본 PDF 서명(참고) · {content.sourceSignature.page}쪽</span>
-              <img src={content.sourceSignature.image} alt="원본 결과보고서의 서명 이미지" />
-            </div>
-          )}
         </>
       )}
     </div>,
@@ -652,7 +654,7 @@ export function DocumentPreview({
                 ? `최종 제출본 · v${revision}`
                 : "검토용 초안"}
             </span>
-            <span>- {i + 1} -</span>
+            <span className="op-page-number">{i === 0 ? "" : `- ${i} -`}</span>
             <span>울산과학대학교 앵커사업단</span>
           </footer>
         </article>

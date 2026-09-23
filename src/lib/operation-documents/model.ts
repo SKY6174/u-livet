@@ -67,7 +67,12 @@ export type CourseInfo = {
 export type DocumentContext = {
   course: CourseInfo;
   manager: boolean;
-  responsible: { person_id: string; name: string; revision: number } | null;
+  responsible: {
+    person_id: string;
+    name: string;
+    affiliation: string;
+    revision: number;
+  } | null;
   candidates: { id: string; name: string }[];
   members: { person_id: string; name: string }[];
   documents: OperationDocument[];

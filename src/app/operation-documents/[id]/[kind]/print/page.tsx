@@ -41,6 +41,7 @@ export default async function Print({
         kind={kind}
         content={doc.content}
         budget={doc.budget}
+        responsibleAffiliation={context.responsible?.affiliation}
         status={doc.status}
         revision={doc.revision}
       />
