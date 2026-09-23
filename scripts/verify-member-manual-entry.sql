@@ -128,4 +128,7 @@ select pg_temp.check_result(not has_table_privilege('authenticated','life_privat
 \if :{?rank_edit_extension}
 \ir verify-member-rank-edit.sql
 \endif
+\if :{?member_excel_extension}
+\ir verify-member-excel.sql
+\endif
 rollback;

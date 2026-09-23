@@ -57,6 +57,7 @@ const audience = load('src/lib/auth/login-audience.ts');
 let directory = { items: [{ id: '20000000-0000-4000-8000-000000000001', name: '검증 회원', email: 'synthetic@example.invalid', office_position: 'DIRECTOR', instructor_kind: 'EXTERNAL', notes: '<script>alert(1)</script>', revision: 0 }], total: 1, counts: { office: 1, instructor: 1, learner: 1 } };
 let reads = 0;
 const page = load('src/app/admin/accounts/page.tsx', { 'next/link': 'a', 'next/navigation': mocks['next/navigation'], '@/lib/auth/login-audience': audience, '@/lib/members/model': model,
+  '@/components/members/member-excel': { MemberExcel: () => null },
   '@/components/portal/member-notice': load('src/components/portal/member-notice.tsx'),
   '@/components/portal/ui': { PageIntro: ({ title }) => React.createElement('h1', null, title), Empty: ({ title }) => React.createElement('p', null, title) },
   '@/lib/members/data': { memberAdmin: mocks['@/lib/members/data'].memberAdmin, getMembers: async () => { reads++; return { data: directory, error: directory === null }; } },
