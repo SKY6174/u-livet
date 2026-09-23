@@ -18,6 +18,9 @@ export type CourseGuide = {
   certificate: string | null;
   offering_id: string | null;
 };
+export type CourseGuideSummary = Omit<CourseGuide,
+  "curriculum" | "schedule_history" | "time_label" | "location"
+>;
 export type CatalogCourse = Pick<CourseGuide,
   "id" | "name" | "academy" | "summary" | "mode" | "capacity" | "period_label" | "certificate"
 > & { teaching_hours: number | null; href: string };
@@ -33,7 +36,7 @@ export function catalogHref(filters: ReturnType<typeof catalogFilters>, view: "c
   if (filters.mode) query.set("mode", filters.mode);
   return `/courses?${query}`;
 }
-export function mergeCatalog(guides: CourseGuide[], offerings: CourseSummary[]): CatalogCourse[] {
+export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSummary[]): CatalogCourse[] {
   const linked = new Set(guides.map((guide) => guide.offering_id).filter(Boolean));
   return [
     ...guides.map((guide) => ({ ...guide, href: `/courses/${guide.id}` })),
