@@ -4,7 +4,7 @@ import { startTransition, useActionState, useEffect, useState } from "react";
 import { createOffering } from "@/app/actions";
 import { saveOpeningWorkingCopy } from "@/app/opening-working-copy-actions";
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
-import type { OpeningWorkingCopy } from "@/lib/course-opening/working-copy";
+import { openingDateOrderError, openingValues, type OpeningWorkingCopy } from "@/lib/course-opening/working-copy";
 
 export function WorkingCopyForm({ source, copy, children }: { source: string; copy?: OpeningWorkingCopy | null; children: React.ReactNode }) {
   const [saved, save, saving] = useActionState(saveOpeningWorkingCopy, { message: "" });
@@ -12,15 +12,25 @@ export function WorkingCopyForm({ source, copy, children }: { source: string; co
   const [intent, setIntent] = useState("save");
   const [revision, setRevision] = useState(copy?.revision ?? 0);
   const [updatedAt, setUpdatedAt] = useState(copy?.updated_at);
+  const [clientError, setClientError] = useState("");
   useEffect(() => { if (saved.ok) { setRevision(saved.revision!); setUpdatedAt(saved.updatedAt); } }, [saved]);
   const pending = saving || creating, state = intent === "save" ? saved : created;
   const href = `/admin/courses?plan=${source}#offering-draft`;
-  return <form className="space-y-4" onSubmit={event => {
+  return <form className="space-y-4" onChange={() => setClientError("")} onSubmit={event => {
     event.preventDefault(); if (pending || created.ok) return;
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
     const savingCopy = submitter?.value === "save";
     if (!savingCopy && !event.currentTarget.reportValidity()) return;
     const form = new FormData(event.currentTarget); setIntent(savingCopy ? "save" : "create");
+    setClientError("");
+    if (!savingCopy) {
+      const dateError = openingDateOrderError(openingValues(form));
+      if (dateError) {
+        setClientError(dateError.message);
+        event.currentTarget.querySelector<HTMLInputElement>(`[name="${dateError.field}"]`)?.focus();
+        return;
+      }
+    }
     startTransition(() => savingCopy ? save(form) : create(form));
   }}>
     <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-relaxed">
@@ -38,7 +48,7 @@ export function WorkingCopyForm({ source, copy, children }: { source: string; co
         <button type="submit" name="intent" value="create" className="btn-primary">{creating ? "등록 중…" : "실제 기수 초안 등록"}</button>
       </div>
     </fieldset>
-    {state.message && <p role={state.ok ? "status" : "alert"} className={state.ok ? "text-teal-800" : "text-red-700"}>{state.message}</p>}
+    {(clientError || state.message) && <p role={clientError || !state.ok ? "alert" : "status"} className={clientError || !state.ok ? "text-red-700" : "text-teal-800"}>{clientError || state.message}</p>}
     {state.message === MFA_REAUTH_MESSAGE && <a href={`/auth/security?next=${encodeURIComponent(`/admin/courses?plan=${source}`)}`} target="_blank" rel="noopener noreferrer" className="btn-secondary">추가 인증하기 (새 창)</a>}
     {created.ok && <p className="notice">실제 기수 초안을 등록했습니다. 임시저장본은 별도로 유지됩니다. 책임강사 계정 확인과 지정은 별도로 진행해 주세요. <Link href="/operation-documents/plan" className="font-semibold text-teal-800 underline">운영계획서 작성 →</Link> · <Link href="/operation-documents/result" className="font-semibold text-teal-800 underline">결과보고서 작성 →</Link></p>}
   </form>;

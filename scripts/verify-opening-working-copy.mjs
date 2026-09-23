@@ -35,25 +35,51 @@ await check('optional blanks and real leap dates are valid, malformed payloads n
   assert(model.validOpeningValues({ ...blank, starts_on:'2028-02-29', apply_from:'2026-09-21T13:09' }));
   for (const bad of [null,[],{}, { ...blank, extra:'' },{ ...blank, title:null },{ ...blank, title:'x'.repeat(201) },{ ...blank, capacity:'1.5' },{ ...blank, capacity:'0' },{ ...blank, capacity:'1001' },{ ...blank, year:'abc' },{ ...blank, starts_on:'2026-02-29' },{ ...blank, starts_on:'0099-01-01' },{ ...blank, apply_from:'2026-09-21T24:00' },{ ...blank, mode:'remote' }]) assert(!model.validOpeningValues(bad));
 });
+await check('registration date order matches the database while incomplete working copies remain valid', () => {
+  assert(model.validOpeningValues({ ...blank, apply_from:'2026-09-25T09:00', apply_until:'2026-09-24T18:00' }));
+  assert.equal(model.openingDateOrderError({ ...blank, apply_from:'2026-09-25T09:00', apply_until:'2026-09-25T09:00' }).field,'apply_until');
+  assert.equal(model.openingDateOrderError({ ...blank, starts_on:'2026-10-02', ends_on:'2026-10-01' }).field,'ends_on');
+  assert.equal(model.openingDateOrderError({ ...blank, apply_from:'2026-09-24T09:00', apply_until:'2026-09-25T09:00', starts_on:'2026-10-01', ends_on:'2026-10-01' }),null);
+});
+const { createOffering } = load('src/app/actions.ts', dependencies);
+const completeOffering = { ...blank, org, year:org, source:'P01', title:'테스트 과정', academy:'교육', location:'강의실', mode:'OFFLINE', selection_method:'REVIEW', capacity:'14', apply_from:'2026-09-24T09:00', apply_until:'2026-09-25T18:00', starts_on:'2026-10-01', ends_on:'2026-10-02', summary:'과정 소개', curriculum:'교육 내용' };
+await check('course registration explains invalid dates before calling either offering RPC', async () => {
+  const before=calls.length;
+  for (const patch of [{apply_until:'2026-09-24T09:00'},{apply_until:'2026-09-23T18:00'},{starts_on:'2026-10-03'},{source:'' ,ends_on:'2026-09-30'}]) {
+    const response=await createOffering({},form({...completeOffering,...patch}));
+    assert.match(response.message,patch.ends_on ? /교육 종료일/ : patch.starts_on ? /교육 종료일/ : /접수 마감/);
+  }
+  assert.equal(calls.length,before);
+  result={data:null,error:null};
+  assert((await createOffering({},form(completeOffering))).ok);
+  assert.equal(calls.at(-1).name,'life_create_source_offering');
+  assert((await createOffering({},form({...completeOffering,source:''}))).ok);
+  assert.equal(calls.at(-1).name,'life_create_offering');
+  result={data:null,error:{code:'23514',message:'new row for relation "life_offerings" violates check constraint "life_offerings_check"'}};
+  assert.match((await createOffering({},form(completeOffering))).message,/접수 마감/);
+  result={data:{revision:1,updated_at:'2026-09-21T00:00:00Z'},error:null};
+});
 await check('identity and same-organization role are checked before any DB write', async () => {
+  const before=calls.length;
   for (me of [null, { roles:[] }, { roles:[{ ...role, role:'SYSTEM_ADMIN' }] }, { roles:[{ ...role, org_id:org.replace(/1$/,'3') }] }]) assert(!(await save({},form())).ok);
-  assert.equal(calls.length,0); me=identity;
+  assert.equal(calls.length,before); me=identity;
 });
 await check('the action rejects invalid plan/revision/value formats without querying', async () => {
+  const before=calls.length;
   for(const patch of [{ source:'P17' },{ revision:'' },{ revision:'-1' },{ revision:'1.2' },{ revision:'2147483647' },{ starts_on:'2026-02-30' }]) assert(!(await save({},form(patch))).ok);
-  assert.equal(calls.length,0);
+  assert.equal(calls.length,before);
 });
 await check('one whitelisted save RPC carries blank values and no supplied person identity', async () => {
   const r=await save({},form({ person_id:'spoofed', title:'편집 내용' })); assert.equal(r.revision,1); assert(r.ok);
-  assert.equal(calls.length,1); assert.equal(calls[0].name,'life_save_opening_working_copy');
-  assert.deepEqual(calls[0].args,{ o:org,source:'P01',payload:{...blank,title:'편집 내용'},expected_revision:0 });
-  assert.deepEqual(revalidated, ['/admin/course-plan/opening']);
+  assert.equal(calls.at(-1).name,'life_save_opening_working_copy');
+  assert.deepEqual(calls.at(-1).args,{ o:org,source:'P01',payload:{...blank,title:'편집 내용'},expected_revision:0 });
+  assert(revalidated.includes('/admin/course-plan/opening'));
 });
 await check('MFA, conflict and connection failures have actionable messages', async () => {
   result={error:{message:'MFA_REAUTH_REQUIRED'}}; assert.equal((await save({},form())).message,'MFA required');
   result={error:{message:'REVISION_CHANGED'}}; assert.match((await save({},form())).message,/다른 창/);
   networkError=true; assert.match((await save({},form())).message,/입력 내용은 유지/); networkError=false;
-  assert.equal(revalidated.length, 1);
+  assert(revalidated.includes('/admin/course-plan/opening'));
 });
 await check('loader distinguishes an empty DB from failed or malformed reads', async () => {
   result={data:null,error:null}; assert.deepEqual(await get(org,'P01'),{copy:null,unavailable:false});
