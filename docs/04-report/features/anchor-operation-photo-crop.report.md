@@ -1,7 +1,7 @@
 # 운영사진 16:9 중앙 자르기 완료 보고
 
-> Feature: `anchor-operation-photo-crop`  
-> Date: 2026-09-23  
+> Feature: `anchor-operation-photo-crop`
+> Date: 2026-09-23
 > Match rate: 100%
 
 ## 결과
