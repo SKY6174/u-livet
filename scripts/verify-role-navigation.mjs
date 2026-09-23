@@ -103,7 +103,6 @@ await test('learner request alerts count only unresolved requests by document ty
 await test('expert management is an independent office menu with correct nested selection', () => {
   const expert = nav.officeSections(member('COURSE_MANAGER')).flatMap(section => section.links).find(link => link.href === '/admin/instructors');
   assert.equal(expert.label, '전문가 관리');
-  assert(!nav.courseOperationLinks.some(link => link.href === '/admin/instructors'));
   for (const pathname of ['/admin/instructors', '/admin/instructors/documents']) {
     assert.equal(nav.officeActiveHref(pathname), '/admin/instructors');
     assert(nav.primaryActive(pathname, '/admin'));

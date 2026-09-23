@@ -12,7 +12,6 @@ function CourseActions({ course: c, manager, org }: { course: OperationCourse; m
     {manager && (c.workspace ? <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}`}>과정 운영 →</Link> : c.source_id && <Link className="hover:underline" href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>개설 준비 →</Link>)}
     {manager && c.workspace && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>책임강사 지정 →</Link>}
     {manager && c.workspace && <Link className="hover:underline" href={`/operation-documents/${c.workspace.id}/plan`}>계획서 →</Link>}
-    {manager && c.workspace && <Link className="hover:underline" href={`/operation-documents/${c.workspace.id}/result`}>결과보고서 →</Link>}
     <Link className="hover:underline" href={`/courses/${c.id}`}>과정 소개</Link>
     {manager && c.workspace?.report_revision && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/reports`}>증빙·지급자료</Link>}
   </div>;
@@ -41,8 +40,9 @@ export function OperationsDashboard({ courses, workbooks, org, manager, responsi
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {[["2026 전체 과정", `${courses.length}개`], ["개설 준비", `${courses.filter(c => status(c) === "DRAFT").length}개`], ["운영 완료·보관", `${courses.filter(c => status(c) === "ARCHIVED").length}개`], ["편성 예산", `${won(courses.reduce((sum, c) => sum + budgetTotal(c.budget), 0))}원`]].map(([label, value]) => <div key={label} className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-xs text-slate-500">{label}</p><p className={`mt-2 font-bold tabular-nums ${label === "편성 예산" ? "whitespace-nowrap text-base sm:text-xl" : "text-xl sm:text-2xl"}`}>{value}</p></div>)}
     </div>
-    <div role="group" aria-label="과정 관리 화면" className="flex flex-wrap gap-2 border-b border-slate-200 pb-4">
+    <div role="group" aria-label="과정 관리 화면" className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
       {[["courses", "과정 목록"], ["budget", "예산 및 집행현황"]].map(([value, label]) => <button key={value} type="button" aria-pressed={tab === value} onClick={() => setTab(value)} className={`rounded-xl px-5 py-3 text-sm font-bold ${tab === value ? "bg-teal-800 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-teal-50"}`}>{label}</button>)}
+      {manager && <Link className="ml-auto inline-flex min-h-11 items-center rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700" href={`/admin/courses?org=${org}&create=1#new-course`}>새 과정 등록</Link>}
     </div>
     {tab === "courses" && <>
       <div className="flex flex-wrap items-center gap-3">
