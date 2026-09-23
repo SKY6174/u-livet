@@ -135,17 +135,6 @@ export function CoursePlanView({ plan, filters }: {
         })}
       </section>
 
-      <details className="my-7 rounded-xl border border-amber-200 bg-amber-50 p-5">
-        <summary className="cursor-pointer font-semibold text-amber-950">원문 수치와 확인할 사항</summary>
-        <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-amber-950">
-          <li>원문 총계는 {plan.total.capacity}명·{plan.total.hours}시간이며 세부 합산은 {total.capacity}명·{total.hours}시간입니다.</li>
-          <li>스마트테크는 소계만 있습니다. 로컬창업·팝업은 원문 소계와 세부 정원의 차이를 그대로 표시했습니다.</li>
-          <li>교내·교외 구분이 없어 강사와 보조강사의 소속은 확인 필요로 표시합니다. A·B는 원문 표기입니다.</li>
-          <li>모집인원·수료인원과 빈칸은 미기재로, 대시(-)와 미정은 원문대로 구분합니다.</li>
-          <li>기간·요일·시수는 원문 계획입니다. 실제 회차 일정은 과정 개설 시 확인하세요. 예산은 수강료가 아닙니다.</li>
-        </ul>
-      </details>
-
       <form action="/admin/course-plan" className="mb-6 grid items-end gap-3 rounded-2xl border border-slate-200 bg-white p-5 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
         <label className="field">
           과정·인력 검색
