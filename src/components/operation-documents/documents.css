@@ -11,29 +11,30 @@
   width: 210mm;
   min-height: 297mm;
   margin: 0 auto 24px;
-  padding: 20mm 20mm 14mm;
+  /* 원본 PDF 표준 규격(A4, 상단 25mm, 좌우 20mm, 하단 15mm) 여백 */
+  padding: 25mm 20mm 15mm;
   background: white;
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 12px #0f172a15;
   box-sizing: border-box;
-  font-size: 11pt;
+  font-size: 10.5pt;
   line-height: 1.6;
 }
 .op-page-content {
   flex: 1;
 }
 .op-output h1 {
-  font-size: 21pt;
+  font-size: 20pt;
   font-weight: 700;
   text-align: center;
-  margin: 0 0 14mm;
-  line-height: 1.6;
+  margin: 0 0 10mm;
+  line-height: 1.5;
 }
 .op-output h2 {
-  font-size: 12pt;
+  font-size: 13pt;
   font-weight: 700;
-  margin: 6mm 0 3mm;
+  margin: 5mm 0 2.5mm;
 }
 .op-output h3 {
   font-size: 11pt;
@@ -46,7 +47,7 @@
   overflow-wrap: anywhere;
 }
 .op-output small {
-  font-size: 10pt;
+  font-size: 9.5pt;
   font-weight: normal;
 }
 .op-table {
@@ -379,7 +380,7 @@
   .op-output .op-page {
     width: 210mm !important;
     min-height: 297mm !important;
-    padding: 20mm 20mm 14mm !important;
+    padding: 25mm 20mm 15mm !important;
     margin: 0 !important;
     box-shadow: none;
     break-after: page;

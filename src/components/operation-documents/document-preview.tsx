@@ -648,15 +648,18 @@ export function DocumentPreview({
       {pages.map((page, i) => (
         <article key={i} className="report-sheet op-page">
           <div className="op-page-content">{page}</div>
-          <footer className="op-page-footer">
-            <span>
-              {status === "SUBMITTED"
-                ? `최종 제출본 · v${revision}`
-                : "검토용 초안"}
-            </span>
-            <span className="op-page-number">{i === 0 ? "" : `- ${i} -`}</span>
-            <span>울산과학대학교 앵커사업단</span>
-          </footer>
+          {/* 커버페이지(i === 0)에는 페이지 번호와 바닥글을 일체 표시하지 않습니다 */}
+          {i > 0 && (
+            <footer className="op-page-footer">
+              <span>
+                {status === "SUBMITTED"
+                  ? `최종 제출본 · v${revision}`
+                  : "검토용 초안"}
+              </span>
+              <span className="op-page-number">{`- ${i} -`}</span>
+              <span>울산과학대학교 앵커사업단</span>
+            </footer>
+          )}
         </article>
       ))}
     </div>
