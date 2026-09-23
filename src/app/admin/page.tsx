@@ -8,6 +8,7 @@ import { LearnerRequestAlerts } from "@/components/admin/learner-request-alerts"
 import { MenuHint } from "@/components/navigation/menu-hint";
 
 const WORKSPACE_ICONS = {
+  "/admin/development": Layers3,
   "/admin/courses": BookOpen,
   "/admin/instructors": UsersRound,
   "/operation-documents/plan": BookOpen,

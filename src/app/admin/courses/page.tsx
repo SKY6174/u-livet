@@ -61,23 +61,6 @@ export default async function CourseOperations({
       </PageIntro>
       {orgs.length > 1 ? <form className="mb-5 flex flex-wrap gap-3"><label className="text-sm">사업단<select name="org" defaultValue={org} className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm">{orgs.map((id, i) => <option key={id} value={id}>사업단 {i + 1} · {id.slice(-8)}</option>)}</select></label><button className="btn-secondary">선택</button></form>
         : <p className="mb-6 text-sm font-medium text-slate-600">사업단 · {org === ANCHOR_ORG_ID ? "울산과학대학교 앵커사업단" : org.slice(-8)}</p>}
-      {manager && <div className="mb-8 grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]" aria-label="과정 업무 구분">
-        <section className="rounded-2xl border border-teal-200 bg-teal-50/60 p-6">
-          <p className="text-xs font-bold tracking-wide text-teal-800">기존 연간 계획 운영</p>
-          <h2 className="mt-2 text-xl font-bold">연간 계획에서 개설까지</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">과정 현황에서 연간 계획을 확인하고, 개설 준비에서 모집 전 일정·인력·운영 조건을 검토합니다.</p>
-          <nav aria-label="연간 계획과 개설 준비" className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Link className="rounded-xl border border-teal-200 bg-white px-4 py-4 font-semibold text-teal-900 hover:border-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700" href="/admin/course-plan">01 · 과정 현황 확인 →</Link>
-            <Link className="rounded-xl border border-teal-200 bg-white px-4 py-4 font-semibold text-teal-900 hover:border-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700" href="/admin/course-plan/opening">02 · 개설 준비 →</Link>
-          </nav>
-        </section>
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
-          <p className="text-xs font-bold tracking-wide text-slate-500">신규 교육과정 기획</p>
-          <h2 className="mt-2 text-xl font-bold">과정 개발·심의</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">연간 계획의 개설 준비와 별도로 새로운 교육과정을 제안하고 심의 진행 상황을 확인합니다.</p>
-          <Link className="mt-5 inline-flex rounded-xl border border-slate-200 px-4 py-3 font-semibold text-slate-800 hover:border-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700" href="/admin/development">과정 개발·심의로 이동 →</Link>
-        </section>
-      </div>}
       {overview.unavailable || unavailable ? (
         <><Empty title="과정 정보를 불러오지 못했습니다" />{manager && <Link className="mt-4 inline-flex rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700" href={`/admin/courses?org=${org}&create=1#new-course`}>새 과정 등록</Link>}</>
       ) : (

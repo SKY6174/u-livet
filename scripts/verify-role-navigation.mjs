@@ -46,7 +46,7 @@ const LearnerRequestAlerts = load('src/components/admin/learner-request-alerts.t
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
   [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/courses', '/admin/instructors', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/admin/instructors', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/admin/learner-documents', '/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
@@ -80,7 +80,7 @@ await test('office navigation follows the operational workflow', () => {
   const sections = nav.officeSections(member('COURSE_MANAGER', 'FINANCE'));
   assert.deepEqual(sections.map(section => section.title), ['기획·개설', '접수·운영', '마감·수료', '정산·성과']);
   assert.deepEqual(sections.flatMap(section => section.links.map(link => link.href)), [
-    '/admin/courses', '/admin/instructors', '/operation-documents/plan',
+    '/admin/development', '/admin/courses', '/admin/instructors', '/operation-documents/plan',
     '/admin/learner-documents', '/admin/parking',
     '/operation-documents/result', '/completion', '/credentials',
     '/finance', '/performance',
@@ -112,7 +112,7 @@ await test('expert management is an independent office menu with correct nested 
   }
 });
 await test('nested report, completion and certificate routes stay under the office menu', () => {
-  for (const [pathname, active] of [['/admin', '/admin'], ['/admin/course-plan/opening', '/admin/courses'], ['/admin/offerings/id', '/admin/courses'], ['/operation-documents/id/plan', '/operation-documents/plan'], ['/operation-documents/id/result', '/operation-documents/result'], ['/admin/reports', '/operation-documents/result'], ['/admin/offerings/id/reports/print', '/operation-documents/result'], ['/completion/id', '/completion'], ['/credentials/badges', '/credentials'], ['/admin/accounts', '/admin/accounts']]) {
+  for (const [pathname, active] of [['/admin', '/admin'], ['/admin/development', '/admin/development'], ['/admin/course-plan/opening', '/admin/courses'], ['/admin/offerings/id', '/admin/courses'], ['/operation-documents/id/plan', '/operation-documents/plan'], ['/operation-documents/id/result', '/operation-documents/result'], ['/admin/reports', '/operation-documents/result'], ['/admin/offerings/id/reports/print', '/operation-documents/result'], ['/completion/id', '/completion'], ['/credentials/badges', '/credentials'], ['/admin/accounts', '/admin/accounts']]) {
     assert.equal(nav.officeActiveHref(pathname), active);
     assert(nav.primaryActive(pathname, '/admin'));
   }
