@@ -53,6 +53,9 @@ export default async function Members({ searchParams }: { searchParams: Promise<
             <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500"><tr>{columns.map(column => <th scope="col" key={column} className="whitespace-nowrap px-4 py-4 font-semibold">{column}</th>)}</tr></thead>
             <tbody className="divide-y divide-slate-100">{data.items.map((member, index) => {
               const detail = `/admin/accounts/${member.id}?group=${group}`;
+              const isAdmin = me.roles.some(role => role.role === "SYSTEM_ADMIN");
+              const canEdit = isAdmin && (member.can_edit ?? member.can_manage ?? true);
+              const canDelete = isAdmin && member.can_manage !== false && !member.is_super_admin && member.id !== me.id;
               return <tr key={member.id} className="hover:bg-teal-50/30">
                 <td className="px-4 py-5 tabular-nums text-slate-400">{(page - 1) * 20 + index + 1}</td>
                 {group === "office" && <td className="whitespace-nowrap px-4 py-5">{member.office_position ? OFFICE_POSITIONS[member.office_position] : "미등록"}</td>}
@@ -65,7 +68,7 @@ export default async function Members({ searchParams }: { searchParams: Promise<
                 {group === "learner" && <td className="min-w-44 max-w-64 px-4 py-5">{member.current_courses?.length ? <ul className="space-y-1.5">{member.current_courses.map(course => <li key={course.id} className="rounded-md bg-teal-50 px-2.5 py-1.5 text-xs font-medium leading-5 text-teal-900">{course.name}</li>)}</ul> : <span className="text-slate-400">—</span>}</td>}
                 {group !== "office" && <td className="px-4 py-5"><Link aria-label={`${member.name} ${group === "instructor" ? "강의" : "수강"}이력 보기`} className="whitespace-nowrap font-semibold text-teal-800 underline underline-offset-4" href={`${detail}&view=history`}>이력 보기</Link></td>}
                 <td className="min-w-28 max-w-52 break-words px-4 py-5 text-slate-500"><span className="line-clamp-2" title={member.notes}>{member.notes || "—"}</span></td>
-                <td className="px-4 py-5">{member.can_manage !== false && me.roles.some(role => role.role === "SYSTEM_ADMIN") ? <div className="flex items-center gap-2"><Link href={detail} aria-label={`${member.name} 수정`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg border border-slate-200 px-3 font-medium hover:border-teal-400">수정</Link><Link href={`${detail}&view=delete`} aria-label={`${member.name} 삭제`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg px-2 text-rose-700 hover:bg-rose-50">삭제</Link></div> : <span className="text-slate-400">—</span>}</td>
+                <td className="px-4 py-5">{canEdit || canDelete ? <div className="flex items-center gap-2">{canEdit && <Link href={detail} aria-label={`${member.name} 수정`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg border border-slate-200 px-3 font-medium hover:border-teal-400">수정</Link>}{canDelete && <Link href={`${detail}&view=delete`} aria-label={`${member.name} 삭제`} className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg px-2 text-rose-700 hover:bg-rose-50">삭제</Link>}</div> : <span className="text-slate-400">—</span>}</td>
               </tr>;
             })}</tbody>
           </table>

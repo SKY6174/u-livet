@@ -68,3 +68,17 @@ Git 제외 `tmp/member-management/`에 SQL 로그, EXPLAIN, 원격 적용 전후
 기존 구성원 관리 24개·수동 등록 23개(총 47개) 회귀와 ESLint 통과. 알림만 Client Component로 분리하여 목록 조회·권한은 서버에 유지했고, 설계 비교에서 미구현 항목은 없었다.
 
 최종 TypeScript 검사 및 Next.js production build 통과.
+
+
+## 2026-09-23 직책 정렬·최고관리자 수정 검증
+
+사업단 조회는 직책 7단계→미등록, 한국어 ICU 성명→ID 순으로 정렬하며 페이지 분할과 JSON 집계에 동일 순서를 적용한다. 최고관리자 본인이 지정 기관 SYSTEM_ADMIN인 경우의 사업단 정보 수정만 private 함수로 허용하고 기존 관리/삭제 범위는 그대로 둔다. can_edit를 목록·상세에서 사용하여 최고관리자 수정 진입을 허용하며 최고관리자 및 자신의 삭제 링크는 감춘다.
+
+- 수정 전 최고관리자 can_edit가 없는 상태의 실패를 독립 DB에서 재현했다.
+- SQL 69개 통과: 실제 수정 후 이름·전화·직책·비고·revision 재조회, 프로필 이름 연동, 감사 기록, 역할 비추가, MFA·revision·타 계정·타 기관 차단, 최고관리자 삭제 보호, 27명 자료의 20명 페이지 경계/동직책 가나다순/미등록 후순위/검색 검증.
+- JS 49개 통과: 기존 회귀와 최고관리자 수정 링크/수정 폼 진입, 삭제 링크 미노출 및 삭제 주소 직접 접근 거절, 편집 불가 대상 직접 접근 거절. 총 118개 통과.
+- ESLint, TypeScript, production build, whitespace 검사 통과. 실제 회원 정보 변경은 수행하지 않았다. 인증된 운영 화면의 저장 동작은 합성 DB 및 실제 서버 컴포넌트 검증으로 대신했다.
+- 독립 DB Security Advisor WARN/ERROR 없음. 새 판별 함수는 private/search_path 고정이며 PUBLIC·anon·authenticated·service_role 직접 실행 권한을 회수했다.
+- migration `20260923092459_anchor_member_rank_chief_edit`와 이력을 Preview→운영에 원자적으로 적용했다. Preview Auth 4 / 회원 14 / 역할 13, 운영 Auth 7 / 회원 29 / 역할 15를 유지했다. 두 DB의 한국어 collation 및 private 함수 직접 접근 차단을 확인했다. 운영 사업단 자료 읽기 조회에서도 직책 순서와 동일 직책 가나다순을 확인했다.
+
+설계 대비 구현 차이는 없다. 직책순 처리는 페이지 분할 전에 수행하고 수정 예외를 삭제 또는 다른 회원에 확장하지 않는다.

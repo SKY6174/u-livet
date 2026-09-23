@@ -22,8 +22,10 @@ export default async function MemberDetail({ params, searchParams }: {
   if (error || !data) return <div className="page-shell"><Empty title="구성원 정보를 불러오지 못했습니다" /></div>;
   const member = data.items[0];
   if (!member) notFound();
-  const canManage = member.can_manage !== false && me.roles.some(role => role.role === "SYSTEM_ADMIN");
-  if (view !== "history" && !canManage) notFound();
+  const isAdmin = me.roles.some(role => role.role === "SYSTEM_ADMIN");
+  const canEdit = isAdmin && (member.can_edit ?? member.can_manage ?? true);
+  const canDelete = isAdmin && member.can_manage !== false && !member.is_super_admin && member.id !== me.id;
+  if ((view === "edit" && !canEdit) || (view === "delete" && !canDelete)) notFound();
   const page = memberPage(query.page);
   const history = view === "history" ? await getMemberHistory(id, group, page) : null;
   const detail = `/admin/accounts/${id}?group=${group}`;
@@ -34,9 +36,9 @@ export default async function MemberDetail({ params, searchParams }: {
   return <div className="page-shell">
     <PageIntro eyebrow="MEMBERS" title={`${member.name} · ${view === "delete" ? "구성원 삭제" : view === "history" ? historyName : "구성원 수정"}`}>{member.email || "이메일 미등록"}</PageIntro>
     <nav aria-label="구성원 관리" className="mb-6 flex flex-wrap gap-2">
-      {canManage && <Link className={view === "edit" ? "btn-primary gap-2" : "btn-secondary gap-2"} href={detail} aria-current={view === "edit" ? "page" : undefined}><Pencil aria-hidden="true" className="h-4 w-4" />정보 수정</Link>}
+      {canEdit && <Link className={view === "edit" ? "btn-primary gap-2" : "btn-secondary gap-2"} href={detail} aria-current={view === "edit" ? "page" : undefined}><Pencil aria-hidden="true" className="h-4 w-4" />정보 수정</Link>}
       {group !== "office" && <Link className={view === "history" ? "btn-primary gap-2" : "btn-secondary gap-2"} href={`${detail}&view=history`} aria-current={view === "history" ? "page" : undefined}><History aria-hidden="true" className="h-4 w-4" />{historyName}</Link>}
-      {canManage && <Link className="btn-secondary gap-2 text-rose-700" href={`${detail}&view=delete`} aria-current={view === "delete" ? "page" : undefined}><Trash2 aria-hidden="true" className="h-4 w-4" />삭제</Link>}
+      {canDelete && <Link className="btn-secondary gap-2 text-rose-700" href={`${detail}&view=delete`} aria-current={view === "delete" ? "page" : undefined}><Trash2 aria-hidden="true" className="h-4 w-4" />삭제</Link>}
     </nav>
     {view === "edit" && <section className="panel max-w-3xl">
       <ActionForm action={saveMember} label="변경사항 저장" resetOnSuccess={false}>

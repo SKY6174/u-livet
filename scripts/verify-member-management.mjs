@@ -72,5 +72,28 @@ await test('chief is rendered from existing member data without write controls w
   assert(html.includes('사업단 목록') && html.includes('1명'));
   assert(!html.includes('aria-label="송경영 수정"') && !html.includes('aria-label="송경영 삭제"'));
 });
+await test('chief self edit link is shown independently of deletion rights', async () => {
+  directory = {...directory,items:[{...directory.items[0],id:'20000000-0000-4000-8000-000000000099',can_edit:true}]};
+  const html=renderToStaticMarkup(await page({searchParams:Promise.resolve({group:'office'})}));
+  assert(html.includes('aria-label="송경영 수정"'));
+  assert(!html.includes('aria-label="송경영 삭제"'));
+});
+const detail = load('src/app/admin/accounts/[id]/page.tsx', {
+  'next/link':'a','next/navigation':{...mocks['next/navigation'],notFound(){throw Error('NOT_FOUND');}},
+  '@/lib/auth/login-audience':audience,'@/lib/portal/data':mocks['@/lib/portal/data'],'@/lib/members/model':model,
+  '@/components/portal/ui':{PageIntro:({title})=>React.createElement('h1',null,title),Empty:({title})=>React.createElement('p',null,title)},
+  '@/components/portal/action-form':{ActionForm:({children,label})=>React.createElement('form',null,children,React.createElement('button',null,label))},
+  '@/lib/members/data':{memberAdmin:mocks['@/lib/members/data'].memberAdmin,getMembers:async()=>({data:directory,error:false})},
+  '../actions':actions,
+}).default;
+await test('chief can open edit form but cannot open protected delete view', async () => {
+  const params=Promise.resolve({id:directory.items[0].id});
+  const html=renderToStaticMarkup(await detail({params,searchParams:Promise.resolve({group:'office'})}));
+  assert(html.includes('송경영 · 구성원 수정') && html.includes('변경사항 저장'));
+  assert(!html.includes('view=delete'));
+  await assert.rejects(detail({params,searchParams:Promise.resolve({group:'office',view:'delete'})}),/NOT_FOUND/);
+  directory.items[0].can_edit=false;
+  await assert.rejects(detail({params,searchParams:Promise.resolve({group:'office'})}),/NOT_FOUND/);
+});
 await test('failed list is not presented as an empty member database', async () => { directory = null; assert.match(renderToStaticMarkup(await page({ searchParams: Promise.resolve({}) })), /목록을 불러오지 못했습니다/); });
 console.log(`${checks} member management checks passed.`);
