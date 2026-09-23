@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MenuHint } from "@/components/navigation/menu-hint";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/portal/ui";
 import { PrintToolbar } from "@/components/reports/print-toolbar";
@@ -56,10 +57,9 @@ export default async function ReportPreview({ searchParams }: {
         <nav aria-label="검토할 보고서 양식" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {DOCUMENTS.map(([key, label], index) => (
             <Link key={key} href={`?document=${key}`} aria-current={document === key ? "page" : undefined}
-              className={`panel block border-2 transition-colors hover:border-blue-400 ${document === key ? "border-blue-600 bg-blue-50" : "border-transparent"}`}>
+              className={`group relative panel block border-2 transition-colors hover:z-10 hover:border-blue-400 focus-visible:z-10 ${document === key ? "border-blue-600 bg-blue-50" : "border-transparent"}`}>
               <span className="text-sm font-semibold text-blue-700">{GUIDE[key].owner}</span>
-              <h2 className="mt-2 text-lg font-bold">{index + 1}. {label}</h2>
-              <p className="mt-2 text-sm text-slate-600">{GUIDE[key].description}</p>
+              <h2 className="mt-2 text-lg font-bold"><MenuHint label={`${index + 1}. ${label}`} description={GUIDE[key].description} align={index % 2 ? "end" : "start"} /></h2>
             </Link>
           ))}
         </nav>

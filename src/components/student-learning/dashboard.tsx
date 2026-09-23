@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MenuHint } from "@/components/navigation/menu-hint";
 import {
   ArrowDown,
   ArrowRight,
@@ -126,14 +127,13 @@ function ServiceLink({
   return (
     <Link
       href={href}
-      className="group flex min-w-0 items-center gap-4 rounded-xl border border-slate-200/80 bg-white p-4 transition hover:border-teal-300 hover:bg-teal-50/40"
+      className="group relative flex min-w-0 items-center gap-4 rounded-xl border border-slate-200/80 bg-white p-4 transition hover:z-10 hover:border-teal-300 hover:bg-teal-50/40 focus-visible:z-10"
     >
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-teal-800">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
-        <h3 className="font-semibold text-slate-800">{title}</h3>
-        <p className="mt-0.5 text-xs leading-5 text-slate-500">{description}</p>
+        <h3 className="font-semibold text-slate-800"><MenuHint label={title} description={description} /></h3>
       </div>
       <ChevronRight
         className="h-4 w-4 shrink-0 text-slate-400 group-hover:text-teal-700"

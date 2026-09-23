@@ -26,6 +26,7 @@ const attendance = load("src/lib/attendance/model.ts");
 const model = load("src/lib/student-learning/model.ts", {
   "@/lib/attendance/model": attendance,
 });
+const menuHint = load("src/components/navigation/menu-hint.tsx");
 let passed = 0;
 const test = async (name, fn) => {
   await fn();
@@ -199,6 +200,7 @@ const portal = {
 };
 const Dashboard = load("src/components/student-learning/dashboard.tsx", {
   "next/link": "a",
+  "@/components/navigation/menu-hint": menuHint,
   "@/components/instructor-documents/document-popup": {
     DocumentPopup: ({ children, href }) => React.createElement("a", { href }, children),
   },
