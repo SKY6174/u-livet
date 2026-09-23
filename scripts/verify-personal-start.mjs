@@ -25,6 +25,15 @@ const Link = ({ children, ...props }) => React.createElement('a', props, childre
 let currentIdentity = null;
 let security = null;
 let courseReads = 0;
+let instructorReads = 0;
+let instructorSummary = [{ offering_id: '10000000-0000-4000-8000-000000000099', learner_count: 7, ended_sessions: 2, attendance_records: 12, unanswered_questions: 3 }];
+let requestReads = 0;
+let requestContext = { requests: [
+  { kind: 'APPLICATION', status: 'RECEIVED' },
+  { kind: 'SCHOLARSHIP', status: 'REVIEWING' },
+  { kind: 'REFUND', status: 'APPROVED' },
+  { kind: 'REFUND', status: 'COMPLETED' },
+] };
 const session = load('src/lib/auth/session.ts', {
   react: { cache: fn => fn }, 'next/navigation': { redirect },
   '@/lib/deployment/review-mode': { isReviewOnly: () => false },
@@ -37,7 +46,13 @@ const session = load('src/lib/auth/session.ts', {
 const Home = load('src/app/page.tsx', {
   'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'lucide-react': icons,
   '@/lib/auth/session': session, '@/lib/auth/workspace-navigation': navigation,
-  '@/lib/portal/data': { getCourseCards: async () => { courseReads++; return { offerings: [], unavailable: false }; } },
+  '@/lib/portal/data': {
+    getCourseCards: async () => { courseReads++; return { offerings: [], unavailable: false }; },
+    getWorkspaceOfferings: async () => ({ offerings: [{ id: instructorSummary?.[0]?.offering_id, name: '검증 수업' }], unavailable: false }),
+  },
+  '@/lib/classroom-questions/data': { getInstructorHomeSummary: async () => { instructorReads++; return instructorSummary; } },
+  '@/lib/learner-document-workflow/data': { getAdminLearnerDocuments: async () => { requestReads++; return requestContext; } },
+  '@/lib/learner-document-workflow/types': { DOCUMENT_KIND_LABELS: { APPLICATION: '수강신청원서', SCHOLARSHIP: '장학금 지급신청서', REFUND: '수강료환불신청서' } },
   '@/components/portal/ui': { CourseCard: () => null, Empty: ({ title }) => React.createElement('p', null, title) },
 }).default;
 const Login = load('src/app/auth/login/page.tsx', {
@@ -50,7 +65,7 @@ const pass = name => { checks++; console.log('PASS ' + name); };
 await assert.rejects(Home(), e => e.destination === '/auth/login?next=%2F');
 assert.equal(courseReads, 0);
 const entry = renderToStaticMarkup(await Login({ searchParams: Promise.resolve({}) }));
-for (const label of ['사업단', '강사(교내)', '강사(교외)', '수강생']) assert.ok(entry.includes(label));
+for (const label of ['사업단', '강사(교내)', '강사(교외·보조)', '수강생']) assert.ok(entry.includes(label));
 assert.equal((entry.match(/next=%2F"/g) ?? []).length, 4);
 pass('guest reaches four login choices before personal content is loaded');
 security = { status: { mfa_required: true, mfa_verified: false, needs_reset: false } };
@@ -60,23 +75,74 @@ pass('MFA-incomplete identity cannot reach personal home');
 security = null;
 for (const [roles, expected, hidden] of [
   [[], ['나의 강의실', '신청 현황', '수강이력·수료 현황'], ['/instructor', '/admin']],
-  [['INSTRUCTOR'], ['강사 공간', '강사 이력·등록 심사'], ['/admin', '/finance']],
-  [['SYSTEM_ADMIN'], ['계정 관리', '사업단 관리 시작하기'], ['/instructor', '/finance']],
+  [['INSTRUCTOR'], ['My Room', '강사 이력·등록 심사'], ['/admin', '/finance']],
+  [['SYSTEM_ADMIN'], ['구성원 관리', '사업단 관리 시작하기'], ['/instructor', '/finance']],
   [['COURSE_MANAGER'], ['과정 운영'], ['/admin/accounts', '/finance']],
   [['FINANCE'], ['수납·환불'], ['/admin/accounts', '/instructor']],
   [['CERTIFIER'], ['증명 관리'], ['/admin/accounts', '/finance']],
   [['PERFORMANCE'], ['연차 평가·성과'], ['/admin/accounts', '/finance']],
-  [['SYSTEM_ADMIN', 'COURSE_MANAGER', 'INSTRUCTOR'], ['사업단 관리 시작하기', '과정 운영', '강사 공간'], ['/finance']],
+  [['SYSTEM_ADMIN', 'COURSE_MANAGER', 'INSTRUCTOR'], ['사업단 관리 시작하기', '과정 운영', 'My Room'], ['/finance']],
 ]) {
   currentIdentity = { id: 'synthetic', name: '검증 회원', roles: roles.map(role => ({ role, org_id: 'synthetic-org' })) };
+  const beforeCourseReads = courseReads;
+  const beforeRequestReads = requestReads;
+  const beforeInstructorReads = instructorReads;
   const html = renderToStaticMarkup(await Home());
   assert.ok(html.includes('검증 회원 님, 반갑습니다.'));
   const kind = navigation.workspaceKind(currentIdentity);
   assert.ok(html.includes(kind === 'office' ? '사업단 업무를,' : kind === 'instructor' ? '나의 강의와,' : '지금의 배움이,'));
   for (const item of expected) assert.ok(html.includes(item), item);
   for (const item of hidden) assert.ok(!html.includes(item), `unexpected ${item}`);
+  if (kind === 'office') {
+    assert.ok(html.includes('사업단 운영 현황'));
+    assert.ok(!html.includes('함께 시작할 교육과정'));
+    assert.equal(courseReads, beforeCourseReads, 'office home should not query public courses');
+    if (navigation.hasRole(currentIdentity, 'SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE')) {
+      assert.equal(requestReads, beforeRequestReads + 1);
+      assert.ok(html.includes('수강신청원서') && html.includes('장학금 지급신청서') && html.includes('수강료환불신청서'));
+      assert.equal((html.match(/건 미종결/g) ?? []).length, 3);
+    } else {
+      assert.equal(requestReads, beforeRequestReads);
+      assert.ok(!html.includes('수강생 요청'));
+    }
+    assert.equal(instructorReads, beforeInstructorReads);
+  } else if (kind === 'instructor') {
+    assert.ok(html.includes('담당 수업 현황') && html.includes('검증 수업'));
+    assert.ok(html.includes('7명') && html.includes('3건'));
+    assert.ok(html.includes('#class-questions'));
+    assert.ok(!html.includes('함께 시작할 교육과정'));
+    assert.equal(courseReads, beforeCourseReads, 'instructor home should not query public courses');
+    assert.equal(instructorReads, beforeInstructorReads + 1);
+    assert.equal(requestReads, beforeRequestReads);
+  } else {
+    assert.ok(html.includes('함께 시작할 교육과정'));
+    assert.equal(courseReads, beforeCourseReads + 1);
+    assert.equal(requestReads, beforeRequestReads);
+    assert.equal(instructorReads, beforeInstructorReads);
+  }
   pass('personal home shows only granted work links: ' + (roles.join(',') || 'learner'));
 }
+requestContext = null;
+currentIdentity = { id: 'synthetic', name: '검증 회원', roles: [{ role: 'COURSE_MANAGER', org_id: 'synthetic-org' }] };
+const failedRequestsHtml = renderToStaticMarkup(await Home());
+assert.ok(failedRequestsHtml.includes('요청 현황을 불러오지 못했습니다'));
+assert.ok(!failedRequestsHtml.includes('0건 미종결'));
+pass('request read failure is distinct from zero pending requests');
+currentIdentity = { id: 'synthetic', name: '검증 강사', roles: [{ role: 'INSTRUCTOR', org_id: 'synthetic-org' }] };
+instructorSummary = [];
+assert.ok(renderToStaticMarkup(await Home()).includes('현재 배정된 수업이 없습니다'));
+instructorSummary = null;
+assert.ok(renderToStaticMarkup(await Home()).includes('담당 수업 현황을 불러오지 못했습니다'));
+pass('instructor empty assignment and read failure are distinct');
+currentIdentity = { id: 'synthetic', name: '검증 회원', roles: [], member_entry_orgs: ['synthetic-org'] };
+const entryOperatorHtml = renderToStaticMarkup(await Home());
+assert.ok(entryOperatorHtml.includes('구성원 관리'));
+assert.ok(!entryOperatorHtml.includes('수강생 요청'));
+pass('member-entry-only operator sees only authorized management work');
+currentIdentity = { id: 'synthetic', name: '검증 회원', roles: [], member_group: 'office' };
+const unassignedHtml = renderToStaticMarkup(await Home());
+assert.ok(unassignedHtml.includes('연결된 관리 업무가 없습니다'));
+pass('unassigned office member sees permission guidance');
 for (const [next, expected] of [[undefined, '/'], ['/courses/123/apply', '/courses/123/apply'], ['/auth/login', '/'], ['//example.invalid', '/']]) {
   await assert.rejects(Login({ searchParams: Promise.resolve({ next }) }), e => e.destination === expected);
 }

@@ -7,6 +7,8 @@ import type { Lesson, Assignment, Submission, Grade } from "@/lib/portal/types";
 import { ActionForm } from "@/components/portal/action-form";
 import { readLesson, submitAssignment } from "@/app/actions";
 import { Empty, PageIntro } from "@/components/portal/ui";
+import { ClassQuestions } from "@/components/classroom/class-questions";
+import { getClassQuestions } from "@/lib/classroom-questions/data";
 export default async function Classroom(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -57,6 +59,7 @@ export default async function Classroom(props: {
         </Empty>
       </div>
     );
+  const questions = await getClassQuestions(o.id);
   return (
     <div className="page-shell">
       <PageIntro eyebrow="MY CLASSROOM" title={o.name}>
@@ -152,6 +155,7 @@ export default async function Classroom(props: {
           </div>
         </section>
       </div>
+      <ClassQuestions offeringId={o.id} audience="learner" questions={questions} />
     </div>
   );
 }

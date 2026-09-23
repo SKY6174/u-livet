@@ -6,6 +6,8 @@ import { getOffering, dateTime } from "@/lib/portal/data";
 import { createContent, gradeSubmission } from "@/app/actions";
 import { ActionForm } from "@/components/portal/action-form";
 import { PageIntro, Empty } from "@/components/portal/ui";
+import { ClassQuestions } from "@/components/classroom/class-questions";
+import { getClassQuestions } from "@/lib/classroom-questions/data";
 import type {
   RosterRow,
   Assignment,
@@ -57,6 +59,7 @@ export default async function Teaching(props: {
     );
   const members = (roster.data ?? []) as RosterRow[];
   const tasks = (assignments.data ?? []) as Assignment[];
+  const questions = await getClassQuestions(o.id);
   return (
     <div className="page-shell">
       <PageIntro eyebrow="TEACHING ROOM" title={o.name}>
@@ -222,6 +225,7 @@ export default async function Teaching(props: {
           </div>
         </section>
       </div>
+      <ClassQuestions offeringId={o.id} audience="instructor" questions={questions} />
     </div>
   );
 }
