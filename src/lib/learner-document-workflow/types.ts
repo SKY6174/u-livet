@@ -68,6 +68,15 @@ export type LearnerDocumentRequest = {
   events: LearnerDocumentEvent[];
 };
 
+export type LearnerDocumentEligibility = {
+  offering_id: string;
+  course_name: string;
+  application_approved: boolean;
+  completion_approved: boolean;
+  refund_allowed: boolean;
+  scholarship_allowed: boolean;
+};
+
 export type LearnerDocumentAdminContext = {
   organizations: { id: string; name: string }[];
   requests: LearnerDocumentRequest[];

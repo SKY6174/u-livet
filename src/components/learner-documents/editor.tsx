@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { Clock3, Download, FileCheck2, FileText, Send, ShieldCheck, XCircle } from "lucide-react";
+import { Clock3, Download, FileCheck2, FileText, LockKeyhole, Send, ShieldCheck, XCircle } from "lucide-react";
 import { PdfPreview } from "@/components/instructor-documents/pdf-preview";
 import { BANKS, DOCUMENT_TITLES, PURPOSES, REFUND_OCCURRENCES, documentErrors, initialValues, koreaToday, refundAmounts,
   type ConsentChoice, type LearnerDocumentType, type LearnerDocumentValues } from "@/lib/learner-documents/model";
@@ -13,6 +13,7 @@ import {
   DOCUMENT_STATUS_LABELS,
   DOCUMENT_STATUS_TONES,
   documentDate,
+  type LearnerDocumentEligibility,
   type LearnerDocumentRequest,
 } from "@/lib/learner-document-workflow/types";
 import { cancelLearnerDocument, submitLearnerDocument } from "@/app/mypage/documents/actions";
@@ -75,16 +76,20 @@ function Consent({ id, title, value, onChange, children, error }: {
 
 type DocumentCourse = { id: string; name: string; offeringId: string | null; tuition: number | null };
 
-export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, initialCourse }: {
+export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, eligibility, initialCourse }: {
   type: LearnerDocumentType; name: string; email: string; courses: DocumentCourse[];
-  requests: LearnerDocumentRequest[]; initialCourse?: DocumentCourse;
+  requests: LearnerDocumentRequest[]; eligibility: LearnerDocumentEligibility[]; initialCourse?: DocumentCourse;
 }) {
   const router = useRouter();
+  const refundCourses = courses.filter(course => course.offeringId && eligibility.some(item => item.offering_id === course.offeringId && item.refund_allowed));
+  const scholarshipCourses = courses.filter(course => course.offeringId && eligibility.some(item => item.offering_id === course.offeringId && item.scholarship_allowed));
+  const refundInitialCourse = initialCourse?.offeringId && refundCourses.some(course => course.offeringId === initialCourse.offeringId) ? initialCourse : refundCourses[0];
+  const scholarshipInitialCourse = initialCourse?.offeringId && scholarshipCourses.some(course => course.offeringId === initialCourse.offeringId) ? initialCourse : scholarshipCourses[0];
   const [type, setType] = useState(initialType);
   const [forms, setForms] = useState(() => ({
     application: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null),
-    scholarship: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null),
-    refund: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null),
+    scholarship: initialValues(name, email, scholarshipInitialCourse?.name, scholarshipInitialCourse?.offeringId ?? "", scholarshipInitialCourse?.tuition ?? null),
+    refund: initialValues(name, email, refundInitialCourse?.name, refundInitialCourse?.offeringId ?? "", refundInitialCourse?.tuition ?? null),
   }));
   const values = forms[type];
   const [rendered, setRendered] = useState<{ type: LearnerDocumentType; values: LearnerDocumentValues; bytes: Uint8Array } | null>(null);
@@ -103,6 +108,8 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
   const application = type === "application";
   const scholarship = type === "scholarship";
   const refund = type === "refund";
+  const canUseScholarship = scholarshipCourses.length > 0;
+  const canUseRefund = refundCourses.length > 0;
   const pending = rendered?.type !== type || rendered?.values !== values;
   function update<K extends keyof LearnerDocumentValues>(key: K, value: LearnerDocumentValues[K]) {
     setForms(old => ({ ...old, [type]: { ...old[type], [key]: value } }));
@@ -110,10 +117,13 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     setNotice("");
     requestKeys.current[type] = undefined;
   }
-  function updateCourse(courseName: string) {
-    const course = courses.find(item => item.name === courseName);
+  function updateCourse(courseName: string, offeringId?: string) {
+    const course = offeringId
+      ? courses.find(item => item.offeringId === offeringId)
+      : courses.find(item => item.name === courseName);
+    const normalizedName = course?.name ?? courseName;
     setForms(old => {
-      const next = { ...old[type], courseName, offeringId: course?.offeringId ?? "" };
+      const next = { ...old[type], courseName: normalizedName, offeringId: course?.offeringId ?? "" };
       if (type === "refund") Object.assign(next, refundAmounts(course?.tuition ?? null, next.refundOccurrence));
       return { ...old, [type]: next };
     });
@@ -125,7 +135,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     setErrors({}); setNotice(""); requestKeys.current.refund = undefined;
   }
   function selectDocument(nextType: LearnerDocumentType) {
-    if (nextType === type) return;
+    if (nextType === type || (nextType === "refund" && !canUseRefund) || (nextType === "scholarship" && !canUseScholarship)) return;
     activeType.current = nextType;
     signatureJob.current++;
     setType(nextType);
@@ -249,15 +259,20 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-8">
       <div className="mb-6">
         <div className="mb-4 flex flex-wrap gap-3" role="group" aria-label="작성할 서식 선택">
-          {([ ["application", "수강신청원서"], ["scholarship", "장학금 지급신청서"], ["refund", "수강료환불신청서"] ] as const).map(([documentType, label]) => (
+          {([ ["application", "수강신청원서", true], ["scholarship", "장학금 지급신청서", canUseScholarship], ["refund", "수강료환불신청서", canUseRefund] ] as const).map(([documentType, label, enabled]) => (
             <button key={documentType} type="button" aria-pressed={type === documentType} aria-controls="learner-document-fields"
+              disabled={!enabled} aria-disabled={!enabled}
               onClick={() => selectDocument(documentType)}
-              className={`inline-flex min-h-12 items-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition ${type === documentType ? "border-[#123353] bg-[#123353] text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-800"}`}>
-              <FileText size={17} aria-hidden="true" />{label}
+              className={`inline-flex min-h-12 items-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition ${type === documentType ? "border-[#123353] bg-[#123353] text-white shadow-sm" : enabled ? "border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-800" : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"}`}>
+              {enabled ? <FileText size={17} aria-hidden="true" /> : <LockKeyhole size={17} aria-hidden="true" />}{label}
             </button>
           ))}
         </div>
         <p className="text-sm text-slate-600">같은 창에서 세 서식을 작성하세요. 서식을 전환해도 입력한 내용은 유지됩니다.</p>
+        {(!canUseRefund || !canUseScholarship) && <div className="mt-3 space-y-1 text-xs leading-5 text-slate-500">
+          {!canUseRefund && <p className="flex items-center gap-2"><LockKeyhole size={14} aria-hidden="true" />수강료 환불신청서는 수강신청원서 승인 후 이용할 수 있습니다.</p>}
+          {!canUseScholarship && <p className="flex items-center gap-2"><LockKeyhole size={14} aria-hidden="true" />장학금 지급신청서는 수강신청원서 승인과 수료 인정 후 이용할 수 있습니다.</p>}
+        </div>}
       </div>
       <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="learner-document-history">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -283,15 +298,15 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
         <div className="min-w-0 space-y-5">
           <Section number="01" title="과정과 인적사항">
             <div className="space-y-5">
-              {refund ? <div>
+              {!application ? <div>
                 <label htmlFor="courseName" className="mb-2 block text-sm font-semibold text-slate-700">과정명</label>
-                <select id="courseName" name="courseName" value={values.courseName} onChange={e => updateCourse(e.target.value)} className="learner-field" aria-invalid={!!errors.courseName}>
-                  <option value="">수강료가 등록된 과정을 선택해 주세요</option>
-                  {courses.filter(course => course.offeringId).map(course => <option key={course.id} value={course.name}>{course.name}{course.tuition === null ? " · 수강료 미등록" : ` · ${course.tuition.toLocaleString("ko-KR")}원`}</option>)}
+                <select id="courseName" name="courseName" value={values.offeringId} onChange={e => updateCourse("", e.target.value)} className="learner-field" aria-invalid={!!errors.courseName}>
+                  <option value="">{refund ? "승인된 수강 과정을 선택해 주세요" : "수료 인정된 과정을 선택해 주세요"}</option>
+                  {(refund ? refundCourses : scholarshipCourses).map(course => <option key={course.id} value={course.offeringId ?? ""}>{course.name}{refund ? course.tuition === null ? " · 수강료 미등록" : ` · ${course.tuition.toLocaleString("ko-KR")}원` : ""}</option>)}
                 </select>
                 {errors.courseName && <p className="mt-1.5 text-xs leading-5 text-red-700">{errors.courseName}</p>}
-              </div> : <Field {...input("courseName")} onChange={e => updateCourse(e.target.value)} label={application ? "신청과정명" : "과정명"} list="learner-courses" maxLength={100} hint="과정 목록에서 선택하거나 과정명을 직접 입력해 주세요." />}
-              <datalist id="learner-courses">{courses.map(c => <option key={c.id} value={c.name} />)}</datalist>
+              </div> : <Field {...input("courseName")} onChange={e => updateCourse(e.target.value)} label="신청과정명" list="learner-courses" maxLength={100} hint="과정 목록에서 선택하거나 과정명을 직접 입력해 주세요." />}
+              {application && <datalist id="learner-courses">{courses.map(c => <option key={c.id} value={c.name} />)}</datalist>}
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field {...input("name")} label="성명" maxLength={30} autoComplete="name" />
                 <Field {...input("phone")} label="휴대전화" type="tel" maxLength={14} autoComplete="tel" placeholder="010-0000-0000" />

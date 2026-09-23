@@ -32,6 +32,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   REFUND_AMOUNT_MISMATCH: "환불 금액을 다시 계산해 주세요.",
   INVALID_PDF: "제출 PDF를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.",
   IDEMPOTENCY_CONFLICT: "같은 제출 요청의 내용이 달라졌습니다. 페이지를 새로 고쳐 주세요.",
+  APPLICATION_APPROVAL_REQUIRED: "승인된 수강신청원서가 있는 과정만 신청할 수 있습니다.",
+  COMPLETION_APPROVAL_REQUIRED: "수료 인정이 완료된 과정만 장학금을 신청할 수 있습니다.",
 };
 
 const PDF_CREATION_ERROR = "제출 PDF를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.";

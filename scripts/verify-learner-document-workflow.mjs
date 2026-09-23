@@ -54,9 +54,23 @@ sql(`update public.life_offerings set tuition=300000,status='PUBLISHED' where id
 const pdf = Buffer.from("%PDF-1.7\n% synthetic local workflow fixture\n%%EOF\n");
 const pdfBase64 = pdf.toString("base64");
 const pdfSha256 = createHash("sha256").update(pdf).digest("hex");
-const requestKey = crypto.randomUUID();
-const args = { k: "REFUND", f: offering, request_key: requestKey, course_name: "ignored", applicant_name: "서류 검증 learner",
+const commonArgs = { f: offering, course_name: "ignored", applicant_name: "서류 검증 learner",
   phone: "010-1234-5678", occurrence: "before-sixth", amount: 250000, pdf_base64: pdfBase64, pdf_sha256: pdfSha256 };
+deny(await learner.client.rpc("life_submit_learner_document", { ...commonArgs, k: "REFUND", request_key: crypto.randomUUID() }), "APPLICATION_APPROVAL_REQUIRED");
+deny(await learner.client.rpc("life_submit_learner_document", { ...commonArgs, k: "SCHOLARSHIP", request_key: crypto.randomUUID(), occurrence: null, amount: null }), "APPLICATION_APPROVAL_REQUIRED");
+const applicationRequest = ok(await learner.client.rpc("life_submit_learner_document", {
+  ...commonArgs, k: "APPLICATION", request_key: crypto.randomUUID(), occurrence: null, amount: null,
+}));
+ok(await manager.client.rpc("life_decide_learner_document", {
+  r: applicationRequest, next_status: "APPROVED", note: "후속 서류 자격 검증용 승인", expected_revision: 1,
+}));
+let eligibility = ok(await learner.client.rpc("life_learner_document_eligibility"));
+assert.equal(eligibility.find(item => item.offering_id === offering)?.refund_allowed, true);
+assert.equal(eligibility.find(item => item.offering_id === offering)?.scholarship_allowed, false);
+deny(await learner.client.rpc("life_submit_learner_document", { ...commonArgs, k: "SCHOLARSHIP", request_key: crypto.randomUUID(), occurrence: null, amount: null }), "COMPLETION_APPROVAL_REQUIRED");
+
+const requestKey = crypto.randomUUID();
+const args = { ...commonArgs, k: "REFUND", request_key: requestKey };
 const request = ok(await learner.client.rpc("life_submit_learner_document", args));
 assert.equal(ok(await learner.client.rpc("life_submit_learner_document", args)), request, "idempotent retry must return same id");
 deny(await learner.client.rpc("life_submit_learner_document", { ...args, request_key: crypto.randomUUID(), amount: 249999 }), "REFUND_AMOUNT_MISMATCH");
@@ -68,11 +82,13 @@ assert.match(adminFunction, /authorized_orgs as materialized/i);
 assert.match(adminFunction, /limit 500/i);
 
 const mine = ok(await learner.client.rpc("life_my_learner_documents"));
-assert.equal(mine.length, 1);
-assert.equal(mine[0].amount, 250000);
-assert.equal(mine[0].status, "RECEIVED");
-assert.equal(mine[0].events.length, 1);
+assert.equal(mine.length, 2);
+const refundRequest = mine.find(item => item.id === request);
+assert.equal(refundRequest.amount, 250000);
+assert.equal(refundRequest.status, "RECEIVED");
+assert.equal(refundRequest.events.length, 1);
 assert.equal(ok(await outsider.client.rpc("life_my_learner_documents")).length, 0);
+assert.equal(ok(await outsider.client.rpc("life_learner_document_eligibility")).length, 0);
 deny(await outsider.client.rpc("life_learner_document_file", { r: request }), "FORBIDDEN");
 const ownerFile = ok(await learner.client.rpc("life_learner_document_file", { r: request }));
 assert.equal(ownerFile.sha256, pdfSha256);
@@ -98,6 +114,24 @@ assert.equal(dashboard.requests.find(item => item.id === request)?.id, request, 
 const cancelId = ok(await learner.client.rpc("life_submit_learner_document", { ...args, k: "APPLICATION", f: null,
   request_key: crypto.randomUUID(), course_name: "직접 입력 과정", occurrence: null, amount: null }));
 ok(await learner.client.rpc("life_cancel_learner_document", { r: cancelId }));
+const enrollmentPolicy = crypto.randomUUID();
+const completionPolicy = crypto.randomUUID();
+sql(`insert into public.life_policy_versions(id,org_id,kind,version,title,body,status,approved_by,approved_at)
+  values('${enrollmentPolicy}','${org}','ENROLLMENT','TEST-${enrollmentPolicy}','검증용 수강 정책','로컬 서류 자격 검증 전용','APPROVED','${manager.person}',now()),
+  ('${completionPolicy}','${org}','COMPLETION','TEST-${completionPolicy}','검증용 수료 정책','로컬 서류 자격 검증 전용','APPROVED','${manager.person}',now())`);
+const learningApplication = sql(`insert into public.life_applications(offering_id,person_id,status,policy_id)
+  values('${offering}','${learner.person}','ACCEPTED','${enrollmentPolicy}') returning id`).split("\n")[0];
+const enrollment = sql(`insert into public.life_enrollments(application_id,offering_id,person_id)
+  values('${learningApplication}','${offering}','${learner.person}') returning id`).split("\n")[0];
+sql(`update public.life_course_versions set status='APPROVED',completion_policy_id='${completionPolicy}',approved_by='${manager.person}'
+  where id=(select course_version_id from public.life_offerings where id='${offering}');
+  update public.life_offerings set enrollment_policy_id='${enrollmentPolicy}',academic_sealed=true where id='${offering}'`);
+const completionRun = sql(`insert into public.life_completion_runs(enrollment_id,offering_id,person_id,input_revision,outcome,reasons,evidence,calculated_by)
+  select '${enrollment}','${offering}','${learner.person}',academic_revision,'READY','[]'::jsonb,
+    jsonb_build_object('policy_id','${completionPolicy}'),'${manager.person}' from public.life_offerings where id='${offering}' returning id`).split("\n")[0];
+sql(`insert into public.life_completion_approvals(run_id,approved_by) values('${completionRun}','${manager.person}')`);
+eligibility = ok(await learner.client.rpc("life_learner_document_eligibility"));
+assert.equal(eligibility.find(item => item.offering_id === offering)?.scholarship_allowed, true);
 const pendingId = ok(await learner.client.rpc("life_submit_learner_document", { ...args, k: "SCHOLARSHIP", f: offering,
   request_key: crypto.randomUUID(), occurrence: null, amount: null }));
 deny(await learner.client.rpc("life_cancel_learner_document", { r: request }), "FORBIDDEN");
@@ -111,4 +145,4 @@ for (const [label, actor] of [["learner", learner], ["manager", manager]]) {
 }
 writeFileSync("tmp/learner-document-workflow/fixture.json", JSON.stringify({ request, pendingId, offering }), { mode: 0o600 });
 
-console.log("PASS idempotent submission, refund calculation, tenant isolation, immutable PDF, optimized queue filters, status history, optimistic locking and table isolation");
+console.log("PASS approval-gated refund, completion-gated scholarship, idempotent submission, refund calculation, tenant isolation, immutable PDF, optimized queue filters, status history, optimistic locking and table isolation");

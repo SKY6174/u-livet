@@ -1,10 +1,26 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type {
   LearnerDocumentAdminContext,
+  LearnerDocumentEligibility,
   LearnerDocumentKind,
   LearnerDocumentRequest,
   LearnerDocumentStatus,
 } from "./types";
+
+export async function getLearnerDocumentEligibility(): Promise<
+  LearnerDocumentEligibility[]
+> {
+  try {
+    const { data, error } = await (
+      await createServerSupabaseClient()
+    ).rpc("life_learner_document_eligibility");
+    return error || !Array.isArray(data)
+      ? []
+      : (data as LearnerDocumentEligibility[]);
+  } catch {
+    return [];
+  }
+}
 
 export async function getMyLearnerDocuments(): Promise<
   LearnerDocumentRequest[]
