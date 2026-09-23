@@ -143,12 +143,39 @@ export function AuthForm({
             강사·관리자 권한은 사업단의 확인 후 부여됩니다.
           </p>
         )}
-        <Link
-          className="flex min-h-11 items-center text-base underline"
-          href={signup ? `/auth/login?audience=${audience}` : `/auth/signup?audience=${audience}`}
-        >
-          {signup ? "로그인으로 이동" : audience === "office" || audience === "internal" ? "등록된 구성원 계정 활성화" : "처음이신가요? 회원가입"}
-        </Link>
+        {!signup && (audience === "office" || audience === "internal") ? (
+          <div className="group relative flex w-fit max-w-full flex-wrap items-center gap-1">
+            <Link
+              className="flex min-h-11 items-center text-base underline"
+              href={`/auth/signup?audience=${audience}`}
+              aria-describedby="member-activation-help"
+            >
+              등록된 구성원 계정 활성화
+            </Link>
+            <button
+              type="button"
+              className="flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700"
+              aria-label="계정 활성화 안내"
+              aria-describedby="member-activation-help"
+            >
+              <span aria-hidden="true" className="flex h-6 w-6 items-center justify-center rounded-full border border-teal-700 text-sm font-bold text-teal-900">?</span>
+            </button>
+            <span
+              id="member-activation-help"
+              role="tooltip"
+              className="pointer-events-none invisible absolute bottom-full left-0 z-10 mb-2 w-72 max-w-[calc(100vw-3rem)] rounded-xl border border-teal-200 bg-white p-4 text-sm leading-6 text-slate-700 shadow-lg after:absolute after:-bottom-2 after:right-14 after:h-4 after:w-4 after:rotate-45 after:border-b after:border-r after:border-teal-200 after:bg-white group-hover:visible group-focus-within:visible sm:left-auto sm:right-0 sm:after:right-4"
+            >
+              사업단에 미리 등록된 사업단 구성원·교내 강사가 등록 이메일을 인증하고 U-LIFE 전용 비밀번호를 설정하면 기존 구성원 정보와 계정이 연결됩니다.
+            </span>
+          </div>
+        ) : (
+          <Link
+            className="flex min-h-11 items-center text-base underline"
+            href={signup ? `/auth/login?audience=${audience}` : `/auth/signup?audience=${audience}`}
+          >
+            {signup ? "로그인으로 이동" : "처음이신가요? 회원가입"}
+          </Link>
+        )}
       </ActionForm>
   );
   return (
