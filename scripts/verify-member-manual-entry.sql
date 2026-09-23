@@ -2,7 +2,7 @@
 \set ON_ERROR_STOP on
 begin;
 do $$begin
-  if current_database() not in ('life_members_test_20260921','life_member_auth_test_20260923') then
+  if current_database() not in ('life_members_test_20260921','life_member_auth_test_20260923','life_chief_roster_test_20260923') then
     raise exception 'Use the isolated local life_members_test_20260921 database only';
   end if;
 end$$;
@@ -121,5 +121,8 @@ reset role;
 select pg_temp.check_result(not has_table_privilege('authenticated','life_private.member_entry_operators','select') and not has_table_privilege('authenticated','life_private.manual_members','select'),'private tables inaccessible directly');
 \if :{?member_auth_extension}
 \ir verify-member-auth-link.sql
+\endif
+\if :{?chief_roster_extension}
+\ir verify-chief-member-roster.sql
 \endif
 rollback;

@@ -31,4 +31,10 @@
 - TypeScript/ESLint/기존 역할·로그인 회귀/빌드. 브라우저에서 세 분류, 검색, 수정/삭제 화면, 모바일 넘침을 확인한다.
 - 기존 연결 대상은 운영 uoebygejgglgiivzgyks, Preview bfqwntulxabfrimcypvx. 이전 상태를 읽고 정확히 새 migration만 적용한다. 실제 사용자 정보 수정·삭제 검증은 하지 않는다.
 
+## 2026-09-23 최고관리자 명단 표시
+- 검증된 `member_entry_operators`의 SUPER_ADMIN 계정은 지정된 소속 사업단의 읽기 명부에 포함한다. 다른 기관의 COURSE_MANAGER 역할이 있다는 이유로 사업단 명부에서 제외하지 않는다.
+- 이름/직책/이메일은 기존 계정 자료를 조회하며 새 구성원이나 역할을 생성하지 않는다. 목록 성명 옆에 ‘최고 관리자’를 표시하고 집계·검색·페이지 처리에 같은 조회 범위를 적용한다.
+- 예외는 `member_scope_for(false)`의 명부 조회에만 적용한다. `member_scope_for(true)`의 전체 소속 기관 관리 조건, 타 기관 일반 회원 비공개, 최고관리자/자기 삭제 방지, 최근 MFA 조건은 유지한다. 여러 기관에 걸친 대상은 권한이 충분하지 않으면 수정·삭제 버튼을 표시하지 않는다.
+- 회귀: 지정 최고관리자에게 타 기관 운영 역할이 있어도 소속 사업단 명부에 1회 표시, 운영자도 조회 가능, 타 기관에서는 지정되지 않은 최고관리자를 조회할 수 없음, 편집 범위 비확대, 일반 복수 기관 회원 비노출, UI 배지·이름·직책과 집계 검증.
+
 참고: [Supabase 함수 권한](https://supabase.com/docs/guides/database/functions), [사용자 데이터 관리](https://supabase.com/docs/guides/auth/managing-user-data).
