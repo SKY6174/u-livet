@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getSessionIdentity } from "@/lib/auth/session";
 import { UUID } from "@/lib/portal/data";
 import type { ActionState } from "@/lib/portal/types";
+import { OPENING_SOURCE } from "@/lib/course-opening/working-copy";
 
 const errors: Record<string, string> = {
   MFA_REAUTH_REQUIRED: MFA_REAUTH_MESSAGE,
@@ -23,6 +24,9 @@ const errors: Record<string, string> = {
   REVISION_CHANGED: "제출물이 변경되었습니다. 새로고침 후 다시 채점해 주세요.",
   RESPONSIBLE_INSTRUCTOR: "현재 책임강사는 배정을 해제할 수 없습니다. 다른 강사를 책임강사로 지정한 뒤 다시 시도해 주세요.",
   INVALID_TRANSITION: "현재 상태에서는 이 작업을 처리할 수 없습니다.",
+  ALREADY_REGISTERED: "이미 등록된 과정입니다. 문서 목록을 새로고침해 주세요.",
+  INVALID_SOURCE: "연결할 원문 과정을 찾지 못했습니다.",
+  INVALID_YEAR_OR_ORG: "앵커사업단의 2026년 사업연도를 선택해 주세요.",
   WITHDRAWAL_REVIEW_REQUIRED: "교육 시작 후 취소는 사업단 확인이 필요합니다.",
 };
 async function mutate(
@@ -177,7 +181,12 @@ export async function createOffering(
     if (!value(f, key)) return { message: "접수 일시를 입력해 주세요." };
     args[key] = `${value(f, key)}+09:00`;
   }
-  return mutate("life_create_offering", args);
+  const source = value(f, "source");
+  if (source && !OPENING_SOURCE.test(source))
+    return { message: "원문 과정 식별자를 확인해 주세요." };
+  return source
+    ? mutate("life_create_source_offering", { ...args, source_id: source })
+    : mutate("life_create_offering", args);
 }
 export async function publishOffering(
   _: ActionState,

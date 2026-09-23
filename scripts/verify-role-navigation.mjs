@@ -236,8 +236,10 @@ const documentPrefilled = {
   findPrefilledCourse: name => name === '검증 과정' ? { id: 'fixture-course' } : undefined,
 };
 const DocumentList = load('src/components/operation-documents/document-list.tsx', { ...common,
-  '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async () => ({
-    data: [{ id: 'course-1', name: '검증 과정', starts_on: '2026-01-01', ends_on: '2026-02-01', responsible: '책임강사', plan_status: 'DRAFT', result_status: 'REVIEW' }],
+  '@/lib/supabase/server': { createServerSupabaseClient: async () => ({
+    from: () => ({ select: () => ({ eq: async () => ({ data: [{ source_id: 'P01', offering_id: 'course-1' }], error: null }) }) }),
+    rpc: async () => ({
+    data: [{ id: 'course-1', name: '검증 과정(수정)', starts_on: '2026-01-01', ends_on: '2026-02-01', responsible: '책임강사', plan_status: 'DRAFT', result_status: 'REVIEW' }],
     error: documentFailure ? new Error('unavailable') : null,
   }) }) },
   '@/lib/course-workspace/data': { getCourseWorkspaces: async () => { reportReads++; return { courses: [], unavailable: legacyFailure }; } },

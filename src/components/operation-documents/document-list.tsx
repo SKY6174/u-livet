@@ -32,6 +32,8 @@ type DbCourseRow = {
   result_status: keyof typeof RESULT_STATUS_LABELS | null;
 };
 
+type GuideLink = { source_id: string; offering_id: string | null };
+
 export async function DocumentList({
   kind,
   view = "official",
@@ -54,14 +56,19 @@ export async function DocumentList({
 
   // 2. 데이터베이스 과정 및 기존 증빙 데이터 조회
   let dbCourses: DbCourseRow[] = [];
+  let guideLinks: GuideLink[] = [];
   let dbError = false;
 
   if (!evidence) {
     try {
       const client = await createServerSupabaseClient();
-      const response = await client.rpc("life_operation_list");
-      if (!response.error && Array.isArray(response.data)) {
+      const [response, guides] = await Promise.all([
+        client.rpc("life_operation_list"),
+        client.from("life_course_guides").select("source_id,offering_id").eq("year", 2026),
+      ]);
+      if (!response.error && Array.isArray(response.data) && !guides.error && Array.isArray(guides.data)) {
         dbCourses = response.data as DbCourseRow[];
+        guideLinks = guides.data as GuideLink[];
       } else {
         dbError = true;
       }
@@ -77,16 +84,18 @@ export async function DocumentList({
   //    접근이 허용된 실제 과정만 봅니다. 작성 링크와 상태는 DB 행에만 부여합니다.
   const mergedCourses: DocumentCourseItem[] = PREFILLED_COURSES.flatMap(
     (prefilled, idx) => {
-      const matchedDb = dbCourses.find(
-        (db) =>
-          db.name === prefilled.title ||
-          findPrefilledCourse(db.name)?.id === prefilled.id,
-      );
+      const guide = guideLinks.find((entry) => entry.source_id === prefilled.sourceId);
+      const matchedDb = guide
+        ? dbCourses.find((db) => db.id === guide.offering_id)
+        : dbCourses.find((db) =>
+            db.name === prefilled.title || findPrefilledCourse(db.name)?.id === prefilled.id,
+          );
       if (!manager && !matchedDb) return [];
 
       return [
         {
           id: matchedDb ? matchedDb.id : prefilled.id,
+          source_id: prefilled.sourceId,
           registered: Boolean(matchedDb),
           sort_order: idx + 1,
           program_id: prefilled.programId,
@@ -127,6 +136,7 @@ export async function DocumentList({
     unmatchedDbCourses.forEach((course, index) => {
       mergedCourses.push({
         id: course.id,
+        source_id: "",
         registered: true,
         sort_order: PREFILLED_COURSES.length + index + 1,
         program_id: "DB",
@@ -234,6 +244,7 @@ export async function DocumentList({
             <DocumentListView
               kind={kind}
               courses={mergedCourses}
+              manager={manager}
             />
           )}
         </section>
