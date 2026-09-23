@@ -18,7 +18,7 @@ function load(file, replacements) {
 }
 let checks = 0;
 async function test(name, run) { await run(); checks++; console.log('PASS ' + name); }
-const fresh = { active: true, needs_reset: false, staff_required: true, mfa_required: true, mfa_verified: true, recent: true, fresh_minutes: 15 };
+const fresh = { active: true, needs_reset: false, staff_required: true, mfa_required: true, mfa_verified: true, recent: true, fresh_minutes: 120 };
 const factorId = '10000000-0000-4000-8000-000000000009';
 const factors = [{ id: factorId, name: 'Test authenticator', verified: true }];
 const panelFile = 'src/components/auth/mfa-panel.tsx';
@@ -41,6 +41,7 @@ await test('fresh staff MFA hides the duplicate code form and moves management o
   const output = html(fresh);
   assert(!output.includes('id="mfa-code"'));
   assert(output.includes('추가 인증된 로그인입니다.'));
+  assert(output.includes('최근 2시간 안에'));
   assert(output.includes('다른 인증 앱 추가'));
   assert(!output.includes('연결된 인증 앱 관리'));
 });

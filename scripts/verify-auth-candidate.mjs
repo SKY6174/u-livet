@@ -162,7 +162,7 @@ try {
     assert.equal(lab.sql(`select count(*) from auth.mfa_factors where user_id=${quote(staff.user.id)} and status='verified'`), '1');
   });
   await test('old MFA proof cannot authorize new factor enrollment', async () => {
-    lab.sql(`update auth.mfa_amr_claims set updated_at=now()-interval '20 minutes' where session_id in (select id from auth.sessions where user_id=${quote(staff.user.id)})`);
+    lab.sql(`update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id in (select id from auth.sessions where user_id=${quote(staff.user.id)})`);
     assert.equal(ok(await rpc(await token(staff.c), 'life_security_status')).recent, false);
     assert.ok((await rpc(await token(staff.c), 'life_prepare_mfa_change', { k: 'ENROLL' })).error);
     assert.ok((await staff.c.mfa.enroll({ factorType: 'totp', friendlyName: 'Expired approval' })).error);

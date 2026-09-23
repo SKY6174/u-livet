@@ -75,7 +75,7 @@ select pg_temp.expect_error($$select public.life_delete_member(md5('member-test-
 reset role;
 select pg_temp.check_result((select phone='+821033334444' from life_private.learner_contacts where user_id=md5('member-test-3')::uuid),'phone transaction synced');
 select pg_temp.check_result((select name='수강생 변경' from public.user_profiles where id=md5('member-test-3')::uuid),'legacy display name synced');
-update auth.mfa_amr_claims set updated_at=now()-interval '20 minutes' where session_id=md5('session-1')::uuid;
+update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id=md5('session-1')::uuid;
 set local role authenticated;
 select pg_temp.expect_error($$select public.life_delete_member(md5('member-test-3')::uuid,1)$$,'MFA_REAUTH_REQUIRED');
 reset role;

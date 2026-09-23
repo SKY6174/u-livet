@@ -93,7 +93,7 @@ try {
   // Make only this local synthetic MFA session stale; keep current AAL2 for reads.
   const session = ok(await a.c.auth.getSession()).session;
   const claims = JSON.parse(Buffer.from(session.access_token.split('.')[1], 'base64url'));
-  sql(`update auth.mfa_amr_claims set updated_at=now()-interval '2 hours' where session_id='${claims.session_id}' and authentication_method='totp';`);
+  sql(`update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id='${claims.session_id}' and authentication_method='totp';`);
   denied(await save(a, blank, 2), 'MFA_REAUTH_REQUIRED');
   assert.equal(ok(await get(a)).revision, 2);
   pass('recent MFA is required for writing and a rejected write preserves the saved version');

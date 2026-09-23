@@ -20,7 +20,7 @@ reset role;
 select pg_temp.check_result((select name='수정한 최고관리자' from public.user_profiles where id=md5('member-test-1')::uuid),'linked profile name is synchronized');
 select pg_temp.check_result((select count(*)=2 from public.life_audit_events where actor_id=md5('member-test-1')::uuid and entity_id=md5('member-test-1')::uuid and action='MEMBER_UPDATED'),'chief edit audited for both affiliations');
 select pg_temp.check_result((select count(*)=2 from public.life_role_assignments where person_id=md5('member-test-1')::uuid),'chief edit does not add roles');
-update auth.mfa_amr_claims set updated_at=now()-interval '20 minutes' where session_id=md5('session-1')::uuid;
+update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id=md5('session-1')::uuid;
 set local role authenticated;
 select pg_temp.expect_error($cmd$select public.life_save_member(md5('member-test-1')::uuid,'office','인증 필요','DIRECTOR',null,null,null,null,null,'',1)$cmd$,'MFA_REAUTH_REQUIRED');
 reset role;

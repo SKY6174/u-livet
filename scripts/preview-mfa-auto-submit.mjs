@@ -37,7 +37,7 @@ const entry = write('entry.js', `
 import React from 'react'; import {createRoot} from 'react-dom/client'; import {MfaPanel} from ${JSON.stringify(panel)};
 const mode = new URLSearchParams(window.location.search).get('mode');
 createRoot(document.getElementById('app')).render(React.createElement(React.StrictMode,null,React.createElement(MfaPanel,{
-status:{active:true,needs_reset:false,staff_required:true,mfa_required:true,mfa_verified:false,recent:false,fresh_minutes:15},
+status:{active:true,needs_reset:false,staff_required:true,mfa_required:true,mfa_verified:false,recent:false,fresh_minutes:120},
 factors:mode==='enroll'?[]:[{id:'factor-one',name:'검증용 앱 1',verified:true},{id:'factor-two',name:'검증용 앱 2',verified:true}],
 next:'/verified',returnToWork:mode!=='manage'
 })));

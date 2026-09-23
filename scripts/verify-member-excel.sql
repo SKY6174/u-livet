@@ -59,7 +59,7 @@ select pg_temp.check_result(jsonb_array_length(public.life_member_excel_export('
 select pg_temp.actor(3);
 select pg_temp.expect_error($cmd$select public.life_member_excel_export('office','')$cmd$,'FORBIDDEN');
 reset role;
-update auth.mfa_amr_claims set updated_at=now()-interval '20 minutes' where session_id=md5('session-1')::uuid;
+update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id=md5('session-1')::uuid;
 set local role authenticated;
 select pg_temp.actor(1);
 select pg_temp.expect_error($cmd$select public.life_member_excel_import('office','10000000-0000-4000-8000-000000000001',jsonb_build_array(

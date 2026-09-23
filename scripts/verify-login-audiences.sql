@@ -89,7 +89,7 @@ begin
  perform public.life_set_account_classification(admin_person,'DIRECTOR',null);
  perform pg_temp.check_it(public.life_identity()->>'office_position'='DIRECTOR','authenticated administrator can save classification through public RPC');
  reset role;
- update auth.mfa_amr_claims set updated_at=now()-interval '16 minutes' where session_id=admin_session;
+ update auth.mfa_amr_claims set updated_at=now()-interval '121 minutes' where session_id=admin_session;
  perform pg_temp.rejects(format('select public.life_set_account_classification(%L,''DIRECTOR'',null)',admin_person),'classification update requires recent MFA');
  perform pg_temp.check_it(not has_table_privilege('authenticated','life_private.account_classifications','update'),'classification table not writable by clients');
  perform pg_temp.check_it(not has_table_privilege('authenticated','life_private.account_classifications','select'),'classification table not directly readable');
