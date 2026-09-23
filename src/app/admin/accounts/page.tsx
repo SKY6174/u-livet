@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Plus, Search, ShieldCheck, UsersRound } from "lucide-react";
 import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
 import { PageIntro, Empty } from "@/components/portal/ui";
+import { MemberNotice } from "@/components/portal/member-notice";
 import { getMembers, memberAdmin } from "@/lib/members/data";
 import { MEMBER_GROUPS, memberGroup, memberPage, displayPhone, type MemberGroup } from "@/lib/members/model";
 
@@ -18,22 +19,23 @@ export default async function Members({ searchParams }: { searchParams: Promise<
   const pages = Math.max(1, Math.ceil((data?.total ?? 0) / 20));
   if (data && page > pages) redirect(href(pages));
   const phoneHeading = group === "instructor" ? "연락처" : "핸드폰 전화번호";
+  const notice = params.created === "1" ? "created" : params.saved === "1" ? "saved" : params.deleted === "1" ? "deleted" : undefined;
   const columns = ["순번", ...(group === "office" ? ["직책"] : group === "instructor" ? ["교내/교외"] : []), "성명", group === "learner" ? "이메일" : "이메일(아이디)", ...(group === "office" ? ["사무실 전화번호"] : []), phoneHeading, ...(group === "learner" ? ["생년월일", "올해 수강과목", "수강이력"] : group === "instructor" ? ["강의이력"] : []), "비고", "관리"];
   return <div className="page-shell">
     <PageIntro eyebrow="MEMBERS" title="구성원 관리">사업단·강사·수강생의 정보와 활동 이력을 관리합니다.</PageIntro>
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div className="mb-6">
       <span className="inline-flex items-center gap-2 text-sm text-slate-500"><ShieldCheck aria-hidden="true" className="h-4 w-4 text-teal-700" />{me.is_super_admin ? "최고 관리자 · " + me.name : "구성원 명부"}</span>
-      {!!me.member_entry_orgs?.length && <Link className="btn-primary gap-2" href={`/admin/accounts/new?group=${group}`}><Plus aria-hidden="true" className="h-4 w-4" />구성원 수동 등록</Link>}
     </div>
-    {params.created === "1" && <p role="status" className="mb-5 rounded-xl bg-teal-50 p-4 text-sm text-teal-900">구성원을 등록하고 DB에 저장했습니다.</p>}
-    {params.saved === "1" && <p role="status" className="mb-5 rounded-xl bg-teal-50 p-4 text-sm text-teal-900">구성원 정보를 저장했습니다.</p>}
-    {params.deleted === "1" && <p role="status" className="mb-5 rounded-xl bg-teal-50 p-4 text-sm text-teal-900">구성원을 삭제했습니다. 서비스 이용은 중지되고 기존 이력은 보존됩니다.</p>}
-    <nav aria-label="구성원 구분" className="mb-6 flex flex-wrap gap-2">
+    <MemberNotice key={notice ?? "none"} kind={notice} />
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <nav aria-label="구성원 구분" className="flex flex-wrap gap-2">
       {Object.entries(MEMBER_GROUPS).map(([key, label]) => <Link key={key} href={`/admin/accounts?group=${key}`} aria-current={key === group ? "page" : undefined}
         className={`inline-flex min-h-12 items-center gap-3 rounded-xl border px-5 text-sm font-semibold transition-colors ${key === group ? "border-teal-800 bg-teal-800 text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-800"}`}>
         {label}<span className={`rounded-md px-2 py-0.5 text-xs tabular-nums ${key === group ? "bg-white/15" : "bg-slate-100"}`}>{data?.counts[key as MemberGroup] ?? "—"}</span>
       </Link>)}
     </nav>
+      {!!me.member_entry_orgs?.length && <Link className="btn-primary ml-auto min-h-12 shrink-0 gap-2" href={`/admin/accounts/new?group=${group}`}><Plus aria-hidden="true" className="h-4 w-4" />구성원 수동 등록</Link>}
+    </div>
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2"><UsersRound aria-hidden="true" className="h-5 w-5 text-teal-700" /><h2 className="font-bold">{MEMBER_GROUPS[group]} 목록</h2><span className="text-sm text-slate-500">{data ? `${data.total}명` : ""}</span></div>
