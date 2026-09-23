@@ -25,6 +25,9 @@ export function officeSections(member: Member) {
   const certifier = hasRole(member, "COURSE_MANAGER", "CERTIFIER");
   return [
     { title: "기획·개설", links: [
+      ...(manager ? [
+        { label: "과정 개발·심의", href: "/admin/development", description: "새 교육과정을 제안하고 심의 진행 상황을 확인합니다." },
+      ] : []),
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
       ] : []),
@@ -64,7 +67,7 @@ export function officeActiveHref(path: string) {
   if (within(path, "/operation-documents/result") || /^\/operation-documents\/[^/]+\/result(?:\/|$)/.test(path)) return "/operation-documents/result";
   if (within(path, "/operation-documents")) return "/operation-documents/plan";
   if (within(path, "/admin/reports") || /^\/admin\/offerings\/[^/]+\/reports(?:\/|$)/.test(path)) return "/operation-documents/result";
-  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/instructors", "/admin/parking", "/admin/learner-documents"])
+  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/development", "/admin/instructors", "/admin/parking", "/admin/learner-documents"])
     if (within(path, href)) return href;
   return path === "/admin" ? "/admin" : "/admin/courses";
 }

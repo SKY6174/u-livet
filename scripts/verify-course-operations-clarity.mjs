@@ -72,8 +72,8 @@ assert(html.includes("울산과학대학교 앵커사업단"));
 assert(!html.includes("name=\"org\""));
 assert(!html.includes("02c1d0c2"));
 for (const href of ["/admin/course-plan", "/admin/course-plan/opening", "/admin/development"])
-  assert(html.includes(`href="${href}"`), href);
-assert(html.indexOf("연간 계획에서 개설까지") < html.indexOf("과정 개발·심의"));
+  assert(!html.includes(`href="${href}"`), href);
+assert(!html.includes("연간 계획에서 개설까지") && !html.includes("과정 개발·심의"));
 assert(!html.includes("/admin/messages") && !html.includes("/operation-documents/result"));
 assert(!html.includes("결과보고서"));
 const tabs = html.indexOf('aria-label="과정 관리 화면"');
@@ -82,7 +82,7 @@ const views = html.indexOf('aria-label="보기 방식"', tabs);
 assert(tabs >= 0 && register > tabs && register < views);
 assert.match(html.slice(tabs, views), /href="\/admin\/courses\?org=10000000-0000-4000-8000-000000000001&amp;create=1#new-course"[^>]*bg-red-600|bg-red-600[^>]*href="\/admin\/courses\?org=10000000-0000-4000-8000-000000000001&amp;create=1#new-course"/);
 assert(!html.includes("/operation-documents/offering/result"));
-console.log("PASS anchor manager sees focused organization, grouped workflow and relocated red registration action");
+console.log("PASS anchor manager sees focused organization and registration without workflow cards");
 
 expectedOrg = SANHAK;
 html = await render([["COURSE_MANAGER", SANHAK]]);
