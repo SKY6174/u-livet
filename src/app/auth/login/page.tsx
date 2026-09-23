@@ -31,10 +31,10 @@ export default async function Login(props: {
         ))}
       </nav>}
         {socialLoginError(searchParams.social_error) && <p role="alert" className="mb-6 rounded-xl bg-amber-50 p-4 text-base leading-7 text-amber-900">{socialLoginError(searchParams.social_error)}</p>}
-      {audience ? <section className="panel" aria-labelledby="login-form-title">
+      {audience && <section className="panel" aria-labelledby="login-form-title">
         <h2 id="login-form-title" className="mb-6 text-xl font-bold">{LOGIN_AUDIENCES.find(item => item.id === audience)?.label} 로그인</h2>
         <AuthForm key={audience} next={next} audience={audience} />
-      </section> : <p className="rounded-xl bg-slate-50 p-6 text-base leading-7 text-slate-600">위 버튼을 누르면 대상에 맞는 로그인 방법을 안내해 드립니다. 교육과정은 로그인 전에도 둘러볼 수 있습니다.</p>}
+      </section>}
     </div>
   );
 }
