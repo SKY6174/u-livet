@@ -83,6 +83,9 @@ export function MfaPanel({
     setCode(value);
     if (autoVerify) verifyCode(value);
   };
+  const freshLabel = status.fresh_minutes % 60 === 0
+    ? `${status.fresh_minutes / 60}시간`
+    : `${status.fresh_minutes}분`;
   return (
     <section className="panel space-y-6 text-base">
       {(status.staff_required || status.mfa_verified || !status.mfa_required) && (
@@ -96,7 +99,7 @@ export function MfaPanel({
           )}
           {status.staff_required && (
             <p>
-              관리자 계정의 저장·승인은 최근 {status.fresh_minutes}분 안에 추가
+              관리자 계정의 저장·승인은 최근 {freshLabel} 안에 추가
               인증한 경우만 가능합니다.
             </p>
           )}
