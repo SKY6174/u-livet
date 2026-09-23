@@ -214,9 +214,6 @@ export async function DocumentList({
               <h2 className="text-xl font-bold text-slate-900">
                 {result ? "공식 운영결과보고서" : "과정별 운영계획서"}
               </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                2026년 RISE사업 평생직업교육과정 16개 과정의 문서 작성 상태를 확인하고 양식을 작성·검토합니다.
-              </p>
             </div>
             <a
               className="btn-secondary"
