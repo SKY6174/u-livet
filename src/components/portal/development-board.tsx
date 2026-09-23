@@ -9,21 +9,54 @@ import {
   type DevelopmentBoardData,
   type InstructorOptions,
 } from "@/lib/instructors/types";
+
+const PROJECT_YEARS = [2025, 2026, 2027, 2028, 2029] as const;
+const ANCHOR_TRACKS = ["RCC", "AID-X", "ECC"] as const;
+const trackLabel = (track: string | null) =>
+  track === "WORKER" ? "재직자 과정" : track ?? "미분류";
+
 export async function DevelopmentBoard({
   orgId,
+  year,
+  track,
   staff,
 }: {
   orgId?: string;
+  year?: string;
+  track?: string;
   staff: boolean;
 }) {
   await requireIdentity(staff ? "/admin/development" : "/development");
   const db = await createServerSupabaseClient(),
     r = await db.rpc("life_instructor_options"),
     options = r.data as InstructorOptions | null;
-  const orgs = options?.organizations.filter((o) => !staff || o.manager) ?? [],
-    org = orgs.find((o) => o.id === orgId) ?? orgs[0];
-  const b = org
-      ? await db.rpc("life_development_board", { o: org.id, staff })
+  const orgs = (options?.organizations.filter((o) => !staff || o.manager) ?? [])
+      .sort((a, b) =>
+        (a.slug === "uc-anchor" ? 0 : a.slug === "uc-sanhak" ? 1 : 2) -
+        (b.slug === "uc-anchor" ? 0 : b.slug === "uc-sanhak" ? 1 : 2),
+      ),
+    org = orgs.find((o) => o.id === orgId) ?? orgs[0],
+    today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" }),
+    businessYear = Number(today.slice(0, 4)) - (Number(today.slice(5, 7)) < 3 ? 1 : 0),
+    selectedYear = PROJECT_YEARS.includes(Number(year) as typeof PROJECT_YEARS[number])
+      ? Number(year)
+      : Math.max(2025, Math.min(2029, businessYear)),
+    selectedYearRecord = options?.years.find((y) =>
+      y.org_id === org?.id && (y.label === `${selectedYear}년 (${selectedYear - 2024}차년도)`
+        || (org?.slug === "uc-anchor" && selectedYear === 2026 && y.label === "2차년도 · 2026")),
+    ),
+    tracks = org?.slug === "uc-anchor" ? [...ANCHOR_TRACKS] : org?.slug === "uc-sanhak" ? ["WORKER"] : [],
+    selectedTrack = track === "UNCLASSIFIED" || tracks.includes(track ?? "") ? track : undefined,
+    basePath = staff ? "/admin/development" : "/development",
+    boardHref = (id: string, y: number, t?: string) => {
+      const query = new URLSearchParams({ org: id, year: String(y) });
+      if (t) query.set("track", t);
+      return `${basePath}?${query.toString()}`;
+    };
+  const b = org && selectedYearRecord
+      ? await db.rpc("life_development_board_filtered", {
+          o: org.id, staff, y: selectedYearRecord.id, track: selectedTrack ?? null,
+        })
       : null,
     board = b?.data as DevelopmentBoardData | null;
   return (
@@ -34,26 +67,53 @@ export async function DevelopmentBoard({
       >
         수요와 역량을 교육과정으로 구체화하고 승인본을 기수 운영에 연결합니다.
       </PageIntro>
-      <form className="panel mb-6 flex flex-wrap items-end gap-3">
-        <label className="field grow">
-          기관
-          <select name="org" defaultValue={org?.id}>
+      <section className="panel mb-6 space-y-5" aria-label="과정 개발 분류">
+        <div>
+          <h2 className="mb-2 font-semibold">주관 기관</h2>
+          <div className="flex flex-wrap gap-2">
             {orgs.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
+              <Link key={o.id} href={boardHref(o.id, selectedYear)}
+                className={o.id === org?.id ? "btn-primary" : "btn-secondary"}
+                aria-current={o.id === org?.id ? "page" : undefined}>
+                {o.slug === "uc-anchor" ? "앵커사업단" : o.slug === "uc-sanhak" ? "산학협력단" : o.name}
+              </Link>
             ))}
-          </select>
-        </label>
-        <button className="btn-secondary">기관 선택</button>
-      </form>
-      {r.error || b?.error || !board || !org ? (
-        <Empty title="과정 제안 정보를 불러오지 못했습니다" />
+          </div>
+        </div>
+        <div>
+          <h2 className="mb-2 font-semibold">사업연도</h2>
+          <div className="flex flex-wrap gap-2">
+            {PROJECT_YEARS.map((y) => (
+              <Link key={y} href={boardHref(org?.id ?? "", y, selectedTrack)}
+                className={y === selectedYear ? "btn-primary" : "btn-secondary"}
+                aria-current={y === selectedYear ? "page" : undefined}>
+                {y}년 ({y - 2024}차년도)
+              </Link>
+            ))}
+          </div>
+        </div>
+        {!!tracks.length && (
+          <div>
+            <h2 className="mb-2 font-semibold">{org?.slug === "uc-anchor" ? "앵커사업단 주관 센터" : "과정 구분"}</h2>
+            <div className="flex flex-wrap gap-2">
+              {[undefined, ...tracks, "UNCLASSIFIED"].map((t) => (
+                <Link key={t ?? "all"} href={boardHref(org?.id ?? "", selectedYear, t)}
+                  className={t === selectedTrack ? "btn-primary" : "btn-secondary"}
+                  aria-current={t === selectedTrack ? "page" : undefined}>
+                  {t === undefined ? "전체" : t === "UNCLASSIFIED" ? "미분류(기존)" : trackLabel(t)}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+      {r.error || b?.error || !board || !org || !selectedYearRecord ? (
+        <Empty title={selectedYearRecord ? "과정 제안 정보를 불러오지 못했습니다" : "선택한 사업연도가 등록되지 않았습니다"} />
       ) : (
         <>
           {staff && (
             <section className="panel mb-6">
-              <h2 className="section-title">사업연도별 승인 개발·개편</h2>
+              <h2 className="section-title">{selectedYear}년 ({selectedYear - 2024}차년도) · {selectedTrack ? trackLabel(selectedTrack === "UNCLASSIFIED" ? null : selectedTrack) : "전체"} 승인 개발·개편</h2>
               <p className="notice mb-4">
                 승인 취소를 제외한 심의 버전 수입니다. 같은 버전의 여러 개설
                 기수는 중복하지 않습니다. 공식 RISE 성과 산식과 대외 제출은 별도
@@ -64,8 +124,7 @@ export async function DevelopmentBoard({
                   {board.counts.map((c) => (
                     <p key={c.project_year_id}>
                       {
-                        options?.years.find((y) => y.id === c.project_year_id)
-                          ?.label
+                        `${selectedYear}년 (${selectedYear - 2024}차년도)`
                       }{" "}
                       · 신규 {c.new_count}건 · 개편 {c.revision_count}건
                     </p>
@@ -78,9 +137,7 @@ export async function DevelopmentBoard({
               )}
             </section>
           )}
-          <h2 className="section-title">
-            {staff ? "제출된 과정 제안" : "내가 작성한 과정"}
-          </h2>
+          <h2 className="section-title">{staff ? "제출된 과정 제안" : "내가 작성한 과정"} · {selectedYear}년 · {selectedTrack ? trackLabel(selectedTrack === "UNCLASSIFIED" ? null : selectedTrack) : "전체"}</h2>
           {!board.items.length ? (
             <Empty title="과정 제안이 없습니다" />
           ) : (
@@ -99,7 +156,7 @@ export async function DevelopmentBoard({
                     {p.title || "과정명 작성 전"}
                   </h3>
                   <p className="mt-2 text-sm text-slate-600">
-                    {p.name} · 최초 제안: {reviewLabels[p.kind]}
+                    {trackLabel(p.track)} · {p.name} · 최초 제안: {reviewLabels[p.kind]}
                   </p>
                   <p className="mt-3 text-sm text-teal-800">
                     계획·심의·개설 이력 →
@@ -125,17 +182,27 @@ export async function DevelopmentBoard({
                   <input type="hidden" name="o" value={org.id} />
                   <label className="field">
                     개발 귀속 사업연도
-                    <select name="y" required defaultValue="">
+                    <select name="y" required defaultValue={selectedYearRecord.id}>
                       <option value="" disabled>
                         연도 선택
                       </option>
                       {options?.years
-                        .filter((y) => y.org_id === org.id)
+                        .filter((y) => y.org_id === org.id && PROJECT_YEARS.some((n) =>
+                          y.label === `${n}년 (${n - 2024}차년도)` ||
+                          (org.slug === "uc-anchor" && n === 2026 && y.label === "2차년도 · 2026")))
+                        .sort((a, b) => a.starts_on.localeCompare(b.starts_on))
                         .map((y) => (
                           <option key={y.id} value={y.id}>
-                            {y.label}
+                            {Number(y.starts_on.slice(0, 4))}년 ({Number(y.starts_on.slice(0, 4)) - 2024}차년도)
                           </option>
                         ))}
+                    </select>
+                  </label>
+                  <label className="field">
+                    주관 구분
+                    <select name="track" required defaultValue={selectedTrack && selectedTrack !== "UNCLASSIFIED" ? selectedTrack : ""}>
+                      <option value="" disabled>주관 선택</option>
+                      {tracks.map((t) => <option key={t} value={t}>{trackLabel(t)}</option>)}
                     </select>
                   </label>
                   <label className="field">

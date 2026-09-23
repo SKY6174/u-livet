@@ -9,6 +9,7 @@ export type InstructorPolicy = {
 export type InstructorOptions = {
   organizations: {
     id: string;
+    slug: string;
     name: string;
     manager: boolean;
     proposer: boolean;
@@ -100,6 +101,7 @@ export type Development = {
   org_id: string;
   person_id: string;
   project_year_id: string;
+  track: string | null;
   kind: string;
   name: string;
   owner: boolean;
@@ -116,6 +118,7 @@ export type DevelopmentBoardData = {
     title: string;
     kind: string;
     year_id: string;
+    track: string | null;
     status: string;
     version: number;
     revoked_at: string | null;
