@@ -14,6 +14,11 @@ import {
   type Content,
   type Budget,
 } from "@/lib/operation-documents/model";
+import {
+  formatScheduleDate,
+  formatScheduleTime,
+  splitScheduleLocation,
+} from "@/lib/operation-documents/schedule-print";
 import "./documents.css";
 const sum = (rows: Record<string, string>[], key: string) =>
   rows.reduce((n, r) => n + Number(r[key] || 0), 0);
@@ -60,6 +65,44 @@ function Grid({
 }
 function Box({ children }: { children: ReactNode }) {
   return <div className="op-text-box">{children || "\u00a0"}</div>;
+}
+function ScheduleDateTimeCell({ row }: { row?: Record<string, string> }) {
+  const time = formatScheduleTime(row?.startTime || "", row?.endTime || "");
+  return (
+    <td className="op-schedule-datetime">
+      {row?.date ? (
+        <span className="op-schedule-date">{formatScheduleDate(row.date)}</span>
+      ) : (
+        "\u00a0"
+      )}
+      {time && (
+        <>
+          <br />
+          <span className="op-schedule-time">{time}</span>
+        </>
+      )}
+    </td>
+  );
+}
+function ScheduleLocationCell({ value }: { value?: string }) {
+  const location = splitScheduleLocation(value || "");
+  return (
+    <td className="op-schedule-location">
+      {location.name ? (
+        <>
+          <span>{location.name}</span>
+          {location.room && (
+            <>
+              <br />
+              <span className="op-schedule-room">{location.room}</span>
+            </>
+          )}
+        </>
+      ) : (
+        "\u00a0"
+      )}
+    </td>
+  );
 }
 export function DocumentPreview({
   kind,
@@ -349,8 +392,8 @@ export function DocumentPreview({
         <table className="op-table op-schedule">
           <colgroup>
             {(kind === "plan"
-              ? [4, 9, 11, 18, 8, 6, 8, 6, 12, 8, 10]
-              : [4, 11, 13, 24, 10, 7, 10, 7, 14]
+              ? [4, 16, 23, 8, 6, 8, 6, 13, 7, 9]
+              : [4, 19, 29, 8, 6, 8, 6, 20]
             ).map((width, index) => (
               <col key={index} style={{ width: `${width}%` }} />
             ))}
@@ -358,8 +401,11 @@ export function DocumentPreview({
           <thead>
             <tr>
               <th rowSpan={2}>회차</th>
-              <th rowSpan={2}>일자</th>
-              <th rowSpan={2}>시간</th>
+              <th rowSpan={2} className="op-schedule-datetime">
+                일자
+                <br />
+                <span>(시간)</span>
+              </th>
               <th rowSpan={2}>강의주제 및 내용</th>
               <th colSpan={2}>주강사</th>
               <th colSpan={2}>보조강사</th>
@@ -377,27 +423,30 @@ export function DocumentPreview({
             </tr>
             <tr>
               <th>강사명</th>
-              <th>교육시간</th>
+              <th>
+                교육
+                <br />
+                시간
+              </th>
               <th>강사명</th>
-              <th>교육시간</th>
+              <th>
+                교육
+                <br />
+                시간
+              </th>
             </tr>
           </thead>
           <tbody>
             {Array.from({ length: Math.max(15, rows.length) }, (_, i) => (
               <tr key={i}>
                 <td>{group * 15 + i + 1}</td>
-                <td>{rows[i]?.date ? date(rows[i].date) : "\u00a0"}</td>
-                <td>
-                  {rows[i]?.startTime || rows[i]?.endTime
-                    ? `${rows[i]?.startTime || ""} ~ ${rows[i]?.endTime || ""}`
-                    : "\u00a0"}
-                </td>
-                <td>{rows[i]?.topic || "\u00a0"}</td>
-                <td>{rows[i]?.instructor || "\u00a0"}</td>
+                <ScheduleDateTimeCell row={rows[i]} />
+                <td className="op-schedule-topic">{rows[i]?.topic || "\u00a0"}</td>
+                <td className="op-schedule-instructor">{rows[i]?.instructor || "\u00a0"}</td>
                 <td>{rows[i]?.hours || "\u00a0"}</td>
-                <td>{rows[i]?.assistant || "\u00a0"}</td>
+                <td className="op-schedule-instructor">{rows[i]?.assistant || "\u00a0"}</td>
                 <td>{rows[i]?.assistantHours || "\u00a0"}</td>
-                <td>{rows[i]?.location || "\u00a0"}</td>
+                <ScheduleLocationCell value={rows[i]?.location} />
                 {kind === "plan" && (
                   <>
                     <td>{rows[i]?.mode || "\u00a0"}</td>
@@ -407,7 +456,7 @@ export function DocumentPreview({
               </tr>
             ))}
             <tr>
-              <th colSpan={4}>합계</th>
+              <th colSpan={3}>합계</th>
               <td />
               <td>{sum(rows, "hours")}h</td>
               <td />

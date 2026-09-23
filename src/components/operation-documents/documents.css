@@ -199,6 +199,34 @@
   height: 9mm;
   padding: 1.1mm;
 }
+.op-schedule-datetime,
+.op-schedule-date,
+.op-schedule-time,
+.op-schedule-instructor,
+.op-schedule-location > span,
+.op-schedule-room {
+  white-space: nowrap;
+}
+.op-schedule-datetime {
+  line-height: 1.45;
+}
+.op-schedule-topic {
+  line-height: 1.45;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+.op-schedule-instructor {
+  letter-spacing: -0.15mm;
+}
+.op-schedule-location {
+  font-size: 8pt;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+.op-schedule-room {
+  display: inline-block;
+  margin-top: 0.3mm;
+}
 .op-hours {
   text-align: right;
   font-weight: bold;

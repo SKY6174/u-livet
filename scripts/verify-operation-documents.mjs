@@ -70,6 +70,34 @@ vm.runInNewContext(
   ).outputText,
   { exports: photoCrop },
 );
+const schedulePrint = {};
+vm.runInNewContext(
+  ts.transpileModule(
+    readFileSync("src/lib/operation-documents/schedule-print.ts", "utf8"),
+    {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+      },
+    },
+  ).outputText,
+  { exports: schedulePrint },
+);
+assert.equal(schedulePrint.formatScheduleDate("2026-07-14"), "2026. 07. 14.");
+assert.equal(schedulePrint.formatScheduleTime("09:00", "11:00"), "(09:00 ~ 11:00)");
+assert.equal(schedulePrint.formatScheduleTime("", ""), "");
+assert.deepEqual(
+  JSON.parse(JSON.stringify(schedulePrint.splitScheduleLocation("스포츠재활 실습실 (G-110)"))),
+  { name: "스포츠재활 실습실", room: "(G-110)" },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(schedulePrint.splitScheduleLocation("인조축구장"))),
+  { name: "인조축구장", room: "" },
+);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(schedulePrint.splitScheduleLocation("실습실(G-110)"))),
+  { name: "실습실", room: "(G-110)" },
+);
 assert.deepEqual(
   JSON.parse(JSON.stringify(photoCrop.centerCropRect(1600, 900))),
   { x: 0, y: 0, width: 1600, height: 900 },
