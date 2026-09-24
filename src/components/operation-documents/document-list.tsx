@@ -1,8 +1,7 @@
 /**
  * @file src/components/operation-documents/document-list.tsx
- * @description 2026년 RISE사업 평생직업교육과정 운영계획서 및 운영결과보고서 메인 목록 화면 컴포넌트입니다.
- *              데이터베이스에 등록된 과정뿐만 아니라 16개 전체 과정(PREFILLED_COURSES)을 안전하게 병합하여
- *              카드형 및 리스트형(테이블)으로 시각화하고 검색, 아카데미별/상태별 필터링을 제공합니다.
+ * @description 접근 가능한 등록 과정과 2026년 앵커사업단 원문 16개 과정을 병합하여
+ *              기관·사업연도·아카데미·상태별로 운영 문서를 탐색합니다.
  */
 
 import Link from "next/link";
@@ -25,6 +24,13 @@ type Kind = "plan" | "result";
 type DbCourseRow = {
   id: string;
   name: string;
+  org_id: string;
+  org_name: string;
+  year: number;
+  year_label: string;
+  academy: string;
+  capacity: number;
+  location: string;
   starts_on: string;
   ends_on: string;
   responsible: string | null;
@@ -33,6 +39,8 @@ type DbCourseRow = {
 };
 
 type GuideLink = { source_id: string; offering_id: string | null };
+type OrganizationOption = { id: string; name: string };
+const ANCHOR_ORG_ID = "10000000-0000-4000-8000-000000000001";
 
 export async function DocumentList({
   kind,
@@ -48,6 +56,9 @@ export async function DocumentList({
       : `/operation-documents/${kind}`,
   );
   const manager = hasRole(me, "COURSE_MANAGER");
+  const managedOrgIds = Array.from(new Set(me.roles
+    .filter((role) => role.role === "COURSE_MANAGER")
+    .map((role) => role.org_id)));
   const result = kind === "result";
   const evidence = result && view === "evidence";
 
@@ -57,18 +68,23 @@ export async function DocumentList({
   // 2. 데이터베이스 과정 및 기존 증빙 데이터 조회
   let dbCourses: DbCourseRow[] = [];
   let guideLinks: GuideLink[] = [];
+  let managedOrganizations: OrganizationOption[] = [];
   let dbError = false;
 
   if (!evidence) {
     try {
       const client = await createServerSupabaseClient();
-      const [response, guides] = await Promise.all([
+      const [response, guides, organizations] = await Promise.all([
         client.rpc("life_operation_list"),
         client.from("life_course_guides").select("source_id,offering_id").eq("year", 2026),
+        managedOrgIds.length
+          ? client.from("life_organizations").select("id,name").in("id", managedOrgIds)
+          : Promise.resolve({ data: [], error: null }),
       ]);
-      if (!response.error && Array.isArray(response.data) && !guides.error && Array.isArray(guides.data)) {
+      if (!response.error && Array.isArray(response.data) && !guides.error && Array.isArray(guides.data) && !organizations.error && Array.isArray(organizations.data)) {
         dbCourses = response.data as DbCourseRow[];
         guideLinks = guides.data as GuideLink[];
+        managedOrganizations = organizations.data as OrganizationOption[];
       } else {
         dbError = true;
       }
@@ -80,17 +96,19 @@ export async function DocumentList({
   const legacy = evidence ? await getCourseWorkspaces() : null;
   const label = result ? "결과보고서" : "운영계획서";
 
-  // 3. 관리자는 16개 원문 이관 현황을 모두 보고, 책임강사는 DB에서
-  //    접근이 허용된 실제 과정만 봅니다. 작성 링크와 상태는 DB 행에만 부여합니다.
+  // 앵커사업단 관리자는 2026년 원문 이관 현황을 보고, 그 밖의 사용자는
+  // DB에서 접근이 허용된 실제 과정만 봅니다. 작성 링크는 DB 행에만 부여합니다.
+  const canManageAnchor = managedOrgIds.includes(ANCHOR_ORG_ID);
   const mergedCourses: DocumentCourseItem[] = PREFILLED_COURSES.flatMap(
     (prefilled, idx) => {
       const guide = guideLinks.find((entry) => entry.source_id === prefilled.sourceId);
       const matchedDb = guide
-        ? dbCourses.find((db) => db.id === guide.offering_id)
+        ? dbCourses.find((db) => db.id === guide.offering_id && db.org_id === ANCHOR_ORG_ID && db.year === 2026)
         : dbCourses.find((db) =>
-            db.name === prefilled.title || findPrefilledCourse(db.name)?.id === prefilled.id,
+            db.org_id === ANCHOR_ORG_ID && db.year === 2026 &&
+            (db.name === prefilled.title || findPrefilledCourse(db.name)?.id === prefilled.id),
           );
-      if (!manager && !matchedDb) return [];
+      if (!canManageAnchor && !matchedDb) return [];
 
       return [
         {
@@ -101,6 +119,10 @@ export async function DocumentList({
           program_id: prefilled.programId,
           name: prefilled.title,
           academy: prefilled.academy,
+          org_id: ANCHOR_ORG_ID,
+          org_name: matchedDb?.org_name ?? "울산과학대학교 앵커사업단",
+          year: 2026,
+          year_label: matchedDb?.year_label ?? "2026년 (2차년도)",
           capacity: prefilled.capacity,
           teaching_hours: prefilled.teachingHours,
           starts_on: matchedDb?.starts_on || prefilled.startsOn,
@@ -124,43 +146,48 @@ export async function DocumentList({
     },
   );
 
-  // 원문 16개 목록에 없는 실제 DB 과정도 책임강사의 작업 목록에서 누락하지 않습니다.
-  // 관리자 화면은 2026년 원문 이관 대상 16개 과정에 집중하고, 책임강사 화면에서는
-  // Supabase가 허용한 모든 실제 과정이 최종 권한 기준입니다.
-  if (!manager) {
-    const matchedDbIds = new Set(
-      mergedCourses.filter((course) => course.registered).map((course) => course.id),
-    );
-    const unmatchedDbCourses = dbCourses.filter((course) => !matchedDbIds.has(course.id));
-
-    unmatchedDbCourses.forEach((course, index) => {
-      mergedCourses.push({
-        id: course.id,
-        source_id: "",
-        registered: true,
-        sort_order: PREFILLED_COURSES.length + index + 1,
-        program_id: "DB",
-        name: course.name,
-        academy: "등록 과정",
-        capacity: null,
-        teaching_hours: null,
-        starts_on: course.starts_on,
-        ends_on: course.ends_on,
-        period_label: `${course.starts_on} ~ ${course.ends_on}`,
-        time_label: "운영정보 확인",
-        location: "운영정보 확인",
-        teachers: course.responsible || "강사 미지정",
-        responsible: course.responsible || "",
-        source_coordinator: "",
-        assistants: "-",
-        support_staff: "-",
-        plan_status: course.plan_status,
-        result_status: course.result_status,
-        enrolled_completed: "미집계",
-        has_source_report: false,
-      });
+  // 원문 목록에 없는 실제 등록 과정도 기관·연도에 관계없이 권한 범위에서 표시합니다.
+  const matchedDbIds = new Set(
+    mergedCourses.filter((course) => course.registered).map((course) => course.id),
+  );
+  const unmatchedDbCourses = dbCourses.filter((course) => !matchedDbIds.has(course.id));
+  unmatchedDbCourses.forEach((course, index) => {
+    mergedCourses.push({
+      id: course.id,
+      source_id: "",
+      registered: true,
+      sort_order: PREFILLED_COURSES.length + index + 1,
+      program_id: "미기재",
+      name: course.name,
+      academy: course.academy,
+      org_id: course.org_id,
+      org_name: course.org_name,
+      year: course.year,
+      year_label: course.year_label,
+      capacity: course.capacity,
+      teaching_hours: null,
+      starts_on: course.starts_on,
+      ends_on: course.ends_on,
+      period_label: `${course.starts_on} ~ ${course.ends_on}`,
+      time_label: "운영정보 확인",
+      location: course.location,
+      teachers: course.responsible || "강사 미지정",
+      responsible: course.responsible || "",
+      source_coordinator: "",
+      assistants: "-",
+      support_staff: "-",
+      plan_status: course.plan_status,
+      result_status: course.result_status,
+      enrolled_completed: "미집계",
+      has_source_report: false,
     });
-  }
+  });
+
+  const organizationOptions = Array.from(new Map([
+    ...managedOrganizations,
+    ...dbCourses.map((course) => ({ id: course.org_id, name: course.org_name })),
+  ].map((organization) => [organization.id, organization] as const)).values())
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
   return (
     <div className="page-shell space-y-8">
@@ -245,6 +272,7 @@ export async function DocumentList({
               kind={kind}
               courses={mergedCourses}
               manager={manager}
+              organizations={organizationOptions}
             />
           )}
         </section>

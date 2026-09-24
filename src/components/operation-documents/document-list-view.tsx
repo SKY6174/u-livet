@@ -2,7 +2,7 @@
 
 /**
  * @file src/components/operation-documents/document-list-view.tsx
- * @description 2026년 RISE사업 평생직업교육과정 16개 과정의 운영계획서 및 결과보고서를
+ * @description 접근 가능한 교육과정의 운영계획서 및 결과보고서를
  *              카드형과 리스트형(테이블)으로 탐색하고 관리할 수 있는 클라이언트 컴포넌트입니다.
  *              검색 기능(과정명, ID, 강사명 등), 아카데미별 필터링, 상태별 필터링을 지원합니다.
  */
@@ -30,6 +30,12 @@ export type DocumentCourseItem = {
   name: string;
   /** 소속 아카데미 구분 (스마트테크, 라이프케어, 로컬창업, 팝업) */
   academy: string;
+  /** 실제 운영 기관 */
+  org_id: string;
+  org_name: string;
+  /** 사업연도 (교육 시작 연도가 아닌 프로젝트 연도) */
+  year: number;
+  year_label: string;
   /** 모집 정원 (명) */
   capacity: number | null;
   /** 총 교육 시수 (시간) */
@@ -67,16 +73,19 @@ export type DocumentCourseItem = {
 interface DocumentListViewProps {
   /** 문서 구분 ('plan': 운영계획서, 'result': 결과보고서) */
   kind: "plan" | "result";
-  /** 표시할 16개 과정 데이터 목록 */
+  /** 권한이 확인된 등록 과정과 원문 이관 대상 */
   courses: DocumentCourseItem[];
   manager: boolean;
+  organizations: { id: string; name: string }[];
 }
 
-export function DocumentListView({ kind, courses, manager }: DocumentListViewProps) {
+export function DocumentListView({ kind, courses, manager, organizations }: DocumentListViewProps) {
   // 보기 모드 상태: 'cards' (카드형), 'list' (리스트형 테이블)
   const [view, setView] = useState<"cards" | "list">("cards");
   // 검색어 상태 (프로그램 ID, 과정명, 강사명 등)
   const [query, setQuery] = useState("");
+  const [organization, setOrganization] = useState("");
+  const [year, setYear] = useState("2026");
   // 아카데미 필터 상태 (전체 또는 특정 아카데미)
   const [academy, setAcademy] = useState("");
   // 문서 진행 상태 필터 ('all', 'DRAFT', 'REVIEW', 'SUBMITTED', 'PENDING')
@@ -111,38 +120,49 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
     }
   };
 
-  // 목록에 존재하는 고유 아카데미 목록 추출
+  const years = useMemo(() => Array.from(new Set([
+    2025, 2026, 2027, 2028, 2029, ...courses.map((course) => course.year),
+  ])).sort((a, b) => a - b), [courses]);
+
+  // 아카데미는 기관에 종속되지 않습니다. 실제 과정에 저장된 구분을 유지합니다.
   const academies = useMemo(() => {
-    return Array.from(new Set(courses.map((c) => c.academy).filter(Boolean)));
-  }, [courses]);
+    return Array.from(new Set(courses
+      .filter((course) => (!organization || course.org_id === organization) &&
+        (!year || String(course.year) === year))
+      .map((course) => course.academy).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b, "ko"));
+  }, [courses, organization, year]);
+
+  const classifiedCourses = useMemo(() => courses.filter((course) =>
+    (!organization || course.org_id === organization) &&
+    (!year || String(course.year) === year) &&
+    (!academy || course.academy === academy),
+  ), [courses, organization, year, academy]);
 
   // 상단 지표 카드 집계
   const stats = useMemo(() => {
-    const total = courses.length;
-    const submitted = courses.filter((c) =>
+    const total = classifiedCourses.length;
+    const submitted = classifiedCourses.filter((c) =>
       isResult ? c.result_status === "SUBMITTED" : c.plan_status === "SUBMITTED",
     ).length;
-    const reviewing = courses.filter((c) =>
+    const reviewing = classifiedCourses.filter((c) =>
       isResult ? c.result_status === "REVIEW" : c.plan_status === "REVIEW",
     ).length;
-    const drafting = courses.filter((c) => {
+    const drafting = classifiedCourses.filter((c) => {
       if (!c.registered) return false;
       const st = isResult ? c.result_status : c.plan_status;
       return !st || st === "DRAFT";
     }).length;
-    const pending = courses.filter((c) => !c.registered).length;
+    const pending = classifiedCourses.filter((c) => !c.registered).length;
 
     return { total, submitted, reviewing, drafting, pending };
-  }, [courses, isResult]);
+  }, [classifiedCourses, isResult]);
 
   // 검색어 및 필터 조건에 맞게 실시간 필터링
   const visibleCourses = useMemo(() => {
     const q = query.trim().toLowerCase().replace(/\s/g, "");
-    return courses.filter((c) => {
-      // 1. 아카데미 필터
-      if (academy && c.academy !== academy) return false;
-
-      // 2. 상태 필터
+    return classifiedCourses.filter((c) => {
+      // 상태 필터
       const st = isResult ? c.result_status : c.plan_status;
       if (statusFilter !== "all") {
         if (statusFilter === "PENDING") return !c.registered;
@@ -151,21 +171,21 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
         if (statusFilter !== "DRAFT" && st !== statusFilter) return false;
       }
 
-      // 3. 검색어 필터
+      // 검색어 필터
       if (!q) return true;
       const combined = `${c.program_id} ${c.name} ${c.teachers} ${c.responsible} ${c.source_coordinator} ${c.assistants} ${c.support_staff} ${c.location}`
         .toLowerCase()
         .replace(/\s/g, "");
       return combined.includes(q);
     });
-  }, [courses, query, academy, statusFilter, isResult]);
+  }, [classifiedCourses, query, statusFilter, isResult]);
 
   return (
     <div className="space-y-6">
       {/* 1. 상단 운영 지표 통계 카드 (전체, 제출완료, 검토중, 작성준비) */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold text-slate-500">2026 전체 과정</p>
+          <p className="text-xs font-semibold text-slate-500">{year ? `${year}년 과정` : "전체 연도 과정"}</p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">
             {stats.total}개
           </p>
@@ -209,6 +229,42 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
             onChange={(e) => setQuery(e.target.value)}
             placeholder="프로그램 ID·과정명·강사 검색"
           />
+        </label>
+
+        <label>
+          <span className="sr-only">운영 기관</span>
+          <select
+            className="w-full min-w-36 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 shadow-sm focus:border-teal-600 focus:outline-none"
+            value={organization}
+            onChange={(event) => {
+              setOrganization(event.target.value);
+              setAcademy("");
+            }}
+          >
+            <option value="">기관 전체</option>
+            {organizations.map((item) => (
+              <option key={item.id} value={item.id}>{item.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          <span className="sr-only">사업연도</span>
+          <select
+            className="w-full min-w-36 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 shadow-sm focus:border-teal-600 focus:outline-none"
+            value={year}
+            onChange={(event) => {
+              setYear(event.target.value);
+              setAcademy("");
+            }}
+          >
+            <option value="">연도 전체</option>
+            {years.map((value) => (
+              <option key={value} value={value}>
+                {value}년{value >= 2025 && value <= 2029 ? ` (${value - 2024}차년도)` : ""}
+              </option>
+            ))}
+          </select>
         </label>
 
         {/* 아카데미 분류 셀렉트 */}
@@ -281,7 +337,7 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
 
       {/* 3. 검색 결과 요약 안내 */}
       <p role="status" className="text-sm font-medium text-slate-500">
-        {visibleCourses.length}개 과정 · 2026년 운영 현황
+        {visibleCourses.length}개 과정 · {organizations.find((item) => item.id === organization)?.name ?? "기관 전체"} · {year ? `${year}년` : "전체 연도"} 운영 현황
       </p>
 
       {/* 검색 결과가 없을 때의 안내 */}
@@ -317,6 +373,7 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
                 <p className="mt-4 text-xs font-semibold tracking-wide text-slate-400">
                   {c.program_id}
                 </p>
+                <p className="mt-1 text-xs text-slate-500">{c.org_name} · {c.year_label}</p>
                 {isResult && c.has_source_report && (
                   <p className="mt-1 text-xs font-semibold text-teal-700">
                     원문 결과보고서 보유 · DB 제출 상태와 별도
@@ -415,16 +472,17 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
       {view === "list" && visibleCourses.length > 0 && (
         <div
           role="region"
-          aria-label="2026 과정 문서 리스트"
+          aria-label="과정 문서 리스트"
           tabIndex={0}
           className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"
         >
-          <table className="w-full min-w-[1400px] text-left text-sm">
-            <caption className="sr-only">2026년 과정 운영계획서 및 결과보고서 목록</caption>
+          <table className="w-full min-w-[1500px] text-left text-sm">
+            <caption className="sr-only">과정 운영계획서 및 결과보고서 목록</caption>
             <thead className="bg-slate-50 text-xs font-semibold text-slate-500">
               <tr>
                 {[
                   "순번",
+                  "기관 / 사업연도",
                   "프로그램 ID",
                   "세부 프로그램",
                   "정원 / 시수",
@@ -450,6 +508,11 @@ export function DocumentListView({ kind, courses, manager }: DocumentListViewPro
                     {/* 순번 */}
                     <td className="p-4 font-mono text-xs text-slate-400">
                       {c.sort_order}
+                    </td>
+
+                    <td className="min-w-44 p-4 text-xs text-slate-600">
+                      <span className="block font-semibold text-slate-800">{c.org_name}</span>
+                      <span>{c.year_label}</span>
                     </td>
 
                     {/* 프로그램 ID */}
