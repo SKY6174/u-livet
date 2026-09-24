@@ -55,6 +55,7 @@ for (const [roles, links, kind] of roleCases) await test('granted role menus: ' 
   assert.deepEqual(nav.officeSections(identity).flatMap(section => section.links.map(link => link.href)), links);
   assert.equal(nav.workspaceKind(identity), kind);
   const primary = nav.primaryLinks(identity).map(link => link.href);
+  assert.deepEqual(primary.slice(0, 4), ['/about', '/operation-procedure', '/terms', '/courses']);
   assert.equal(primary.includes('/admin'), kind === 'office');
   assert.equal(primary.includes('/instructor'), roles.includes('INSTRUCTOR'));
   for (const href of ['/completion', '/credentials', '/finance', '/performance']) assert(!primary.includes(href));
@@ -66,8 +67,14 @@ await test('all office positions display correctly but never grant permission', 
     assert.equal(nav.officeSections({ ...member(), office_position: position }).length, 0);
   }
   for (const kind of ['INTERNAL', 'EXTERNAL']) assert.match(nav.memberLabel({ ...member('INSTRUCTOR'), instructor_kind: kind }), /강사\((교내|교외)\)/);
-  assert.equal(nav.primaryLinks(null).length, 3);
-  assert.equal(nav.primaryLinks(member('COURSE_MANAGER'), true).length, 3);
+  const publicLinks = [
+    { label: '앵커사업 소개', href: '/about' },
+    { label: '운영절차', href: '/operation-procedure' },
+    { label: '수강안내', href: '/terms' },
+    { label: '교육과정 소개', href: '/courses' },
+  ];
+  assert.deepEqual(nav.primaryLinks(null), publicLinks);
+  assert.deepEqual(nav.primaryLinks(member('COURSE_MANAGER'), true), publicLinks);
 });
 await test('combined roles preserve independent workspaces without duplicate links', () => {
   const mixed = member('SYSTEM_ADMIN', 'COURSE_MANAGER', 'INSTRUCTOR', 'CERTIFIER', 'FINANCE', 'PERFORMANCE');

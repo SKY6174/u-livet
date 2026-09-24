@@ -74,6 +74,7 @@ export function officeActiveHref(path: string) {
 export function primaryLinks(member: Member | null, loginPage = false) {
   const links = [
     { label: "앵커사업 소개", href: "/about" },
+    { label: "운영절차", href: "/operation-procedure" },
     { label: "수강안내", href: "/terms" },
     { label: "교육과정 소개", href: "/courses" },
   ];
