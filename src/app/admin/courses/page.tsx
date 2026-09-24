@@ -30,7 +30,7 @@ export default async function CourseOperations({
   if (!me.roles.some((r) => ["COURSE_MANAGER", "SYSTEM_ADMIN"].includes(r.role))) notFound();
   const params = await searchParams;
   const grantedOrgs = Array.from(new Set(me.roles.filter(r => ["COURSE_MANAGER", "SYSTEM_ADMIN"].includes(r.role)).map(r => r.org_id)));
-  const orgs = grantedOrgs.includes(ANCHOR_ORG_ID) ? [ANCHOR_ORG_ID] : grantedOrgs;
+  const orgs = grantedOrgs.sort((a, b) => Number(b === ANCHOR_ORG_ID) - Number(a === ANCHOR_ORG_ID));
   if (!orgs.length) notFound();
   const org = typeof params.org === "string" && orgs.includes(params.org) ? params.org : orgs[0];
   const year = parseYear(params.year);
@@ -41,12 +41,13 @@ export default async function CourseOperations({
       : findOpeningCourse(await getCourseOpeningPlan(), params.plan);
   if (params.plan !== undefined && !plan) notFound();
   const db = await createServerSupabaseClient();
-  const [{ courses, unavailable }, { data: years }, workingCopy, budgets, responsibilityResult] = await Promise.all([
+  const [{ courses, unavailable }, { data: years }, { data: organizationRows }, workingCopy, budgets, responsibilityResult] = await Promise.all([
     manager ? getCourseWorkspaces() : Promise.resolve({ courses: [], unavailable: false }),
     db
       .from("life_project_years")
       .select("id,org_id,label")
       .in("org_id", orgs),
+    db.from("life_organizations").select("id,name").in("id", orgs),
     plan ? getOpeningWorkingCopy(org, plan.sourceId) : Promise.resolve({ copy: null, unavailable: false }),
     getCourseBudgets(org, [], year),
     db.rpc("life_operation_list"),
@@ -69,7 +70,7 @@ export default async function CourseOperations({
   ])).sort((a, b) => a - b);
   const organizationOptions = orgs.map((id) => ({
     id,
-    name: id === ANCHOR_ORG_ID ? "울산과학대학교 앵커사업단" : `사업단 · ${id.slice(-8)}`,
+    name: organizationRows?.find((item) => item.id === id)?.name ?? (id === ANCHOR_ORG_ID ? "앵커사업단" : "기관"),
   }));
   return (
     <div className="page-shell">

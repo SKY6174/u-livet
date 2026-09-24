@@ -176,7 +176,7 @@ export async function startDevelopment(_: ActionState, f: FormData) {
     !ids(f, ["o", "y"]) ||
     (value(f, "p") && !ids(f, ["p"])) ||
     (value(f, "target") && !ids(f, ["target"])) ||
-    (!continuation && !["RCC", "AID-X", "ECC", "WORKER"].includes(value(f, "track")))
+    (!continuation && !["RCC", "AID-X", "ECC", "ICC", "SANHAK_PLANNING", "SANHAK_SUPPORT"].includes(value(f, "track")))
   )
     return invalid();
   const r = await run(continuation ? "life_start_development" : "life_start_development_classified", {
