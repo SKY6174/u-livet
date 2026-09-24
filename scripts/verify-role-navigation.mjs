@@ -46,7 +46,7 @@ const LearnerRequestAlerts = load('src/components/admin/learner-request-alerts.t
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
   [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance', '/admin/instructors'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/operation-documents/plan', '/admin/monitoring', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance', '/admin/instructors'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/admin/learner-documents', '/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
@@ -82,7 +82,7 @@ await test('office navigation follows the operational workflow', () => {
   assert.deepEqual(sections.map(section => section.title), ['기획·개설', '접수·운영', '마감·수료', '정산·성과', '계정·권한']);
   assert.deepEqual(sections.flatMap(section => section.links.map(link => link.href)), [
     '/admin/development', '/admin/courses', '/operation-documents/plan',
-    '/admin/learner-documents', '/admin/parking',
+    '/admin/monitoring', '/admin/learner-documents', '/admin/parking',
     '/operation-documents/result', '/completion', '/credentials',
     '/finance', '/performance', '/admin/instructors',
   ]);
@@ -113,7 +113,7 @@ await test('expert management is an independent office menu with correct nested 
   }
 });
 await test('nested report, completion and certificate routes stay under the office menu', () => {
-  for (const [pathname, active] of [['/admin', '/admin'], ['/admin/development', '/admin/development'], ['/admin/course-plan/opening', '/admin/courses'], ['/admin/offerings/id', '/admin/courses'], ['/operation-documents/id/plan', '/operation-documents/plan'], ['/operation-documents/id/result', '/operation-documents/result'], ['/admin/reports', '/operation-documents/result'], ['/admin/offerings/id/reports/print', '/operation-documents/result'], ['/completion/id', '/completion'], ['/credentials/badges', '/credentials'], ['/admin/accounts', '/admin/accounts']]) {
+  for (const [pathname, active] of [['/admin', '/admin'], ['/admin/development', '/admin/development'], ['/admin/monitoring', '/admin/monitoring'], ['/admin/course-plan/opening', '/admin/courses'], ['/admin/offerings/id', '/admin/courses'], ['/operation-documents/id/plan', '/operation-documents/plan'], ['/operation-documents/id/result', '/operation-documents/result'], ['/admin/reports', '/operation-documents/result'], ['/admin/offerings/id/reports/print', '/operation-documents/result'], ['/completion/id', '/completion'], ['/credentials/badges', '/credentials'], ['/admin/accounts', '/admin/accounts']]) {
     assert.equal(nav.officeActiveHref(pathname), active);
     assert(nav.primaryActive(pathname, '/admin'));
   }
@@ -253,9 +253,12 @@ const documentPrefilled = {
 };
 const DocumentList = load('src/components/operation-documents/document-list.tsx', { ...common,
   '@/lib/supabase/server': { createServerSupabaseClient: async () => ({
-    from: () => ({ select: () => ({ eq: async () => ({ data: [{ source_id: 'P01', offering_id: 'course-1' }], error: null }) }) }),
+    from: () => ({ select: () => ({
+      eq: async () => ({ data: [{ source_id: 'P01', offering_id: 'course-1' }], error: null }),
+      in: async () => ({ data: [{ id: 'own-org', name: '담당 기관' }], error: null }),
+    }) }),
     rpc: async () => ({
-    data: [{ id: 'course-1', name: '검증 과정(수정)', starts_on: '2026-01-01', ends_on: '2026-02-01', responsible: '책임강사', plan_status: 'DRAFT', result_status: 'REVIEW' }],
+    data: [{ id: 'course-1', org_id: '10000000-0000-4000-8000-000000000001', org_name: '앵커사업단', year: 2026, year_label: '2026년', name: '검증 과정(수정)', starts_on: '2026-01-01', ends_on: '2026-02-01', responsible: '책임강사', plan_status: 'DRAFT', result_status: 'REVIEW' }],
     error: documentFailure ? new Error('unavailable') : null,
   }) }) },
   '@/lib/course-workspace/data': { getCourseWorkspaces: async () => { reportReads++; return { courses: [], unavailable: legacyFailure }; } },

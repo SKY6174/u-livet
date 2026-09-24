@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowUpRight, Award, BookOpen, ChartNoAxesCombined, ClipboardCheck, Files, FileText, Layers3, Ticket, UsersRound, Wallet } from "lucide-react";
+import { Activity, ArrowUpRight, Award, BookOpen, ChartNoAxesCombined, ClipboardCheck, Files, FileText, Layers3, Ticket, UsersRound, Wallet } from "lucide-react";
 import { requireIdentity } from "@/lib/auth/session";
 import { hasRole, isOfficeMember, officeSections } from "@/lib/auth/workspace-navigation";
 import { getAdminLearnerDocuments } from "@/lib/learner-document-workflow/data";
@@ -9,6 +9,7 @@ import { MenuHint } from "@/components/navigation/menu-hint";
 
 const WORKSPACE_ICONS = {
   "/admin/development": Layers3,
+  "/admin/monitoring": Activity,
   "/admin/courses": BookOpen,
   "/admin/instructors": UsersRound,
   "/operation-documents/plan": BookOpen,
