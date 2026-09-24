@@ -1107,7 +1107,7 @@ const RAW_PREFILLED_COURSES: PrefilledCourse[] = [
   {
     "sourceId": "P07",
     "id": "2026-p07",
-    "programId": "C1-RISE-P07",
+    "programId": "C1-LOCAL-BUSINESS-P07",
     "title": "로컬 페스타(LOCAL FESTA) 기획자 양성과정",
     "academy": "로컬창업 아카데미",
     "capacity": 20,
