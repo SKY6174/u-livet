@@ -275,30 +275,6 @@ export function PoolDashboard({
                       : "활동 산출액, 공제액, 실제 지급과 증빙 참조를 관리합니다."}
                 </p>
               </div>
-            </div>
-            <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-              <form className="flex max-w-full items-center gap-2">
-                <input type="hidden" name="org" value={org} />
-                <input type="hidden" name="tab" value={tab} />
-                <input type="hidden" name="kind" value={kind} />
-                <label className="relative">
-                  <span className="sr-only">성명·소속·전문분야 검색</span>
-                  <Search
-                    className="absolute left-3 top-3 text-slate-400"
-                    size={17}
-                  />
-                  <input
-                    className="w-64 max-w-[65vw] rounded-xl border border-slate-200 py-2.5 pl-10 pr-3 text-sm"
-                    name="q"
-                    defaultValue={q}
-                    placeholder="성명·소속·전문분야 검색"
-                    maxLength={100}
-                  />
-                </label>
-                <button className="btn-secondary !px-3 !py-2.5 text-sm">
-                  검색
-                </button>
-              </form>
               <PoolExcel
                 org={org}
                 q={q}
@@ -314,32 +290,56 @@ export function PoolDashboard({
                 })}
               />
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {Object.entries(KIND_LABELS).map(([value, label]) => (
-                <Link
-                  key={value}
-                  href={url({
-                    kind: value,
-                    page: undefined,
-                    activity_page: undefined,
-                    person: undefined,
-                    edit: undefined,
-                    new: undefined,
-                    allowance: undefined,
-                    add: undefined,
-                  })}
-                  className={`rounded-full border px-4 py-2 text-xs font-bold ${kind === value ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600"}`}
-                >
-                  {label}{" "}
-                  {value === "ALL"
-                    ? board.counts.total
-                    : value === "INTERNAL"
-                      ? board.counts.internal
-                      : value === "EXTERNAL"
-                        ? board.counts.external
-                        : board.counts.unclassified}
-                </Link>
-              ))}
+            <div className="mt-5 flex flex-wrap items-center gap-4">
+              <form className="flex w-full max-w-full items-center gap-2 sm:w-auto">
+                <input type="hidden" name="org" value={org} />
+                <input type="hidden" name="tab" value={tab} />
+                <input type="hidden" name="kind" value={kind} />
+                <label className="relative min-w-0 flex-1">
+                  <span className="sr-only">성명·소속·전문분야 검색</span>
+                  <Search
+                    className="absolute left-3 top-3 text-slate-400"
+                    size={17}
+                  />
+                  <input
+                    className="w-full rounded-xl border border-slate-200 py-2.5 pl-10 pr-3 text-sm sm:w-64"
+                    name="q"
+                    defaultValue={q}
+                    placeholder="성명·소속·전문분야 검색"
+                    maxLength={100}
+                  />
+                </label>
+                <button className="btn-secondary shrink-0 !px-3 !py-2.5 text-sm">
+                  검색
+                </button>
+              </form>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(KIND_LABELS).map(([value, label]) => (
+                  <Link
+                    key={value}
+                    href={url({
+                      kind: value,
+                      page: undefined,
+                      activity_page: undefined,
+                      person: undefined,
+                      edit: undefined,
+                      new: undefined,
+                      allowance: undefined,
+                      add: undefined,
+                    })}
+                    className={`rounded-full border px-4 py-2 text-xs font-bold ${kind === value ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600"}`}
+                  >
+                    {label}{" "}
+                    {value === "ALL"
+                      ? board.counts.total
+                      : value === "INTERNAL"
+                        ? board.counts.internal
+                        : value === "EXTERNAL"
+                          ? board.counts.external
+                          : board.counts.unclassified}
+                  </Link>
+                ))}
+              </div>
             </div>
           </section>
           {(query.new === "1" ||
