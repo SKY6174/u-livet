@@ -57,12 +57,12 @@ begin
       )))
   ), ranked as (
     select f.*,row_number() over (order by
-      case when p_sort='default' and p_group='office' or p_sort='position' and p_direction='asc' then position_order end asc nulls last,
-      case when p_sort='position' and p_direction='desc' then position_order end desc nulls last,
+      case when (p_sort='default' and p_group='office' or p_sort='position') and p_direction='asc' then position_order end asc nulls last,
+      case when (p_sort='default' and p_group='office' or p_sort='position') and p_direction='desc' then position_order end desc nulls last,
       case when p_sort='kind' and p_direction='asc' then kind_order end asc nulls last,
       case when p_sort='kind' and p_direction='desc' then kind_order end desc nulls last,
-      case when p_sort='name' and p_direction='desc' then name end collate pg_catalog."ko-x-icu" desc nulls last,
-      case when p_sort in ('default','name') and (p_sort='default' or p_direction='asc') then name end collate pg_catalog."ko-x-icu" asc nulls last,
+      case when p_sort in ('default','name') and p_direction='desc' then name end collate pg_catalog."ko-x-icu" desc nulls last,
+      case when p_sort in ('default','name') and p_direction='asc' then name end collate pg_catalog."ko-x-icu" asc nulls last,
       case when p_sort='email' and p_direction='asc' then lower(email) end asc nulls last,
       case when p_sort='email' and p_direction='desc' then lower(email) end desc nulls last,
       case when p_sort='phone' and p_direction='asc' then coalesce(case when p_group='instructor' then instructor_phone else mobile_phone end,'') end asc nulls last,
@@ -149,12 +149,12 @@ begin
       )))
   ), ranked as (
     select f.*,row_number() over (order by
-      case when p_sort='default' and p_group='office' or p_sort='position' and p_direction='asc' then position_order end asc nulls last,
-      case when p_sort='position' and p_direction='desc' then position_order end desc nulls last,
+      case when (p_sort='default' and p_group='office' or p_sort='position') and p_direction='asc' then position_order end asc nulls last,
+      case when (p_sort='default' and p_group='office' or p_sort='position') and p_direction='desc' then position_order end desc nulls last,
       case when p_sort='kind' and p_direction='asc' then kind_order end asc nulls last,
       case when p_sort='kind' and p_direction='desc' then kind_order end desc nulls last,
-      case when p_sort='name' and p_direction='desc' then name end collate pg_catalog."ko-x-icu" desc nulls last,
-      case when p_sort in ('default','name') and (p_sort='default' or p_direction='asc') then name end collate pg_catalog."ko-x-icu" asc nulls last,
+      case when p_sort in ('default','name') and p_direction='desc' then name end collate pg_catalog."ko-x-icu" desc nulls last,
+      case when p_sort in ('default','name') and p_direction='asc' then name end collate pg_catalog."ko-x-icu" asc nulls last,
       case when p_sort='email' and p_direction='asc' then lower(email) end asc nulls last,
       case when p_sort='email' and p_direction='desc' then lower(email) end desc nulls last,
       case when p_sort='phone' and p_direction='asc' then coalesce(case when p_group='instructor' then instructor_phone else mobile_phone end,'') end asc nulls last,
