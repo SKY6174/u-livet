@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { memberAdmin } from "@/lib/members/data";
-import { MEMBER_GROUPS, type MemberGroup } from "@/lib/members/model";
+import { MEMBER_GROUPS, MEMBER_SORT_OPTIONS, MEMBER_YEARS, type MemberFilters, type MemberGroup } from "@/lib/members/model";
 import { validateMemberExcelRows, type MemberExcelRecord, type MemberExcelRow } from "@/lib/members/excel";
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
 
@@ -20,10 +20,17 @@ function importError(message: string) {
   return prefix + "엑셀 내용을 저장하지 못했습니다. 파일 전체가 반영되지 않았습니다.";
 }
 
-export async function exportMemberExcel(group: string, query: string): Promise<MemberExcelRecord[]> {
+export async function exportMemberExcel(group: string, query: string, filters: MemberFilters): Promise<MemberExcelRecord[]> {
   await memberAdmin();
-  if (!validGroup(group) || typeof query !== "string" || query.length > 100) throw Error("구성원 구분과 검색어를 확인해 주세요.");
-  const { data, error } = await (await createServerSupabaseClient()).rpc("life_member_excel_export", { p_group: group, p_query: query });
+  if (!validGroup(group) || typeof query !== "string" || query.length > 100 || !filters
+    || (filters.year !== null && (group === "office" || !MEMBER_YEARS.some(year => year === filters.year)))
+    || (filters.kind !== null && (group !== "instructor" || !["INTERNAL", "EXTERNAL"].includes(filters.kind)))
+    || !MEMBER_SORT_OPTIONS[group].some(option => option.value === filters.sort)
+    || !["asc", "desc"].includes(filters.direction)) throw Error("명부 조회 조건을 확인해 주세요.");
+  const { data, error } = await (await createServerSupabaseClient()).rpc("life_member_excel_export_filtered", {
+    p_group: group, p_query: query, p_year: filters.year, p_kind: filters.kind,
+    p_sort: filters.sort, p_direction: filters.direction,
+  });
   if (error) throw Error(error.message.includes("EXPORT_LIMIT") ? "검색 결과가 1,000명을 넘습니다. 검색어를 좁혀 주세요." : "명부를 내려받지 못했습니다. 권한과 연결을 확인해 주세요.");
   if (!Array.isArray(data)) throw Error("명부 자료를 확인하지 못했습니다.");
   return data as MemberExcelRecord[];
