@@ -275,19 +275,6 @@ export function PoolDashboard({
                       : "활동 산출액, 공제액, 실제 지급과 증빙 참조를 관리합니다."}
                 </p>
               </div>
-              <Link
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700"
-                href={url({
-                  tab: "master",
-                  new: "1",
-                  person: undefined,
-                  edit: undefined,
-                  allowance: undefined,
-                })}
-              >
-                <Plus size={18} />
-                강사 신규 등록
-              </Link>
             </div>
             <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
               <form className="flex max-w-full items-center gap-2">
@@ -318,6 +305,13 @@ export function PoolDashboard({
                 kind={kind}
                 person={query.person ?? null}
                 tab={tab}
+                newHref={url({
+                  tab: "master",
+                  new: "1",
+                  person: undefined,
+                  edit: undefined,
+                  allowance: undefined,
+                })}
               />
             </div>
             <div className="mt-4 flex flex-wrap gap-2">

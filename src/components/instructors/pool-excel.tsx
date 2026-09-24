@@ -1,7 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Download, Upload, FileSpreadsheet, X } from "lucide-react";
+import { Download, Upload, FileSpreadsheet, Plus, X } from "lucide-react";
 import {
   exportPoolData,
   importPoolPeople,
@@ -35,12 +36,14 @@ export function PoolExcel({
   kind,
   person,
   tab,
+  newHref,
 }: {
   org: string;
   q: string;
   kind: string;
   person: string | null;
   tab: string;
+  newHref: string;
 }) {
   const router = useRouter(),
     input = useRef<HTMLInputElement>(null);
@@ -224,6 +227,13 @@ export function PoolExcel({
           <Download size={16} />
           {busy ? "처리 중…" : "엑셀 다운로드"}
         </button>
+        <Link
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700"
+          href={newHref}
+        >
+          <Plus size={18} />
+          강사 신규 등록
+        </Link>
       </div>
       {message && (
         <p role="status" className="text-sm text-blue-800">
