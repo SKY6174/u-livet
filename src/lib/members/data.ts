@@ -2,7 +2,7 @@ import "server-only";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { MemberDirectory, MemberGroup, MemberHistory } from "./model";
+import type { MemberDirectory, MemberFilters, MemberGroup, MemberHistory } from "./model";
 
 export async function memberAdmin(manage = false) {
   const me = await requireIdentity("/admin/accounts");
@@ -12,6 +12,13 @@ export async function memberAdmin(manage = false) {
 export async function getMembers(group: MemberGroup, query = "", page = 1, person: string | null = null) {
   const { data, error } = await (await createServerSupabaseClient()).rpc("life_member_directory", {
     p_group: group, p_query: query, p_page: page, p_person: person,
+  });
+  return { data: error ? null : data as MemberDirectory | null, error: !!error };
+}
+export async function getFilteredMembers(group: MemberGroup, query: string, page: number, filters: MemberFilters) {
+  const { data, error } = await (await createServerSupabaseClient()).rpc("life_member_directory_filtered", {
+    p_group: group, p_query: query, p_page: page, p_year: filters.year,
+    p_kind: filters.kind, p_sort: filters.sort, p_direction: filters.direction,
   });
   return { data: error ? null : data as MemberDirectory | null, error: !!error };
 }

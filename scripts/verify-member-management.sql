@@ -55,6 +55,16 @@ select pg_temp.check_result(public.life_member_directory('learner','',1,md5('mem
 select pg_temp.check_result(public.life_member_directory('instructor','',1,md5('member-test-2')::uuid)->'items'->0->>'instructor_kind'='EXTERNAL','existing instructor classification');
 select pg_temp.check_result(public.life_member_history(md5('member-test-2')::uuid,'instructor')->'items'->0->>'name'='실제 DB 강의이력 검증','real teaching history');
 select pg_temp.check_result(public.life_member_history(md5('member-test-3')::uuid,'learner')->'items'->0->>'status'='ENROLLED','real enrollment history');
+select pg_temp.check_result((public.life_member_directory_filtered('learner','member3@',1,null,null,'default','asc')->>'total')::int=1,'learner account appears once overall');
+select pg_temp.check_result((public.life_member_directory_filtered('learner','member3@',1,2026,null,'default','asc')->>'total')::int=1,'confirmed learner appears in offering project year');
+select pg_temp.check_result((public.life_member_directory_filtered('learner','member3@',1,2025,null,'default','asc')->>'total')::int=0,'learner excluded from year without enrollment');
+select pg_temp.check_result((public.life_member_directory_filtered('instructor','member2@',1,2026,'EXTERNAL','name','asc')->>'total')::int=1,'assigned external instructor appears in year');
+select pg_temp.check_result((public.life_member_directory_filtered('instructor','member2@',1,2026,'INTERNAL','name','asc')->>'total')::int=0,'internal filter excludes external instructor');
+select pg_temp.check_result((public.life_member_directory_filtered('instructor','member2@',1,2025,null,'default','asc')->>'total')::int=0,'instructor excluded from year without assignment');
+select pg_temp.check_result(jsonb_array_length(public.life_member_excel_export_filtered('learner','member3@',2026,null,'default','asc'))=1,'filtered Excel matches annual learner list');
+select pg_temp.check_result(public.life_member_directory_filtered('learner','',1,null,null,'name','asc')->'items'->0->>'id' is distinct from public.life_member_directory_filtered('learner','',1,null,null,'name','desc')->'items'->0->>'id','name sort reverses across learners');
+select pg_temp.expect_error($$select public.life_member_directory_filtered('learner','',1,2030,null,'default','asc')$$,'INVALID_INPUT');
+select pg_temp.expect_error($$select public.life_member_directory_filtered('office','',1,2026,null,'default','asc')$$,'INVALID_INPUT');
 select pg_temp.expect_error($$select public.life_member_directory('fake')$$,'INVALID_INPUT');
 select pg_temp.expect_error($$select public.life_member_directory('office','',0)$$,'INVALID_INPUT');
 select pg_temp.expect_error($$select public.life_member_history(md5('member-test-5')::uuid,'instructor')$$,'FORBIDDEN');
