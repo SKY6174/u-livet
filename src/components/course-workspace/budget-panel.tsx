@@ -26,7 +26,7 @@ function ComparisonTotals({ courses, comparison, label }: { courses: OperationCo
   </>;
 }
 
-export function BudgetPanel({ courses, org, workbooks }: { courses: OperationCourse[]; org: string; workbooks: WorkbookSummary[] }) {
+export function BudgetPanel({ courses, org, workbooks, year }: { courses: OperationCourse[]; org: string; workbooks: WorkbookSummary[]; year: number }) {
   const [selected, setSelected] = useState("");
   const [source, setSource] = useState<ExecutionSource>({ input: null, saved: false, busy: false, message: "" });
   const editor = useRef<HTMLElement>(null);
@@ -35,7 +35,7 @@ export function BudgetPanel({ courses, org, workbooks }: { courses: OperationCou
   const course = courses.find(c => c.id === selected);
   const academies = Array.from(new Set(courses.map(c => c.academy)));
   return <section className="space-y-5" aria-label="예산 및 집행현황">
-    <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-bold">2026 예산 및 집행현황</h2><span className="shrink-0 text-sm text-slate-500">단위: 원</span></div>
+    <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-bold">{year} 예산 및 집행현황</h2><span className="shrink-0 text-sm text-slate-500">단위: 원</span></div>
     {source.input && <p className="break-words text-xs text-slate-500">집행 자료: {source.input.file_name} · {source.input.sheet_name} · {source.saved ? "저장된 자료" : "저장 전 미리보기"}</p>}
     {source.busy && <p role="status" className="text-sm text-teal-800">집행 자료를 처리하고 있습니다…</p>}
     {!source.input && source.message && <p role="status" className="text-sm text-amber-800">{source.message} 아래 ‘집행 엑셀 자료’에서 확인해 주세요.</p>}
@@ -51,7 +51,7 @@ export function BudgetPanel({ courses, org, workbooks }: { courses: OperationCou
     </section>}
     <div role="region" aria-label="과정별 예산 및 집행현황표" tabIndex={0} className="relative overflow-x-auto rounded-2xl border bg-white">
       <table className="w-full min-w-[1400px] text-right text-sm">
-        <caption className="sr-only">2026년 과정별 예산과 집행 비교, 아카데미 소계와 총계</caption>
+        <caption className="sr-only">{year}년 과정별 예산과 집행 비교, 아카데미 소계와 총계</caption>
         <thead className="bg-slate-50 text-xs text-slate-500"><tr><th scope="col" className="p-4 text-left">프로그램 ID</th><th scope="col" className="p-4 text-left">세부 프로그램</th><th scope="col" className="p-4 text-left">구분</th>{COMPARISON_KEYS.map(k => <th key={k} scope="col" className="whitespace-nowrap p-4">{COMPARISON_FIELDS[k]}</th>)}<th scope="col" className="p-4">총액</th><th scope="col" className="p-4">관리</th></tr></thead>
         {academies.map(academy => {
           const rows = courses.filter(c => c.academy === academy);

@@ -4,13 +4,15 @@ Date: 2026-09-23 · Plan: `docs/01-plan/features/anchor-course-operations-clarit
 
 ## Organization scope
 
-The canonical anchor organization is seeded as `10000000-0000-4000-8000-000000000001`. On `/admin/courses`, derive all allowed organization IDs from the signed-in role grants as before. If that set contains the anchor ID, scope this page to that ID; otherwise preserve the existing granted IDs for other authorized users. Reject an `org` query value outside the resulting set. For a single anchor organization, show its real name as read-only context; do not show a one-choice dropdown or selection button. Do not mutate organizations or role assignments.
+The canonical anchor organization is seeded as `10000000-0000-4000-8000-000000000001`. On `/admin/courses`, derive all allowed organization IDs from the signed-in role grants as before. If that set contains the anchor ID, scope this page to that ID; otherwise preserve the existing granted IDs for other authorized users. Reject an `org` query value outside the resulting set. The dashboard uses the same filter-bar pattern as the operation-document screen: institution, project year, academy and status filters sit beside the unified course search and card/list toggle. A single permitted institution still shows its real organization name as the available institution option. Do not mutate organizations or role assignments.
 
 ## Page structure
 
 Replace the teal summary and flat four-link row with two distinct regions: (1) “연간 계획에서 개설까지”, containing the ordered “과정 현황” and “개설 준비” destinations and a short explanation of their different purposes; (2) “새 교육과정 기획”, containing “과정 개발·심의”. Remove the message-management shortcut. Remove the top result-report button and per-course result-report action; dedicated report navigation remains elsewhere.
 
 Keep the dashboard's course/budget tabs. Add a manager-only red “새 과정 등록” link at the far right of the same tab row; its existing query/hash opens the unchanged registration `<details>` after navigation. Responsive wrapping must keep the button visible above the card/list controls.
+
+The course tab mirrors the operation-document layout with five compact summary cards: selected-year course count, active recruitment/operation, opening preparation, archived operation and DB migration waiting. The filter row follows the cards and uses the same rounded controls, ordering and card/list toggle. Selecting a year reloads the budget and course data for that project year.
 
 ## Security and behavior
 

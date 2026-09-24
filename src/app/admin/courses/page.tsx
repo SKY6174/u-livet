@@ -14,6 +14,12 @@ import { getOpeningWorkingCopy } from "@/lib/course-opening/working-copy-server"
 import { findOpeningCourse } from "@/lib/course-opening/prefill";
 
 const ANCHOR_ORG_ID = "10000000-0000-4000-8000-000000000001";
+const SUPPORTED_YEARS = [2025, 2026, 2027, 2028, 2029];
+
+function parseYear(value: string | string[] | undefined) {
+  const candidate = typeof value === "string" ? Number(value) : NaN;
+  return Number.isInteger(candidate) && candidate >= 2000 && candidate <= 2200 ? candidate : 2026;
+}
 
 export default async function CourseOperations({
   searchParams,
@@ -27,6 +33,7 @@ export default async function CourseOperations({
   const orgs = grantedOrgs.includes(ANCHOR_ORG_ID) ? [ANCHOR_ORG_ID] : grantedOrgs;
   if (!orgs.length) notFound();
   const org = typeof params.org === "string" && orgs.includes(params.org) ? params.org : orgs[0];
+  const year = parseYear(params.year);
   const manager = me.roles.some(r => r.role === "COURSE_MANAGER" && r.org_id === org);
   const plan =
     params.plan === undefined || !manager
@@ -41,10 +48,12 @@ export default async function CourseOperations({
       .select("id,org_id,label")
       .in("org_id", orgs),
     plan ? getOpeningWorkingCopy(org, plan.sourceId) : Promise.resolve({ copy: null, unavailable: false }),
-    getCourseBudgets(org, []),
+    getCourseBudgets(org, [], year),
     db.rpc("life_operation_list"),
   ]);
-  const scopedCourses = courses.filter(c => c.org_id === org);
+  const scopedCourses = courses.filter(
+    (course) => course.org_id === org && Number(course.year_label.match(/\d{4}/)?.[0]) === year,
+  );
   const overview = { ...budgets, courses: mergeOperationCourses(budgets.courses, scopedCourses) };
   const responsibleNames = responsibilityResult.error
     ? null
@@ -54,17 +63,33 @@ export default async function CourseOperations({
       );
   const linked = new Set(overview.courses.map(c => c.offering_id).filter(Boolean));
   const additional = scopedCourses.filter(c => !linked.has(c.id));
+  const yearOptions = Array.from(new Set([
+    ...SUPPORTED_YEARS,
+    ...(years ?? []).map((item) => Number(item.label.match(/\d{4}/)?.[0])).filter(Number.isInteger),
+  ])).sort((a, b) => a - b);
+  const organizationOptions = orgs.map((id) => ({
+    id,
+    name: id === ANCHOR_ORG_ID ? "울산과학대학교 앵커사업단" : `사업단 · ${id.slice(-8)}`,
+  }));
   return (
     <div className="page-shell">
       <PageIntro eyebrow="OPERATIONS" title="과정 운영 관리">
         과정 개설부터 모집·강사 배정·출결까지 교육 운영을 관리합니다.
       </PageIntro>
-      {orgs.length > 1 ? <form className="mb-5 flex flex-wrap gap-3"><label className="text-sm">사업단<select name="org" defaultValue={org} className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm">{orgs.map((id, i) => <option key={id} value={id}>사업단 {i + 1} · {id.slice(-8)}</option>)}</select></label><button className="btn-secondary">선택</button></form>
-        : <p className="mb-6 text-sm font-medium text-slate-600">사업단 · {org === ANCHOR_ORG_ID ? "울산과학대학교 앵커사업단" : org.slice(-8)}</p>}
       {overview.unavailable || unavailable ? (
         <><Empty title="과정 정보를 불러오지 못했습니다" />{manager && <Link className="mt-4 inline-flex rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700" href={`/admin/courses?org=${org}&create=1#new-course`}>새 과정 등록</Link>}</>
       ) : (
-        <OperationsDashboard key={org} courses={overview.courses} workbooks={overview.workbooks} org={org} manager={manager} responsibleNames={responsibleNames} />
+        <OperationsDashboard
+          key={`${org}:${year}`}
+          courses={overview.courses}
+          workbooks={overview.workbooks}
+          org={org}
+          manager={manager}
+          responsibleNames={responsibleNames}
+          organizations={organizationOptions}
+          years={yearOptions}
+          selectedYear={year}
+        />
       )}
       {!overview.unavailable && additional.length > 0 && <section className="mt-10"><h2 className="mb-5 text-xl font-bold">추가 개설 과정</h2><CourseList courses={additional} /></section>}
       {manager && <details
