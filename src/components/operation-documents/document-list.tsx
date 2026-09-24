@@ -198,21 +198,7 @@ export async function DocumentList({
           : "책임강사가 운영 내용을 작성하고, 담당자가 예산을 완성해 최종 제출합니다."}
       </PageIntro>
 
-      {/* 2. 운영계획서 / 결과보고서 상단 탭 네비게이션 */}
-      <nav className="flex flex-wrap gap-3" aria-label="과정 문서 종류">
-        {(["plan", "result"] as const).map((entry) => (
-          <Link
-            key={entry}
-            className={entry === kind ? "btn-primary" : "btn-secondary"}
-            href={`/operation-documents/${entry}`}
-            aria-current={entry === kind ? "page" : undefined}
-          >
-            {entry === "plan" ? "운영계획서" : "결과보고서"}
-          </Link>
-        ))}
-      </nav>
-
-      {/* 3. 결과보고서 서브 네비게이션 (공식 운영결과보고서 vs 결과 보고·6종 증빙) */}
+      {/* 2. 결과보고서 서브 네비게이션 (공식 운영결과보고서 vs 결과 보고·6종 증빙) */}
       {result && manager && (
         <nav
           className="flex flex-wrap gap-2 border-b border-slate-200 pb-3"
@@ -243,17 +229,9 @@ export async function DocumentList({
         </nav>
       )}
 
-      {/* 4. 공식 운영계획서 / 결과보고서 목록 영역 */}
+      {/* 3. 공식 운영계획서 / 결과보고서 목록 영역 */}
       {!evidence && (
         <section aria-label={result ? "공식 운영결과보고서" : "운영계획서"}>
-          <div className="mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">
-                {result ? "공식 운영결과보고서" : "과정별 운영계획서"}
-              </h2>
-            </div>
-          </div>
-
           {/* 카드형 / 리스트형 인터랙티브 뷰 컴포넌트 */}
           {dbError ? (
             <Empty title="문서 현황을 불러오지 못했습니다">
@@ -270,7 +248,7 @@ export async function DocumentList({
         </section>
       )}
 
-      {/* 5. 결과 보고 · 6종 증빙 관리자 전용 영역 */}
+      {/* 4. 결과 보고 · 6종 증빙 관리자 전용 영역 */}
       {evidence && (
         <section aria-label="결과 보고 및 6종 증빙">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
