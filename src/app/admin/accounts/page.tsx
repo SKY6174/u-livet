@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Search, ShieldCheck, UsersRound } from "lucide-react";
+import { Search, UsersRound } from "lucide-react";
 import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { MemberNotice } from "@/components/portal/member-notice";
@@ -26,10 +26,7 @@ export default async function Members({ searchParams }: { searchParams: Promise<
   const notice = params.created === "1" ? "created" : params.saved === "1" ? "saved" : params.deleted === "1" ? "deleted" : undefined;
   const columns = ["순번", ...(group === "office" ? ["직책"] : group === "instructor" ? ["교내/교외"] : []), "성명", group === "learner" ? "이메일" : "이메일(아이디)", ...(group === "office" ? ["사무실 전화번호"] : []), phoneHeading, ...(group === "learner" ? ["생년월일", filters.year ? `${filters.year}년 수강과목` : "올해 수강과목", "수강이력"] : group === "instructor" ? ["강의이력"] : []), "비고", "관리"];
   return <div className="page-shell">
-    <PageIntro eyebrow="MEMBERS" title="구성원 관리">사업단·강사·수강생의 정보와 활동 이력을 관리합니다.</PageIntro>
-    <div className="mb-6">
-      <span className="inline-flex items-center gap-2 text-sm text-slate-500"><ShieldCheck aria-hidden="true" className="h-4 w-4 text-teal-700" />{me.is_super_admin ? "최고 관리자 · " + me.name : "구성원 명부"}</span>
-    </div>
+    <PageIntro eyebrow="MEMBERS" title="구성원 관리" />
     <MemberNotice key={notice ?? "none"} kind={notice} />
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
     <nav aria-label="구성원 구분" className="flex flex-wrap gap-2">
