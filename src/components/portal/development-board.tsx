@@ -3,6 +3,7 @@ import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
+import { DevelopmentFilters } from "@/components/portal/development-filters";
 import { startDevelopment } from "@/app/instructor-development-actions";
 import {
   reviewLabels,
@@ -11,19 +12,25 @@ import {
 } from "@/lib/instructors/types";
 
 const PROJECT_YEARS = [2025, 2026, 2027, 2028, 2029] as const;
-const ANCHOR_TRACKS = ["RCC", "AID-X", "ECC"] as const;
+const ANCHOR_TRACKS = ["ECC", "ICC", "RCC", "AID-X"] as const;
+const SANHAK_TRACKS = ["SANHAK_PLANNING", "SANHAK_SUPPORT"] as const;
+const ACADEMIES = ["스마트테크", "라이프케어", "로컬창업", "팝업"] as const;
 const trackLabel = (track: string | null) =>
-  track === "WORKER" ? "재직자 과정" : track ?? "미분류";
+  track === "WORKER" ? "재직자 과정" :
+  track === "SANHAK_PLANNING" ? "산학기획팀" :
+  track === "SANHAK_SUPPORT" ? "산학지원팀" : track ?? "미분류";
 
 export async function DevelopmentBoard({
   orgId,
   year,
   track,
+  academy,
   staff,
 }: {
   orgId?: string;
   year?: string;
   track?: string;
+  academy?: string;
   staff: boolean;
 }) {
   await requireIdentity(staff ? "/admin/development" : "/development");
@@ -45,17 +52,14 @@ export async function DevelopmentBoard({
       y.org_id === org?.id && (y.label === `${selectedYear}년 (${selectedYear - 2024}차년도)`
         || (org?.slug === "uc-anchor" && selectedYear === 2026 && y.label === "2차년도 · 2026")),
     ),
-    tracks = org?.slug === "uc-anchor" ? [...ANCHOR_TRACKS] : org?.slug === "uc-sanhak" ? ["WORKER"] : [],
-    selectedTrack = track === "UNCLASSIFIED" || tracks.includes(track ?? "") ? track : undefined,
-    basePath = staff ? "/admin/development" : "/development",
-    boardHref = (id: string, y: number, t?: string) => {
-      const query = new URLSearchParams({ org: id, year: String(y) });
-      if (t) query.set("track", t);
-      return `${basePath}?${query.toString()}`;
-    };
+    tracks: string[] = org?.slug === "uc-anchor" ? [...ANCHOR_TRACKS] : org?.slug === "uc-sanhak" ? [...SANHAK_TRACKS] : [],
+    selectedTrack = tracks.includes(track ?? "") ? track : undefined,
+    selectedAcademy = ACADEMIES.includes(academy as typeof ACADEMIES[number]) ? academy : undefined,
+    basePath = staff ? "/admin/development" : "/development";
   const b = org && selectedYearRecord
-      ? await db.rpc("life_development_board_filtered", {
+      ? await db.rpc("life_development_board_classified", {
           o: org.id, staff, y: selectedYearRecord.id, track: selectedTrack ?? null,
+          academy: selectedAcademy ?? null,
         })
       : null,
     board = b?.data as DevelopmentBoardData | null;
@@ -67,53 +71,22 @@ export async function DevelopmentBoard({
       >
         수요와 역량을 교육과정으로 구체화하고 승인본을 기수 운영에 연결합니다.
       </PageIntro>
-      <section className="panel mb-6 space-y-5" aria-label="과정 개발 분류">
-        <div>
-          <h2 className="mb-2 font-semibold">주관 기관</h2>
-          <div className="flex flex-wrap gap-2">
-            {orgs.map((o) => (
-              <Link key={o.id} href={boardHref(o.id, selectedYear)}
-                className={o.id === org?.id ? "btn-primary" : "btn-secondary"}
-                aria-current={o.id === org?.id ? "page" : undefined}>
-                {o.slug === "uc-anchor" ? "앵커사업단" : o.slug === "uc-sanhak" ? "산학협력단" : o.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div>
-          <h2 className="mb-2 font-semibold">사업연도</h2>
-          <div className="flex flex-wrap gap-2">
-            {PROJECT_YEARS.map((y) => (
-              <Link key={y} href={boardHref(org?.id ?? "", y, selectedTrack)}
-                className={y === selectedYear ? "btn-primary" : "btn-secondary"}
-                aria-current={y === selectedYear ? "page" : undefined}>
-                {y}년 ({y - 2024}차년도)
-              </Link>
-            ))}
-          </div>
-        </div>
-        {!!tracks.length && (
-          <div>
-            <h2 className="mb-2 font-semibold">{org?.slug === "uc-anchor" ? "앵커사업단 주관 센터" : "과정 구분"}</h2>
-            <div className="flex flex-wrap gap-2">
-              {[undefined, ...tracks, "UNCLASSIFIED"].map((t) => (
-                <Link key={t ?? "all"} href={boardHref(org?.id ?? "", selectedYear, t)}
-                  className={t === selectedTrack ? "btn-primary" : "btn-secondary"}
-                  aria-current={t === selectedTrack ? "page" : undefined}>
-                  {t === undefined ? "전체" : t === "UNCLASSIFIED" ? "미분류(기존)" : trackLabel(t)}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
+      <DevelopmentFilters
+        basePath={basePath}
+        organizations={orgs}
+        organizationId={org?.id ?? ""}
+        organizationSlug={org?.slug ?? ""}
+        year={selectedYear}
+        track={selectedTrack ?? ""}
+        academy={selectedAcademy ?? ""}
+      />
       {r.error || b?.error || !board || !org || !selectedYearRecord ? (
         <Empty title={selectedYearRecord ? "과정 제안 정보를 불러오지 못했습니다" : "선택한 사업연도가 등록되지 않았습니다"} />
       ) : (
         <>
           {staff && (
             <section className="panel mb-6">
-              <h2 className="section-title">{selectedYear}년 ({selectedYear - 2024}차년도) · {selectedTrack ? trackLabel(selectedTrack === "UNCLASSIFIED" ? null : selectedTrack) : "전체"} 승인 개발·개편</h2>
+              <h2 className="section-title">{selectedYear}년 ({selectedYear - 2024}차년도) · {selectedTrack ? trackLabel(selectedTrack) : "전체"} · {selectedAcademy ?? "아카데미 전체"} 승인 개발·개편</h2>
               <p className="notice mb-4">
                 승인 취소를 제외한 심의 버전 수입니다. 같은 버전의 여러 개설
                 기수는 중복하지 않습니다. 공식 RISE 성과 산식과 대외 제출은 별도
@@ -137,7 +110,7 @@ export async function DevelopmentBoard({
               )}
             </section>
           )}
-          <h2 className="section-title">{staff ? "제출된 과정 제안" : "내가 작성한 과정"} · {selectedYear}년 · {selectedTrack ? trackLabel(selectedTrack === "UNCLASSIFIED" ? null : selectedTrack) : "전체"}</h2>
+          <h2 className="section-title">{staff ? "제출된 과정 제안" : "내가 작성한 과정"} · {selectedYear}년 · {selectedTrack ? trackLabel(selectedTrack) : "전체"} · {selectedAcademy ?? "아카데미 전체"}</h2>
           {!board.items.length ? (
             <Empty title="과정 제안이 없습니다" />
           ) : (
@@ -200,7 +173,7 @@ export async function DevelopmentBoard({
                   </label>
                   <label className="field">
                     주관 구분
-                    <select name="track" required defaultValue={selectedTrack && selectedTrack !== "UNCLASSIFIED" ? selectedTrack : ""}>
+                    <select name="track" required defaultValue={selectedTrack ?? ""}>
                       <option value="" disabled>주관 선택</option>
                       {tracks.map((t) => <option key={t} value={t}>{trackLabel(t)}</option>)}
                     </select>
