@@ -246,20 +246,12 @@ export async function DocumentList({
       {/* 4. 공식 운영계획서 / 결과보고서 목록 영역 */}
       {!evidence && (
         <section aria-label={result ? "공식 운영결과보고서" : "운영계획서"}>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="mb-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
                 {result ? "공식 운영결과보고서" : "과정별 운영계획서"}
               </h2>
             </div>
-            <a
-              className="btn-secondary"
-              href={result ? "/forms/operation-result.pdf" : "/forms/operation-plan.pdf"}
-              target="_blank"
-              rel="noreferrer"
-            >
-              원본 양식 보기
-            </a>
           </div>
 
           {/* 카드형 / 리스트형 인터랙티브 뷰 컴포넌트 */}
