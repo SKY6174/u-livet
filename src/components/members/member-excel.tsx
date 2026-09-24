@@ -1,7 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Download, FileSpreadsheet, Upload, X } from "lucide-react";
+import { Download, FileSpreadsheet, Plus, Upload, X } from "lucide-react";
 import { exportMemberExcel, importMemberExcel } from "@/app/admin/accounts/excel-actions";
 import { MEMBER_GROUPS, type MemberGroup } from "@/lib/members/model";
 import { MEMBER_EXCEL_COLUMNS, memberExcelValues, parseMemberWorkbook, validateMemberExcelRows, type MemberExcelRow } from "@/lib/members/excel";
@@ -60,8 +61,8 @@ export function MemberExcel({ group, query, orgs, canEdit }: {
       router.refresh();
     });
   }
-  return <section aria-label="구성원 엑셀 관리" className="mb-6 space-y-3">
-    <div className="flex flex-wrap items-center gap-2">
+  return <section aria-label="구성원 엑셀 관리" className="min-w-0 flex-1 basis-[650px] space-y-3">
+    <div className="flex flex-wrap items-center justify-end gap-2">
       <button type="button" className="btn-secondary !px-3 !py-2 text-sm" disabled={busy} onClick={() => void task(() => saveWorkbook([columns.map(([, label]) => label)], `${MEMBER_GROUPS[group]}-구성원-등록서식.xlsx`))}><FileSpreadsheet aria-hidden="true" size={16} />엑셀 서식</button>
       {canUpload && <>
         <button type="button" className="btn-secondary !px-3 !py-2 text-sm" disabled={busy} onClick={() => fileInput.current?.click()}><Upload aria-hidden="true" size={16} />엑셀 업로드</button>
@@ -73,6 +74,7 @@ export function MemberExcel({ group, query, orgs, canEdit }: {
         setMessage(`${records.length}명의 명부를 내려받았습니다.`);
       })}><Download aria-hidden="true" size={16} />엑셀 다운로드</button>
       {orgs.length > 1 && <label className="flex items-center gap-2 text-sm">신규 등록 사업단<select className="rounded-lg border border-slate-300 px-3 py-2" value={org} disabled={busy} onChange={event => { setOrg(event.target.value); reset(); }}>{orgs.map(item => <option key={item.org_id} value={item.org_id}>{item.org_name}</option>)}</select></label>}
+      {orgs.length > 0 && <Link className="btn-primary min-h-12 shrink-0 gap-2" href={`/admin/accounts/new?group=${group}`}><Plus aria-hidden="true" className="h-4 w-4" />구성원 수동 등록</Link>}
     </div>
     <p className="text-xs leading-5 text-slate-500">현재 {MEMBER_GROUPS[group]} 분류와 검색 결과 전체를 내려받습니다(최대 1,000명). 서식의 ID가 비어 있으면 신규 등록, ID와 수정 버전이 있으면 기존 정보 수정입니다. 기존 이메일·로그인 권한은 엑셀로 변경되지 않습니다.</p>
     {message && <p role={error ? "alert" : "status"} className={error ? "text-sm text-red-700" : "text-sm text-teal-800"}>{message}</p>}
