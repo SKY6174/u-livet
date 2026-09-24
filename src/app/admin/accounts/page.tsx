@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, Search, ShieldCheck, UsersRound } from "lucide-react";
+import { Search, ShieldCheck, UsersRound } from "lucide-react";
 import { OFFICE_POSITIONS } from "@/lib/auth/login-audience";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { MemberNotice } from "@/components/portal/member-notice";
@@ -28,16 +28,15 @@ export default async function Members({ searchParams }: { searchParams: Promise<
       <span className="inline-flex items-center gap-2 text-sm text-slate-500"><ShieldCheck aria-hidden="true" className="h-4 w-4 text-teal-700" />{me.is_super_admin ? "최고 관리자 · " + me.name : "구성원 명부"}</span>
     </div>
     <MemberNotice key={notice ?? "none"} kind={notice} />
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
     <nav aria-label="구성원 구분" className="flex flex-wrap gap-2">
       {Object.entries(MEMBER_GROUPS).map(([key, label]) => <Link key={key} href={`/admin/accounts?group=${key}`} aria-current={key === group ? "page" : undefined}
         className={`inline-flex min-h-12 items-center gap-3 rounded-xl border px-5 text-sm font-semibold transition-colors ${key === group ? "border-teal-800 bg-teal-800 text-white shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-800"}`}>
         {label}<span className={`rounded-md px-2 py-0.5 text-xs tabular-nums ${key === group ? "bg-white/15" : "bg-slate-100"}`}>{data?.counts[key as MemberGroup] ?? "—"}</span>
       </Link>)}
     </nav>
-      {!!me.member_entry_orgs?.length && <Link className="btn-primary ml-auto min-h-12 shrink-0 gap-2" href={`/admin/accounts/new?group=${group}`}><Plus aria-hidden="true" className="h-4 w-4" />구성원 수동 등록</Link>}
+      <MemberExcel key={group} group={group} query={query} orgs={me.member_entry_orgs ?? []} canEdit={me.roles.some(role => role.role === "SYSTEM_ADMIN")} />
     </div>
-    <MemberExcel key={group} group={group} query={query} orgs={me.member_entry_orgs ?? []} canEdit={me.roles.some(role => role.role === "SYSTEM_ADMIN")} />
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2"><UsersRound aria-hidden="true" className="h-5 w-5 text-teal-700" /><h2 className="font-bold">{MEMBER_GROUPS[group]} 목록</h2><span className="text-sm text-slate-500">{data ? `${data.total}명` : ""}</span></div>
