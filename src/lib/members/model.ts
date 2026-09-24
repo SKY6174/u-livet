@@ -6,6 +6,24 @@ export type MemberGroup = keyof typeof MEMBER_GROUPS;
 export const memberGroup = (value: unknown): MemberGroup =>
   value === "instructor" || value === "learner" ? value : "office";
 export const memberPage = (value: unknown) => typeof value === "string" && /^[1-9][0-9]{0,5}$/.test(value) ? Math.min(Number(value), 100000) : 1;
+export const MEMBER_YEARS = [2025, 2026, 2027, 2028, 2029] as const;
+export type MemberSort = "default" | "name" | "email" | "phone" | "position" | "kind" | "birth_date";
+export type MemberDirection = "asc" | "desc";
+export type MemberFilters = { year: number | null; kind: "INTERNAL" | "EXTERNAL" | null; sort: MemberSort; direction: MemberDirection };
+export const MEMBER_SORT_OPTIONS: Record<MemberGroup, { value: MemberSort; label: string }[]> = {
+  office: [{ value: "default", label: "직책순·성명순" }, { value: "position", label: "직책순" }, { value: "name", label: "성명순" }, { value: "email", label: "이메일순" }, { value: "phone", label: "전화번호순" }],
+  instructor: [{ value: "default", label: "성명순" }, { value: "name", label: "성명순" }, { value: "kind", label: "교내·교외순" }, { value: "email", label: "이메일순" }, { value: "phone", label: "연락처순" }],
+  learner: [{ value: "default", label: "성명순" }, { value: "name", label: "성명순" }, { value: "email", label: "이메일순" }, { value: "phone", label: "전화번호순" }, { value: "birth_date", label: "생년월일순" }],
+};
+export function memberFilters(group: MemberGroup, params: Record<string, string | string[] | undefined>): MemberFilters {
+  const parsedYear = typeof params.year === "string" ? Number(params.year) : NaN;
+  return {
+    year: group !== "office" && MEMBER_YEARS.some(year => year === parsedYear) ? parsedYear : null,
+    kind: group === "instructor" && (params.kind === "INTERNAL" || params.kind === "EXTERNAL") ? params.kind : null,
+    sort: MEMBER_SORT_OPTIONS[group].find(option => option.value === params.sort)?.value ?? "default",
+    direction: params.dir === "desc" ? "desc" : "asc",
+  };
+}
 export type Member = {
   id: string; name: string; email: string | null; office_position: OfficePosition | null;
   instructor_kind: "INTERNAL" | "EXTERNAL" | null; office_phone: string | null;

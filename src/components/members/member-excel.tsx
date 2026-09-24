@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Download, FileSpreadsheet, Plus, Upload, X } from "lucide-react";
 import { exportMemberExcel, importMemberExcel } from "@/app/admin/accounts/excel-actions";
-import { MEMBER_GROUPS, type MemberGroup } from "@/lib/members/model";
+import { MEMBER_GROUPS, type MemberFilters, type MemberGroup } from "@/lib/members/model";
 import { MEMBER_EXCEL_COLUMNS, memberExcelValues, parseMemberWorkbook, validateMemberExcelRows, type MemberExcelRow } from "@/lib/members/excel";
 
 async function saveWorkbook(rows: string[][], filename: string) {
@@ -15,8 +15,8 @@ async function saveWorkbook(rows: string[][], filename: string) {
   }))), { columns: rows[0].map((_, index) => ({ width: index === 3 ? 32 : index === rows[0].length - 1 ? 36 : 22 })) }).toFile(filename);
 }
 
-export function MemberExcel({ group, query, orgs, canEdit }: {
-  group: MemberGroup; query: string; orgs: { org_id: string; org_name: string }[]; canEdit: boolean;
+export function MemberExcel({ group, query, filters, orgs, canEdit }: {
+  group: MemberGroup; query: string; filters: MemberFilters; orgs: { org_id: string; org_name: string }[]; canEdit: boolean;
 }) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -69,7 +69,7 @@ export function MemberExcel({ group, query, orgs, canEdit }: {
         <input ref={fileInput} type="file" accept=".xlsx" className="sr-only" aria-label={`${MEMBER_GROUPS[group]} 구성원 엑셀 파일`} disabled={busy} onChange={event => void upload(event.target.files?.[0])} />
       </>}
       <button type="button" className="btn-secondary !px-3 !py-2 text-sm" disabled={busy} onClick={() => void task(async () => {
-        const records = await exportMemberExcel(group, query);
+        const records = await exportMemberExcel(group, query, filters);
         await saveWorkbook([columns.map(([, label]) => label), ...records.map(record => memberExcelValues(group, record))], `${MEMBER_GROUPS[group]}-구성원-명부.xlsx`);
         setMessage(`${records.length}명의 명부를 내려받았습니다.`);
       })}><Download aria-hidden="true" size={16} />엑셀 다운로드</button>
