@@ -1,4 +1,4 @@
-import { Download, FileClock, Search } from "lucide-react";
+import { FileClock, FileText, Search } from "lucide-react";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/portal/ui";
 import { requireIdentity } from "@/lib/auth/session";
@@ -37,6 +37,14 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
   const query = String(params.q ?? "").trim().slice(0, 100);
   const data = await getAdminLearnerDocuments({ kind, status, query });
   const requests = data?.requests ?? [];
+  const kindHref = (value: string) => {
+    const filters = new URLSearchParams();
+    if (value) filters.set("kind", value);
+    if (status) filters.set("status", status);
+    if (query) filters.set("q", query);
+    const search = filters.toString();
+    return `/admin/learner-documents${search ? `?${search}` : ""}`;
+  };
   const hiddenFilters = <>
     <input type="hidden" name="filter_kind" value={kind ?? ""} />
     <input type="hidden" name="filter_status" value={status ?? ""} />
@@ -57,12 +65,13 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
         <fieldset className="min-w-0 sm:col-span-2 xl:col-span-1">
           <legend className="text-sm font-semibold">서류 종류</legend>
           <div className="mt-2 flex flex-wrap gap-2">
-            {KIND_FILTERS.map(({ value, label }) => <label key={value} className="cursor-pointer">
-              <input type="radio" name="kind" value={value} defaultChecked={(kind ?? "") === value} className="peer sr-only" />
-              <span className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 peer-checked:border-teal-800 peer-checked:bg-teal-800 peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-600">{label}</span>
-            </label>)}
+            {KIND_FILTERS.map(({ value, label }) => <a key={value} href={kindHref(value)} aria-current={(kind ?? "") === value ? "page" : undefined}
+              className={`inline-flex min-h-11 items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${(kind ?? "") === value ? "border-teal-800 bg-teal-800 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}>
+              {label}
+            </a>)}
           </div>
         </fieldset>
+        <input type="hidden" name="kind" value={kind ?? ""} />
         <label className="text-sm font-semibold">처리 상태<select className={field} name="status" defaultValue={status ?? ""}><option value="">전체</option>{statusKeys.map(value => <option value={value} key={value}>{DOCUMENT_STATUS_LABELS[value]}</option>)}</select></label>
         <label className="text-sm font-semibold">과정명·신청자<input className={field} name="q" defaultValue={query} maxLength={100} placeholder="검색어 입력" /></label>
         <button className="btn-secondary inline-flex min-h-11 items-center justify-center gap-2" type="submit"><Search size={16} />조회</button>
@@ -73,11 +82,11 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
           <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
           <div role="region" aria-labelledby="document-queue-heading" aria-describedby="document-queue-help" tabIndex={0} className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="w-full min-w-[1320px] table-fixed text-left text-sm">
-              <caption className="sr-only">접수 문서 목록. 각 행에서 처리 단계와 수강생 안내를 입력하고 상태를 저장할 수 있습니다.</caption>
-              <colgroup>{[4, 17, 11, 11, 12, 22, 11, 12].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
+              <caption className="sr-only">접수 문서 목록. 각 행에서 처리 결과와 수강생 안내를 입력하고 상태를 저장할 수 있습니다.</caption>
+              <colgroup>{[4, 19, 11, 11, 14, 17.6, 11.4, 12].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
               <thead className="border-b border-slate-200 bg-slate-50 text-slate-700">
                 <tr>
-                  {["순번", "과정", "신청자", "신청시각", "다음 처리 단계", "수강생 안내 내용", "첨부문서", "비고"].map(label => (
+                  {["순번", "과정", "신청자", "신청시각", "처리 결과", "수강생 안내 내용", "첨부문서", "비고"].map(label => (
                     <th key={label} scope="col" className={`px-3 py-4 font-semibold ${label === "순번" ? "text-center" : ""}`}>
                       {label}{label === "신청자" && <span className="mt-1 block text-xs font-normal text-slate-500">성명 · 전화번호</span>}
                     </th>
@@ -103,7 +112,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                     <td className="px-3 py-5 leading-6 text-slate-600"><time dateTime={request.submitted_at}>{documentDate(request.submitted_at)}</time></td>
                     <td className="px-3 py-5">
                       {nextStatuses.length ? <>
-                        <label htmlFor={`${formId}-next`} className="sr-only">{rowLabel} 다음 처리 단계</label>
+                        <label htmlFor={`${formId}-next`} className="sr-only">{rowLabel} 처리 결과</label>
                         <select id={`${formId}-next`} form={formId} name="next_status" required className={rowField} defaultValue="">
                           <option value="" disabled>선택해 주세요</option>
                           {nextStatuses.map(next => <option value={next} key={next}>{DOCUMENT_STATUS_LABELS[next]}</option>)}
@@ -119,7 +128,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                     </td>
                     <td className="px-3 py-5">
                       <a href={`/api/learner-documents/${request.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold text-slate-700 hover:bg-slate-50">
-                        <Download size={16} className="shrink-0" aria-hidden="true" /><span>제출 원본 PDF<span className="sr-only"> · {rowLabel} (새 창)</span></span>
+                        <FileText size={16} className="shrink-0" aria-hidden="true" /><span>신청서<span className="sr-only"> · {rowLabel} PDF (새 창)</span></span>
                       </a>
                     </td>
                     <td className="px-3 py-5">

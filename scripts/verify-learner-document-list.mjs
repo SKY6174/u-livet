@@ -28,12 +28,16 @@ let identity = { roles: ["COURSE_MANAGER"] };
 let context = { requests };
 let lastFilters;
 let reads = 0;
+let applyKindFilter = false;
 const Page = load("src/app/admin/learner-documents/page.tsx", {
   "next/navigation": { notFound() { throw new Error("NOT_FOUND"); } },
   "@/components/portal/ui": { PageIntro: ({ title, children }) => React.createElement("div", null, React.createElement("h1", { className: "page-title" }, title), children) },
   "@/lib/auth/session": { requireIdentity: async () => { if (!identity) throw new Error("LOGIN_REQUIRED"); return identity; } },
   "@/lib/auth/workspace-navigation": { hasRole: (person, ...roles) => person.roles.some(role => roles.includes(role)) },
-  "@/lib/learner-document-workflow/data": { getAdminLearnerDocuments: async filters => { reads++; lastFilters = filters; return context; } },
+  "@/lib/learner-document-workflow/data": { getAdminLearnerDocuments: async filters => {
+    reads++; lastFilters = filters;
+    return applyKindFilter && context ? { requests: context.requests.filter(request => !filters.kind || request.kind === filters.kind) } : context;
+  } },
   "@/lib/learner-document-workflow/types": types,
   "./actions": { updateLearnerDocumentStatus: "/synthetic-status-update" },
 }).default;
@@ -43,7 +47,7 @@ const tree = await render({ kind: "REFUND", status: "RECEIVED", q: "검증" });
 const all = nodes(tree);
 assert.deepEqual(lastFilters, { kind: "REFUND", status: "RECEIVED", query: "검증" });
 assert.deepEqual(all.filter(node => node.type === "th" && node.props.scope === "col").map(node => node.props.children[0]),
-  ["순번", "과정", "신청자", "신청시각", "다음 처리 단계", "수강생 안내 내용", "첨부문서", "비고"]);
+  ["순번", "과정", "신청자", "신청시각", "처리 결과", "수강생 안내 내용", "첨부문서", "비고"]);
 const tbody = all.find(node => node.type === "tbody");
 const rows = React.Children.toArray(tbody.props.children);
 assert.equal(rows.length, requests.length);
@@ -76,12 +80,26 @@ for (const [index, row] of rows.entries()) {
   assert.deepEqual(fields, { filter_kind: "REFUND", filter_status: "RECEIVED", filter_query: "검증", request_id: request.id, revision: request.revision });
 }
 for (const kind of ["", "APPLICATION", "SCHOLARSHIP", "REFUND"]) {
-  const filtered = nodes(await render({ kind }));
-  const radios = filtered.filter(node => node.type === "input" && node.props.type === "radio");
-  assert.equal(radios.length, 4);
-  assert.deepEqual(radios.filter(node => node.props.defaultChecked).map(node => node.props.value), [kind]);
-  assert(!filtered.some(node => node.type === "select" && node.props.name === "kind"));
+  const filtered = nodes(await render({ kind, status: "REVIEWING", q: "가 나" }));
+  const links = filtered.filter(node => node.type === "a" && node.props.href?.startsWith("/admin/learner-documents"));
+  assert.equal(links.length, 4);
+  assert.deepEqual(links.filter(node => node.props["aria-current"] === "page").map(node => node.props.children),
+    [{ "": "전체", APPLICATION: "수강신청", SCHOLARSHIP: "장학금신청", REFUND: "환불신청" }[kind]]);
+  for (const [index, value] of ["", "APPLICATION", "SCHOLARSHIP", "REFUND"].entries()) {
+    const target = new URL(links[index].props.href, "http://localhost");
+    assert.equal(target.searchParams.get("kind"), value || null);
+    assert.equal(target.searchParams.get("status"), "REVIEWING");
+    assert.equal(target.searchParams.get("q"), "가 나");
+  }
+  assert.deepEqual(filtered.filter(node => node.type === "input" && node.props.name === "kind").map(node => node.props.value), [kind]);
 }
+applyKindFilter = true;
+for (const kind of ["", "APPLICATION", "SCHOLARSHIP", "REFUND"]) {
+  const filtered = nodes(await render({ kind }));
+  const filteredRows = React.Children.toArray(filtered.find(node => node.type === "tbody").props.children);
+  assert.equal(filteredRows.length, kind ? requests.filter(request => request.kind === kind).length : requests.length);
+}
+applyKindFilter = false;
 await render({ kind: "INVALID", status: "INVALID", q: "  검증  " });
 assert.deepEqual(lastFilters, { kind: null, status: null, query: "검증" });
 const before = reads;
@@ -108,4 +126,4 @@ if (process.argv.includes("--preview")) {
   writeFileSync(`${dir}/index.html`, `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>접수 문서 합성 자료 검증</title><link rel="stylesheet" href="/style.css"></head><body>${html}</body></html>`);
   console.log(`Synthetic UI preview: ${dir}/index.html`);
 }
-console.log("PASS: 8 columns, per-request form ownership, transitions, terminal rows, PDF/history, 4 kind selections, filters and authorization; synthetic data only.");
+console.log("PASS: 8 columns, per-request form ownership, transitions, terminal rows, PDF/history, immediate kind links, filtered rows and authorization; synthetic data only.");
