@@ -4,9 +4,9 @@ import opening from "../../../docs/operations/2026-course-opening-plans.json";
 import { mergeOperationCourses, type OperationCourse, type WorkbookSummary } from "./model";
 import type { CourseWorkspace } from "@/lib/course-workspace/types";
 
-export async function getCourseBudgets(org: string, workspaces: CourseWorkspace[]) {
+export async function getCourseBudgets(org: string, workspaces: CourseWorkspace[], year = 2026) {
   try {
-    const { data, error } = await (await createServerSupabaseClient()).rpc("life_course_budget_overview", { o: org, y: 2026 });
+    const { data, error } = await (await createServerSupabaseClient()).rpc("life_course_budget_overview", { o: org, y: year });
     if (error || !data) return { courses: [], workbooks: [], unavailable: true };
     const guides = (data.courses as Omit<OperationCourse, "workspace">[]).map(course => {
       const plan = opening.courses.find(p => p.sourceId === course.source_id);
