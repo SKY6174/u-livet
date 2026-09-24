@@ -76,7 +76,6 @@ export function MemberExcel({ group, query, orgs, canEdit }: {
       {orgs.length > 1 && <label className="flex items-center gap-2 text-sm">신규 등록 사업단<select className="rounded-lg border border-slate-300 px-3 py-2" value={org} disabled={busy} onChange={event => { setOrg(event.target.value); reset(); }}>{orgs.map(item => <option key={item.org_id} value={item.org_id}>{item.org_name}</option>)}</select></label>}
       {orgs.length > 0 && <Link className="btn-primary min-h-12 shrink-0 gap-2" href={`/admin/accounts/new?group=${group}`}><Plus aria-hidden="true" className="h-4 w-4" />구성원 수동 등록</Link>}
     </div>
-    <p className="text-xs leading-5 text-slate-500">현재 {MEMBER_GROUPS[group]} 분류와 검색 결과 전체를 내려받습니다(최대 1,000명). 서식의 ID가 비어 있으면 신규 등록, ID와 수정 버전이 있으면 기존 정보 수정입니다. 기존 이메일·로그인 권한은 엑셀로 변경되지 않습니다.</p>
     {message && <p role={error ? "alert" : "status"} className={error ? "text-sm text-red-700" : "text-sm text-teal-800"}>{message}</p>}
     {rows.length > 0 && <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm">
       <div className="flex justify-between gap-3"><h2 className="font-bold">업로드 미리보기 · 신규 {rows.filter(row => !row.person_id).length}명 · 수정 {rows.filter(row => !!row.person_id).length}명</h2><button type="button" aria-label="엑셀 업로드 취소" disabled={busy} onClick={reset}><X size={18} /></button></div>
