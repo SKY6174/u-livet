@@ -318,9 +318,45 @@ deny(
   }),
   "FORBIDDEN",
 );
-assert.ok(
-  ok(await teacher.c.rpc("life_operation_list")).some((r) => r.id === f),
-);
+const listedCourse = ok(await teacher.c.rpc("life_operation_list"))
+  .find((course) => course.id === f);
+assert.ok(listedCourse, "배정된 강사에게 본인 과정이 보여야 합니다.");
+assert.equal(listedCourse.org_id, org);
+assert.equal(listedCourse.org_name, "울산과학대학교 앵커사업단");
+assert.equal(listedCourse.year, 2026);
+assert.equal(listedCourse.year_label, "2차년도 · 2026");
+assert.equal(listedCourse.academy, "로컬창업 아카데미");
+assert.equal(listedCourse.capacity, 20);
+assert.equal(listedCourse.location, "302호");
+const sanhakOrg = sql("select id from public.life_organizations where slug='uc-sanhak'");
+const sanhakYear = sql(`select id from public.life_project_years where org_id='${sanhakOrg}' and starts_on='2025-03-01'`);
+sql(`insert into public.life_role_assignments(person_id,org_id,role) values('${manager.p}','${sanhakOrg}','COURSE_MANAGER');`);
+const sanhakOffering = ok(await manager.c.rpc("life_create_offering", {
+  o: sanhakOrg,
+  y: sanhakYear,
+  title: "[검증] 산학협력단 스마트테크 과정",
+  academy: "스마트테크",
+  summary: "기관 및 사업연도 목록 검증",
+  curriculum: "과정 분류 확인",
+  mode: "OFFLINE",
+  location: "산학협력단 실습실",
+  capacity: 12,
+  selection_method: "FIRST_COME",
+  apply_from: "2025-01-01T00:00:00Z",
+  apply_until: "2025-02-01T00:00:00Z",
+  starts_on: "2025-03-15",
+  ends_on: "2025-03-30",
+}));
+const managedList = ok(await manager.c.rpc("life_operation_list"));
+assert.ok(managedList.some((course) => course.id === f));
+const sanhakRow = managedList.find((course) => course.id === sanhakOffering);
+assert.ok(sanhakRow);
+assert.equal(sanhakRow.org_id, sanhakOrg);
+assert.equal(sanhakRow.org_name, "울산과학대학교 산학협력단");
+assert.equal(sanhakRow.year, 2025);
+assert.equal(sanhakRow.year_label, "2025년 (1차년도)");
+assert.equal(sanhakRow.academy, "스마트테크");
+assert.equal(ok(await teacher.c.rpc("life_operation_list")).some((course) => course.id === sanhakOffering), false);
 let content = model.emptyContent("plan"),
   budget = model.emptyBudget("plan");
 for (const field of schema.fields("plan"))
@@ -561,6 +597,7 @@ sql(
   `insert into public.life_organizations(id,slug,name) values('99000000-0000-4000-8000-000000000099','operation-test-other','운영문서 다른기관 검증') on conflict do nothing; insert into public.life_role_assignments(person_id,org_id,role) select '${outsider.p}','99000000-0000-4000-8000-000000000099','SYSTEM_ADMIN' where not exists(select 1 from public.life_role_assignments where person_id='${outsider.p}' and org_id='99000000-0000-4000-8000-000000000099' and role='SYSTEM_ADMIN');`,
 );
 deny(await context(outsider.c), "FORBIDDEN");
+assert.equal(ok(await outsider.c.rpc("life_operation_list")).some((course) => course.id === f), false);
 sql(
   `update public.life_offering_instructors set valid_until=now() where offering_id='${f}' and person_id='${teacher.p}';`,
 );
