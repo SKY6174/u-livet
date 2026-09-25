@@ -118,6 +118,21 @@ function AttachmentSheet({ title, offering, number, wide = false, stats, classNa
     <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
   </section>;
 }
+function PaymentDetails({ bank, account, holder, paidOn, note, reveal }: {
+  bank: string;
+  account: string;
+  holder: string;
+  paidOn: string;
+  note: string;
+  reveal: boolean;
+}) {
+  return <div className="report-payment-details">
+    <span><b>은행</b> {bank || "—"}</span>
+    <span><b>계좌번호</b> {maskAccount(account, reveal) || "—"}</span>
+    <span><b>예금주</b> {holder || "—"}</span>
+    <span><b>지급일 / 비고</b> {paidOn || "미지급"} {note}</span>
+  </div>;
+}
 function Narrative({ title, body }: { title: string; body: string }) {
   return (
     <div className="report-narrative">
@@ -407,7 +422,7 @@ export function ReportDocuments({
           </AttachmentSheet>
         ))}
       {show("scholarships") &&
-        chunk(scholarships, 8).map((rows, pi) => (
+        chunk(scholarships, 4).map((rows, pi) => (
           <AttachmentSheet
             title={title("scholarships")}
             offering={o}
@@ -417,36 +432,25 @@ export function ReportDocuments({
             className="report-scholarship-list"
             key={`s-${pi}`}
           >
-            <Table
-              head={[
-                "순번",
-                "성명",
-                "생년월일",
-                "수강료 (원)",
-                "수료여부",
-                "장학유형",
-                "지급률",
-                "금액 (원)",
-                "은행",
-                "계좌번호",
-                "예금주",
-                "지급일 / 비고",
-              ]}
-              rows={rows.map((r, i) => [
-                pi * 8 + i + 1,
-                scholarshipNames.get(r.personId) ?? member(r.personId)?.name,
-                details(r.personId)?.birthDate,
-                money(o.tuition),
-                yes(r.personId),
-                r.category,
-                `${r.rate}%`,
-                money(r.amount),
-                r.bank,
-                maskAccount(r.account, reveal),
-                r.holder,
-                `${r.paidOn || "미지급"} ${r.note}`,
-              ])}
-            />
+            <table className="report-table report-payment-table">
+              <thead><tr>
+                {["순번", "성명", "생년월일", "수강료 (원)", "수료여부", "장학유형", "지급률", "금액 (원)"].map((label) => <th key={label}>{label}</th>)}
+              </tr></thead>
+              {rows.length ? rows.map((r, i) => (
+                <tbody className="report-payment-entry" key={`${pi}-${i}`}>
+                  <tr>
+                    <td>{pi * 4 + i + 1}</td>
+                    <td>{scholarshipNames.get(r.personId) ?? member(r.personId)?.name ?? "—"}</td>
+                    <td>{details(r.personId)?.birthDate || "—"}</td>
+                    <td>{money(o.tuition)}</td><td>{yes(r.personId)}</td>
+                    <td>{r.category || "—"}</td><td>{r.rate}%</td><td>{money(r.amount)}</td>
+                  </tr>
+                  <tr><td colSpan={8} className="report-payment-detail-cell">
+                    <PaymentDetails bank={r.bank} account={r.account} holder={r.holder} paidOn={r.paidOn} note={r.note} reveal={reveal} />
+                  </td></tr>
+                </tbody>
+              )) : <tbody><tr><td colSpan={8}>등록된 내역 없음</td></tr></tbody>}
+            </table>
             <p className="report-total">
               전체 합계: {money(sumScholarships)}원
             </p>
@@ -465,28 +469,23 @@ export function ReportDocuments({
         </AttachmentSheet>
       ))}
       {show("fees") &&
-        chunk(p.fees, 6).map((rows, pi) => (
+        chunk(p.fees, 4).map((rows, pi) => (
           <AttachmentSheet title={title("fees")} offering={o} number={5} wide
             stats={[["지급 건수", `${p.fees.length}건`], ["강사료 합계", `${money(sumFees)}원`]]}
             className="report-fee-list" key={`f-${pi}`}>
-            <table className="report-table report-fee-table">
+            <table className="report-table report-payment-table">
               <thead><tr>
                 {["순번", "강사구분", "성명", "생년월일", "강의일자", "시수 (h)", "단가 (원)", "금액 (원)"].map((label) => <th key={label}>{label}</th>)}
               </tr></thead>
               {rows.length ? rows.map((r, i) => (
-                <tbody className="report-fee-entry" key={`${pi}-${i}`}>
+                <tbody className="report-payment-entry" key={`${pi}-${i}`}>
                   <tr>
-                    <td>{pi * 6 + i + 1}</td><td>{r.kind || "—"}</td><td>{r.name || "—"}</td>
+                    <td>{pi * 4 + i + 1}</td><td>{r.kind || "—"}</td><td>{r.name || "—"}</td>
                     <td>{r.birthDate || "—"}</td><td>{r.dates || "—"}</td><td>{r.hours}</td>
                     <td>{money(r.rate)}</td><td>{money(feeAmount(r))}</td>
                   </tr>
-                  <tr><td colSpan={8} className="report-fee-detail-cell">
-                    <div className="report-fee-details">
-                      <span><b>은행</b> {r.bank || "—"}</span>
-                      <span><b>계좌번호</b> {maskAccount(r.account, reveal) || "—"}</span>
-                      <span><b>예금주</b> {r.holder || "—"}</span>
-                      <span><b>지급일 / 비고</b> {r.paidOn || "미지급"} {r.note}</span>
-                    </div>
+                  <tr><td colSpan={8} className="report-payment-detail-cell">
+                    <PaymentDetails bank={r.bank} account={r.account} holder={r.holder} paidOn={r.paidOn} note={r.note} reveal={reveal} />
                   </td></tr>
                 </tbody>
               )) : <tbody><tr><td colSpan={8}>등록된 내역 없음</td></tr></tbody>}

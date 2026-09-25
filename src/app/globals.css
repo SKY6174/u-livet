@@ -306,37 +306,31 @@ body {
   padding: 1.8mm 1mm;
   font-size: 8pt;
 }
-.report-scholarship-list .report-table:not(.report-form-meta) th,
-.report-scholarship-list .report-table:not(.report-form-meta) td {
-  padding: 1.5mm 1mm;
-  font-size: 8pt;
-  line-height: 1.3;
-}
-.report-fee-table {
+.report-payment-table {
   margin: 0 0 3mm;
 }
-.report-fee-table th,
-.report-fee-table td {
+.report-payment-table th,
+.report-payment-table td {
   padding: 1.5mm 1mm;
   font-size: 8pt;
   line-height: 1.3;
 }
-.report-fee-table th:first-child {
+.report-payment-table th:first-child {
   width: 9mm;
 }
-.report-fee-entry {
+.report-payment-entry {
   break-inside: avoid;
 }
-.report-fee-detail-cell {
+.report-payment-detail-cell {
   text-align: left !important;
 }
-.report-fee-details {
+.report-payment-details {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr 2.5fr;
   gap: 2mm;
   text-align: left;
 }
-.report-fee-details b {
+.report-payment-details b {
   margin-right: 1mm;
 }
 .report-teaching-signature {
