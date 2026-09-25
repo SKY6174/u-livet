@@ -70,20 +70,17 @@ function Sheet({
   title,
   offering,
   wide = false,
-  attachment,
   children,
 }: {
   title: string;
   offering: Offering;
   wide?: boolean;
-  attachment?: number;
   children: ReactNode;
 }) {
   return (
     <section
       className={`report-sheet ${wide ? "report-landscape" : "report-portrait"}`}
     >
-      {attachment && <div className="report-attachment-marker">[첨부 #{attachment}]</div>}
       <div className="report-brand">
         울산과학대학교 · 지역성장 인재양성체계(앵커)사업단
       </div>
@@ -100,6 +97,26 @@ function Sheet({
       </div>
     </section>
   );
+}
+function AttachmentSheet({ title, offering, number, wide = false, stats, className = "", children }: {
+  title: string;
+  offering: Offering;
+  number: number;
+  wide?: boolean;
+  stats: [[string, ReactNode], [string, ReactNode]];
+  className?: string;
+  children: ReactNode;
+}) {
+  return <section className={`report-sheet report-form-20 ${wide ? "report-landscape" : "report-portrait"} report-attachment-sheet ${className}`}>
+    <div className="report-attachment-marker">[첨부 #{number}]</div>
+    <h1>{title}</h1>
+    <table className="report-table report-form-meta"><tbody>
+      <tr><th>과정명</th><td>{offering.name}</td><th>교육기간</th><td>{offering.starts_on} ~ {offering.ends_on}</td></tr>
+      <tr><th>{stats[0][0]}</th><td>{stats[0][1]}</td><th>{stats[1][0]}</th><td>{stats[1][1]}</td></tr>
+    </tbody></table>
+    {children}
+    <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
+  </section>;
 }
 function Narrative({ title, body }: { title: string; body: string }) {
   return (
@@ -350,16 +367,12 @@ export function ReportDocuments({
       )}
       {show("attendance") && (attendanceBook
         ? <AttendancePrint book={attendanceBook} title={title("attendance")} attachmentNumber={attachmentNumber("attendance")} />
-        : <section className="report-sheet report-form-20"><div className="report-attachment-marker">[첨부 #1]</div><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p></section>)}
+        : <section className="report-sheet report-form-20 report-landscape report-attachment-sheet"><div className="report-attachment-marker">[첨부 #1]</div><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p><Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized /></section>)}
       {show("completion") &&
         chunk(members, 8).map((people, pi, pages) => (
-          <section className="report-sheet report-form-20 report-landscape report-completion-list" key={`c-${pi}`}>
-            <div className="report-attachment-marker">[첨부 #{attachmentNumber("completion")}]</div>
-            <h1>{title("completion")}</h1>
-            <table className="report-table report-form-meta"><tbody>
-              <tr><th>과정명</th><td>{o.name}</td><th>교육기간</th><td>{o.starts_on} ~ {o.ends_on}</td></tr>
-              <tr><th>전체 교육시간</th><td>{source?.educationHours ?? hours(totalMinutes)}시간</td><th>수료인원</th><td>{completedCount}명</td></tr>
-            </tbody></table>
+          <AttachmentSheet title={title("completion")} offering={o} number={2} wide
+            stats={[["전체 교육시간", `${source?.educationHours ?? hours(totalMinutes)}시간`], ["수료인원", `${completedCount}명`]]}
+            className="report-completion-list" key={`c-${pi}`}>
             <p className="report-form-caption">담당 교수: {p.professor || "미입력"} · 수강생 {members.length}명 · {pi + 1}/{pages.length}쪽</p>
             <Table
               head={[
@@ -391,22 +404,22 @@ export function ReportDocuments({
                 ];
               })}
             />
-            <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
-          </section>
+          </AttachmentSheet>
         ))}
       {show("scholarships") &&
-        chunk(scholarships, 14).map((rows, pi) => (
-          <Sheet
+        chunk(scholarships, 8).map((rows, pi) => (
+          <AttachmentSheet
             title={title("scholarships")}
             offering={o}
-            attachment={attachmentNumber("scholarships")}
+            number={3}
             wide
+            stats={[["지급 대상", `${source?.scholarshipRecipients ?? new Set(scholarships.map((row) => row.personId)).size}명`], ["장학금 합계", `${money(sumScholarships)}원`]]}
+            className="report-scholarship-list"
             key={`s-${pi}`}
           >
             <Table
               head={[
                 "순번",
-                "과정명",
                 "성명",
                 "생년월일",
                 "수강료 (원)",
@@ -420,8 +433,7 @@ export function ReportDocuments({
                 "지급일 / 비고",
               ]}
               rows={rows.map((r, i) => [
-                pi * 14 + i + 1,
-                o.name,
+                pi * 8 + i + 1,
                 scholarshipNames.get(r.personId) ?? member(r.personId)?.name,
                 details(r.personId)?.birthDate,
                 money(o.tuition),
@@ -438,62 +450,47 @@ export function ReportDocuments({
             <p className="report-total">
               전체 합계: {money(sumScholarships)}원
             </p>
-          </Sheet>
+          </AttachmentSheet>
         ))}
       {show("teaching") && chunk(teachingRows,12).map((rows, pi) => (
-        <section className="report-sheet report-portrait report-form-20 report-teaching-ledger" key={`t-${pi}`}>
-          <div className="report-attachment-marker">[첨부 #4]</div>
-          <h1>{title("teaching")}</h1>
-          <Table head={["과정명","강의기간","승인된 실강의시간"]} rows={[[
-            o.name,`${o.starts_on} ~ ${o.ends_on}`,
-            `${hours(approvedTeachingMinutes)}시간`,
-          ]]} />
+        <AttachmentSheet title={title("teaching")} offering={o} number={4}
+          stats={[["승인된 실강의시간", `${hours(approvedTeachingMinutes)}시간`], ["표시 강의 구간", `${teachingRows.length}건`]]}
+          className="report-teaching-ledger" key={`t-${pi}`}>
           <Table head={["차수","날짜","시간","실강의시간","성명","서명"]} rows={rows.map((row) => [
             row.session,day(`${row.date}T00:00:00+09:00`),`${row.period} ${row.time}`,
             row.minutes === null ? "—" : `${hours(row.minutes)}시간`,row.name,
             row.signature ? <Image key={row.key} src={row.signature} width={110} height={42} unoptimized alt={`${row.name} 본인 서명`} className="report-teaching-signature" /> : row.note || "—",
           ])} />
           <p className="report-note">승인된 실강의시간만 합산하고 유효한 본인 서명만 날인합니다. 미등록·승인 대기는 표시하되 자동 날인하지 않습니다.</p>
-          <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
-        </section>
+        </AttachmentSheet>
       ))}
       {show("fees") &&
-        chunk(p.fees, 14).map((rows, pi) => (
-          <Sheet title={title("fees")} offering={o} attachment={attachmentNumber("fees")} wide key={`f-${pi}`}>
-            <Table
-              head={[
-                "순번",
-                "분야 / 과정명",
-                "교육기간",
-                "강사구분",
-                "성명",
-                "생년월일",
-                "강의일자",
-                "시수 (h)",
-                "단가 (원)",
-                "금액 (원)",
-                "은행",
-                "계좌번호",
-                "예금주",
-                "지급일 / 비고",
-              ]}
-              rows={rows.map((r, i) => [
-                pi * 14 + i + 1,
-                `${o.academy} / ${o.name}`,
-                `${o.starts_on} ~ ${o.ends_on}`,
-                r.kind,
-                r.name,
-                r.birthDate,
-                r.dates,
-                r.hours,
-                money(r.rate),
-                money(feeAmount(r)),
-                r.bank,
-                maskAccount(r.account, reveal),
-                r.holder,
-                `${r.paidOn || "미지급"} ${r.note}`,
-              ])}
-            />
+        chunk(p.fees, 6).map((rows, pi) => (
+          <AttachmentSheet title={title("fees")} offering={o} number={5} wide
+            stats={[["지급 건수", `${p.fees.length}건`], ["강사료 합계", `${money(sumFees)}원`]]}
+            className="report-fee-list" key={`f-${pi}`}>
+            <table className="report-table report-fee-table">
+              <thead><tr>
+                {["순번", "강사구분", "성명", "생년월일", "강의일자", "시수 (h)", "단가 (원)", "금액 (원)"].map((label) => <th key={label}>{label}</th>)}
+              </tr></thead>
+              {rows.length ? rows.map((r, i) => (
+                <tbody className="report-fee-entry" key={`${pi}-${i}`}>
+                  <tr>
+                    <td>{pi * 6 + i + 1}</td><td>{r.kind || "—"}</td><td>{r.name || "—"}</td>
+                    <td>{r.birthDate || "—"}</td><td>{r.dates || "—"}</td><td>{r.hours}</td>
+                    <td>{money(r.rate)}</td><td>{money(feeAmount(r))}</td>
+                  </tr>
+                  <tr><td colSpan={8} className="report-fee-detail-cell">
+                    <div className="report-fee-details">
+                      <span><b>은행</b> {r.bank || "—"}</span>
+                      <span><b>계좌번호</b> {maskAccount(r.account, reveal) || "—"}</span>
+                      <span><b>예금주</b> {r.holder || "—"}</span>
+                      <span><b>지급일 / 비고</b> {r.paidOn || "미지급"} {r.note}</span>
+                    </div>
+                  </td></tr>
+                </tbody>
+              )) : <tbody><tr><td colSpan={8}>등록된 내역 없음</td></tr></tbody>}
+            </table>
             <p className="report-total">
               전체 {p.fees.reduce((n, r) => n + r.hours, 0).toFixed(2)}h ·
               강사료 합계 {money(sumFees)}원
@@ -502,7 +499,7 @@ export function ReportDocuments({
               단가가 다른 강의는 별도 행으로 표시합니다. 운영 담당자:{" "}
               {p.operator}
             </p>
-          </Sheet>
+          </AttachmentSheet>
         ))}
     </div>
   );

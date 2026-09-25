@@ -285,7 +285,7 @@ body {
   font-size: 8pt;
   margin: 0 0 3mm;
 }
-.report-completion-list h1 {
+.report-attachment-sheet h1 {
   font-size: 18pt;
   margin: 0 0 5mm;
 }
@@ -301,14 +301,43 @@ body {
 .report-completion-list .report-table:not(.report-form-meta) td:nth-child(2) {
   text-align: left;
 }
-.report-teaching-ledger h1 {
-  font-size: 18pt;
-  margin: 0 0 5mm;
-}
 .report-teaching-ledger .report-table th,
 .report-teaching-ledger .report-table td {
   padding: 1.8mm 1mm;
   font-size: 8pt;
+}
+.report-scholarship-list .report-table:not(.report-form-meta) th,
+.report-scholarship-list .report-table:not(.report-form-meta) td {
+  padding: 1.5mm 1mm;
+  font-size: 8pt;
+  line-height: 1.3;
+}
+.report-fee-table {
+  margin: 0 0 3mm;
+}
+.report-fee-table th,
+.report-fee-table td {
+  padding: 1.5mm 1mm;
+  font-size: 8pt;
+  line-height: 1.3;
+}
+.report-fee-table th:first-child {
+  width: 9mm;
+}
+.report-fee-entry {
+  break-inside: avoid;
+}
+.report-fee-detail-cell {
+  text-align: left !important;
+}
+.report-fee-details {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 2.5fr;
+  gap: 2mm;
+  text-align: left;
+}
+.report-fee-details b {
+  margin-right: 1mm;
 }
 .report-teaching-signature {
   width: 28mm;
@@ -326,11 +355,11 @@ body {
 }
 @page reportPortrait {
   size: A4 portrait;
-  margin: 12mm;
+  margin: 20mm;
 }
 @page reportLandscape {
   size: A4 landscape;
-  margin: 10mm;
+  margin: 20mm;
 }
 @page reportFormPortrait {
   size: A4 portrait;
@@ -370,13 +399,13 @@ body {
     min-height: 0;
   }
   .report-portrait {
-    width: 186mm;
+    width: 170mm;
   }
   .report-landscape {
-    width: 277mm;
+    width: 257mm;
   }
   .report-cover {
-    min-height: 200mm;
+    min-height: 170mm;
     padding-top: 15mm;
   }
   .report-form-20.report-portrait {
