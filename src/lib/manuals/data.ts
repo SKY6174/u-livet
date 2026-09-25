@@ -1,6 +1,8 @@
 import catalog from "@/content/manuals/releases.json";
 import firstRelease from "@/content/manuals/1.0.0.json";
 import secondRelease from "@/content/manuals/1.1.0.json";
+import thirdRelease from "@/content/manuals/1.2.0.json";
+import fourthRelease from "@/content/manuals/1.3.0.json";
 
 export type ManualSection = {
   id: string; title: string; path: string; entry: string; prepare: string;
@@ -17,7 +19,7 @@ export type ManualRelease = {
 };
 
 // Keep every published import: an old URL must always render its own complete snapshot.
-export const MANUAL_RELEASES: ManualRelease[] = [firstRelease, secondRelease];
+export const MANUAL_RELEASES: ManualRelease[] = [firstRelease, secondRelease, thirdRelease, fourthRelease];
 export const CURRENT_MANUAL_VERSION = catalog.current;
 if (catalog.versions.length !== MANUAL_RELEASES.length ||
     catalog.versions.some(version => !MANUAL_RELEASES.some(release => release.version === version)) ||

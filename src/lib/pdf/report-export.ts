@@ -59,9 +59,12 @@ export async function downloadReportPdf17(filename: string): Promise<void> {
   await document.fonts.ready;
   let pageCount = 0;
   for (const sheet of sheets) {
-    const landscape = sheet.classList.contains("report-landscape");
-    const width = landscape ? 297 : 210;
-    const height = landscape ? 210 : 297;
+    const largerPaper = (["a0", "a1", "a2", "a3"] as const).find(size => sheet.classList.contains(`report-${size}-landscape`));
+    const landscape = !!largerPaper || sheet.classList.contains("report-landscape");
+    const format = largerPaper ?? "a4";
+    const dimensions = { a4: [297, 210], a3: [420, 297], a2: [594, 420], a1: [841, 594], a0: [1189, 841] } as const;
+    const width = landscape ? dimensions[format][0] : 210;
+    const height = landscape ? dimensions[format][1] : 297;
     const form20 = sheet.classList.contains("report-form-20");
     const margin = form20 || sheet.classList.contains("op-page") ? 20 : landscape ? 10 : 12;
     const host = document.createElement("div");
@@ -95,14 +98,15 @@ export async function downloadReportPdf17(filename: string): Promise<void> {
         range.selectNodeContents(node);
         for (const rect of Array.from(range.getClientRects())) blocks.push({ top: Math.floor(rect.top - bounds.top), bottom: Math.ceil(rect.bottom - bounds.top) });
       }
-      const canvas = await html2canvas(paper, { scale: 2, backgroundColor: "#ffffff", logging: false, useCORS: true });
+      const renderScale = format === "a0" || format === "a1" ? 1 : format === "a2" ? 1.5 : 2;
+      const canvas = await html2canvas(paper, { scale: renderScale, backgroundColor: "#ffffff", logging: false, useCORS: true });
       if (!canvas.width || !canvas.height) throw new Error("문서 이미지를 만들지 못했습니다.");
       const scale = canvas.width / bounds.width;
       // CSS mm-to-pixel rounding can leave a one-pixel white strip on 20mm forms.
       const capacity = Math.floor((height - margin * 2) * canvas.width / (width - margin * 2)) + (form20 ? 3 : 0);
       const slices = getPdfPageSlices(canvas.height, capacity, blocks.map(b => ({ top: Math.floor(b.top * scale), bottom: Math.ceil(b.bottom * scale) })), (top, end) => findCanvasWhitespace(canvas, top, end));
       for (const slice of slices) {
-        pdf.addPage("a4", landscape ? "landscape" : "portrait");
+        pdf.addPage(format, landscape ? "landscape" : "portrait");
         pageCount++;
         const crop = document.createElement("canvas");
         crop.width = canvas.width;

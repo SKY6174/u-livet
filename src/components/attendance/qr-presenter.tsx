@@ -7,7 +7,7 @@ import { Maximize2, QrCode } from "lucide-react";
 import { issueAttendanceQr, stopAttendanceQr, rescheduleQrTestClass } from "@/app/qr-attendance-actions";
 import type { AttendanceBook } from "@/lib/attendance/model";
 import type { ClassSession } from "@/lib/portal/evaluation";
-import { koreanDateTimeInput, type QrChallenge } from "@/lib/attendance/qr";
+import { koreanDateTimeInput, type QrChallenge, type QrPhase } from "@/lib/attendance/qr";
 const koreanTime = (iso: string) => new Date(iso).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
 export function QrPresenter({ offering, sessions, activeSession: initialSession, enrolledCount, canEditTestTime = false }: {
   offering: AttendanceBook["offering"]; sessions: ClassSession[]; activeSession: ClassSession; enrolledCount: number; canEditTestTime?: boolean;
@@ -18,6 +18,7 @@ export function QrPresenter({ offering, sessions, activeSession: initialSession,
   const [challenge, setChallenge] = useState<QrChallenge | null>(null);
   const [image, setImage] = useState(""), [url, setUrl] = useState("");
   const [running, setRunning] = useState(false), [pending, setPending] = useState(false);
+  const [phase, setPhase] = useState<QrPhase>("START");
   const [message, setMessage] = useState(""), [now, setNow] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const [activeSession, setActiveSession] = useState(initialSession);
@@ -43,7 +44,7 @@ export function QrPresenter({ offering, sessions, activeSession: initialSession,
     const request = ++generation.current;
     setPending(true); setMessage("");
     try {
-      const result = await issueAttendanceQr(offering.id, activeSession.id);
+      const result = await issueAttendanceQr(offering.id, activeSession.id, phase);
       if (!mounted.current || request !== generation.current) return;
       if (!result.challenge) throw new Error(result.message ?? "QR을 발급하지 못했습니다.");
       const nextUrl = `${window.location.origin}/learning/${offering.id}/attendance/checkin?${new URLSearchParams({ session: activeSession.id, t: result.challenge.token })}`;
@@ -56,17 +57,19 @@ export function QrPresenter({ offering, sessions, activeSession: initialSession,
         setMessage(error instanceof Error ? error.message : "QR 생성에 실패했습니다. 다시 시도해 주세요.");
       }
     } finally { inFlight.current = false; if (mounted.current) setPending(false); }
-  }, [offering.id, activeSession.id]);
+  }, [offering.id, activeSession.id, phase]);
   useEffect(() => {
     if (!running) return;
     const timer = setInterval(() => { void generate(); }, 60000);
     return () => clearInterval(timer);
   }, [running, generate]);
   const valid = challenge && Date.parse(challenge.expires_at) > now && image;
-  const open = now >= Date.parse(activeSession.starts_at) && now < Date.parse(activeSession.ends_at) && activeSession.status === "SCHEDULED";
+  const open = now >= Date.parse(activeSession.starts_at)
+    && now < Date.parse(activeSession.ends_at) + (phase === "END" ? 15 * 60_000 : 0)
+    && activeSession.status === "SCHEDULED";
   async function stop() {
     generation.current++; setRunning(false); setChallenge(null); setImage(""); setUrl(""); setPending(true);
-    try { const result = await stopAttendanceQr(offering.id, activeSession.id); setMessage(result.ok ? "QR 입실 확인을 중지했습니다." : result.message ?? "중지를 확인하지 못했습니다."); }
+    try { const result = await stopAttendanceQr(offering.id, activeSession.id); setMessage(result.ok ? "QR 확인을 중지했습니다." : result.message ?? "중지를 확인하지 못했습니다."); }
     catch { setMessage("중지 요청에 실패했습니다. 기존 QR은 최대 2분 후 만료됩니다."); }
     finally { setPending(false); }
   }
@@ -131,7 +134,7 @@ export function QrPresenter({ offering, sessions, activeSession: initialSession,
     <div className="grid items-center gap-8 py-8 md:grid-cols-2">
       <div className="min-w-0 text-center">
         <div className="mx-auto flex aspect-square w-full max-w-sm items-center justify-center rounded-2xl border-4 border-teal-800 bg-white p-3">
-          {valid && open ? <Image src={image} alt="수강생 입실 확인 QR" width={400} height={400} unoptimized className="h-auto w-full" />
+          {valid && open ? <Image src={image} alt={`수강생 ${phase === "END" ? "종료" : "시작"} 확인 QR`} width={400} height={400} unoptimized className="h-auto w-full" />
             : <p className="p-6 text-slate-600">{savingTime ? "수업 시간을 저장하고 있습니다…" : pending ? "QR을 발급하고 있습니다…" : running ? "QR이 만료되었습니다. 새로 발급해 주세요." : "수업 시작 후 QR 입실 확인을 시작해 주세요."}</p>}
         </div>
         {valid && open && <p className="mt-3 text-sm text-teal-800">유효시간 {Math.max(0, Math.ceil((Date.parse(challenge!.expires_at) - now) / 1000))}초 · 60초마다 갱신</p>}
@@ -143,16 +146,21 @@ export function QrPresenter({ offering, sessions, activeSession: initialSession,
         <p className="my-3 text-sm text-slate-600">{koreanTime(activeSession.starts_at)} ~ {koreanTime(activeSession.ends_at)} (한국시간)</p>
         <ol className="my-6 list-inside list-decimal space-y-3 text-sm text-slate-600">
           <li>수강생이 휴대전화 카메라로 QR을 스캔합니다.</li>
-          <li>수강 확정 계정으로 로그인하고 ‘내 입실 확인하기’를 누릅니다.</li>
-          <li>강사는 출석부의 입실 시각을 확인하고 수업 종료 후 실제 출석시간을 확정합니다.</li>
+          <li>수강 확정 계정으로 로그인하고 시작 또는 종료 확인 버튼을 누릅니다.</li>
+          <li>강사는 출석부의 두 QR 시각을 확인하고 실제 출석시간을 별도로 확정합니다.</li>
         </ol>
-        <p className="notice mb-5">입실 확인만으로 전체 수업시간이나 수료가 자동 인정되지는 않습니다. 카메라를 사용할 수 없는 수강생은 강사에게 확인을 요청하세요.</p>
+        <p className="notice mb-5">QR 확인만으로 전체 수업시간이나 수료가 자동 인정되지는 않습니다. 종료 QR은 시작 확인 이후에만 기록됩니다.</p>
+        <label className="field mb-4">QR 확인 단계
+          <select value={phase} disabled={pending || running || savingTime} onChange={(event) => setPhase(event.target.value as QrPhase)}>
+            <option value="START">시작</option><option value="END">종료</option>
+          </select>
+        </label>
         <div className="flex flex-wrap gap-3">
-          <button type="button" className="btn-primary" disabled={pending || savingTime || !open} onClick={generate}><QrCode className="mr-2 inline h-4 w-4" />{running ? "QR 새로 발급" : "QR 입실 확인 시작"}</button>
+          <button type="button" className="btn-primary" disabled={pending || savingTime || !open} onClick={generate}><QrCode className="mr-2 inline h-4 w-4" />{running ? "QR 새로 발급" : `${phase === "END" ? "종료" : "시작"} QR 발급`}</button>
           <button type="button" className="btn-secondary" disabled={pending || savingTime} onClick={stop}>QR 중지</button>
           <button type="button" className="btn-secondary" disabled={!valid || !open || pending || savingTime} onClick={copy}>링크 복사</button>
         </div>
-        {!open && now > 0 && <p className="mt-4 text-sm text-slate-600">현재 진행 중인 정상 수업에서만 시작할 수 있습니다.</p>}
+        {!open && now > 0 && <p className="mt-4 text-sm text-slate-600">시작 QR은 수업 시간 중, 종료 QR은 종료 후 15분까지 발급할 수 있습니다.</p>}
         {message && <p role="status" className="mt-4 text-sm text-teal-900">{message}</p>}
       </div>
     </div>

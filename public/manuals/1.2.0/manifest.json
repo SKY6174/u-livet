@@ -1,0 +1,58 @@
+{
+  "version": "1.2.0",
+  "releasedOn": "2026-09-23",
+  "sourceSha256": "d69f23be8f6085f365c3a8d2ea93599d48f5099873fcb8c8f5eeb8145b37a1c1",
+  "files": {
+    "administrator.md": "dcdb09a10a14e98cb49a44be515947747e7698c1aafa4eb5ca8995147464057b",
+    "administrator.pdf": "c82b76aa0138b38679c56fbd6b0571af17f9d968f672b64c5da96406ddda5401",
+    "all.pdf": "e0aa6b3019d8a295c4125760ef01446be12c528d67af392b166827fb3241daf3",
+    "certification.md": "9a978516890aedc182d6cc6153e2cb4576f8029b71a8aab86f1abdf2264ddb33",
+    "certification.pdf": "060c5a9fd2689776bd778c742b22a0af43435e2e0110014fa8146f5681f08206",
+    "course-operator.md": "3f66590733164b9e5c6046aee5be948183923fab08e49cb79ed05d664a5a60b0",
+    "course-operator.pdf": "b43b7a66367e5997248385c8be9e806d7f5e3f7f1fb9f78a8b6eb2f18fd64697",
+    "external-instructor.md": "53fe4a076810367e376a345e7406b2db7f486d75dc7bd98dec8eea7b195fb0f7",
+    "external-instructor.pdf": "ba23b2414b11790ceecc3fe58429f68aa4d5f52e649f8f9a533ef4cbf15d6870",
+    "finance.md": "4b634b2f3e65776c22b2db3553278e307b550cd360cfd1c883becb61d96b3d6f",
+    "finance.pdf": "d926237cde16ca7a2192d178d542375498893a359a389c9e6f0464fcdc90ddcb",
+    "internal-instructor.md": "24582ef23b4b0cf1b97c1db0c4ad23459e33882ba4c2c33dca4625f88af95fa0",
+    "internal-instructor.pdf": "64712543ef0218dd3385674ec62e39ec9e90e0f020c0b4b48fc8ef58d2bf705d",
+    "learner.md": "596fa66157c7cf78732d9dc3d956bd7016995f9d31689e1b76fdf9d8da9d914d",
+    "learner.pdf": "928c24ddf5d02e7ddce82705cec3f6d9bafb2b7513788c90e201e55481df7cf6",
+    "performance.md": "2d7e71fc3792ed430e23b2818f2f9c7c0e79c2a8f5b2719c874c2f690d86a4ea",
+    "performance.pdf": "91543f87d63573f70d79a34d7217aedc920c0e64c88175949d2553e5888cb7c3"
+  },
+  "pages": [
+    {
+      "id": "learner",
+      "pages": 5
+    },
+    {
+      "id": "internal-instructor",
+      "pages": 5
+    },
+    {
+      "id": "external-instructor",
+      "pages": 5
+    },
+    {
+      "id": "course-operator",
+      "pages": 6
+    },
+    {
+      "id": "certification",
+      "pages": 5
+    },
+    {
+      "id": "finance",
+      "pages": 5
+    },
+    {
+      "id": "performance",
+      "pages": 5
+    },
+    {
+      "id": "administrator",
+      "pages": 6
+    }
+  ]
+}
