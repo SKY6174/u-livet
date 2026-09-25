@@ -62,7 +62,7 @@ export async function DocumentList({
   const result = kind === "result";
   const evidence = result && view === "evidence";
 
-  // 6종 증빙자료 뷰는 관리자만 접근 가능
+  // 결과 보고와 첨부 5종 증빙자료 뷰는 관리자만 접근 가능
   if (evidence && !manager) notFound();
 
   // 2. 데이터베이스 과정 및 기존 증빙 데이터 조회
@@ -198,7 +198,7 @@ export async function DocumentList({
           : "책임강사가 운영 내용을 작성하고, 담당자가 예산을 완성해 최종 제출합니다."}
       </PageIntro>
 
-      {/* 2. 결과보고서 서브 네비게이션 (공식 운영결과보고서 vs 결과 보고·6종 증빙) */}
+      {/* 2. 결과보고서 서브 네비게이션 (공식 운영결과보고서 vs 결과 보고·첨부 5종) */}
       {result && manager && (
         <nav
           className="flex flex-wrap gap-2 border-b border-slate-200 pb-3"
@@ -224,7 +224,7 @@ export async function DocumentList({
             href="/operation-documents/result?view=evidence"
             aria-current={evidence ? "page" : undefined}
           >
-            결과 보고 · 6종 증빙
+            결과 보고(5종 증빙 포함)
           </Link>
         </nav>
       )}
@@ -248,18 +248,18 @@ export async function DocumentList({
         </section>
       )}
 
-      {/* 4. 결과 보고 · 6종 증빙 관리자 전용 영역 */}
+      {/* 4. 결과 보고·첨부 5종 증빙 관리자 전용 영역 */}
       {evidence && (
-        <section aria-label="결과 보고 및 6종 증빙">
+        <section aria-label="결과 보고 및 5종 증빙">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-bold">결과 보고 · 6종 증빙</h2>
+              <h2 className="text-xl font-bold">결과 보고(5종 증빙 포함)</h2>
               <p className="mt-1 text-sm text-slate-600">
                 기존 결과 보고의 운영 집계·지급자료·원본 PDF를 검토하고 출력합니다.
               </p>
             </div>
             <Link className="btn-secondary" href="/admin/reports/preview">
-              6종 보고서 양식 검토
+              결과보고서·첨부 5종 양식 검토
             </Link>
           </div>
           {legacy?.unavailable ? (

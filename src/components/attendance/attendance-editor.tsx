@@ -63,7 +63,11 @@ export function AttendanceEditor({ book }: { book: AttendanceBook }) {
         return <fieldset key={member.person_id} disabled={locked || self} className="rounded-xl border border-slate-200 p-4">
           <legend className="px-2 font-semibold"><label className="inline-flex items-center gap-2"><input type="checkbox" disabled={locked || self} checked={!!row} onChange={e => change(member.person_id, e.target.checked ? { minutes: prior ? String(prior.credited_minutes) : "", reason: "", expected_revision: prior?.revision ?? 0 } : null)} />{member.name}</label></legend>
           <p className="mb-3 text-sm text-slate-500">{self ? "본인 출석 기록 불가" : prior ? `현재 ${formatMinutes(prior.credited_minutes)}분 · ${prior.reason}` : "아직 기록되지 않았습니다."}</p>
-          {checkin && <p className="mb-3 text-sm font-semibold text-teal-800">QR 입실 확인: {new Date(checkin.checked_in_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })} · 실제 인정시간을 확인해 주세요.</p>}
+          {checkin && <p className="mb-3 text-xs font-semibold text-teal-800">
+            QR 시작 {new Date(checkin.checked_in_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
+            {checkin.checked_out_at && <> · 종료 {new Date(checkin.checked_out_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</>}
+            <span className="block font-normal">QR 시각을 참고해 실제 인정시간을 확인해 주세요.</span>
+          </p>}
           {row && row.expected_revision !== (prior?.revision ?? 0) && <div className="notice mb-3">
             <p>다른 작업에서 기록이 변경되었습니다. 위의 현재 기록을 확인해 주세요.</p>
             <button type="button" className="mt-2 text-sm font-bold underline" onClick={() => change(member.person_id, { ...row, expected_revision: prior?.revision ?? 0 })}>현재 기록을 확인했으며 입력 내용으로 정정</button>

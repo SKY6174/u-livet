@@ -288,6 +288,8 @@ await test('plan and result menus separate documents and keep legacy reports man
   assert.equal(reportReads, 0);
   output = renderToStaticMarkup(await DocumentList({ kind: 'result', view: 'evidence' }));
   assert(output.includes('기존 결과 보고 목록'));
+  assert(output.includes('결과 보고(5종 증빙 포함)'));
+  assert(!output.includes('6종 증빙'));
   assert(!output.includes('/operation-documents/course-1/result'));
   assert.equal(reportReads, 1);
   for (const role of ['SYSTEM_ADMIN', 'INSTRUCTOR']) {
