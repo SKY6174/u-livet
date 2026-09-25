@@ -4,8 +4,12 @@
 .meta th { width: 20mm; }
 .caption { font-size: 8pt; margin: 0 0 3mm; }
 .ledger { margin: 0; }
-.ledger th, .ledger td { padding: 1.5mm 1mm; font-size: 7pt; line-height: 1.25; white-space: normal; word-break: keep-all; }
+.ledger th, .ledger td { padding: 2mm 1mm; font-size: 8pt; line-height: 1.3; white-space: normal; word-break: keep-all; }
 .ledger th { text-align: center; }
+.ledger td { text-align: center; }
+.ledger tbody th { white-space: nowrap; }
+.session { font-weight: 700; }
+.stamp { display: inline-block; font-size: 7.5pt; line-height: 1.3; white-space: nowrap; color: #334155; }
 .number { width: 8mm; }
 .name { width: 18mm; }
 .total { width: 22mm; }

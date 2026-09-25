@@ -6,6 +6,7 @@ import { buildTeachingLedger } from "@/lib/reports/teaching-ledger";
 import type { Offering } from "@/lib/portal/types";
 import {
   attendanceSummary,
+  attachmentNumber,
   attachmentTitle,
   emptyReport,
   feeAmount,
@@ -69,17 +70,20 @@ function Sheet({
   title,
   offering,
   wide = false,
+  attachment,
   children,
 }: {
   title: string;
   offering: Offering;
   wide?: boolean;
+  attachment?: number;
   children: ReactNode;
 }) {
   return (
     <section
       className={`report-sheet ${wide ? "report-landscape" : "report-portrait"}`}
     >
+      {attachment && <div className="report-attachment-marker">[첨부 #{attachment}]</div>}
       <div className="report-brand">
         울산과학대학교 · 지역성장 인재양성체계(앵커)사업단
       </div>
@@ -345,11 +349,11 @@ export function ReportDocuments({
         </>
       )}
       {show("attendance") && (attendanceBook
-        ? <AttendancePrint official book={attendanceBook} title={title("attendance")} />
-        : <section className="report-sheet report-form-20"><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p></section>)}
+        ? <AttendancePrint official book={attendanceBook} title={title("attendance")} attachmentNumber={attachmentNumber("attendance")} />
+        : <section className="report-sheet report-form-20"><div className="report-attachment-marker">[첨부 #1]</div><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p></section>)}
       {show("completion") &&
         chunk(members, 18).map((people, pi) => (
-          <Sheet title={title("completion")} offering={o} wide key={`c-${pi}`}>
+          <Sheet title={title("completion")} offering={o} attachment={attachmentNumber("completion")} wide key={`c-${pi}`}>
             <p>담당 교수: {p.professor || "미입력"}</p>
             <Table
               head={[
@@ -392,6 +396,7 @@ export function ReportDocuments({
           <Sheet
             title={title("scholarships")}
             offering={o}
+            attachment={attachmentNumber("scholarships")}
             wide
             key={`s-${pi}`}
           >
@@ -434,6 +439,7 @@ export function ReportDocuments({
         ))}
       {show("teaching") && chunk(teachingRows,12).map((rows, pi) => (
         <section className="report-sheet report-portrait report-form-20 report-teaching-ledger" key={`t-${pi}`}>
+          <div className="report-attachment-marker">[첨부 #4]</div>
           <h1>{title("teaching")}</h1>
           <Table head={["과정명","강의기간","승인된 실강의시간"]} rows={[[
             o.name,`${o.starts_on} ~ ${o.ends_on}`,
@@ -450,7 +456,7 @@ export function ReportDocuments({
       ))}
       {show("fees") &&
         chunk(p.fees, 14).map((rows, pi) => (
-          <Sheet title={title("fees")} offering={o} wide key={`f-${pi}`}>
+          <Sheet title={title("fees")} offering={o} attachment={attachmentNumber("fees")} wide key={`f-${pi}`}>
             <Table
               head={[
                 "순번",

@@ -22,9 +22,11 @@ export const ATTACHMENT_KINDS = [
   "fees",
 ] as const satisfies readonly DocumentKind[];
 export function attachmentTitle(kind: DocumentKind) {
-  const label = DOCUMENTS.find(([key]) => key === kind)?.[1] ?? kind;
+  return DOCUMENTS.find(([key]) => key === kind)?.[1] ?? kind;
+}
+export function attachmentNumber(kind: DocumentKind) {
   const index = ATTACHMENT_KINDS.indexOf(kind as (typeof ATTACHMENT_KINDS)[number]);
-  return index < 0 ? label : `첨부 ${index + 1}. ${label}`;
+  return index < 0 ? undefined : index + 1;
 }
 export type BudgetRow = {
   category: string;

@@ -1,5 +1,6 @@
 export type QrChallenge = { token: string; expires_at: string };
-export type QrCheckin = { session_id: string; person_id: string; checked_in_at: string };
+export type QrCheckin = { session_id: string; person_id: string; checked_in_at: string; checked_out_at?: string | null };
+export type QrPhase = "START" | "END";
 export const QR_TOKEN = /^[0-9a-f]{64}$/;
 export type QrSessionTime = { id: string; starts_at: string; ends_at: string };
 export function koreanDateTimeInput(iso: string) {
@@ -20,6 +21,7 @@ export function qrError(message: string, code?: string) {
     CLASS_NOT_OPEN: "진행 중인 정상 수업에서만 QR 입실을 확인할 수 있습니다.",
     INVALID_QR: "올바른 QR 코드가 아닙니다. 강의실의 QR을 다시 스캔해 주세요.",
     QR_EXPIRED: "QR 코드가 만료되었거나 중지되었습니다. 강의실의 새 QR을 스캔해 주세요.",
+    CHECKIN_REQUIRED: "종료 QR을 확인하려면 먼저 시작 QR로 입실을 확인해 주세요.",
     MFA_REAUTH_REQUIRED: "계정 보안 화면에서 추가 인증한 뒤 다시 시도해 주세요.",
     TEST_CLASS_FORBIDDEN: "등록된 테스트 강좌의 담당 강사만 시간을 수정할 수 있습니다.",
     INVALID_SESSION_TIME: "종료는 시작 이후여야 하며 수업 시간은 최대 24시간입니다.",

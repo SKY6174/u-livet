@@ -3,12 +3,12 @@ import { revalidatePath } from "next/cache";
 import { getSessionIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
-import { QR_TOKEN, qrError, parseKoreanDateTime, type QrChallenge, type QrSessionTime } from "@/lib/attendance/qr";
-export async function issueAttendanceQr(offering: string, session: string): Promise<{ challenge?: QrChallenge; message?: string }> {
+import { QR_TOKEN, qrError, parseKoreanDateTime, type QrChallenge, type QrSessionTime, type QrPhase } from "@/lib/attendance/qr";
+export async function issueAttendanceQr(offering: string, session: string, phase: QrPhase): Promise<{ challenge?: QrChallenge; message?: string }> {
   if (!UUID.test(offering) || !UUID.test(session)) return { message: "올바른 수업을 선택해 주세요." };
   try {
     if (!(await getSessionIdentity())) return { message: "로그인이 필요합니다." };
-    const { data, error } = await (await createServerSupabaseClient()).rpc("life_issue_attendance_qr", { f: offering, s: session });
+    const { data, error } = await (await createServerSupabaseClient()).rpc(phase === "END" ? "life_issue_attendance_qr_end" : "life_issue_attendance_qr", { f: offering, s: session });
     if (error) return { message: qrError(error.message, error.code) };
     if (!data || !QR_TOKEN.test(data.token) || !Number.isFinite(Date.parse(data.expires_at))) return { message: "QR 발급 응답을 확인하지 못했습니다." };
     return { challenge: data };

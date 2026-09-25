@@ -29,11 +29,13 @@ async function test(name, run) { await run(); checks++; console.log('PASS ' + na
 await test('jsPDF writes real 1.7 pages with portrait and landscape dimensions', async () => {
   const pdf = await createPdf17({format:'a4',unit:'mm'});
   pdf.text('Synthetic PDF 1.7 test',20,20); pdf.addPage('a4','landscape'); pdf.text('Second page',20,20);
+  pdf.addPage('a3','landscape'); pdf.text('Whole-session attendance page',20,20);
   const bytes = requirePdf17(pdf.output('arraybuffer'));
   const parsed = await PDFDocument.load(bytes);
-  assert.equal(parsed.getPageCount(),2);
+  assert.equal(parsed.getPageCount(),3);
   assert(Math.abs(parsed.getPage(0).getWidth()-595.28)<0.1);
   assert(Math.abs(parsed.getPage(1).getWidth()-841.89)<0.1);
+  assert(Math.abs(parsed.getPage(2).getWidth()-1190.55)<0.1);
   assert((await toPdf17DataUri(bytes)).startsWith('data:application/pdf;base64,JVBERi0xLjc'));
   writeFileSync(`${output}/generated.pdf`,bytes);
 });
