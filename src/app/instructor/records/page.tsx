@@ -55,6 +55,10 @@ export default async function Records() {
         완료된 수업의 실제 강의 구간과 내용을 제출하고 본인 서명을 등록하세요.
         과정담당이 확인한 실적과 서명이 강의날인부에 반영됩니다.
       </PageIntro>
+      <p className="notice mb-6">
+        강사 강의날인부는 매회차 강의를 마친 당일 강의시간과 서명을 입력하는 것을 원칙으로 합니다.
+        지난 회차를 입력하거나 정정할 때는 아래 강의 내용·정정 근거에 사유를 남겨 주세요.
+      </p>
       <Link className="btn-secondary mb-6" href="/mypage/certificates">
         강의경력증명 신청 →
       </Link>

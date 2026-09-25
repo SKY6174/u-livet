@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { AttendancePrint } from "@/components/attendance/attendance-print";
 import type { AttendanceBook } from "@/lib/attendance/model";
-import { buildTeachingLedger } from "@/lib/reports/teaching-ledger";
+import { buildTeachingLedger, formatTeachingMinutes } from "@/lib/reports/teaching-ledger";
 import type { Offering } from "@/lib/portal/types";
 import {
   attendanceSummary,
@@ -38,9 +38,16 @@ const clock = (value: string) =>
     minute: "2-digit",
     hour12: false,
   }).format(new Date(value));
-function Table({ head, rows }: { head: ReactNode[]; rows: ReactNode[][] }) {
+function Table({ head, rows, columnWidths }: {
+  head: ReactNode[];
+  rows: ReactNode[][];
+  columnWidths?: string[];
+}) {
   return (
     <table className="report-table">
+      {columnWidths && <colgroup>{columnWidths.map((width, index) => (
+        <col key={index} style={{ width }} />
+      ))}</colgroup>}
       <thead>
         <tr>
           {head.map((h, i) => (
@@ -455,14 +462,29 @@ export function ReportDocuments({
           </AttachmentSheet>
         ))}
       {show("teaching") && chunk(teachingRows,12).map((rows, pi) => (
-        <AttachmentSheet title={title("teaching")} offering={o} number={4}
-          stats={[[<>승인된<br />실강의시간</>, `${hours(approvedTeachingMinutes)}시간`], ["표시 강의 구간", `${teachingRows.length}건`]]}
-          className="report-teaching-ledger" key={`t-${pi}`}>
-          <Table head={["차수","날짜","시간","실강의시간","성명","서명"]} rows={rows.map((row) => [
-            row.session,day(`${row.date}T00:00:00+09:00`),`${row.period} ${row.time}`,
-            row.minutes === null ? "—" : `${hours(row.minutes)}시간`,row.name,
-            row.signature ? <Image key={row.key} src={row.signature} width={110} height={42} unoptimized alt={`${row.name} 본인 서명`} className="report-teaching-signature" /> : row.note || "—",
-          ])} />
+        <section className="report-sheet report-portrait report-form-20 report-teaching-ledger" key={`t-${pi}`}>
+          <h1>{title("teaching")}</h1>
+          <Table head={["과정명","강의기간","승인된 실강의시간"]} rows={[[
+            o.name,`${o.starts_on} ~ ${o.ends_on}`,
+            formatTeachingMinutes(approvedTeachingMinutes),
+          ]]} />
+          <Table
+            head={["차수","일자","시간","실강의시간","성명","서명"]}
+            columnWidths={["8.33%","16.67%","16.67%","16.67%","20.83%","20.83%"]}
+            rows={rows.map((row) => [
+              row.session,
+              <span key={row.key} style={{ whiteSpace: "nowrap" }}>{row.date.replaceAll("-", ".")}</span>,
+              <span key={row.key} style={{ whiteSpace: "nowrap" }}>
+                {row.time}
+                <small style={{ display: "block" }}>{row.period}</small>
+              </span>,
+              row.minutes === null ? "—" : formatTeachingMinutes(row.minutes),
+              row.name,
+              row.signature
+                ? <Image key={row.key} src={row.signature} width={126} height={42} unoptimized alt={`${row.name} 본인 서명`} className="report-teaching-signature" style={{ width: "32mm", maxWidth: "100%" }} />
+                : row.note || "—",
+            ])}
+          />
           <p className="report-note">승인된 실강의시간만 합산하고 유효한 본인 서명만 날인합니다. 미등록·승인 대기는 표시하되 자동 날인하지 않습니다.</p>
         </AttachmentSheet>
       ))}
