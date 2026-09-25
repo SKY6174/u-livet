@@ -43,7 +43,7 @@ export function AttendancePrint({ book, title = "출석부", attachmentNumber }:
       <h1>{title}</h1>
       <table className="report-table report-form-meta"><tbody>
         <tr><th>과정명</th><td>{book.offering.name}</td><th>교육기간</th><td>{book.offering.starts_on} ~ {book.offering.ends_on}</td></tr>
-        <tr><th>교육시간/회</th><td>{perSession}</td><th>전체 교육시간</th><td>{formatMinutes(totalMinutes)}분</td></tr>
+        <tr><th>교육시간/회</th><td>{perSession}</td><th>전체<br />교육시간</th><td>{formatMinutes(totalMinutes)}분</td></tr>
       </tbody></table>
       <p className={styles.caption}>전체 {sessions.length}회차 · 수강생 {book.members.length}명 · {page + 1}/{pages.length}쪽</p>
       <table className={`report-table ${styles.ledger}`}>

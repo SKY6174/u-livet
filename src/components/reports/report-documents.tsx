@@ -102,7 +102,7 @@ function AttachmentSheet({ title, offering, number, stats, className = "", child
   title: string;
   offering: Offering;
   number: number;
-  stats: [[string, ReactNode], [string, ReactNode]];
+  stats: [[ReactNode, ReactNode], [ReactNode, ReactNode]];
   className?: string;
   children: ReactNode;
 }) {
@@ -385,7 +385,7 @@ export function ReportDocuments({
       {show("completion") &&
         chunk(members, 8).map((people, pi, pages) => (
           <AttachmentSheet title={title("completion")} offering={o} number={2}
-            stats={[["전체 교육시간", `${source?.educationHours ?? hours(totalMinutes)}시간`], ["수료인원", `${completedCount}명`]]}
+            stats={[[<>전체<br />교육시간</>, `${source?.educationHours ?? hours(totalMinutes)}시간`], ["수료인원", `${completedCount}명`]]}
             className="report-completion-list" key={`c-${pi}`}>
             <p className="report-form-caption">담당 교수: {p.professor || "미입력"} · 수강생 {members.length}명 · {pi + 1}/{pages.length}쪽</p>
             <Table
@@ -456,7 +456,7 @@ export function ReportDocuments({
         ))}
       {show("teaching") && chunk(teachingRows,12).map((rows, pi) => (
         <AttachmentSheet title={title("teaching")} offering={o} number={4}
-          stats={[["승인된 실강의시간", `${hours(approvedTeachingMinutes)}시간`], ["표시 강의 구간", `${teachingRows.length}건`]]}
+          stats={[[<>승인된<br />실강의시간</>, `${hours(approvedTeachingMinutes)}시간`], ["표시 강의 구간", `${teachingRows.length}건`]]}
           className="report-teaching-ledger" key={`t-${pi}`}>
           <Table head={["차수","날짜","시간","실강의시간","성명","서명"]} rows={rows.map((row) => [
             row.session,day(`${row.date}T00:00:00+09:00`),`${row.period} ${row.time}`,
