@@ -128,13 +128,13 @@ body {
 .report-a0-landscape { width: 1189mm; min-height: 841mm; font-size: 8.5pt; }
 .report-attachment-marker {
   color: #111827;
-  font-size: calc(21pt - 3px);
+  font-size: calc(21pt - 5px);
   font-weight: 700;
   line-height: 1.2;
   text-align: left;
 }
 .report-form-20 .report-attachment-marker {
-  font-size: calc(18pt - 3px);
+  font-size: calc(18pt - 5px);
 }
 .report-brand {
   color: #155e75;
