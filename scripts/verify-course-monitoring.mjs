@@ -33,7 +33,12 @@ const archived = {
   missing_attendance: 0, teaching_pending: 0, completion_pending: 0, completed: 0,
   source_enrolled: 12,
 };
-const Dashboard = load('src/components/admin/course-monitoring-dashboard.tsx', { 'next/link': 'a' }).CourseMonitoringDashboard;
+const PlanDashboard = ({ summaryCards }) => React.createElement('section', null,
+  '신호등', summaryCards, React.createElement('span', null, '연간 일정'));
+const Dashboard = load('src/components/admin/course-monitoring-dashboard.tsx', {
+  'next/link': 'a',
+  './course-monitoring-plan-dashboard': { CourseMonitoringPlanDashboard: PlanDashboard },
+}).CourseMonitoringDashboard;
 
 await test('manager dashboard distinguishes applications, enrollment, attendance entry and source reports', () => {
   const html = renderToStaticMarkup(React.createElement(Dashboard, {
@@ -54,10 +59,30 @@ await test('manager dashboard distinguishes applications, enrollment, attendance
   assert(html.includes('종료 수업 출결 집계 대상 없음'));
 });
 
+await test('course metadata uses two lines without the academy suffix', () => {
+  const html = renderToStaticMarkup(React.createElement(Dashboard, {
+    courses: [{ ...active, year_label: '2차년도 · 2026', academy: '라이프케어 아카데미' }],
+    organizations: [{ id: 'own-org', name: '울산과학대학교 앵커사업단' }],
+  }));
+  assert.match(html, /울산과학대학교 앵커사업단<\/p><p[^>]*>2026\(2차년도\)∙라이프케어<\/p>/);
+  assert(!html.includes('라이프케어 아카데미'));
+});
+
 await test('empty monitoring data is clearly distinguished from zero applications', () => {
   const html = renderToStaticMarkup(React.createElement(Dashboard, { courses: [], organizations: [] }));
   assert(html.includes('등록된 과정이 없습니다'));
   assert(!html.includes('직업교육 A'));
+});
+
+await test('summary cards appear once directly after traffic lights', () => {
+  const html = renderToStaticMarkup(React.createElement(Dashboard, {
+    courses: [active], organizations: [{ id: 'own-org', name: '앵커사업단' }],
+    annual: { guides: [], plans: [], documents: [], today: '2026-09-25' },
+  }));
+  assert(html.indexOf('신호등') < html.indexOf('과정 운영 현황 요약'));
+  assert(html.indexOf('과정 운영 현황 요약') < html.indexOf('연간 일정'));
+  assert.equal((html.match(/과정 운영 현황 요약/g) ?? []).length, 1);
+  assert(html.includes('표시 과정</p><p') && html.includes('>1<span'));
 });
 
 let identity = { roles: [{ role: 'COURSE_MANAGER', org_id: 'own-org' }] };
@@ -67,7 +92,7 @@ const Page = load('src/app/admin/monitoring/page.tsx', {
   'next/navigation': { notFound: () => { throw new Error('NOT_FOUND'); } },
   '@/components/admin/admin-live-refresh': { AdminLiveRefresh: () => React.createElement('button', null, '지금 갱신') },
   '@/components/admin/course-monitoring-dashboard': { CourseMonitoringDashboard: Dashboard },
-  '@/components/admin/course-monitoring-plan-dashboard': { CourseMonitoringPlanDashboard: () => React.createElement('section', null, '연간 일정') },
+  '@/components/admin/course-monitoring-plan-dashboard': { CourseMonitoringPlanDashboard: PlanDashboard },
   '@/components/portal/ui': {
     PageIntro: ({ title, children }) => React.createElement('header', null, React.createElement('h1', null, title), children),
     Empty: ({ title, children }) => React.createElement('section', null, title, children),

@@ -133,6 +133,14 @@ export function normalizeDocumentContent(
 ): Content {
   return {
     ...content,
+    fields:
+      kind === "plan"
+        ? {
+            ...content.fields,
+            completionAttendancePercent:
+              content.fields.completionAttendancePercent || "80",
+          }
+        : content.fields,
     tables: {
       ...content.tables,
       schedule: (content.tables.schedule ?? []).map((row) =>
@@ -160,7 +168,12 @@ function sessionDateTime(value: string) {
 }
 export function emptyContent(kind: DocumentKind): Content {
   return {
-    fields: Object.fromEntries(fields(kind).map((f) => [f.key, ""])),
+    fields: Object.fromEntries(
+      fields(kind).map((f) => [
+        f.key,
+        f.key === "completionAttendancePercent" ? "80" : "",
+      ]),
+    ),
     tables: Object.fromEntries(tables(kind).map((t) => [t.key, []])),
     photos:
       kind === "result"
@@ -391,6 +404,8 @@ export function validField(value: unknown, f: Field) {
   if (f.type === "number")
     return (
       /^\d{1,9}(\.\d{1,2})?$/.test(value) &&
+      (f.key !== "completionAttendancePercent" ||
+        (Number(value) >= 80 && Number(value) <= 100)) &&
       (!(f.key === "ratio" || f.key === "satisfaction") || Number(value) <= 100)
     );
   if (f.type === "date")

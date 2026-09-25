@@ -99,6 +99,7 @@ export const PLAN_SECTIONS: Section[] = [
     label: "2. 모집 대상 계획",
     fields: [
       f("capacity", "가. 모집인원", "number", true),
+      f("completionAttendancePercent", "수료 인정 최소 출석률 (%)", "number", true),
       f(
         "purposes",
         "다. 주요목적 (자격증 / 취창업 / 취미·여가 / 자기계발 / 진로진학 / 기타)",
