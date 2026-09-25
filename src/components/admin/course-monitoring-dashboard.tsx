@@ -120,7 +120,6 @@ export function CourseMonitoringDashboard({ courses, organizations, annual }: {
       </label>
     </div>
 
-    <p className="text-sm text-slate-600" role="status">조건에 맞는 과정 {visible.length}개 · 상태별로 주의 항목이 많은 과정부터 표시됩니다.</p>
     {!visible.length ? <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
       <h2 className="font-bold">{courses.length ? "조건에 맞는 과정이 없습니다" : "등록된 과정이 없습니다"}</h2>
       <p className="mt-2 text-sm text-slate-600">{courses.length ? "필터를 변경해 주세요." : "과정을 등록하면 신청·출결 현황이 여기에 표시됩니다."}</p>
