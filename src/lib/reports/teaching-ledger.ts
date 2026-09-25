@@ -15,10 +15,15 @@ export type LedgerRow = {
 const kstDate = (value: number) => new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
 }).format(value);
-const kstTime = (value: number) => new Intl.DateTimeFormat("ko-KR", {
-  timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false,
+const kstTime = (value: number) => new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
 }).format(value);
 const instant = (date: string, time: string) => Date.parse(`${date}T${time}:00+09:00`);
+
+export function formatTeachingMinutes(value: number): string {
+  const minutes = Math.max(0, Math.round(Number.isFinite(value) ? value : 0));
+  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}시간 ${String(minutes % 60).padStart(2, "0")}분`;
+}
 
 function splitAtNoon(start: number, end: number) {
   const parts: { start: number; end: number; period: string }[] = [];
@@ -48,12 +53,12 @@ export function buildTeachingLedger(sessions: ClassSession[], teaching: Teaching
       if (latestEnd && gap >= 30*60000 && kstDate(latestEnd) === date) {
         const lunch = latestEnd < instant(date,"14:00") && part.start > instant(date,"11:00");
         rows.push({ key: `${session.id}-gap-${part.start}`, session: sessionIndex+1, date,
-          period: lunch ? "점심시간" : "휴식", time: `${kstTime(latestEnd)}~${kstTime(part.start)}`,
+          period: lunch ? "점심시간" : "휴식", time: `${kstTime(latestEnd)} ~ ${kstTime(part.start)}`,
           minutes: null, name: "—", signature: null, note: "강의시간 제외" });
       }
       const signed = part.log.current && part.log.signature && part.log.signed_revision === part.log.revision;
       rows.push({ key: part.key, session: sessionIndex+1, date,
-        period: part.period, time: `${kstTime(part.start)}~${kstTime(part.end)}`,
+        period: part.period, time: `${kstTime(part.start)} ~ ${kstTime(part.end)}`,
         minutes: (part.end-part.start)/60000, name: part.log.name,
         signature: signed ? part.log.signature! : null,
         note: !part.log.current ? "승인 대기" : signed ? "" : "서명 대기" });

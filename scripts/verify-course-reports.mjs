@@ -48,8 +48,9 @@ const ORG = "10000000-0000-4000-8000-000000000001",
   YEAR = "10000000-0000-4000-8000-000000000002",
   PRIVACY = "20000000-0000-4000-8000-000000000011";
 const password = "Local-Only-2026!";
+const run = randomUUID().slice(0, 8);
 async function account(label, role) {
-  const email = `report-${label}@example.invalid`;
+  const email = `report-${run}-${label}@example.invalid`;
   let user = (
     await admin.auth.admin.listUsers({ perPage: 1000 })
   ).data.users.find((u) => u.email === email);
@@ -63,6 +64,7 @@ async function account(label, role) {
           name: `테스트 ${label}`,
           privacy_policy_id: PRIVACY,
           privacy_accepted: true,
+          mobile_phone: "+821000000000",
         },
       }),
     ).user;
@@ -83,10 +85,17 @@ async function account(label, role) {
   await ensureLocalMfa(c);
   return { c, p, jar };
 }
-const manager = await account("manager", "COURSE_MANAGER"),
-  teacher = await account("teacher", "INSTRUCTOR"),
-  learner = await account("learner"),
+const signup = JSON.parse(sql("select row_to_json(s) from life_private.signup_settings s"));
+let manager, teacher, learner, outsider;
+try {
+  sql(`update life_private.signup_settings set enabled=true,policy_id='${PRIVACY}',org_id='${ORG}'`);
+  manager = await account("manager", "COURSE_MANAGER");
+  teacher = await account("teacher", "INSTRUCTOR");
+  learner = await account("learner");
   outsider = await account("outsider");
+} finally {
+  sql(`update life_private.signup_settings set enabled=${signup.enabled},policy_id=${signup.policy_id ? `'${signup.policy_id}'` : "null"},org_id='${signup.org_id}'`);
+}
 const iso = (n) => new Date(Date.now() + n * 86400000).toISOString(),
   day = (n) => iso(n).slice(0, 10);
 const f = ok(
