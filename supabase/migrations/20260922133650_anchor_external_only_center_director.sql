@@ -20,6 +20,11 @@ BEGIN
   WHERE p.active AND role.role='COURSE_MANAGER' AND role.valid_from<=now()
     AND (role.valid_until IS NULL OR role.valid_until>now())
   ORDER BY p.id LIMIT 1;
+  IF seed_actor IS NULL THEN
+    SELECT id INTO seed_actor FROM public.life_people
+    WHERE id='20260922-1331-4000-8000-000000000001'
+      AND name='마이그레이션 자료 이관' AND active;
+  END IF;
   IF anchor_org IS NULL OR seed_actor IS NULL
      OR (SELECT count(*) FROM public.life_course_guides WHERE year=2026)<>16
      OR (SELECT count(*) FROM public.life_course_guides WHERE year=2026 AND initial_instructor_id IS NOT NULL)<>10

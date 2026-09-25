@@ -67,6 +67,7 @@ const Page = load('src/app/admin/monitoring/page.tsx', {
   'next/navigation': { notFound: () => { throw new Error('NOT_FOUND'); } },
   '@/components/admin/admin-live-refresh': { AdminLiveRefresh: () => React.createElement('button', null, '지금 갱신') },
   '@/components/admin/course-monitoring-dashboard': { CourseMonitoringDashboard: Dashboard },
+  '@/components/admin/course-monitoring-plan-dashboard': { CourseMonitoringPlanDashboard: () => React.createElement('section', null, '연간 일정') },
   '@/components/portal/ui': {
     PageIntro: ({ title, children }) => React.createElement('header', null, React.createElement('h1', null, title), children),
     Empty: ({ title, children }) => React.createElement('section', null, title, children),
@@ -76,6 +77,8 @@ const Page = load('src/app/admin/monitoring/page.tsx', {
     workspaceReads++;
     return { courses: [active, { ...active, id: 'foreign', org_id: 'other-org', name: '외부 과정' }], unavailable };
   } },
+  '@/lib/course-monitoring/data': { getAnnualMonitoringData: async () => ({ guides: [], plans: [], documents: [], unavailable: false }) },
+  '@/lib/course-monitoring/model': { ANCHOR_ORG_ID: '10000000-0000-4000-8000-000000000001' },
   '@/lib/supabase/server': { createServerSupabaseClient: async () => ({
     from: () => ({ select: () => ({ in: async () => ({ data: [{ id: 'own-org', name: '앵커사업단' }], error: null }) }) }),
   }) },
