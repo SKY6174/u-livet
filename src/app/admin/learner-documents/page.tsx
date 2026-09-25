@@ -17,6 +17,8 @@ import { updateLearnerDocumentStatus } from "./actions";
 
 const field = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
 const rowField = "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
+const submittedDateFormat = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", dateStyle: "medium" });
+const submittedTimeFormat = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", timeStyle: "short" });
 const kindKeys = Object.keys(DOCUMENT_KIND_LABELS) as LearnerDocumentKind[];
 const statusKeys = Object.keys(DOCUMENT_STATUS_LABELS) as LearnerDocumentStatus[];
 const KIND_FILTERS = [
@@ -109,7 +111,10 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                       <p className="font-semibold">{request.applicant_name}</p>
                       <p className="mt-2 whitespace-nowrap text-slate-600">{request.phone_masked || "전화번호 미등록"}</p>
                     </td>
-                    <td className="px-3 py-5 leading-6 text-slate-600"><time dateTime={request.submitted_at}>{documentDate(request.submitted_at)}</time></td>
+                    <td className="px-3 py-5 leading-6 text-slate-600"><time dateTime={request.submitted_at}>
+                      <span className="block whitespace-nowrap">{submittedDateFormat.format(new Date(request.submitted_at))}</span>
+                      <span className="block whitespace-nowrap">{submittedTimeFormat.format(new Date(request.submitted_at))}</span>
+                    </time></td>
                     <td className="px-3 py-5">
                       {nextStatuses.length ? <>
                         <label htmlFor={`${formId}-next`} className="sr-only">{rowLabel} 처리 결과</label>
@@ -120,10 +125,10 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                       </> : <span className="inline-block py-2 text-slate-500">처리 종결</span>}
                     </td>
                     <td className="px-3 py-5">
-                      <p className="whitespace-pre-wrap break-words leading-6 text-slate-600">{request.current_note || "등록된 안내가 없습니다."}</p>
+                      <p className="truncate leading-6 text-slate-600" title={request.current_note || undefined}>{request.current_note || "등록된 안내가 없습니다."}</p>
                       {nextStatuses.length > 0 && <div className="mt-3">
                         <label htmlFor={`${formId}-note`} className="sr-only">{rowLabel} 새 수강생 안내 내용</label>
-                        <textarea id={`${formId}-note`} form={formId} name="note" required maxLength={1000} rows={3} className={rowField} placeholder="검토 결과와 다음 절차를 입력해 주세요." />
+                        <input type="text" id={`${formId}-note`} form={formId} name="note" required maxLength={1000} className={`${rowField} min-h-11`} placeholder="검토 결과와 다음 절차를 입력해 주세요." />
                       </div>}
                     </td>
                     <td className="px-3 py-5">
@@ -132,11 +137,13 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                       </a>
                     </td>
                     <td className="px-3 py-5">
-                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${DOCUMENT_STATUS_TONES[request.status]}`}>{DOCUMENT_STATUS_LABELS[request.status]}</span>
-                      {nextStatuses.length > 0 && <form id={formId} action={updateLearnerDocumentStatus} aria-label={`${rowLabel} 상태 변경`} className="mt-3">
-                        {hiddenFilters}<input type="hidden" name="request_id" value={request.id} /><input type="hidden" name="revision" value={request.revision} />
-                        <button type="submit" className="btn-primary w-full px-3">상태 저장</button>
-                      </form>}
+                      <div className={nextStatuses.length ? "grid grid-cols-2 items-stretch gap-2" : ""}>
+                        <span className={`inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-lg border px-1 text-center text-xs font-semibold ${DOCUMENT_STATUS_TONES[request.status]}`}>{DOCUMENT_STATUS_LABELS[request.status]}</span>
+                        {nextStatuses.length > 0 && <form id={formId} action={updateLearnerDocumentStatus} aria-label={`${rowLabel} 상태 변경`} className="min-w-0">
+                          {hiddenFilters}<input type="hidden" name="request_id" value={request.id} /><input type="hidden" name="revision" value={request.revision} />
+                          <button type="submit" className="btn-primary w-full whitespace-nowrap px-1 text-xs">상태 저장</button>
+                        </form>}
+                      </div>
                       <details className="mt-3">
                         <summary className="min-h-11 cursor-pointer py-2 text-xs font-semibold text-slate-600"><FileClock size={14} className="mr-1 inline-block text-teal-700" aria-hidden="true" />처리 이력 {request.events.length}건</summary>
                         <ol className="mt-1 space-y-3 border-l-2 border-slate-200 pl-3">{request.events.map(event => <li key={event.id} className="break-words text-xs leading-5">

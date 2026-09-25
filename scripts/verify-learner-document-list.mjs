@@ -60,21 +60,28 @@ for (const [index, row] of rows.entries()) {
   assert.equal(pdf.props.href, `/api/learner-documents/${request.id}/pdf`);
   assert.equal(pdf.props.target, "_blank");
   assert.equal(children.filter(node => node.type === "details").length, 1);
+  const submittedTime = children.find(node => node.type === "time");
+  assert.equal(submittedTime.props.dateTime, request.submitted_at);
+  assert.equal(React.Children.toArray(submittedTime.props.children).length, 2);
+  assert(React.Children.toArray(submittedTime.props.children).every(node => node.props.className.includes("block")));
   const form = children.find(node => node.type === "form");
   const next = types.NEXT_DOCUMENT_STATUSES[request.status] ?? [];
   assert.equal(Boolean(form), next.length > 0);
   if (!form) {
-    assert(!children.some(node => ["select", "textarea", "button"].includes(node.type)));
+    assert(!children.some(node => ["select", "button"].includes(node.type) || node.type === "input" && node.props.name === "note"));
     continue;
   }
   const select = children.find(node => node.type === "select");
-  const note = children.find(node => node.type === "textarea");
+  const note = children.find(node => node.type === "input" && node.props.name === "note");
+  assert.equal(note.props.type, "text");
   assert.equal(select.props.form, form.props.id);
   assert.equal(note.props.form, form.props.id);
   assert.equal(select.props.required, true);
   assert.equal(note.props.required, true);
   assert.equal(note.props.maxLength, 1000);
   assert.equal(note.props.defaultValue, undefined);
+  const statusRow = children.find(node => node.type === "div" && node.props.className?.includes("grid-cols-2"));
+  assert(statusRow && nodes(statusRow).some(node => node.type === "form" && node.props.id === form.props.id));
   assert.deepEqual(React.Children.toArray(select.props.children).map(node => node.props.value).filter(Boolean), next);
   const fields = Object.fromEntries(nodes(form).filter(node => node.type === "input").map(node => [node.props.name, node.props.value]));
   assert.deepEqual(fields, { filter_kind: "REFUND", filter_status: "RECEIVED", filter_query: "검증", request_id: request.id, revision: request.revision });
