@@ -45,6 +45,12 @@ const STATUS_LABELS: Record<string, string> = {
 
 const YEAR_PATTERN = /\d{4}/;
 const yearOf = (course: MonitoringCourse) => course.year_label.match(YEAR_PATTERN)?.[0] ?? course.starts_on.slice(0, 4);
+const courseYearAndField = (course: MonitoringCourse) => {
+  const phase = course.year_label.match(/\d+차년도/)?.[0];
+  const academy = course.academy.replace(/\s*아카데미\s*$/, "").trim();
+  const year = `${yearOf(course)}${phase ? `(${phase})` : ""}`;
+  return academy ? `${year}∙${academy}` : year;
+};
 const attentionCount = (course: MonitoringCourse) =>
   course.application_pending + course.missing_attendance + course.teaching_pending + course.completion_pending;
 const statusOrder = (status: string) => status === "PUBLISHED" || status === "CLOSED" ? 0 : status === "DRAFT" ? 1 : 2;
@@ -137,7 +143,8 @@ export function CourseMonitoringDashboard({ courses, organizations, annual }: {
               <th scope="row" className="w-[28%] min-w-64 px-5 py-5 font-normal">
                 <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${course.status === "ARCHIVED" ? "bg-slate-100 text-slate-700" : course.status === "DRAFT" ? "bg-amber-50 text-amber-800" : "bg-teal-50 text-teal-800"}`}>{STATUS_LABELS[course.status] ?? course.status}</span>
                 <Link href={base} className="mt-2 block break-keep font-bold text-slate-900 hover:text-teal-800 hover:underline">{course.name}</Link>
-                <p className="mt-1 text-xs text-slate-500">{organizationNames.get(course.org_id) ?? "담당 기관"} · {course.year_label} · {course.academy}</p>
+                <p className="mt-1 whitespace-nowrap text-xs text-slate-500">{organizationNames.get(course.org_id) ?? "담당 기관"}</p>
+                <p className="whitespace-nowrap text-xs text-slate-500">{courseYearAndField(course)}</p>
                 <p className="mt-1 text-xs text-slate-500">{course.starts_on} ~ {course.ends_on}</p>
               </th>
               <td className="min-w-44 px-5 py-5">

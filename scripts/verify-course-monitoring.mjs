@@ -59,6 +59,15 @@ await test('manager dashboard distinguishes applications, enrollment, attendance
   assert(html.includes('종료 수업 출결 집계 대상 없음'));
 });
 
+await test('course metadata uses two lines without the academy suffix', () => {
+  const html = renderToStaticMarkup(React.createElement(Dashboard, {
+    courses: [{ ...active, year_label: '2차년도 · 2026', academy: '라이프케어 아카데미' }],
+    organizations: [{ id: 'own-org', name: '울산과학대학교 앵커사업단' }],
+  }));
+  assert.match(html, /울산과학대학교 앵커사업단<\/p><p[^>]*>2026\(2차년도\)∙라이프케어<\/p>/);
+  assert(!html.includes('라이프케어 아카데미'));
+});
+
 await test('empty monitoring data is clearly distinguished from zero applications', () => {
   const html = renderToStaticMarkup(React.createElement(Dashboard, { courses: [], organizations: [] }));
   assert(html.includes('등록된 과정이 없습니다'));
