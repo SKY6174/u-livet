@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { attendanceIndex, attendanceSummary, formatMinutes, sessionMinutes, type AttendanceBook } from "@/lib/attendance/model";
+import { formatMinutes, sessionMinutes, type AttendanceBook } from "@/lib/attendance/model";
 import type { QrCheckin } from "@/lib/attendance/qr";
 import styles from "./attendance-print.module.css";
 
@@ -15,52 +15,52 @@ const time = (value: string) => new Intl.DateTimeFormat("ko-KR", {
 const qrStamp = (value?: string | null) => value
   ? <span className={styles.stamp}>{date(value)}<br />{time(value)}</span> : "—";
 
-export function AttendancePrint({ book, official = false, title = "출석부", attachmentNumber }: {
-  book: AttendanceBook; official?: boolean; title?: string; attachmentNumber?: number;
+export function AttendancePrint({ book, title = "출석부", attachmentNumber }: {
+  book: AttendanceBook; title?: string; attachmentNumber?: number;
 }) {
-  const index = attendanceIndex(book.attendance), now = Date.parse(book.generated_at);
   const sessions = book.sessions.filter((session) => session.status === "SCHEDULED");
-  const paper = sessions.length > 22 ? "a0" : sessions.length > 15 ? "a1"
-    : sessions.length > 10 ? "a2" : sessions.length > 6 ? "a3" : "a4";
-  const peoplePerPage = { a4: 8, a3: 14, a2: 20, a1: 28, a0: 32 }[paper];
-  const peoplePages = groupsOf(book.members, peoplePerPage);
+  const sessionPages = groupsOf(sessions, 2);
+  const peoplePages = groupsOf(book.members, 8);
+  const pages = sessionPages.flatMap((pageSessions, sessionPage) => peoplePages.map((people, peoplePage) => ({
+    pageSessions, people, sessionOffset: sessionPage * 2, peopleOffset: peoplePage * 8,
+  })));
+  const durations = sessions.map(sessionMinutes);
+  const perSession = !durations.length ? "—" : new Set(durations).size === 1
+    ? `${formatMinutes(durations[0])}분`
+    : `회차별 상이 (${formatMinutes(Math.min(...durations))}~${formatMinutes(Math.max(...durations))}분)`;
+  const totalMinutes = durations.reduce((sum, minutes) => sum + minutes, 0);
   const qr = new Map<string, QrCheckin>((book.qr_checkins ?? []).map((checkin) => [
     `${checkin.session_id}:${checkin.person_id}`, checkin,
   ]));
-  const expected = sessions.filter((session) => Date.parse(session.ends_at) <= now).length * book.members.length;
-  const finalized = expected > 0 && expected === book.attendance.filter((row) => sessions.some(
-    (session) => session.id === row.session_id && Date.parse(session.ends_at) <= now,
-  )).length && sessions.every((session) => Date.parse(session.ends_at) <= now);
   if (!sessions.length || !peoplePages.length) return <p className="page-shell">수업 일정과 수강 확정 명단을 등록하면 출석부가 생성됩니다.</p>;
 
   return <div className="report-output">
     {book.qr_unavailable && <p className="no-print notice mx-auto max-w-4xl">QR 확인 기록을 불러오지 못했습니다. QR 열을 확인한 뒤 다시 출력하세요.</p>}
-    {peoplePages.map((people, page) => <section
-      className={`report-sheet report-form-20 ${paper === "a4" ? "report-landscape" : `report-${paper}-landscape`} ${styles.sheet}`}
+    {pages.map(({ pageSessions, people, sessionOffset, peopleOffset }, page) => <section
+      className={`report-sheet report-form-20 report-portrait ${styles.sheet}`}
       key={page}>
       {attachmentNumber && <div className="report-attachment-marker">[첨부 #{attachmentNumber}]</div>}
       <h1>{title}</h1>
-      <table className={`report-table ${styles.meta}`}><tbody>
+      <table className="report-table report-form-meta"><tbody>
         <tr><th>과정명</th><td>{book.offering.name}</td><th>교육기간</th><td>{book.offering.starts_on} ~ {book.offering.ends_on}</td></tr>
-        <tr><th>교육시간</th><td>{formatMinutes(sessions.reduce((sum, session) => sum + sessionMinutes(session), 0))}분</td><th>확정 상태</th><td>{official && finalized && !book.qr_unavailable ? "최종 확정" : "확인 중"}</td></tr>
+        <tr><th>교육시간/회</th><td>{perSession}</td><th>전체 교육시간</th><td>{formatMinutes(totalMinutes)}분</td></tr>
       </tbody></table>
-      <p className={styles.caption}>전체 {sessions.length}회차 · 수강생 {book.members.length}명 · {page + 1}/{peoplePages.length}쪽</p>
+      <p className={styles.caption}>전체 {sessions.length}회차 · 수강생 {book.members.length}명 · {page + 1}/{pages.length}쪽</p>
       <table className={`report-table ${styles.ledger}`}>
-        <caption className="sr-only">전체 회차별 수강생 QR 시작·종료 시각과 인정시간</caption>
+        <caption className="sr-only">회차별 수강생 QR 시작·종료 시각</caption>
         <thead>
-          <tr><th rowSpan={2} scope="col" className={styles.number}>번호</th><th rowSpan={2} scope="col" className={styles.name}>성명</th>
-            {sessions.map((session, si) => <th colSpan={2} scope="colgroup" key={session.id} className={styles.session}>
-              {si + 1}회차<br />{date(session.starts_at)}<br />{time(session.starts_at)}–{time(session.ends_at)}
-            </th>)}
-            <th rowSpan={2} scope="col" className={styles.total}>인정시간<br />출석률</th>
-          </tr>
-          <tr>{sessions.map((session) => <FragmentPair key={session.id} />)}</tr>
+          <tr><th colSpan={2} className={styles.axis}>회차</th>{pageSessions.map((session, i) =>
+            <th colSpan={2} scope="colgroup" key={session.id}>{sessionOffset + i + 1}회차</th>)}</tr>
+          <tr><th colSpan={2} className={styles.axis}>일자</th>{pageSessions.map((session) =>
+            <th colSpan={2} key={session.id} className={styles.sessionDate}>{date(session.starts_at)}</th>)}</tr>
+          <tr><th colSpan={2} className={styles.axis}>시간</th>{pageSessions.map((session) =>
+            <th colSpan={2} key={session.id}>{time(session.starts_at)}–{time(session.ends_at)}</th>)}</tr>
+          <tr><th scope="col" className={styles.number}>연번</th><th scope="col" className={styles.name}>성명</th>
+            {pageSessions.map((session) => <FragmentPair key={session.id} />)}</tr>
         </thead>
         <tbody>{people.map((person, i) => {
-          const summary = attendanceSummary(book.sessions, index, person.person_id, now);
-          return <tr key={person.person_id}><td>{page * peoplePerPage + i + 1}</td><th scope="row">{person.name}</th>
-            {sessions.map((session) => <FragmentCells key={session.id} checkin={qr.get(`${session.id}:${person.person_id}`)} />)}
-            <td>{formatMinutes(summary.credited)}분<br />{summary.missing ? `미확정 ${summary.missing}회` : summary.percent === null ? "—" : `${summary.percent}%`}</td>
+          return <tr key={person.person_id}><td>{peopleOffset + i + 1}</td><th scope="row">{person.name}</th>
+            {pageSessions.map((session) => <FragmentCells key={session.id} checkin={qr.get(`${session.id}:${person.person_id}`)} />)}
           </tr>;
         })}</tbody>
       </table>

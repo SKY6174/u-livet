@@ -37,19 +37,21 @@ const portal = { UUID: /^[a-f0-9-]{36}$/i, dateTime: value => value, statusLabel
 const ui = { PageIntro: ({ title, children }) => React.createElement('header', null, title, children), Empty: ({ title }) => React.createElement('p', null, title) };
 const common = { 'next/link': 'a', '@/lib/attendance/model': model, '@/lib/portal/data': portal, '@/components/portal/ui': ui };
 const Printed = load('src/components/attendance/attendance-print.tsx', { ...common, './attendance-print.module.css': { sheet: 'attendance-sheet' } }).AttendancePrint;
-await test('print keeps every session on one horizontal axis and QR start/end stamps in each row', () => {
+await test('portrait print groups two sessions per page and keeps QR start/end stamps without a summary column', () => {
   const large = { ...book, members: Array.from({ length: 21 }, (_, i) => ({ person_id: 'p'+i, name: '수강생'+i })), sessions: Array.from({ length: 7 }, (_, i) => ({ ...sessions[0], id: 's'+i, title: '회차'+i })),
     qr_checkins: [{ session_id: 's0', person_id: 'p0', checked_in_at: '2026-09-19T00:03:00Z', checked_out_at: '2026-09-19T01:00:00Z' }] };
   const output = renderToStaticMarkup(React.createElement(Printed, { book: large, attachmentNumber: 1 }));
-  assert.equal((output.match(/class="report-sheet report-form-20 report-a3-landscape /g) ?? []).length, 2);
-  assert.equal((output.match(/scope="row"/g) ?? []).length, 21);
-  assert.equal((output.match(/scope="colgroup"/g) ?? []).length, 14);
+  assert.equal((output.match(/class="report-sheet report-form-20 report-portrait /g) ?? []).length, 12);
+  assert.equal((output.match(/scope="row"/g) ?? []).length, 84);
+  assert.equal((output.match(/scope="colgroup"/g) ?? []).length, 21);
   assert(output.includes('수강생20') && output.includes('09:03') && output.includes('10:00'));
   assert(output.includes('[첨부 #1]') && output.includes('>시작<') && output.includes('>종료<'));
+  assert(output.includes('>교육시간/회<') && output.includes('>전체 교육시간<'));
+  assert(!output.includes('>확정 상태<') && !output.includes('>인정시간<br/>출석률<'));
   assert(!output.includes('email'));
   const veryWide = renderToStaticMarkup(React.createElement(Printed, { book: { ...large, members: large.members.slice(0, 2),
     sessions: Array.from({ length: 23 }, (_, i) => ({ ...sessions[0], id: 'wide'+i })) } }));
-  assert(veryWide.includes('report-a0-landscape'));
+  assert.equal((veryWide.match(/class="report-sheet report-form-20 report-portrait /g) ?? []).length, 12);
   assert.equal((veryWide.match(/scope="colgroup"/g) ?? []).length, 23);
 });
 let identity = true, requests = [], response = { data: book, error: null };

@@ -118,23 +118,15 @@ body {
   min-height: 210mm;
   font-size: 8.5pt;
 }
-.report-a3-landscape {
-  width: 420mm;
-  min-height: 297mm;
-  font-size: 8.5pt;
-}
-.report-a2-landscape { width: 594mm; min-height: 420mm; font-size: 8.5pt; }
-.report-a1-landscape { width: 841mm; min-height: 594mm; font-size: 8.5pt; }
-.report-a0-landscape { width: 1189mm; min-height: 841mm; font-size: 8.5pt; }
 .report-attachment-marker {
   color: #111827;
-  font-size: calc(21pt - 3px);
+  font-size: calc(21pt - 5px);
   font-weight: 700;
   line-height: 1.2;
   text-align: left;
 }
 .report-form-20 .report-attachment-marker {
-  font-size: calc(18pt - 3px);
+  font-size: calc(18pt - 5px);
 }
 .report-brand {
   color: #155e75;
@@ -278,14 +270,71 @@ body {
   width: 58mm;
   height: auto;
 }
-.report-teaching-ledger h1 {
+.report-form-meta {
+  margin: 0 0 4mm;
+}
+.report-form-meta th,
+.report-form-meta td {
+  padding: 1.4mm 2mm;
+  font-size: calc(8pt + 1px);
+}
+.report-form-meta th {
+  width: 20mm;
+}
+.report-form-caption {
+  font-size: 8pt;
+  margin: 0 0 3mm;
+}
+.report-attachment-sheet h1 {
   font-size: 18pt;
   margin: 0 0 5mm;
+}
+.report-completion-list .report-table:not(.report-form-meta) {
+  margin: 0;
+}
+.report-completion-list .report-table:not(.report-form-meta) th,
+.report-completion-list .report-table:not(.report-form-meta) td {
+  padding: 2mm 1mm;
+  font-size: 8pt;
+  line-height: 1.3;
+}
+.report-completion-list .report-table:not(.report-form-meta) td:nth-child(2) {
+  text-align: left;
 }
 .report-teaching-ledger .report-table th,
 .report-teaching-ledger .report-table td {
   padding: 1.8mm 1mm;
   font-size: 8pt;
+}
+.report-payment-table {
+  margin: 0 0 3mm;
+}
+.report-payment-table th,
+.report-payment-table td {
+  padding: 1.5mm 1mm;
+  font-size: 8pt;
+  line-height: 1.3;
+}
+.report-payment-table th:first-child {
+  width: 9mm;
+}
+.report-payment-entry {
+  break-inside: avoid;
+}
+.report-payment-detail-cell {
+  text-align: left !important;
+}
+.report-payment-details {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 2.5fr;
+  gap: 2mm;
+  text-align: left;
+}
+.report-portrait .report-payment-details {
+  grid-template-columns: 1fr 1.7fr;
+}
+.report-payment-details b {
+  margin-right: 1mm;
 }
 .report-teaching-signature {
   width: 28mm;
@@ -303,11 +352,11 @@ body {
 }
 @page reportPortrait {
   size: A4 portrait;
-  margin: 12mm;
+  margin: 20mm;
 }
 @page reportLandscape {
   size: A4 landscape;
-  margin: 10mm;
+  margin: 20mm;
 }
 @page reportFormPortrait {
   size: A4 portrait;
@@ -317,13 +366,6 @@ body {
   size: A4 landscape;
   margin: 20mm;
 }
-@page reportFormA3Landscape {
-  size: A3 landscape;
-  margin: 20mm;
-}
-@page reportFormA2Landscape { size: A2 landscape; margin: 20mm; }
-@page reportFormA1Landscape { size: A1 landscape; margin: 20mm; }
-@page reportFormA0Landscape { size: A0 landscape; margin: 20mm; }
 @media print {
   .report-portrait {
     page: reportPortrait;
@@ -331,12 +373,6 @@ body {
   .report-landscape {
     page: reportLandscape;
   }
-  .report-a3-landscape {
-    page: reportFormA3Landscape;
-  }
-  .report-a2-landscape { page: reportFormA2Landscape; }
-  .report-a1-landscape { page: reportFormA1Landscape; }
-  .report-a0-landscape { page: reportFormA0Landscape; }
   .report-sheet {
     width: auto;
     min-height: 0;
@@ -360,19 +396,13 @@ body {
     min-height: 0;
   }
   .report-portrait {
-    width: 186mm;
+    width: 170mm;
   }
   .report-landscape {
-    width: 277mm;
+    width: 257mm;
   }
-  .report-a3-landscape {
-    width: 380mm;
-  }
-  .report-a2-landscape { width: 554mm; }
-  .report-a1-landscape { width: 801mm; }
-  .report-a0-landscape { width: 1149mm; }
   .report-cover {
-    min-height: 200mm;
+    min-height: 170mm;
     padding-top: 15mm;
   }
   .report-form-20.report-portrait {
@@ -392,13 +422,6 @@ body {
   .report-form-20.report-landscape {
     min-height: 170mm;
   }
-  .report-form-20.report-a3-landscape {
-    min-height: 257mm;
-    width: 380mm;
-  }
-  .report-form-20.report-a2-landscape { min-height: 380mm; width: 554mm; }
-  .report-form-20.report-a1-landscape { min-height: 554mm; width: 801mm; }
-  .report-form-20.report-a0-landscape { min-height: 801mm; width: 1149mm; }
   .report-form-logo {
     bottom: 0;
     left: 0;

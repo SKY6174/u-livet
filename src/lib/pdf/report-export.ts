@@ -66,7 +66,7 @@ export async function downloadReportPdf17(filename: string): Promise<void> {
     const width = landscape ? dimensions[format][0] : 210;
     const height = landscape ? dimensions[format][1] : 297;
     const form20 = sheet.classList.contains("report-form-20");
-    const margin = form20 || sheet.classList.contains("op-page") ? 20 : landscape ? 10 : 12;
+    const margin = 20;
     const host = document.createElement("div");
     host.style.cssText = "position:fixed;left:-10000px;top:0;pointer-events:none;background:white;";
     host.className = sheet.closest(".report-output")?.className ?? "report-output";
