@@ -330,6 +330,9 @@ body {
   gap: 2mm;
   text-align: left;
 }
+.report-portrait .report-payment-details {
+  grid-template-columns: 1fr 1.7fr;
+}
 .report-payment-details b {
   margin-right: 1mm;
 }

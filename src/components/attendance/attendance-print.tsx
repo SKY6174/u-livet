@@ -19,10 +19,10 @@ export function AttendancePrint({ book, title = "출석부", attachmentNumber }:
   book: AttendanceBook; title?: string; attachmentNumber?: number;
 }) {
   const sessions = book.sessions.filter((session) => session.status === "SCHEDULED");
-  const sessionPages = groupsOf(sessions, 4);
+  const sessionPages = groupsOf(sessions, 2);
   const peoplePages = groupsOf(book.members, 8);
   const pages = sessionPages.flatMap((pageSessions, sessionPage) => peoplePages.map((people, peoplePage) => ({
-    pageSessions, people, sessionOffset: sessionPage * 4, peopleOffset: peoplePage * 8,
+    pageSessions, people, sessionOffset: sessionPage * 2, peopleOffset: peoplePage * 8,
   })));
   const durations = sessions.map(sessionMinutes);
   const perSession = !durations.length ? "—" : new Set(durations).size === 1
@@ -37,7 +37,7 @@ export function AttendancePrint({ book, title = "출석부", attachmentNumber }:
   return <div className="report-output">
     {book.qr_unavailable && <p className="no-print notice mx-auto max-w-4xl">QR 확인 기록을 불러오지 못했습니다. QR 열을 확인한 뒤 다시 출력하세요.</p>}
     {pages.map(({ pageSessions, people, sessionOffset, peopleOffset }, page) => <section
-      className={`report-sheet report-form-20 report-landscape ${styles.sheet}`}
+      className={`report-sheet report-form-20 report-portrait ${styles.sheet}`}
       key={page}>
       {attachmentNumber && <div className="report-attachment-marker">[첨부 #{attachmentNumber}]</div>}
       <h1>{title}</h1>

@@ -42,7 +42,7 @@ export function officeSections(member: Member) {
     ] },
     { title: "마감·수료", links: [
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
-        { label: "결과보고서", href: "/operation-documents/result", description: "공식 결과보고서와 과정별 결과 보고·6종 증빙을 관리합니다." },
+        { label: "결과보고서", href: "/operation-documents/result", description: "공식 결과보고서와 과정별 결과 보고(5종 증빙 포함)를 관리합니다." },
       ] : []),
       ...(certifier ? [
         { label: "수료 검토", href: "/completion", description: "출결·평가 근거를 확인하고 수료 판정을 검토·승인합니다." },

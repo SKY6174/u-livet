@@ -98,16 +98,15 @@ function Sheet({
     </section>
   );
 }
-function AttachmentSheet({ title, offering, number, wide = false, stats, className = "", children }: {
+function AttachmentSheet({ title, offering, number, stats, className = "", children }: {
   title: string;
   offering: Offering;
   number: number;
-  wide?: boolean;
   stats: [[string, ReactNode], [string, ReactNode]];
   className?: string;
   children: ReactNode;
 }) {
-  return <section className={`report-sheet report-form-20 ${wide ? "report-landscape" : "report-portrait"} report-attachment-sheet ${className}`}>
+  return <section className={`report-sheet report-form-20 report-portrait report-attachment-sheet ${className}`}>
     <div className="report-attachment-marker">[첨부 #{number}]</div>
     <h1>{title}</h1>
     <table className="report-table report-form-meta"><tbody>
@@ -382,10 +381,10 @@ export function ReportDocuments({
       )}
       {show("attendance") && (attendanceBook
         ? <AttendancePrint book={attendanceBook} title={title("attendance")} attachmentNumber={attachmentNumber("attendance")} />
-        : <section className="report-sheet report-form-20 report-landscape report-attachment-sheet"><div className="report-attachment-marker">[첨부 #1]</div><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p><Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized /></section>)}
+        : <section className="report-sheet report-form-20 report-portrait report-attachment-sheet"><div className="report-attachment-marker">[첨부 #1]</div><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p><Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized /></section>)}
       {show("completion") &&
         chunk(members, 8).map((people, pi, pages) => (
-          <AttachmentSheet title={title("completion")} offering={o} number={2} wide
+          <AttachmentSheet title={title("completion")} offering={o} number={2}
             stats={[["전체 교육시간", `${source?.educationHours ?? hours(totalMinutes)}시간`], ["수료인원", `${completedCount}명`]]}
             className="report-completion-list" key={`c-${pi}`}>
             <p className="report-form-caption">담당 교수: {p.professor || "미입력"} · 수강생 {members.length}명 · {pi + 1}/{pages.length}쪽</p>
@@ -427,7 +426,6 @@ export function ReportDocuments({
             title={title("scholarships")}
             offering={o}
             number={3}
-            wide
             stats={[["지급 대상", `${source?.scholarshipRecipients ?? new Set(scholarships.map((row) => row.personId)).size}명`], ["장학금 합계", `${money(sumScholarships)}원`]]}
             className="report-scholarship-list"
             key={`s-${pi}`}
@@ -470,7 +468,7 @@ export function ReportDocuments({
       ))}
       {show("fees") &&
         chunk(p.fees, 4).map((rows, pi) => (
-          <AttachmentSheet title={title("fees")} offering={o} number={5} wide
+          <AttachmentSheet title={title("fees")} offering={o} number={5}
             stats={[["지급 건수", `${p.fees.length}건`], ["강사료 합계", `${money(sumFees)}원`]]}
             className="report-fee-list" key={`f-${pi}`}>
             <table className="report-table report-payment-table">
