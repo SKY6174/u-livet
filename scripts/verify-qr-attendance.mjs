@@ -8,7 +8,7 @@ function load(file,mocks={}) {
   const m={exports:{}};new Function('require','module','exports',code)(name=>name in mocks?mocks[name]:require(name),m,m.exports);return m.exports;
 }
 const id='10000000-0000-4000-8000-000000000001',session='10000000-0000-4000-8000-000000000002',token='b'.repeat(64);
-let identity=true,calls=[],invalidations=[],response={data:{session_title:'수업',checked_in_at:new Date().toISOString()},error:null};
+let identity=true,calls=[],invalidations=[],response={data:{session_title:'수업',checked_in_at:new Date().toISOString(),phase:'START'},error:null};
 const qr=load('src/lib/attendance/qr.ts');
 const common={
   '@/lib/portal/data':{UUID:/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i},
@@ -23,13 +23,17 @@ const form=(overrides={})=>{const f=new FormData();for(const [key,value]of Objec
 for(const changes of [{offering:'bad'},{session:'bad'},{token:''},{token:'short'}])assert(!(await checkin({},form(changes))).ok);
 identity=false;assert(!(await checkin({},form())).ok);assert.equal(calls.length,0);identity=true;
 const good=await checkin({},form());assert(good.ok);assert.deepEqual(calls[0],{name:'life_qr_checkin',args:{f:id,s:session,t:token}});assert.equal(invalidations.length,2);
+response={data:{session_title:'수업',checked_in_at:new Date().toISOString(),checked_out_at:new Date().toISOString(),phase:'END'},error:null};
+assert.equal((await checkin({},form())).phase,'END');
 console.log('PASS input and identity checks precede scoped RPC; success requires a valid receipt');
 for(const value of [{data:null,error:{message:'QR_EXPIRED'}},{data:null,error:{message:'missing',code:'PGRST202'}},{data:null,error:null},{data:{session_title:'x',checked_in_at:'invalid'},error:null},Error('offline')]) {
  response=value;invalidations=[];assert(!(await checkin({},form())).ok);assert.equal(invalidations.length,0);
 }
 console.log('PASS DB errors, unavailable migration, malformed receipts and connection failures cannot report success');
-response={data:{token,expires_at:new Date(Date.now()+120000).toISOString()},error:null};assert((await issue.issueAttendanceQr(id,session)).challenge);
-response={data:null,error:{message:'CLASS_NOT_OPEN'}};assert(!(await issue.issueAttendanceQr(id,session)).challenge);
+response={data:{token,expires_at:new Date(Date.now()+120000).toISOString()},error:null};assert((await issue.issueAttendanceQr(id,session,'START')).challenge);
+assert((await issue.issueAttendanceQr(id,session,'END')).challenge);
+assert.equal(calls.at(-1).name,'life_issue_attendance_qr_end');
+response={data:null,error:{message:'CLASS_NOT_OPEN'}};assert(!(await issue.issueAttendanceQr(id,session,'START')).challenge);
 assert(!(await issue.stopAttendanceQr(id,session)).ok);
 response={data:null,error:null};assert((await issue.stopAttendanceQr(id,session)).ok);
 console.log('PASS issuing and stopping QR propagate server failures');
@@ -59,6 +63,8 @@ const Records=load('src/app/instructor/records/page.tsx',{
  '@/lib/portal/data':{getWorkspaceOfferings:async()=>({offerings:[],unavailable:false}),dateTime:value=>value},
  '@/components/portal/ui':{PageIntro:({children})=>React.createElement('header',null,children),Empty:({title})=>React.createElement('p',null,title)},
  '@/components/portal/action-form':{ActionForm:'form'},'@/app/certificate-actions':{submitTeaching:()=>{}},
+ '@/components/teaching/teaching-segments-input':{TeachingSegmentsInput:()=>null},
+ '@/components/teaching/teaching-signature-form':{TeachingSignatureForm:()=>null},
 }).default;
 const history=renderToStaticMarkup(await Records());
 assert(history.includes('배정 종료된 본인 강좌'));assert(!history.includes('다른 강사 비공개 이력'));assert(history.includes('60분'));
@@ -95,6 +101,7 @@ const Login=load('src/app/auth/login/page.tsx',{
  'next/link':'a','next/navigation':{redirect:path=>{throw Error('REDIRECT '+path);}},
  '@/lib/auth/session':{getSessionIdentity:async()=>signedIn?{name:'테스트'}:null,safeReturnTo:registration.socialReturnTo},
  '@/lib/auth/registration':registration,'@/lib/auth/login-audience':load('src/lib/auth/login-audience.ts'),
+ '@/components/navigation/menu-hint':{MenuHint:({label})=>React.createElement('span',null,label)},
  '@/components/auth/auth-form':{AuthForm:props=>{loginForm=props;return React.createElement('form',{'aria-label':'간편 로그인'});}},
 }).default;
 for(const audience of [undefined,'office','external','learner']) {
