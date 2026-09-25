@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { CourseMonitoringPlanDashboard } from "./course-monitoring-plan-dashboard";
+import type { MonitoringDocument, MonitoringGuide, MonitoringPlan } from "@/lib/course-monitoring/model";
 
 export type MonitoringCourse = {
   id: string;
@@ -27,6 +29,12 @@ export type MonitoringCourse = {
 };
 
 type Organization = { id: string; name: string };
+type AnnualMonitoring = {
+  guides: MonitoringGuide[];
+  plans: MonitoringPlan[];
+  documents: MonitoringDocument[];
+  today: string;
+};
 
 const STATUS_LABELS: Record<string, string> = {
   DRAFT: "개설 준비",
@@ -41,9 +49,10 @@ const attentionCount = (course: MonitoringCourse) =>
   course.application_pending + course.missing_attendance + course.teaching_pending + course.completion_pending;
 const statusOrder = (status: string) => status === "PUBLISHED" || status === "CLOSED" ? 0 : status === "DRAFT" ? 1 : 2;
 
-export function CourseMonitoringDashboard({ courses, organizations }: {
+export function CourseMonitoringDashboard({ courses, organizations, annual }: {
   courses: MonitoringCourse[];
   organizations: Organization[];
+  annual?: AnnualMonitoring;
 }) {
   const [organization, setOrganization] = useState("all");
   const [year, setYear] = useState("all");
@@ -67,8 +76,7 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
     completion: sum.completion + course.completion_pending,
   }), { applications: 0, enrolled: 0, missing: 0, completion: 0 });
 
-  return <section aria-label="과정별 운영 현황" className="space-y-6">
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+  const summaryCards = <div aria-label="과정 운영 현황 요약" className="grid grid-cols-2 gap-3 lg:grid-cols-5">
       {([
         ["표시 과정", visible.length, "개"],
         ["신청 대기·대기자", totals.applications, "명"],
@@ -79,7 +87,12 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
         <p className="text-xs font-semibold text-slate-600">{label}</p>
         <p className={`mt-2 text-2xl font-bold tabular-nums ${value > 0 && (label === "출결 미입력" || label === "수료 검토 대기") ? "text-amber-800" : "text-slate-900"}`}>{value.toLocaleString("ko-KR")}<span className="ml-1 text-sm font-normal text-slate-500">{unit}</span></p>
       </div>)}
-    </div>
+    </div>;
+
+  return <>
+    {annual && <CourseMonitoringPlanDashboard {...annual} courses={courses} summaryCards={summaryCards} />}
+    <section aria-label="과정별 운영 현황" className="space-y-6">
+    {!annual && summaryCards}
 
     <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
       {organizations.length > 1 && <label className="min-w-40 flex-1 text-xs font-semibold text-slate-600">담당 기관
@@ -160,5 +173,6 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
       </table>
     </div>}
     <p className="text-xs leading-5 text-slate-500">신청 대기·대기자는 제출·대기 상태의 신청 건수입니다. 출결 미입력은 결석 수가 아니며, 수료 승인은 별도로 진행됩니다.</p>
-  </section>;
+    </section>
+  </>;
 }

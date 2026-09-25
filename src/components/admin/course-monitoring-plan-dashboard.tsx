@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { saveMonitoringPlan } from "@/app/admin/monitoring/actions";
@@ -78,12 +78,13 @@ function DocumentStatus({ label, status }: { label: string; status: string | nul
   return <span className="text-xs text-slate-600">{label} {status === "REVIEW" ? "검토 요청" : status === "SUBMITTED" ? "최종 제출" : status === "DRAFT" ? "작성 중" : status ?? "미작성"}</span>;
 }
 
-export function CourseMonitoringPlanDashboard({ guides, plans, documents, courses, today }: {
+export function CourseMonitoringPlanDashboard({ guides, plans, documents, courses, today, summaryCards }: {
   guides: MonitoringGuide[];
   plans: MonitoringPlan[];
   documents: MonitoringDocument[];
   courses: MonitoringCourse[];
   today: string;
+  summaryCards?: ReactNode;
 }) {
   const router = useRouter();
   const [localPlans, setLocalPlans] = useState(plans);
@@ -171,6 +172,8 @@ export function CourseMonitoringPlanDashboard({ guides, plans, documents, course
       </div>
       <p className="mt-3 text-xs leading-5 text-slate-600">정상: 확정된 일정에서 지연 없음 · 지연: 목표일 미준수 · 애로: 담당자가 사유를 등록 · 계획전: P 세부 업무와 D/C/A 목표일 미확정. 신호등을 누르면 해당 과정만 표시됩니다.</p>
     </div>
+
+    {summaryCards}
 
     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4" aria-label="연간 PDCA 운영 흐름">
       {PHASES.map((phase) => <div key={phase.key} className={`rounded-xl border p-4 ${phase.color}`}>

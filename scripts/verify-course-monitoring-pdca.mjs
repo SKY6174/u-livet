@@ -107,6 +107,7 @@ const guides = Array.from({ length: 16 }, (_, index) => ({
 }));
 const html = renderToStaticMarkup(React.createElement(componentModule.exports.CourseMonitoringPlanDashboard, {
   guides, plans: [], documents: [], courses: [], today,
+  summaryCards: React.createElement('div', null, '운영 현황 카드'),
 }));
 assert(html.includes("2026년 16개 과정 연간 일정"));
 assert.equal((html.match(/>PDCA<\/button>/g) ?? []).length, 16);
@@ -115,4 +116,6 @@ assert(html.includes("운영계획서 제출") && html.includes("차년도 과�
 assert(html.includes("P 0%") && html.includes("D 0%") && html.includes("C 0%") && html.includes("A 0%"));
 assert(html.includes("표시 과정 16 / 16개"));
 assert(html.includes("계획전") && html.includes("16</strong>"));
+assert(html.indexOf('진행 신호등') < html.indexOf('운영 현황 카드'));
+assert(html.indexOf('운영 현황 카드') < html.indexOf('연간 PDCA 운영 흐름'));
 console.log("검증 완료: 14개월·PDCA 실제 완성도·16개 과정 연간 일정 렌더링");
