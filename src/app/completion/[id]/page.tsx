@@ -428,7 +428,7 @@ export default async function CompletionReview({
                           ) : <span className="text-slate-400">—</span>}
                         </td>
                         <td className="px-3 py-4">
-                          <div className="flex flex-wrap items-start gap-2 [&_button]:min-h-9 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:py-2 [&_button]:text-xs">
+                          <div className="space-y-2 [&_button]:min-h-9 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:py-2 [&_button]:text-xs">
                             <ActionForm
                               action={calculateCompletion}
                               label={r ? "최신 자료로 재산출" : "수료 후보 산출"}
@@ -440,21 +440,28 @@ export default async function CompletionReview({
                             </ActionForm>
                             {(certifier || isSample) && r && r.outcome === "READY" &&
                               !row.stale && !row.approval && (
-                                <ActionForm
-                                  action={confirmCompletion}
-                                  label="수료 확정"
-                                  disabled={isSample || r.calculated_by === me.id || row.person_id === me.id}
-                                  className="space-y-2"
-                                >
-                                  <input type="hidden" name="run" value={r.id} />
-                                  <label className="flex items-start gap-2 text-xs leading-5">
-                                    <input type="checkbox" name="reviewed" required />
-                                    수료 기준과 판정 근거를 검토했습니다.
-                                  </label>
-                                  {r.calculated_by === me.id && (
-                                    <p className="text-xs">직접 산출한 결과는 다른 승인자가 확정해야 합니다.</p>
-                                  )}
-                                </ActionForm>
+                                <details>
+                                  <summary className="cursor-pointer font-semibold text-teal-800">
+                                    수료 확정<span className="sr-only"> · {row.name}</span>
+                                  </summary>
+                                  <div className="mt-2">
+                                    <ActionForm
+                                      action={confirmCompletion}
+                                      label="수료 확정"
+                                      disabled={isSample || r.calculated_by === me.id || row.person_id === me.id}
+                                      className="space-y-2"
+                                    >
+                                      <input type="hidden" name="run" value={r.id} />
+                                      <label className="flex items-start gap-2 text-xs leading-5">
+                                        <input type="checkbox" name="reviewed" required />
+                                        수료 기준과 판정 근거를 검토했습니다.
+                                      </label>
+                                      {r.calculated_by === me.id && (
+                                        <p className="text-xs">직접 산출한 결과는 다른 승인자가 확정해야 합니다.</p>
+                                      )}
+                                    </ActionForm>
+                                  </div>
+                                </details>
                               )}
                           </div>
                         </td>
