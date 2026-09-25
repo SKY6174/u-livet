@@ -313,40 +313,40 @@ export default async function CompletionReview({
         {rows.length > 0 && (
           <>
             <p id="completion-list-help" className="mb-3 text-sm text-slate-600">
-              판정 근거는 해당 행에서 펼쳐 확인할 수 있습니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.
+              판정 근거는 해당 행에서 펼쳐 확인할 수 있습니다. 좁은 화면에서는 항목이 두 열로 표시됩니다.
             </p>
             <div
               role="region"
               aria-label="수강생별 수료 판정 목록"
               aria-describedby="completion-list-help"
-              tabIndex={0}
-              className="overflow-x-auto rounded-2xl border border-slate-200 bg-white"
+              className="min-w-0 rounded-2xl border border-slate-200 bg-white"
             >
-              <table className="w-full min-w-[1500px] table-fixed text-left text-sm">
+              <table className="block w-full text-left text-sm xl:table xl:table-fixed">
                 <caption className="sr-only">수강생별 출석률, 수강·환불 상태, 판정 결과와 처리 목록</caption>
-                <colgroup>
-                  {[4, 10, 12, 14, 12, 12, 16, 20].map((width, index) => (
+                <colgroup className="hidden xl:table-column-group">
+                  {[4, 16, 9, 13, 11, 14, 13, 20].map((width, index) => (
                     <col key={index} style={{ width: `${width}%` }} />
                   ))}
                 </colgroup>
-                <thead className="border-b border-slate-200 bg-slate-50 text-slate-700">
+                <thead className="sr-only border-b border-slate-200 bg-slate-50 text-slate-700 xl:not-sr-only xl:table-header-group">
                   <tr>
                     {[
                       "순번", "수강생", "출석률", "수강·환불 상태", "판정 결과",
                       "산출 시각", "판정 근거", "처리",
                     ].map((label) => (
-                      <th key={label} scope="col" className="px-3 py-3 font-semibold">{label}</th>
+                      <th key={label} scope="col" className="px-2 py-3 font-semibold">{label}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="block divide-y divide-slate-200 xl:table-row-group">
                   {rows.map((row, index) => {
                     const r = row.run;
                     return (
-                      <tr key={row.person_id} className="align-top hover:bg-teal-50/30">
-                        <td className="px-3 py-4 tabular-nums text-slate-500">{index + 1}</td>
-                        <th scope="row" className="px-3 py-4 font-semibold text-slate-900">{row.name}</th>
-                        <td className="px-3 py-4">
+                      <tr key={row.person_id} className="grid grid-cols-2 gap-x-4 gap-y-2 px-3 py-3 align-top hover:bg-teal-50/30 xl:table-row xl:p-0">
+                        <td className="block min-w-0 px-1 py-1 tabular-nums text-slate-500 xl:table-cell xl:px-2 xl:py-4">{index + 1}</td>
+                        <th scope="row" className="block min-w-0 break-words px-1 py-1 font-semibold text-slate-900 xl:table-cell xl:px-2 xl:py-4">{row.name}</th>
+                        <td className="block min-w-0 px-1 py-1 xl:table-cell xl:px-2 xl:py-4">
+                          <span className="block text-xs font-medium text-slate-500 xl:hidden">출석률</span>
                           <strong className="tabular-nums">
                             {row.attendance_percent == null ? "산정 전" : `${row.attendance_percent}%`}
                           </strong>
@@ -356,7 +356,8 @@ export default async function CompletionReview({
                               : "출결 진행 중"}
                           </span>
                         </td>
-                        <td className="px-3 py-4 text-slate-700">
+                        <td className="block min-w-0 break-words px-1 py-1 text-slate-700 xl:table-cell xl:px-2 xl:py-4">
+                          <span className="block text-xs font-medium text-slate-500 xl:hidden">수강·환불 상태</span>
                           <span>{row.enrollment_status === "ACTIVE" ? "수강 중" : "수강 철회"}</span>
                           {row.refund_document && (
                             <span className="mt-1 block text-xs text-amber-900">
@@ -369,7 +370,8 @@ export default async function CompletionReview({
                             </span>
                           )}
                         </td>
-                        <td className="px-3 py-4">
+                        <td className="block min-w-0 px-1 py-1 xl:table-cell xl:px-2 xl:py-4">
+                          <span className="block text-xs font-medium text-slate-500 xl:hidden">판정 결과</span>
                           <span className="badge">
                             {r
                               ? row.stale
@@ -378,10 +380,12 @@ export default async function CompletionReview({
                               : "미산출"}
                           </span>
                         </td>
-                        <td className="px-3 py-4 text-slate-600">
+                        <td className="block min-w-0 break-words px-1 py-1 text-slate-600 xl:table-cell xl:px-2 xl:py-4">
+                          <span className="block text-xs font-medium text-slate-500 xl:hidden">산출 시각</span>
                           {r ? <time dateTime={r.calculated_at}>{dateTime(r.calculated_at)}</time> : "—"}
                         </td>
-                        <td className="px-3 py-4">
+                        <td className="block min-w-0 break-words px-1 py-1 xl:table-cell xl:px-2 xl:py-4">
+                          <span className="block text-xs font-medium text-slate-500 xl:hidden">판정 근거</span>
                           {r ? (
                             <details>
                               <summary className="cursor-pointer font-semibold text-teal-800">
@@ -427,13 +431,14 @@ export default async function CompletionReview({
                             </details>
                           ) : <span className="text-slate-400">—</span>}
                         </td>
-                        <td className="px-3 py-4">
-                          <div className="space-y-2 [&_button]:min-h-9 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:py-2 [&_button]:text-xs">
+                        <td className="block min-w-0 break-words px-1 py-1 xl:table-cell xl:px-2 xl:py-4">
+                          <span className="block text-xs font-medium text-slate-500 xl:hidden">처리</span>
+                          <div className="min-w-0 space-y-2 [&_button]:max-w-full [&_button]:min-h-9 [&_button]:whitespace-normal [&_button]:px-2 [&_button]:py-2 [&_button]:text-xs">
                             <ActionForm
                               action={calculateCompletion}
                               label={r ? "최신 자료로 재산출" : "수료 후보 산출"}
                               disabled={isSample}
-                              className="space-y-2"
+                              className="min-w-0 space-y-2"
                             >
                               <input type="hidden" name="offering" value={id} />
                               <input type="hidden" name="person" value={row.person_id} />
@@ -449,7 +454,7 @@ export default async function CompletionReview({
                                       action={confirmCompletion}
                                       label="수료 확정"
                                       disabled={isSample || r.calculated_by === me.id || row.person_id === me.id}
-                                      className="space-y-2"
+                                      className="min-w-0 space-y-2"
                                     >
                                       <input type="hidden" name="run" value={r.id} />
                                       <label className="flex items-start gap-2 text-xs leading-5">
