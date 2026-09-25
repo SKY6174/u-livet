@@ -56,6 +56,10 @@ export default async function CourseMonitoring() {
     source_enrolled: course.source?.enrolled ?? null,
   }));
   const organizations = orgIds.map((id, index) => ({ id, name: organizationNames.get(id) ?? `담당 기관 ${index + 1}` }));
+  const annualPlan = annual && !annual.unavailable ? {
+    guides: annual.guides, plans: annual.plans, documents: annual.documents,
+    today: new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }),
+  } : null;
 
   return <div className="page-shell">
     <PageIntro eyebrow="COURSE MONITORING" title="과정 모니터링">
@@ -65,11 +69,10 @@ export default async function CourseMonitoring() {
       <span className="text-xs text-slate-500">화면을 보는 동안 30초마다 갱신</span>
       <AdminLiveRefresh />
     </div>
-    {annual && (annual.unavailable
-      ? <Empty title="연간 일정·PDCA 계획을 불러오지 못했습니다">데이터베이스 업데이트와 연결 상태를 확인한 뒤 다시 갱신해 주세요.</Empty>
-      : <CourseMonitoringPlanDashboard guides={annual.guides} plans={annual.plans} documents={annual.documents}
-          courses={courses} today={new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" })} />)}
-    {unavailable ? <Empty title="과정 현황을 불러오지 못했습니다">잠시 후 다시 갱신해 주세요.</Empty>
-      : <CourseMonitoringDashboard courses={courses} organizations={organizations} />}
+    {annual?.unavailable && <Empty title="연간 일정·PDCA 계획을 불러오지 못했습니다">데이터베이스 업데이트와 연결 상태를 확인한 뒤 다시 갱신해 주세요.</Empty>}
+    {unavailable ? <>
+      {annualPlan && <CourseMonitoringPlanDashboard {...annualPlan} courses={courses} />}
+      <Empty title="과정 현황을 불러오지 못했습니다">잠시 후 다시 갱신해 주세요.</Empty>
+    </> : <CourseMonitoringDashboard courses={courses} organizations={organizations} annual={annualPlan ?? undefined} />}
   </div>;
 }

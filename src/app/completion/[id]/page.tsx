@@ -11,6 +11,7 @@ import type {
 import { outcomeLabels } from "@/lib/portal/evaluation";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
+import { createCompletionReviewPreview } from "@/lib/completion/review-preview";
 import {
   proposeRules,
   approveRules,
@@ -20,10 +21,13 @@ import {
 } from "@/app/evaluation-actions";
 export default async function CompletionReview({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ sample?: string }>;
 }) {
   const { id } = await params;
+  const { sample } = await searchParams;
   const me = await requireIdentity(`/completion/${id}`);
   const o = await getOffering(id);
   if (!o) notFound();
@@ -66,7 +70,23 @@ export default async function CompletionReview({
       </div>
     );
   const rule = rules.data as CompletionRule | null;
-  const rows = board.data as CompletionRow[];
+  const liveRows = board.data as CompletionRow[];
+  const isSample = sample === "1" && liveRows.length === 0;
+  const rows = isSample ? createCompletionReviewPreview() : liveRows;
+  const threshold =
+    rows[0]?.attendance_threshold ?? Math.max(80, rule?.attendance_percent ?? 0);
+  const eligibleCount = rows.filter((row) => row.attendance_eligible).length;
+  const confirmedCount = rows.filter(
+    (row) => row.approval && !row.stale && row.enrollment_status === "ACTIVE",
+  ).length;
+  const refundCount = rows.filter(
+    (row) => row.refund || row.refund_document,
+  ).length;
+  const attendanceCompleteCount = rows.filter(
+    (row) => row.attendance_complete,
+  ).length;
+  const completionRate = (count: number) =>
+    rows.length ? `${((count / rows.length) * 100).toFixed(1)}%` : "—";
   return (
     <div className="page-shell">
       {manager && (
@@ -80,6 +100,45 @@ export default async function CompletionReview({
         과정 종료 후 승인된 기준으로 판정합니다. 수료 확정과 증명서·배지 발급은
         별도 단계입니다.
       </PageIntro>
+      {isSample && (
+        <div role="status" className="notice mb-6 border border-amber-300 bg-amber-50 text-amber-950">
+          <strong>검토용 예시 데이터</strong>입니다. 실제 수강생·출석·환불·수료 기록에
+          저장되지 않으며 아래 처리 버튼은 사용할 수 없습니다.{" "}
+          <Link className="font-semibold underline" href={`/completion/${id}`}>
+            실제 화면으로 돌아가기
+          </Link>
+        </div>
+      )}
+      <section className="mb-6 grid gap-3 sm:grid-cols-3" aria-label="수료율 자동 산정">
+        <div className="panel">
+          <h2 className="text-sm font-semibold text-slate-600">출석기준 충족 수료율</h2>
+          <p className="mt-2 text-2xl font-bold tabular-nums">
+            {completionRate(eligibleCount)}
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            {eligibleCount} / {rows.length}명 · 최소 출석률 {threshold}%
+          </p>
+        </div>
+        <div className="panel">
+          <h2 className="text-sm font-semibold text-slate-600">확정 수료율</h2>
+          <p className="mt-2 text-2xl font-bold tabular-nums">
+            {completionRate(confirmedCount)}
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            수료 승인 {confirmedCount} / 등록 {rows.length}명
+          </p>
+        </div>
+        <div className="panel">
+          <h2 className="text-sm font-semibold text-slate-600">중도 환불 표시</h2>
+          <p className="mt-2 text-2xl font-bold tabular-nums">{refundCount}명</p>
+          <p className="mt-1 text-sm text-slate-500">신청·진행·지급 상태를 학습자별로 구분</p>
+        </div>
+      </section>
+      {attendanceCompleteCount < rows.length && (
+        <p className="mb-6 text-sm text-slate-600">
+          출석기준 충족 수료율은 모든 회차 종료와 출석 기록 완료 전에는 잠정치입니다. 승인된 과제·시험 기준과 운영자료 마감 여부는 별도 판정에 반영됩니다.
+        </p>
+      )}
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <section className="panel">
           <h2 className="section-title">수료 기준</h2>
@@ -98,9 +157,7 @@ export default async function CompletionReview({
               <dl className="grid grid-cols-2 gap-3 border-y py-4 text-sm">
                 <dt>출석률</dt>
                 <dd>
-                  {rule?.attendance_percent == null
-                    ? "미적용"
-                    : `${rule.attendance_percent}% 이상`}
+                  {threshold}% 이상 (운영계획서·승인 정책 중 높은 기준)
                 </dd>
                 <dt>각 과제 점수</dt>
                 <dd>
@@ -129,7 +186,7 @@ export default async function CompletionReview({
                     계산 기준 작성
                   </summary>
                   <div className="mt-4">
-                    <ActionForm action={proposeRules} label="기준안 저장">
+                    <ActionForm action={proposeRules} label="기준안 저장" disabled={isSample}>
                       <input
                         type="hidden"
                         name="policy"
@@ -182,7 +239,7 @@ export default async function CompletionReview({
                   <ActionForm
                     action={approveRules}
                     label="계산 기준 승인"
-                    disabled={rule.created_by === me.id}
+                    disabled={isSample || rule.created_by === me.id}
                   >
                     <input type="hidden" name="policy" value={rule.policy_id} />
                     <input
@@ -224,7 +281,7 @@ export default async function CompletionReview({
             <ActionForm
               action={sealAcademics}
               label="운영자료 마감 확인"
-              disabled={o.academic_sealed}
+              disabled={isSample || o.academic_sealed}
             >
               <input type="hidden" name="offering" value={id} />
               <input
@@ -242,7 +299,17 @@ export default async function CompletionReview({
       </div>
       <section className="mt-10">
         <h2 className="section-title">수강생별 판정과 승인</h2>
-        {!rows.length && <Empty title="수강등록된 학습자가 없습니다" />}
+        {!rows.length && (
+          <>
+            <Empty title="수강등록된 학습자가 없습니다" />
+            <Link
+              className="btn-secondary mt-4 inline-flex"
+              href={`/completion/${id}?sample=1`}
+            >
+              예시 데이터로 화면 보기
+            </Link>
+          </>
+        )}
         <div className="space-y-5">
           {rows.map((row) => {
             const r = row.run;
@@ -259,6 +326,29 @@ export default async function CompletionReview({
                           : outcomeLabels[r.outcome]
                       : "미산출"}
                   </span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2 text-sm">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                    출석률{" "}
+                    {row.attendance_percent == null
+                      ? "산정 전"
+                      : `${row.attendance_percent}%`}
+                    {row.attendance_complete
+                      ? row.attendance_eligible
+                        ? " · 기준 충족"
+                        : " · 기준 미달"
+                      : " · 출결 진행 중"}
+                  </span>
+                  {row.refund_document && (
+                    <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-900">
+                      중도 환불 신청서 {refundDocumentStatus(row.refund_document.status)}
+                    </span>
+                  )}
+                  {row.refund && (
+                    <span className="rounded-full bg-rose-50 px-3 py-1 text-rose-900">
+                      중도 환불 {refundStatus(row.refund.status)}
+                    </span>
+                  )}
                 </div>
                 {r && (
                   <>
@@ -322,11 +412,12 @@ export default async function CompletionReview({
                   <ActionForm
                     action={calculateCompletion}
                     label={r ? "최신 자료로 재산출" : "수료 후보 산출"}
+                    disabled={isSample}
                   >
                     <input type="hidden" name="offering" value={id} />
                     <input type="hidden" name="person" value={row.person_id} />
                   </ActionForm>
-                  {certifier &&
+                  {(certifier || isSample) &&
                     r &&
                     r.outcome === "READY" &&
                     !row.stale &&
@@ -335,7 +426,7 @@ export default async function CompletionReview({
                         action={confirmCompletion}
                         label="수료 확정"
                         disabled={
-                          r.calculated_by === me.id || row.person_id === me.id
+                          isSample || r.calculated_by === me.id || row.person_id === me.id
                         }
                       >
                         <input type="hidden" name="run" value={r.id} />
@@ -358,4 +449,26 @@ export default async function CompletionReview({
       </section>
     </div>
   );
+}
+
+function refundStatus(status: string) {
+  const labels: Record<string, string> = {
+    REQUESTED: "요청",
+    REVIEWED: "검토",
+    APPROVED: "승인",
+    PROCESSING: "지급 처리 중",
+    RECONCILING: "지급 확인 중",
+    PAID: "지급 완료",
+  };
+  return labels[status] ?? status;
+}
+
+function refundDocumentStatus(status: string) {
+  const labels: Record<string, string> = {
+    RECEIVED: "접수",
+    REVIEWING: "검토",
+    APPROVED: "승인",
+    COMPLETED: "처리 완료",
+  };
+  return labels[status] ?? status;
 }

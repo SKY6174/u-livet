@@ -1075,12 +1075,18 @@ function Input({
                   ? "time"
                   : "text"
           }
-          min={0}
+          min={f.key === "completionAttendancePercent" ? 80 : 0}
+          max={f.key === "completionAttendancePercent" ? 100 : undefined}
           step={f.type === "number" ? ".01" : undefined}
           maxLength={f.max}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
+      )}
+      {f.key === "completionAttendancePercent" && (
+        <span className="text-xs font-normal text-slate-500">
+          기본 80%. 책임교수와 사업단이 협의한 과정별 기준을 입력하며, 최종 제출 후 수료 판정에 적용됩니다.
+        </span>
       )}
     </label>
   );

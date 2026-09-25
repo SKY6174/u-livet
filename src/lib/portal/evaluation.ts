@@ -80,6 +80,12 @@ export type CompletionRow = {
   run: CompletionRun | null;
   approval: { approved_at: string } | null;
   stale: boolean;
+  attendance_percent?: number | null;
+  attendance_threshold?: number;
+  attendance_complete?: boolean;
+  attendance_eligible?: boolean;
+  refund?: { status: string; requested_at: string } | null;
+  refund_document?: { status: string; submitted_at: string } | null;
 };
 export type HistoryRow = {
   offering_id: string;

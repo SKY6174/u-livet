@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { CourseMonitoringPlanDashboard } from "./course-monitoring-plan-dashboard";
+import type { MonitoringDocument, MonitoringGuide, MonitoringPlan } from "@/lib/course-monitoring/model";
 
 export type MonitoringCourse = {
   id: string;
@@ -27,6 +29,12 @@ export type MonitoringCourse = {
 };
 
 type Organization = { id: string; name: string };
+type AnnualMonitoring = {
+  guides: MonitoringGuide[];
+  plans: MonitoringPlan[];
+  documents: MonitoringDocument[];
+  today: string;
+};
 
 const STATUS_LABELS: Record<string, string> = {
   DRAFT: "개설 준비",
@@ -37,13 +45,20 @@ const STATUS_LABELS: Record<string, string> = {
 
 const YEAR_PATTERN = /\d{4}/;
 const yearOf = (course: MonitoringCourse) => course.year_label.match(YEAR_PATTERN)?.[0] ?? course.starts_on.slice(0, 4);
+const courseYearAndField = (course: MonitoringCourse) => {
+  const phase = course.year_label.match(/\d+차년도/)?.[0];
+  const academy = course.academy.replace(/\s*아카데미\s*$/, "").trim();
+  const year = `${yearOf(course)}${phase ? `(${phase})` : ""}`;
+  return academy ? `${year}∙${academy}` : year;
+};
 const attentionCount = (course: MonitoringCourse) =>
   course.application_pending + course.missing_attendance + course.teaching_pending + course.completion_pending;
 const statusOrder = (status: string) => status === "PUBLISHED" || status === "CLOSED" ? 0 : status === "DRAFT" ? 1 : 2;
 
-export function CourseMonitoringDashboard({ courses, organizations }: {
+export function CourseMonitoringDashboard({ courses, organizations, annual }: {
   courses: MonitoringCourse[];
   organizations: Organization[];
+  annual?: AnnualMonitoring;
 }) {
   const [organization, setOrganization] = useState("all");
   const [year, setYear] = useState("all");
@@ -67,8 +82,7 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
     completion: sum.completion + course.completion_pending,
   }), { applications: 0, enrolled: 0, missing: 0, completion: 0 });
 
-  return <section aria-label="과정별 운영 현황" className="space-y-6">
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+  const summaryCards = <div aria-label="과정 운영 현황 요약" className="grid grid-cols-2 gap-3 lg:grid-cols-5">
       {([
         ["표시 과정", visible.length, "개"],
         ["신청 대기·대기자", totals.applications, "명"],
@@ -79,7 +93,12 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
         <p className="text-xs font-semibold text-slate-600">{label}</p>
         <p className={`mt-2 text-2xl font-bold tabular-nums ${value > 0 && (label === "출결 미입력" || label === "수료 검토 대기") ? "text-amber-800" : "text-slate-900"}`}>{value.toLocaleString("ko-KR")}<span className="ml-1 text-sm font-normal text-slate-500">{unit}</span></p>
       </div>)}
-    </div>
+    </div>;
+
+  return <>
+    {annual && <CourseMonitoringPlanDashboard {...annual} courses={courses} summaryCards={summaryCards} />}
+    <section aria-label="과정별 운영 현황" className="space-y-6">
+    {!annual && summaryCards}
 
     <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
       {organizations.length > 1 && <label className="min-w-40 flex-1 text-xs font-semibold text-slate-600">담당 기관
@@ -107,7 +126,6 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
       </label>
     </div>
 
-    <p className="text-sm text-slate-600" role="status">조건에 맞는 과정 {visible.length}개 · 상태별로 주의 항목이 많은 과정부터 표시됩니다.</p>
     {!visible.length ? <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
       <h2 className="font-bold">{courses.length ? "조건에 맞는 과정이 없습니다" : "등록된 과정이 없습니다"}</h2>
       <p className="mt-2 text-sm text-slate-600">{courses.length ? "필터를 변경해 주세요." : "과정을 등록하면 신청·출결 현황이 여기에 표시됩니다."}</p>
@@ -125,7 +143,8 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
               <th scope="row" className="w-[28%] min-w-64 px-5 py-5 font-normal">
                 <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${course.status === "ARCHIVED" ? "bg-slate-100 text-slate-700" : course.status === "DRAFT" ? "bg-amber-50 text-amber-800" : "bg-teal-50 text-teal-800"}`}>{STATUS_LABELS[course.status] ?? course.status}</span>
                 <Link href={base} className="mt-2 block break-keep font-bold text-slate-900 hover:text-teal-800 hover:underline">{course.name}</Link>
-                <p className="mt-1 text-xs text-slate-500">{organizationNames.get(course.org_id) ?? "담당 기관"} · {course.year_label} · {course.academy}</p>
+                <p className="mt-1 whitespace-nowrap text-xs text-slate-500">{organizationNames.get(course.org_id) ?? "담당 기관"}</p>
+                <p className="whitespace-nowrap text-xs text-slate-500">{courseYearAndField(course)}</p>
                 <p className="mt-1 text-xs text-slate-500">{course.starts_on} ~ {course.ends_on}</p>
               </th>
               <td className="min-w-44 px-5 py-5">
@@ -160,5 +179,6 @@ export function CourseMonitoringDashboard({ courses, organizations }: {
       </table>
     </div>}
     <p className="text-xs leading-5 text-slate-500">신청 대기·대기자는 제출·대기 상태의 신청 건수입니다. 출결 미입력은 결석 수가 아니며, 수료 승인은 별도로 진행됩니다.</p>
-  </section>;
+    </section>
+  </>;
 }
