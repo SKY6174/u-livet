@@ -349,17 +349,21 @@ export function ReportDocuments({
         </>
       )}
       {show("attendance") && (attendanceBook
-        ? <AttendancePrint official book={attendanceBook} title={title("attendance")} attachmentNumber={attachmentNumber("attendance")} />
+        ? <AttendancePrint book={attendanceBook} title={title("attendance")} attachmentNumber={attachmentNumber("attendance")} />
         : <section className="report-sheet report-form-20"><div className="report-attachment-marker">[첨부 #1]</div><h1>{title("attendance")}</h1><p>QR·확정 출결 자료를 불러오지 못했습니다. 다시 시도해 주세요.</p></section>)}
       {show("completion") &&
-        chunk(members, 18).map((people, pi) => (
-          <Sheet title={title("completion")} offering={o} attachment={attachmentNumber("completion")} wide key={`c-${pi}`}>
-            <p>담당 교수: {p.professor || "미입력"}</p>
+        chunk(members, 8).map((people, pi, pages) => (
+          <section className="report-sheet report-form-20 report-landscape report-completion-list" key={`c-${pi}`}>
+            <div className="report-attachment-marker">[첨부 #{attachmentNumber("completion")}]</div>
+            <h1>{title("completion")}</h1>
+            <table className="report-table report-form-meta"><tbody>
+              <tr><th>과정명</th><td>{o.name}</td><th>교육기간</th><td>{o.starts_on} ~ {o.ends_on}</td></tr>
+              <tr><th>전체 교육시간</th><td>{source?.educationHours ?? hours(totalMinutes)}시간</td><th>수료인원</th><td>{completedCount}명</td></tr>
+            </tbody></table>
+            <p className="report-form-caption">담당 교수: {p.professor || "미입력"} · 수강생 {members.length}명 · {pi + 1}/{pages.length}쪽</p>
             <Table
               head={[
                 "순번",
-                "과정명",
-                "교육기간",
                 "성명",
                 "생년월일",
                 "총 교육시간",
@@ -371,9 +375,7 @@ export function ReportDocuments({
               rows={people.map((m, i) => {
                 const a = attendanceSummary(b, m.person_id);
                 return [
-                  pi * 18 + i + 1,
-                  o.name,
-                  `${o.starts_on} ~ ${o.ends_on}`,
+                  pi * 8 + i + 1,
                   m.name,
                   details(m.person_id)?.birthDate,
                   `${hours(a.total)}h`,
@@ -389,7 +391,8 @@ export function ReportDocuments({
                 ];
               })}
             />
-          </Sheet>
+            <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
+          </section>
         ))}
       {show("scholarships") &&
         chunk(scholarships, 14).map((rows, pi) => (

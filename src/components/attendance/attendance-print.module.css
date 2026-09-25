@@ -1,15 +1,12 @@
 .sheet h1 { margin: 0 0 5mm; font-size: 18pt; }
-.sheet .meta { margin: 0 0 4mm; }
-.meta th, .meta td { padding: 1mm 2mm; font-size: 8pt; }
-.meta th { width: 20mm; }
 .caption { font-size: 8pt; margin: 0 0 3mm; }
 .ledger { margin: 0; }
 .ledger th, .ledger td { padding: 2mm 1mm; font-size: 8pt; line-height: 1.3; white-space: normal; word-break: keep-all; }
 .ledger th { text-align: center; }
 .ledger td { text-align: center; }
-.ledger tbody th { white-space: nowrap; }
-.session { font-weight: 700; }
+.ledger tbody th { text-align: left; overflow-wrap: anywhere; }
+.axis { font-weight: 500; }
+.sessionDate { font-weight: 700; }
 .stamp { display: inline-block; font-size: 7.5pt; line-height: 1.3; white-space: nowrap; color: #334155; }
-.number { width: 8mm; }
-.name { width: 18mm; }
-.total { width: 22mm; }
+.number { width: 10mm; }
+.name { width: 30mm; }

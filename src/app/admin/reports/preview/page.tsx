@@ -16,7 +16,7 @@ export const metadata = {
 };
 const GUIDE: Record<DocumentKind, { owner: string; description: string }> = {
   result: { owner: "운영진 작성", description: "운영 개요·성과·사진·예산·품질 개선·총평" },
-  attendance: { owner: "QR 시작·종료 / 강사 확정", description: "전체 회차를 가로로 펼쳐 QR 시작·종료 시각과 별도 확정 인정시간을 확인" },
+  attendance: { owner: "QR 시작·종료 / 강사 확정", description: "회차를 4개씩 나누어 QR 시작·종료 시각을 확인하고 인정시간은 별도 출결 기록에서 확인" },
   completion: { owner: "수료 승인 연동", description: "교육시간·이수시간·출석률·최신 수료 승인 상태" },
   scholarships: { owner: "운영진 입력", description: "장학유형·지급률·금액·지급계좌·지급일" },
   teaching: { owner: "강사 서명 → 운영진 확인", description: "오전·점심·오후 실제 강의 구간과 본인 전자서명 자동 취합" },
