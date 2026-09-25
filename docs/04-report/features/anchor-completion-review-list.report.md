@@ -7,3 +7,5 @@
 변경 파일은 `src/app/completion/[id]/page.tsx`이며 DB와 판정 규칙은 변경하지 않았다. `npm run lint`, `npx tsc --noEmit`, `npm run build`, `git diff --check`를 통과했다. 설계 일치율은 100%로 확인했다.
 
 운영 화면 확인에서 승인 대기 행이 높아진 문제를 발견하여 승인 체크박스와 확정 버튼을 해당 행에서 펼쳐 보도록 보완했다. 수정 후 `npm run build`를 다시 통과했다.
+
+후속 요청에 따라 표의 1500px 최소 너비를 제거하고 열 폭을 조정했다. 좁은 화면은 두 열 목록으로 전환하며 처리 버튼 문구도 셀 안에서 줄바꿈한다. 변경 파일에 대한 ESLint와 TypeScript 검사는 통과했다.
