@@ -226,6 +226,10 @@ export function DocumentPreview({
           2. 모집 대상 계획 <small>(총 모집인원 중 모집 계획)</small>
         </h2>
         <p>가. 모집인원 : {v.capacity}명</p>
+        <p>
+          수료 인정 최소 출석률 : {v.completionAttendancePercent || "80"}%
+          (책임교수·사업단 협의 기준)
+        </p>
         <p>나. 주요대상 :</p>
         <Grid
           headers={["구분", ...RECRUITMENT]}
