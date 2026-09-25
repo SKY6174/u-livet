@@ -16,14 +16,28 @@ const ok = r => { assert.equal(r.error, null, r.error?.message); return r.data; 
 let checks = 0; const pass = label => { checks++; console.log('PASS ' + label); };
 const denied = async (actor, fn, args, code) => { const r = await actor.c.rpc(fn,args); assert(r.error, fn + ' must reject'); if(code) assert.equal(r.error.message,code); };
 const run = randomUUID().slice(0,8);
+let accountNo = 0;
 async function account(label, role) {
   const email = `qr-${run}-${label}@example.invalid`, password = 'Local-Only-2026!';
-  ok(await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { name: '[TEST] QR '+label, privacy_policy_id: privacy, privacy_accepted: true } }));
+  const mobile = `+8210${String((Date.now() + accountNo++) % 100000000).padStart(8, '0')}`;
+  ok(await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { name: '[TEST] QR '+label, mobile_phone: mobile, privacy_policy_id: privacy, privacy_accepted: true } }));
   const c=create(); ok(await c.auth.signInWithPassword({email,password})); const person=ok(await c.rpc('life_identity')).id;
   if(role) { sql(`insert into public.life_role_assignments(person_id,org_id,role) values('${person}','${org}','${role}');`); await ensureLocalMfa(c); }
   return {c,person,email,password};
 }
-const teacher=await account('teacher','INSTRUCTOR'), learner=await account('learner'), other=await account('other'), outsider=await account('outsider'), manager=await account('manager','COURSE_MANAGER');
+const [signupEnabled, signupPolicy] = sql("select enabled,coalesce(policy_id::text,'') from life_private.signup_settings where singleton=true;").split('|');
+assert(['t', 'f'].includes(signupEnabled), 'local signup settings missing');
+let teacher, learner, other, outsider, manager;
+try {
+  sql(`update life_private.signup_settings set enabled=true,policy_id='${privacy}' where singleton=true;`);
+  teacher=await account('teacher','INSTRUCTOR');
+  learner=await account('learner');
+  other=await account('other');
+  outsider=await account('outsider');
+  manager=await account('manager','COURSE_MANAGER');
+} finally {
+  sql(`update life_private.signup_settings set enabled=${signupEnabled==='t'},policy_id=${signupPolicy ? `'${signupPolicy}'` : 'null'} where singleton=true;`);
+}
 const iso = n => new Date(Date.now()+n).toISOString();
 const day = n => new Date(Date.now()+n+9*3600000).toISOString().slice(0,10);
 const offering=ok(await manager.c.rpc('life_create_offering',{o:org,y:year,title:'[TEST] QR '+run,academy:'스마트테크',summary:'Local QR verification',curriculum:'Synthetic only',mode:'OFFLINE',location:'Local',capacity:30,selection_method:'REVIEW',apply_from:iso(-86400000),apply_until:iso(86400000),starts_on:day(-86400000),ends_on:day(86400000)}));
@@ -45,12 +59,20 @@ await denied(learner,'life_qr_checkin',{...check,f:randomUUID()},'NOT_ENROLLED')
 pass('enrollment, self-checkin, forged token, session and course mismatches rejected');
 const checked=ok(await learner.c.rpc('life_qr_checkin',check));
 const repeated=ok(await learner.c.rpc('life_qr_checkin',check)); assert.equal(checked.checked_in_at,repeated.checked_in_at);
+const endChallenge=ok(await teacher.c.rpc('life_issue_attendance_qr_end',args));
+await denied(other,'life_qr_checkin',{...args,t:endChallenge.token},'CHECKIN_REQUIRED');
+const checkout=ok(await learner.c.rpc('life_qr_checkin',{...args,t:endChallenge.token}));
+const checkoutAgain=ok(await learner.c.rpc('life_qr_checkin',{...args,t:endChallenge.token}));
+assert.equal(checkout.phase,'END'); assert.equal(checkout.checked_in_at,checked.checked_in_at);
+assert.equal(checkout.checked_out_at,checkoutAgain.checked_out_at);
+assert(Date.parse(checkout.checked_out_at)>=Date.parse(checked.checked_in_at));
 ok(await other.c.rpc('life_qr_checkin',check));
 const own=ok(await learner.c.rpc('life_qr_checkins',{f:offering})); assert.equal(own.length,1); assert.equal(own[0].person_id,learner.person);
+assert.equal(own[0].checked_out_at,checkout.checked_out_at);
 assert.equal(ok(await teacher.c.rpc('life_qr_checkins',{f:offering})).length,2);
 assert.equal(ok(await learner.c.rpc('life_my_attendance',{f:offering})).attendance.length,0);
 await denied(outsider,'life_qr_checkins',{f:offering});
-pass('duplicate check-in preserves first timestamp; scoped reads; no automatic credit');
+pass('start and end QR preserve first timestamps; ending requires a start; scoped reads; no automatic credit');
 sql(`update public.life_enrollments set status='WITHDRAWN' where offering_id='${offering}' and person_id='${learner.person}';`);
 await denied(learner,'life_qr_checkin',check,'NOT_ENROLLED');
 sql(`update public.life_enrollments set status='ACTIVE' where offering_id='${offering}' and person_id='${learner.person}'; update public.life_offering_instructors set valid_until=now()-interval '1 day' where offering_id='${offering}';`);

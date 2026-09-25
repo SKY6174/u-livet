@@ -17,7 +17,7 @@ export default async function StudentAttendanceCheckinPage({ params, searchParam
   const nextUrl = `/learning/${id}/attendance/checkin?${new URLSearchParams({ session, t })}`;
   const me = await requireIdentity(nextUrl);
   return <div className="page-shell max-w-lg">
-    <PageIntro eyebrow="QR CHECK-IN" title="QR 입실 확인">로그인한 본인의 수강 내역과 수업 시간을 확인하여 기록합니다.</PageIntro>
+    <PageIntro eyebrow="QR ATTENDANCE" title="QR 시작·종료 확인">로그인한 본인의 QR 확인 시각을 기록합니다.</PageIntro>
     <QrCheckin offering={id} session={session} token={t} name={me.name} />
     <Link className="btn-secondary mt-5" href={`/learning/${id}/attendance`}>나의 출석 내역</Link>
   </div>;
