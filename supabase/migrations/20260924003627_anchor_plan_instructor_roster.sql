@@ -98,6 +98,11 @@ BEGIN
   WHERE p.active AND role.role='COURSE_MANAGER' AND role.valid_from<=now()
     AND (role.valid_until IS NULL OR role.valid_until>now())
   ORDER BY p.id LIMIT 1;
+  IF seed_actor IS NULL THEN
+    SELECT id INTO seed_actor FROM public.life_people
+    WHERE id='20260922-1331-4000-8000-000000000001'
+      AND name='마이그레이션 자료 이관' AND active;
+  END IF;
   IF anchor_org IS NULL OR seed_actor IS NULL THEN RAISE EXCEPTION 'ANCHOR_MANAGER_REQUIRED'; END IF;
   IF (SELECT count(*) FROM plan_staff)<>43 OR
      (SELECT count(*) FROM plan_people)<>39 OR

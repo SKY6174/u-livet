@@ -53,7 +53,14 @@ BEGIN
   WHERE p.active AND role.role='COURSE_MANAGER' AND role.valid_from<=now()
     AND (role.valid_until IS NULL OR role.valid_until>now())
   ORDER BY p.id LIMIT 1;
-  IF anchor_org IS NULL OR seed_actor IS NULL THEN RAISE EXCEPTION 'ANCHOR_MANAGER_REQUIRED'; END IF;
+  IF anchor_org IS NULL THEN RAISE EXCEPTION 'ANCHOR_ORG_REQUIRED'; END IF;
+  -- Fresh preview branches replay migrations before any staff account exists.
+  -- This provenance-only person has no auth link or role and cannot sign in.
+  IF seed_actor IS NULL THEN
+    INSERT INTO public.life_people(id,name)
+    VALUES ('20260922-1331-4000-8000-000000000001','마이그레이션 자료 이관');
+    seed_actor := '20260922-1331-4000-8000-000000000001';
+  END IF;
   IF (SELECT count(*) FROM initial_internal_instructors)<>10
      OR (SELECT count(*) FROM initial_internal_people)<>9
      OR EXISTS (
