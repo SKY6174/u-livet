@@ -310,142 +310,162 @@ export default async function CompletionReview({
             </Link>
           </>
         )}
-        <div className="space-y-5">
-          {rows.map((row) => {
-            const r = row.run;
-            return (
-              <article key={row.person_id} className="panel">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-lg font-semibold">{row.name}</h3>
-                  <span className="badge">
-                    {r
-                      ? row.stale
-                        ? "자료 변경 · 재산출 필요"
-                        : row.approval
-                          ? "수료 확정"
-                          : outcomeLabels[r.outcome]
-                      : "미산출"}
-                  </span>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2 text-sm">
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                    출석률{" "}
-                    {row.attendance_percent == null
-                      ? "산정 전"
-                      : `${row.attendance_percent}%`}
-                    {row.attendance_complete
-                      ? row.attendance_eligible
-                        ? " · 기준 충족"
-                        : " · 기준 미달"
-                      : " · 출결 진행 중"}
-                  </span>
-                  {row.refund_document && (
-                    <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-900">
-                      중도 환불 신청서 {refundDocumentStatus(row.refund_document.status)}
-                    </span>
-                  )}
-                  {row.refund && (
-                    <span className="rounded-full bg-rose-50 px-3 py-1 text-rose-900">
-                      중도 환불 {refundStatus(row.refund.status)}
-                    </span>
-                  )}
-                </div>
-                {r && (
-                  <>
-                    <p className="my-3 text-sm text-slate-500">
-                      산출 {dateTime(r.calculated_at)} ·{" "}
-                      {row.enrollment_status === "ACTIVE"
-                        ? "수강 중"
-                        : "수강 철회"}
-                    </p>
-                    {r.reasons.length > 0 && (
-                      <ul className="notice list-inside list-disc">
-                        {r.reasons.map((s) => (
-                          <li key={s}>{s}</li>
-                        ))}
-                      </ul>
-                    )}
-                    <details className="my-4 rounded-xl border p-4">
-                      <summary className="cursor-pointer font-semibold">
-                        판정 근거 확인
-                      </summary>
-                      <div className="mt-4 space-y-4 text-sm">
-                        <p>
-                          산출 출석률:{" "}
-                          {r.evidence.attendance_percent == null
-                            ? "미적용 또는 판정 불가"
-                            : `${r.evidence.attendance_percent}%`}
-                        </p>
-                        <div>
-                          <strong>전체 유효 수업</strong>
-                          {r.evidence.sessions.map((s) => (
-                            <p key={s.session_id} className="py-1">
-                              {s.title} · {s.credited_minutes ?? "미기록"} /{" "}
-                              {s.minutes}분
-                            </p>
-                          ))}
-                        </div>
-                        <div>
-                          <strong>과제</strong>
-                          {r.evidence.assignments.map((a) => (
-                            <p key={a.assignment_id} className="py-1">
-                              {a.title} · 제출 {a.revision ?? "없음"} ·{" "}
-                              {a.score ?? "미채점"}
-                              {a.score !== null && "점"}
-                            </p>
-                          ))}
-                        </div>
-                        <div>
-                          <strong>시험</strong>
-                          {r.evidence.quizzes.map((q) => (
-                            <p key={q.quiz_id} className="py-1">
-                              {q.title} · {q.score ?? "미완료"}
-                              {q.score !== null && "점"}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    </details>
-                  </>
-                )}
-                <div className="grid items-start gap-5 md:grid-cols-2">
-                  <ActionForm
-                    action={calculateCompletion}
-                    label={r ? "최신 자료로 재산출" : "수료 후보 산출"}
-                    disabled={isSample}
-                  >
-                    <input type="hidden" name="offering" value={id} />
-                    <input type="hidden" name="person" value={row.person_id} />
-                  </ActionForm>
-                  {(certifier || isSample) &&
-                    r &&
-                    r.outcome === "READY" &&
-                    !row.stale &&
-                    !row.approval && (
-                      <ActionForm
-                        action={confirmCompletion}
-                        label="수료 확정"
-                        disabled={
-                          isSample || r.calculated_by === me.id || row.person_id === me.id
-                        }
-                      >
-                        <input type="hidden" name="run" value={r.id} />
-                        <label className="flex gap-3 text-sm">
-                          <input type="checkbox" name="reviewed" required />
-                          수료 기준과 판정 근거를 검토했습니다.
-                        </label>
-                        {r.calculated_by === me.id && (
-                          <p className="text-sm">
-                            직접 산출한 결과는 다른 승인자가 확정해야 합니다.
-                          </p>
-                        )}
-                      </ActionForm>
-                    )}
-                </div>
-              </article>
-            );
-          })}
-        </div>
+        {rows.length > 0 && (
+          <>
+            <p id="completion-list-help" className="mb-3 text-sm text-slate-600">
+              판정 근거는 해당 행에서 펼쳐 확인할 수 있습니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.
+            </p>
+            <div
+              role="region"
+              aria-label="수강생별 수료 판정 목록"
+              aria-describedby="completion-list-help"
+              tabIndex={0}
+              className="overflow-x-auto rounded-2xl border border-slate-200 bg-white"
+            >
+              <table className="w-full min-w-[1500px] table-fixed text-left text-sm">
+                <caption className="sr-only">수강생별 출석률, 수강·환불 상태, 판정 결과와 처리 목록</caption>
+                <colgroup>
+                  {[4, 10, 12, 14, 12, 12, 16, 20].map((width, index) => (
+                    <col key={index} style={{ width: `${width}%` }} />
+                  ))}
+                </colgroup>
+                <thead className="border-b border-slate-200 bg-slate-50 text-slate-700">
+                  <tr>
+                    {[
+                      "순번", "수강생", "출석률", "수강·환불 상태", "판정 결과",
+                      "산출 시각", "판정 근거", "처리",
+                    ].map((label) => (
+                      <th key={label} scope="col" className="px-3 py-3 font-semibold">{label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {rows.map((row, index) => {
+                    const r = row.run;
+                    return (
+                      <tr key={row.person_id} className="align-top hover:bg-teal-50/30">
+                        <td className="px-3 py-4 tabular-nums text-slate-500">{index + 1}</td>
+                        <th scope="row" className="px-3 py-4 font-semibold text-slate-900">{row.name}</th>
+                        <td className="px-3 py-4">
+                          <strong className="tabular-nums">
+                            {row.attendance_percent == null ? "산정 전" : `${row.attendance_percent}%`}
+                          </strong>
+                          <span className="mt-1 block text-xs text-slate-600">
+                            {row.attendance_complete
+                              ? row.attendance_eligible ? "기준 충족" : "기준 미달"
+                              : "출결 진행 중"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-4 text-slate-700">
+                          <span>{row.enrollment_status === "ACTIVE" ? "수강 중" : "수강 철회"}</span>
+                          {row.refund_document && (
+                            <span className="mt-1 block text-xs text-amber-900">
+                              중도 환불 신청서 {refundDocumentStatus(row.refund_document.status)}
+                            </span>
+                          )}
+                          {row.refund && (
+                            <span className="mt-1 block text-xs text-rose-900">
+                              중도 환불 {refundStatus(row.refund.status)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-4">
+                          <span className="badge">
+                            {r
+                              ? row.stale
+                                ? "자료 변경 · 재산출 필요"
+                                : row.approval ? "수료 확정" : outcomeLabels[r.outcome]
+                              : "미산출"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-4 text-slate-600">
+                          {r ? <time dateTime={r.calculated_at}>{dateTime(r.calculated_at)}</time> : "—"}
+                        </td>
+                        <td className="px-3 py-4">
+                          {r ? (
+                            <details>
+                              <summary className="cursor-pointer font-semibold text-teal-800">
+                                판정 근거 확인<span className="sr-only"> · {row.name}</span>
+                              </summary>
+                              <div className="mt-3 space-y-3 break-words text-xs leading-5 text-slate-700">
+                                {r.reasons.length > 0 && (
+                                  <div>
+                                    <strong>판정 사유</strong>
+                                    <ul className="list-inside list-disc">
+                                      {r.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                                    </ul>
+                                  </div>
+                                )}
+                                <p>산출 출석률: {r.evidence.attendance_percent == null
+                                  ? "미적용 또는 판정 불가" : `${r.evidence.attendance_percent}%`}</p>
+                                <div>
+                                  <strong>전체 유효 수업</strong>
+                                  {r.evidence.sessions.map((session) => (
+                                    <p key={session.session_id}>
+                                      {session.title} · {session.credited_minutes ?? "미기록"} / {session.minutes}분
+                                    </p>
+                                  ))}
+                                </div>
+                                <div>
+                                  <strong>과제</strong>
+                                  {r.evidence.assignments.map((assignment) => (
+                                    <p key={assignment.assignment_id}>
+                                      {assignment.title} · 제출 {assignment.revision ?? "없음"} · {assignment.score ?? "미채점"}
+                                      {assignment.score !== null && "점"}
+                                    </p>
+                                  ))}
+                                </div>
+                                <div>
+                                  <strong>시험</strong>
+                                  {r.evidence.quizzes.map((quiz) => (
+                                    <p key={quiz.quiz_id}>
+                                      {quiz.title} · {quiz.score ?? "미완료"}{quiz.score !== null && "점"}
+                                    </p>
+                                  ))}
+                                </div>
+                              </div>
+                            </details>
+                          ) : <span className="text-slate-400">—</span>}
+                        </td>
+                        <td className="px-3 py-4">
+                          <div className="flex flex-wrap items-start gap-2 [&_button]:min-h-9 [&_button]:whitespace-nowrap [&_button]:px-3 [&_button]:py-2 [&_button]:text-xs">
+                            <ActionForm
+                              action={calculateCompletion}
+                              label={r ? "최신 자료로 재산출" : "수료 후보 산출"}
+                              disabled={isSample}
+                              className="space-y-2"
+                            >
+                              <input type="hidden" name="offering" value={id} />
+                              <input type="hidden" name="person" value={row.person_id} />
+                            </ActionForm>
+                            {(certifier || isSample) && r && r.outcome === "READY" &&
+                              !row.stale && !row.approval && (
+                                <ActionForm
+                                  action={confirmCompletion}
+                                  label="수료 확정"
+                                  disabled={isSample || r.calculated_by === me.id || row.person_id === me.id}
+                                  className="space-y-2"
+                                >
+                                  <input type="hidden" name="run" value={r.id} />
+                                  <label className="flex items-start gap-2 text-xs leading-5">
+                                    <input type="checkbox" name="reviewed" required />
+                                    수료 기준과 판정 근거를 검토했습니다.
+                                  </label>
+                                  {r.calculated_by === me.id && (
+                                    <p className="text-xs">직접 산출한 결과는 다른 승인자가 확정해야 합니다.</p>
+                                  )}
+                                </ActionForm>
+                              )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </section>
     </div>
   );
