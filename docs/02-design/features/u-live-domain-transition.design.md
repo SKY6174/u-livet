@@ -31,3 +31,10 @@
 - `/api/version`, `/api/health`, 공개 홈페이지, `auth/login`의 주소와 canonical을 확인한다.
 - 제공자별 로그인과 이메일 인증·복구·초대 메일은 새 도메인의 실제 사용자 흐름으로 확인한다. 실사용자 계정 대신 승인된 테스트 계정을 사용한다.
 - 기존 미커밋 변경이 많으므로 파일별 차이만 확인하고 무관한 파일은 수정하지 않는다.
+
+## 후속 결정: Preview 도메인 전환 (2026-09-27)
+
+- 사용자 요청에 따라 Preview 기준 origin을 `https://staging.u-live.org`로 변경한다. `staging.uc-life.org`는 경로와 쿼리를 보존하여 새 주소로 301 이동한다.
+- Vercel에서 새 도메인을 `preview` 브랜치에 연결하고 해당 브랜치의 `AUTH_SITE_ORIGIN`, `CERTIFICATE_VERIFY_ORIGIN`을 새 origin으로 맞춘다. Production 설정과 Supabase 프로젝트는 변경하지 않는다.
+- Preview Supabase Site URL과 복구·초대·OAuth 앱 복귀 허용 경로를 새 주소로 변경한다. Google OAuth 웹 클라이언트의 JavaScript origin도 새 주소로 변경한다. Google의 서버 redirect URI는 기존 Preview Supabase callback을 유지한다.
+- 새 주소의 배포 보호를 유지하고 Google 계정 선택 화면에서 `redirect_to=https://staging.u-live.org/auth/callback...`을 확인한다. 실제 계정 선택과 로그인 완료는 별도 테스트 계정으로 확인한다.
