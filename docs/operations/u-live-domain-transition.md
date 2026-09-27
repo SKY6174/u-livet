@@ -30,10 +30,12 @@
 - 기존 세 호스트는 경로와 쿼리를 보존하며 새 도메인으로 HTTP 308 이동한다.
 - Google 운영 OAuth 클라이언트의 Authorized JavaScript origins에 `https://u-live.org`를 추가하고 기존 `https://uc-life.org`를 유지했다. Authorized redirect URI는 Supabase callback `https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback` 그대로다.
 - Google 동의 화면의 홈페이지와 개인정보처리방침 URL을 새 도메인으로 저장했다. Google이 브랜드 재검증을 요구한다. 이전에 검증된 문안이 사용자에게 계속 표시될 수 있다.
+- Google Search Console에 `u-live.org` 도메인 속성을 추가하고 DNS TXT 레코드로 소유권을 검증했다. 검증 레코드는 유지한다. Google OAuth 브랜드 재검증을 다시 제출했으며 결과를 기다리고 있다.
+- 더 이상 커스텀 도메인을 사용하지 않는 Vercel `u-live-org-redirect` 프로젝트의 Git 연결을 해제했다. 이 프로젝트의 이전 Preview 빌드는 운영 앱용 환경 변수가 없어 실패했지만, 운영 앱 `u-live`의 Preview 빌드는 통과했다.
 
 ## 남은 설정 및 전환 순서
 
-1. Google 브랜드 재검증을 제출하고 승인 상태를 확인한다. 이전 도메인 제거는 기존 링크 사용 현황을 확인한 뒤 별도로 진행한다.
+1. Google 브랜드 재검증의 승인 상태를 확인한다. 이전 도메인 제거는 기존 링크 사용 현황을 확인한 뒤 별도로 진행한다.
 2. 소셜 로그인 3종, 가입·초대·비밀번호 복구 메일, 증명서 검증 주소를 실제 계정으로 확인한다. 전환 기간에는 Supabase의 기존 Redirect URLs와 Google의 이전 origin을 유지한다.
 3. Naver 연결 끊기 callback은 현재 앱의 `/auth/callback`이 연결 해제 알림을 처리하지 않으므로 별도 엔드포인트 설계가 필요하다.
 
