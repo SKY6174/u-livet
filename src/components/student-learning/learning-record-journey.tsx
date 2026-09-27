@@ -69,7 +69,7 @@ export function LearningRecordJourney() {
         ))}
       </ol>
       <p className="mt-4 text-xs leading-5 text-slate-600">
-        국가 포털의 이력 등록·연계동의·증명서와 이력철 발급은 온국민평생배움터 로그인 후 진행합니다. UC Life의 사업단 이수증은 아래에서 별도로 신청할 수 있습니다.
+        국가 포털의 이력 등록·연계동의·증명서와 이력철 발급은 온국민평생배움터 로그인 후 진행합니다. UC Life의 사업단 이수증은 이 화면에서 별도로 신청할 수 있습니다.
       </p>
     </div>
   );

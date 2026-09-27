@@ -829,7 +829,7 @@ export function StudentDashboard({
                       <p className="mt-1 text-xs text-slate-500">
                         {h.approved_at && !h.stale
                           ? `수료 확정 ${shortDate(h.approved_at)}`
-                          : h.outcome && h.stale
+                          : h.stale
                             ? "자료 변경으로 다시 확인하고 있어요"
                             : "공식 수료 결과를 확인하세요"}
                       </p>
@@ -845,7 +845,7 @@ export function StudentDashboard({
                       href="/mypage/history"
                       className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-teal-50"
                     >
-                      {h.outcome && h.stale
+                      {h.stale
                         ? "재검토 필요"
                         : h.approved_at
                           ? "수료 완료"
