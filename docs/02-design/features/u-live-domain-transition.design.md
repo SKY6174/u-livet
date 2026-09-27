@@ -20,7 +20,7 @@
 ## 저장소 변경
 
 - Git 원격 URL은 `https://github.com/SKY6174/u-live.git`로 갱신한다.
-- `package.json`과 lockfile의 내부 package name은 저장소 이름에 맞춰 `u-live`로 변경한다. 제품 소스에는 옛 도메인 하드코딩이 없어 기능 코드는 변경하지 않는다.
+- `package.json`과 lockfile의 내부 package name, `/api/version`의 application 식별자는 저장소 이름에 맞춰 `u-live`로 변경한다. 제품 소스에는 옛 도메인 하드코딩이 없어 다른 기능 코드는 변경하지 않는다.
 - 운영 절차 문서에 새 도메인 기준값과 제공자별 콘솔 점검값을 기록한다. 과거 배포 기록은 당시 URL을 증거로 유지한다.
 - 기존 `U-LIFE` 브랜드 문구는 별도의 브랜드 승인 없이 일괄 치환하지 않는다. 도메인과 저장소 이름 변경과 브랜드 표기 변경은 별개의 범위다.
 
