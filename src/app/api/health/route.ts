@@ -4,7 +4,7 @@ export async function GET() {
   let ok = false;
   try {
     const { error } = await (await createServerSupabaseClient())
-      .from("life_catalog")
+      .from("life_course_guides")
       .select("id")
       .limit(1);
     ok = !error;
