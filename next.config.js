@@ -13,7 +13,7 @@ const nextConfig = {
     return [
       {
         source: "/favicon.ico",
-        destination: "/images/ulsan-college-logo.png",
+        destination: "/images/u-live-favicon.png",
       },
     ];
   },
