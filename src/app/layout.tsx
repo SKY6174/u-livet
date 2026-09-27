@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description:
     "교육과정 신청부터 학습과 경력까지, 울산과학대학교 앵커사업 평생직업교육.",
   icons: {
-    icon: { url: "/images/ulsan-college-logo.png", type: "image/png" },
+    icon: { url: "/images/u-live-favicon.png", type: "image/png" },
   },
 };
 export const dynamic = "force-dynamic";
