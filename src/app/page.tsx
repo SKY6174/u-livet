@@ -6,7 +6,7 @@ import {
   ClipboardCheck,
   GraduationCap,
 } from "lucide-react";
-import { requireIdentity } from "@/lib/auth/session";
+import { getSessionIdentity } from "@/lib/auth/session";
 import { hasRole, officeSections, workspaceKind } from "@/lib/auth/workspace-navigation";
 import { getWorkspaceOfferings } from "@/lib/portal/data";
 import { getInstructorHomeSummary } from "@/lib/classroom-questions/data";
@@ -21,7 +21,37 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 const REQUEST_KINDS = ["APPLICATION", "SCHOLARSHIP", "REFUND"] as const;
 const OPEN_REQUEST_STATUSES = new Set(["RECEIVED", "REVIEWING", "APPROVED"]);
 export default async function Home() {
-  const me = await requireIdentity("/");
+  const me = await getSessionIdentity();
+  if (!me) {
+    return (
+      <>
+        <section className="bg-uc-navy text-white">
+          <div className="mx-auto max-w-7xl px-5 py-20 md:py-28">
+            <p className="mb-5 text-sm font-semibold tracking-label text-teal-200">U-LiVE · LIFELONG LEARNING</p>
+            <h1 className="max-w-3xl text-4xl font-bold leading-tight md:text-6xl">
+              새로운 배움을, 여기에서 시작하세요.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200">
+              울산과학대학교 앵커사업단의 평생직업교육과정을 살펴보고 나에게 맞는 배움을 찾아보세요.
+            </p>
+            <Link href="/courses" className="mt-8 inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-bold text-uc-navy">
+              교육과정 둘러보기 <ArrowUpRight className="ml-3 h-5 w-5" aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
+        <section className="page-shell grid gap-4 md:grid-cols-2" aria-label="시작하기">
+          <Link href="/about" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-teal-500">
+            <h2 className="text-xl font-bold">앵커사업 소개</h2>
+            <p className="mt-2 text-slate-600">지역과 함께하는 평생직업교육의 목표를 확인하세요.</p>
+          </Link>
+          <Link href="/auth/login" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-teal-500">
+            <h2 className="text-xl font-bold">나의 공간 로그인</h2>
+            <p className="mt-2 text-slate-600">초대받은 계정으로 학습과 업무를 이어가세요.</p>
+          </Link>
+        </section>
+      </>
+    );
+  }
   const kind = workspaceKind(me);
   const officeGroups = kind === "office" ? officeSections(me) : [];
   const canReviewRequests = kind === "office" && hasRole(me, "SYSTEM_ADMIN", "COURSE_MANAGER", "FINANCE");
