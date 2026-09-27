@@ -6,7 +6,7 @@ export function NaverSignupEmail({ next, pendingEmail }: { next: string; pending
   return <div className="space-y-7">
     <div>
       <h2 className="text-xl font-bold">가입에 사용할 이메일 확인</h2>
-      <p className="mt-3 text-base leading-7 text-slate-600">네이버 인증이 완료되었습니다. U-LIFE에서 사용할 이메일을 입력해 주세요. 네이버 아이디의 메일 주소와 연락처 이메일은 다를 수 있습니다.</p>
+      <p className="mt-3 text-base leading-7 text-slate-600">네이버 인증이 완료되었습니다. U-LiVE에서 사용할 이메일을 입력해 주세요. 네이버 아이디의 메일 주소와 연락처 이메일은 다를 수 있습니다.</p>
       <p className="mt-2 text-base leading-7 text-slate-600">이메일 확인 후 이름·휴대폰 번호와 개인정보 동의를 입력하면 가입이 완료됩니다.</p>
     </div>
     <ActionForm action={requestNaverSignupEmail} label={pendingEmail ? "인증 메일 다시 받기" : "인증 메일 받기"} resetOnSuccess={false}>

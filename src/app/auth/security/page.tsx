@@ -8,7 +8,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { MfaPanel } from "@/components/auth/mfa-panel";
 import { signOut } from "@/app/auth/actions";
 export const metadata = {
-  title: "추가인증(2중 인증) · U-LIFE",
+  title: "추가인증(2중 인증) · U-LiVE",
   robots: { index: false, follow: false },
 };
 export default async function SecurityPage({

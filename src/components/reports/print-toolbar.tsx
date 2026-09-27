@@ -32,7 +32,7 @@ export function PrintToolbar({
     setError("");
     try {
       const { downloadReportPdf17 } = await import("@/lib/pdf/report-export");
-      await downloadReportPdf17(`U-LIFE-${preview ? "검토용-" : ""}보고서-${document}.pdf`);
+      await downloadReportPdf17(`U-LiVE-${preview ? "검토용-" : ""}보고서-${document}.pdf`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "PDF를 만들지 못했습니다. 다시 시도해 주세요.");
     } finally { setBusy(false); }

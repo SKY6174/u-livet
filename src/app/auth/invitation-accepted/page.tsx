@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "계정 설정 안내 · U-LIFE",
+  title: "계정 설정 안내 · U-LiVE",
   robots: { index: false, follow: false },
 };
 

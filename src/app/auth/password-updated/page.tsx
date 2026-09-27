@@ -1,6 +1,6 @@
 import Link from "next/link";
 export const metadata = {
-  title: "비밀번호 변경 안내 · U-LIFE",
+  title: "비밀번호 변경 안내 · U-LiVE",
   robots: { index: false, follow: false },
 };
 export default function PasswordUpdated() {

@@ -9,7 +9,7 @@ import {
 } from "@/lib/learner-document-workflow/data";
 
 export const metadata: Metadata = {
-  title: "수강생 작성 서류 | U-LIFE",
+  title: "수강생 작성 서류 | U-LiVE",
   robots: { index: false, follow: false },
 };
 

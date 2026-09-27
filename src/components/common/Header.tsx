@@ -185,7 +185,7 @@ export default function Header() {
               <p className="text-xs font-semibold text-teal-700">사업단 업무</p>
               <p className="mb-3 mt-2 text-xl font-bold tracking-tight text-slate-900">{previewLink.label}</p>
               <p className="text-sm leading-7 text-slate-600">{previewLink.description}</p>
-              <span className="mt-auto pt-6 text-xs font-medium text-teal-700">U-LIFE · OFFICE WORKSPACE</span>
+              <span className="mt-auto pt-6 text-xs font-medium text-teal-700">U-LiVE · OFFICE WORKSPACE</span>
             </div>
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function Header() {
             priority
           />
           <span>
-            <strong className="block text-xl tracking-tight">U-LIFE</strong>
+            <strong className="block text-xl tracking-tight">U-LiVE</strong>
             <span className="block text-xs text-slate-500">
               배움에서 새로운 일로
             </span>
