@@ -486,7 +486,7 @@ export function ReportDocuments({
             ])}
           />
           <p className="report-note">승인된 실강의시간만 합산하고 유효한 본인 서명만 날인합니다. 미등록·승인 대기는 표시하되 자동 날인하지 않습니다.</p>
-        </AttachmentSheet>
+        </section>
       ))}
       {show("fees") &&
         chunk(p.fees, 4).map((rows, pi) => (

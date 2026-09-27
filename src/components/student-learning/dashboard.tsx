@@ -25,6 +25,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { ActionForm } from "@/components/portal/action-form";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
+import { LearningRecordJourney } from "@/components/student-learning/learning-record-journey";
 import { decideApplication } from "@/app/actions";
 import { submitLearningRequest } from "@/app/learning-request-actions";
 import { attendanceState } from "@/lib/attendance/model";
@@ -865,8 +866,8 @@ export function StudentDashboard({
             <ServiceLink
               href="/mypage/certificates"
               icon={Award}
-              title="증명서 신청·발급"
-              description="나의 배움을 공식 증명서로"
+              title="사업단 이수증 신청·발급"
+              description="UC Life 과정의 수료 확정 후 신청"
             />
             <ServiceLink
               href="/mypage/badges"
@@ -876,6 +877,7 @@ export function StudentDashboard({
             />
           </div>
         </div>
+        <LearningRecordJourney />
       </section>
 
       <section id="scholarships" className={`${sectionClass} mt-12`}>
