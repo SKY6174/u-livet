@@ -38,3 +38,9 @@
 - Vercel에서 새 도메인을 `preview` 브랜치에 연결하고 해당 브랜치의 `AUTH_SITE_ORIGIN`, `CERTIFICATE_VERIFY_ORIGIN`을 새 origin으로 맞춘다. Production 설정과 Supabase 프로젝트는 변경하지 않는다.
 - Preview Supabase Site URL과 복구·초대·OAuth 앱 복귀 허용 경로를 새 주소로 변경한다. Google OAuth 웹 클라이언트의 JavaScript origin도 새 주소로 변경한다. Google의 서버 redirect URI는 기존 Preview Supabase callback을 유지한다.
 - 새 주소의 배포 보호를 유지하고 Google 계정 선택 화면에서 `redirect_to=https://staging.u-live.org/auth/callback...`을 확인한다. 실제 계정 선택과 로그인 완료는 별도 테스트 계정으로 확인한다.
+
+## 후속 결정: 검색 엔진 사이트맵 (2026-09-27)
+
+- 운영 사이트의 `/sitemap.xml`에 새 도메인의 공개 정적 페이지와 게시된 교육과정 목록의 상세 URL만 포함한다. 로그인, 개인 계정, 신청 및 검증 화면은 제외한다.
+- 사이트맵 URL은 `RELEASE_PRODUCTION_SITE_ORIGIN`을 기준으로 생성하고, 공개 과정 목록을 불러오지 못해도 정적 페이지는 제공한다.
+- `robots.txt`에서 사이트맵 위치를 알린다. 운영 응답과 URL 목록을 확인한 뒤 Search Console의 새 도메인 속성에 제출한다.
