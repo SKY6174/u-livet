@@ -207,19 +207,19 @@ export default function Header() {
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" aria-label="U-LiVE — 열린 배움, 더 넓은 내일" className="flex shrink-0 items-center gap-3">
           <Image
-            src="/images/ulsan-college-logo.png"
-            alt="울산과학대학교"
-            width={154}
-            height={140}
+            src="/images/u-live-favicon.png"
+            alt=""
+            width={64}
+            height={61}
             className="h-14 w-auto shrink-0"
             priority
           />
           <span>
-            <strong className="block text-xl tracking-tight">U-LiVE</strong>
-            <span className="block text-xs text-slate-500">
-              배움에서 새로운 일로
+            <strong className="block whitespace-nowrap bg-gradient-to-r from-[#082b68] via-[#0998ba] to-[#087c70] bg-clip-text text-xl font-extrabold tracking-tight text-transparent sm:text-2xl">U-LiVE</strong>
+            <span className="block whitespace-nowrap text-xs text-slate-500">
+              열린 배움, 더 넓은 내일
             </span>
           </span>
         </Link>
