@@ -18,7 +18,7 @@ export default async function Login(props: {
   if (await getSessionIdentity()) redirect(socialReturnTo(next));
   return (
     <div className="mx-auto max-w-2xl px-5 py-12 sm:py-16">
-      <p className="eyebrow">U-LIFE ACCOUNT</p>
+      <p className="eyebrow">U-LiVE ACCOUNT</p>
       <h1 className="page-title">{qrCheckin ? "QR 출석 간편 로그인" : "로그인"}</h1>
       <p className="mb-7 text-base leading-7 text-slate-600">{qrCheckin ? "수강 신청한 계정으로 로그인하면 QR 시작·종료 확인 화면으로 바로 연결됩니다." : "이용하실 대상을 선택해 주세요."}</p>
       {!qrCheckin && <nav aria-label="로그인 대상 선택" className="mb-7 grid grid-cols-2 gap-3 sm:grid-cols-4">

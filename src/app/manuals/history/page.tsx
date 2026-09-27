@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CURRENT_MANUAL_VERSION, MANUAL_RELEASES, manualFile, manualHref } from "@/lib/manuals/data";
 
-export const metadata: Metadata = { title: "매뉴얼 버전·개정 이력 | U-LIFE" };
+export const metadata: Metadata = { title: "매뉴얼 버전·개정 이력 | U-LiVE" };
 export default function ManualHistory() {
   return <div className="page-shell max-w-4xl">
     <Link className="text-sm font-semibold text-teal-800 underline" href="/manuals">이용 매뉴얼</Link>

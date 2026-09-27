@@ -1,7 +1,7 @@
 import { RecoveryForm } from "@/components/auth/recovery-form";
 import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 export const metadata = {
-  title: "새 비밀번호 만들기 · U-LIFE",
+  title: "새 비밀번호 만들기 · U-LiVE",
   robots: { index: false, follow: false },
 };
 export default function ResetPassword() {

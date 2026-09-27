@@ -17,7 +17,7 @@ export async function generateMetadata({
   const query = await searchParams;
   const name =
     DOCUMENTS.find((d) => d[0] === query.document)?.[1] ?? "결과보고서 6종";
-  return { title: `${name} · U-LIFE` };
+  return { title: `${name} · U-LiVE` };
 }
 export default async function PrintReport({
   params,

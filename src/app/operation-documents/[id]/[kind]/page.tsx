@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getOperationEditorData } from "@/lib/operation-documents/data";
 import { DocumentEditor } from "@/components/operation-documents/document-editor";
 export const dynamic = "force-dynamic";
-export const metadata = { title: "과정 운영 문서 · U-LIFE" };
+export const metadata = { title: "과정 운영 문서 · U-LiVE" };
 export default async function Page({
   params,
 }: {

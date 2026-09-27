@@ -5,7 +5,7 @@ import { getCourseOpeningPlan } from "@/lib/course-opening/server";
 import { getOpeningWorkingCopyOverview } from "@/lib/course-opening/working-copy-overview-server";
 
 export const metadata: Metadata = {
-  title: "2026년 과정 개설 준비 | U-LIFE",
+  title: "2026년 과정 개설 준비 | U-LiVE",
   robots: { index: false, follow: false },
 };
 

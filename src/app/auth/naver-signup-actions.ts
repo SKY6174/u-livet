@@ -21,7 +21,7 @@ async function pendingSignup() {
 export async function requestNaverSignupEmail(_: ActionState, form: FormData): Promise<ActionState> {
   if (isReviewOnly()) return { message: REVIEW_MESSAGE };
   const email = signupEmail(form.get("email"));
-  if (!email) return { message: "U-LIFE에서 사용할 이메일 주소를 확인해 주세요." };
+  if (!email) return { message: "U-LiVE에서 사용할 이메일 주소를 확인해 주세요." };
   try {
     const pending = await pendingSignup();
     if (!pending) return { message: "네이버 로그인을 다시 진행해 주세요. 이미 이메일을 확인했다면 화면을 새로고침해 주세요." };

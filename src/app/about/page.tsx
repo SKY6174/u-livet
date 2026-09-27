@@ -4,8 +4,8 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, ArrowUpRight, Building2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "앵커사업 소개 | U-LIFE",
-  description: "울산과학대학교 앵커사업단의 4대 프로젝트와 여러 센터가 함께 활용하는 평생직업교육 플랫폼 U-LIFE를 소개합니다.",
+  title: "앵커사업 소개 | U-LiVE",
+  description: "울산과학대학교 앵커사업단의 4대 프로젝트와 여러 센터가 함께 활용하는 평생직업교육 플랫폼 U-LiVE를 소개합니다.",
 };
 
 // Official project colors and image provenance: docs/operations/anchor-about-sources.md.
@@ -29,7 +29,7 @@ const PROJECTS = [
     title: "새로운 일을 향한 생애 도약",
     description: "생애 전반의 직무 역량을 높이고, 평생직업교육을 취업·창업과 연결합니다.",
     imageAlt: "간절곶 소망우체통과 해안 너머로 펼쳐진 노을",
-    tasks: ["U-LIFE 평생직업교육 기반 취·창업 연계모델 구축", "동남권과 함께 성장하는 돌봄생태계 ‘울산愛’ 구현"],
+    tasks: ["U-LiVE 평생직업교육 기반 취·창업 연계모델 구축", "동남권과 함께 성장하는 돌봄생태계 ‘울산愛’ 구현"],
   },
   {
     id: "care", name: "CARE", color: "#E5480E", theme: "지역사회 상생",
@@ -94,7 +94,7 @@ export default function About() {
                 </ul>
                 {project.id === "jump" && (
                   <Link href="/courses" className="mt-6 inline-flex min-h-11 items-center gap-2 self-start rounded-lg px-4 py-2 text-sm font-bold text-slate-950 hover:brightness-110" style={{ backgroundColor: project.color }}>
-                    U-LIFE 교육과정 보기<ArrowRight size={17} aria-hidden="true" />
+                    U-LiVE 교육과정 보기<ArrowRight size={17} aria-hidden="true" />
                   </Link>
                 )}
               </div>
@@ -106,9 +106,9 @@ export default function About() {
       <section id="centers" aria-labelledby="centers-title" className="mt-16 scroll-mt-40 border-t border-slate-200 pt-12">
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
-            <p className="eyebrow">U-LIFE · LIFELONG LEARNING</p>
+            <p className="eyebrow">U-LiVE · LIFELONG LEARNING</p>
             <h2 id="centers-title" className="text-2xl font-bold text-slate-900 sm:text-3xl">함께 운영하는 평생직업교육</h2>
-            <p className="mt-4 leading-8 text-slate-600">U-LIFE는 지역 주민의 배움부터 재직자의 직무 역량 향상까지, 다양한 평생직업교육을 위한 공동 플랫폼입니다. 각 센터의 교육을 한곳에서 안내하고 신청부터 학습·이력 관리까지 연결합니다.</p>
+            <p className="mt-4 leading-8 text-slate-600">U-LiVE는 지역 주민의 배움부터 재직자의 직무 역량 향상까지, 다양한 평생직업교육을 위한 공동 플랫폼입니다. 각 센터의 교육을 한곳에서 안내하고 신청부터 학습·이력 관리까지 연결합니다.</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
             <h3 className="font-bold text-slate-900">여러 센터가 함께 활용하는 교육 공간</h3>
@@ -126,7 +126,7 @@ export default function About() {
 
       <section aria-labelledby="learning-title" className="mt-12 flex flex-col gap-6 rounded-2xl bg-teal-50 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="eyebrow mb-2">U-LIFE · LIFELONG LEARNING</p>
+          <p className="eyebrow mb-2">U-LiVE · LIFELONG LEARNING</p>
           <h2 id="learning-title" className="text-xl font-bold text-teal-950">오늘의 배움을, 내일의 일로</h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">나에게 맞는 평생직업교육 과정을 찾아보세요.</p>
         </div>

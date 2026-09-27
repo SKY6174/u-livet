@@ -70,7 +70,7 @@ export default async function Home() {
         <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 md:grid-cols-[1.35fr_1fr] md:py-24">
           <div>
             <p className="mb-6 text-sm font-semibold tracking-label text-teal-200">
-              U-LIFE · LIFELONG LEARNING
+              U-LiVE · LIFELONG LEARNING
             </p>
             <p className="mb-4 break-words text-lg text-teal-100">{me.name} 님, 반갑습니다.</p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl">
