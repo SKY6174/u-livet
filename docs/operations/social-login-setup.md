@@ -23,8 +23,8 @@
 
 | 환경 | 홈페이지 | Supabase 기본 OAuth callback |
 | --- | --- | --- |
-| 운영 | https://uc-life.org | https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback |
-| 스테이징 | https://staging.uc-life.org | https://bfqwntulxabfrimcypvx.supabase.co/auth/v1/callback |
+| 운영 | https://u-live.org | https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback |
+| 스테이징 | https://staging.u-live.org | https://bfqwntulxabfrimcypvx.supabase.co/auth/v1/callback |
 
 외부 제공자의 Redirect URI는 Supabase 대시보드에 표시된 **해당 제공자의 callback URL을 그대로 복사**한다. 앱의 `/auth/callback`은 Supabase 인증 이후 돌아오는 주소이므로 구분한다. Supabase Redirect URLs에는 해당 홈페이지의 `/auth/callback` 복귀 주소를 허용한다.
 
