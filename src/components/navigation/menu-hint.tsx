@@ -16,11 +16,69 @@ type Placement = {
   width: number;
   arrowLeft: number;
   fontSize: string;
+  textColor: string;
 };
+
+type Rgb = { r: number; g: number; b: number };
+type Rgba = Rgb & { a: number };
 
 const VIEWPORT_INSET = 16;
 const CARD_GAP = 12;
 const MAX_WIDTH = 256;
+const DARK_TEXT = { r: 15, g: 23, b: 42 };
+const LIGHT_TEXT = { r: 255, g: 255, b: 255 };
+const PINK_SURFACE = { r: 251, g: 207, b: 232, a: 0.35 };
+
+function parseRgb(value: string): Rgba | null {
+  const parts = /^rgba?\(([^)]+)\)$/.exec(value)?.[1].split(/[,\s/]+/).filter(Boolean);
+  if (!parts || parts.length < 3) return null;
+  const channels = parts.slice(0, 3).map((part) => part.endsWith("%") ? parseFloat(part) * 2.55 : Number(part));
+  const alpha = parts[3] ? (parts[3].endsWith("%") ? parseFloat(parts[3]) / 100 : Number(parts[3])) : 1;
+  if (![...channels, alpha].every(Number.isFinite)) return null;
+  return { r: channels[0], g: channels[1], b: channels[2], a: alpha };
+}
+
+function blend(base: Rgb, overlay: Rgba): Rgb {
+  return {
+    r: base.r * (1 - overlay.a) + overlay.r * overlay.a,
+    g: base.g * (1 - overlay.a) + overlay.g * overlay.a,
+    b: base.b * (1 - overlay.a) + overlay.b * overlay.a,
+  };
+}
+
+function luminance(color: Rgb): number {
+  const linear = (channel: number) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * linear(color.r) + 0.7152 * linear(color.g) + 0.0722 * linear(color.b);
+}
+
+function contrast(first: Rgb, second: Rgb): number {
+  const a = luminance(first);
+  const b = luminance(second);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+function backgroundAt(x: number, y: number): Rgb {
+  const layers: Element[] = [];
+  for (let element = document.elementFromPoint(x, y); element; element = element.parentElement) {
+    layers.unshift(element);
+  }
+  return layers.reduce<Rgb>((color, element) => {
+    const background = parseRgb(getComputedStyle(element).backgroundColor);
+    return background ? blend(color, background) : color;
+  }, LIGHT_TEXT);
+}
+
+function readableTextColor(left: number, top: number, width: number, height: number): string {
+  const scores = [0.2, 0.5, 0.8].map((fraction) => {
+    const surface = blend(backgroundAt(left + width * fraction, top + height / 2), PINK_SURFACE);
+    return { dark: contrast(surface, DARK_TEXT), light: contrast(surface, LIGHT_TEXT) };
+  });
+  return Math.min(...scores.map(({ dark }) => dark)) >= Math.min(...scores.map(({ light }) => light))
+    ? "#0f172a" : "#ffffff";
+}
 
 /** Use inside a hoverable/focusable navigation link with the Tailwind `group` class. */
 export function MenuHint({ label, description }: MenuHintProps) {
@@ -64,7 +122,7 @@ export function MenuHint({ label, description }: MenuHintProps) {
     const measure = () => {
       const bounds = link.getBoundingClientRect();
       const width = Math.max(1, Math.min(MAX_WIDTH, window.innerWidth - VIEWPORT_INSET * 2));
-      const fontSize = `calc(${getComputedStyle(label).fontSize} - 1.2px)`;
+      const fontSize = `calc(${getComputedStyle(label).fontSize} - 3.2px)`;
       tooltip.style.fontSize = fontSize;
       const height = tooltip.offsetHeight;
       const center = bounds.left + bounds.width / 2;
@@ -88,7 +146,8 @@ export function MenuHint({ label, description }: MenuHintProps) {
       });
       const { side, top } = candidates[1].score < candidates[0].score ? candidates[1] : candidates[0];
       const arrowLeft = Math.max(16, Math.min(center - left, width - 16));
-      setPlacement({ side, left, top, width, arrowLeft, fontSize });
+      const textColor = readableTextColor(left, top, width, height);
+      setPlacement({ side, left, top, width, arrowLeft, fontSize, textColor });
     };
 
     measure();
@@ -108,9 +167,11 @@ export function MenuHint({ label, description }: MenuHintProps) {
           ref={tooltipRef}
           role="tooltip"
           aria-hidden="true"
-          className={`pointer-events-none fixed z-[100] rounded-xl border border-pink-300/55 bg-pink-200/35 px-4 py-3 text-left font-normal normal-case leading-relaxed tracking-normal text-slate-700 shadow-xl backdrop-blur-sm after:absolute after:left-[var(--hint-arrow-left)] after:-translate-x-1/2 after:border-x-8 after:border-x-transparent after:content-[''] ${placement ? "visible" : "invisible"} ${placement?.side === "above" ? "after:-bottom-3 after:border-t-[12px] after:border-t-pink-200/35" : "after:-top-3 after:border-b-[12px] after:border-b-pink-200/35"}`}
+          className={`pointer-events-none fixed z-[100] rounded-xl border border-pink-300/55 bg-pink-200/35 px-4 py-3 text-left font-normal normal-case leading-relaxed tracking-normal shadow-xl backdrop-blur-sm after:absolute after:left-[var(--hint-arrow-left)] after:-translate-x-1/2 after:border-x-8 after:border-x-transparent after:content-[''] ${placement ? "visible" : "invisible"} ${placement?.side === "above" ? "after:-bottom-3 after:border-t-[12px] after:border-t-pink-200/35" : "after:-top-3 after:border-b-[12px] after:border-b-pink-200/35"}`}
           style={{
-            fontSize: placement?.fontSize ?? "calc(1em - 1.2px)",
+            fontSize: placement?.fontSize ?? "calc(1em - 3.2px)",
+            color: placement?.textColor ?? "#0f172a",
+            textShadow: placement?.textColor === "#ffffff" ? "0 1px 2px rgba(15, 23, 42, 0.7)" : "0 1px 1px rgba(255, 255, 255, 0.7)",
             width: placement?.width ?? Math.max(1, Math.min(MAX_WIDTH, window.innerWidth - VIEWPORT_INSET * 2)),
             left: placement?.left ?? 0,
             top: placement?.top ?? 0,
