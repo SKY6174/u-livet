@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, Building2, Check, ClipboardCheck, Info, ShieldCheck, UsersRound } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "평생직업교육 운영절차 | U-LiVE",
+  title: "평생직업교육 운영절차 | U-LiVET",
   description: "내부·외부 평생직업교육과정의 개설과 운영, 모집 미달 시 조율·폐강 기준, 결과보고 및 정산 절차를 안내합니다.",
 };
 

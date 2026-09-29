@@ -11,7 +11,7 @@ import type { AttendanceBook } from "@/lib/attendance/model";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "결과보고서 양식 검토 · U-LiVE",
+  title: "결과보고서 양식 검토 · U-LiVET",
   robots: { index: false, follow: false },
 };
 const GUIDE: Record<DocumentKind, { owner: string; description: string }> = {

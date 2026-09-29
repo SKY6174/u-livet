@@ -185,7 +185,7 @@ export default function Header() {
               <p className="text-xs font-semibold text-teal-700">사업단 업무</p>
               <p className="mb-3 mt-2 text-xl font-bold tracking-tight text-slate-900">{previewLink.label}</p>
               <p className="text-sm leading-7 text-slate-600">{previewLink.description}</p>
-              <span className="mt-auto pt-6 text-xs font-medium text-teal-700">U-LiVE · OFFICE WORKSPACE</span>
+              <span className="mt-auto pt-6 text-xs font-medium text-teal-700">U-LiVET · OFFICE WORKSPACE</span>
             </div>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function Header() {
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
-        <Link href="/" aria-label="U-LiVE — 열린 배움, 더 넓은 내일" className="flex shrink-0 items-center gap-3">
+        <Link href="/" aria-label="U-LiVET — 열린 배움, 더 넓은 내일" className="flex shrink-0 items-center gap-3">
           <Image
             src="/images/u-live-favicon.png"
             alt=""
@@ -217,7 +217,7 @@ export default function Header() {
             priority
           />
           <span>
-            <strong className="block whitespace-nowrap bg-gradient-to-r from-[#082b68] via-[#0998ba] to-[#087c70] bg-clip-text text-xl font-extrabold tracking-tight text-transparent sm:text-2xl">U-LiVE</strong>
+            <strong className="block whitespace-nowrap text-xl font-extrabold tracking-tight text-[#082b68] sm:text-2xl">U-LiVE<span className="text-[#6b9fc4]">T</span></strong>
             <span className="block whitespace-nowrap text-xs text-slate-500">
               열린 배움, 더 넓은 내일
             </span>

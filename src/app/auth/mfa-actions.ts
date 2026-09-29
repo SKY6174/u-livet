@@ -39,7 +39,7 @@ export async function enrollMfa(): Promise<MfaResult> {
     if (permit.error || !permit.data) return { message: MFA_REAUTH_MESSAGE };
     const { data, error } = await client.auth.mfa.enroll({
       factorType: "totp",
-      issuer: "U-LiVE",
+      issuer: "U-LiVET",
       friendlyName: permit.data,
     });
     if (error || !data)

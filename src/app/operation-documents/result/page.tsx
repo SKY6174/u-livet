@@ -1,6 +1,6 @@
 import { DocumentList } from "@/components/operation-documents/document-list";
 
-export const metadata = { title: "결과보고서 · U-LiVE" };
+export const metadata = { title: "결과보고서 · U-LiVET" };
 
 export default async function Page({ searchParams }: {
   searchParams: Promise<{ view?: string }>;

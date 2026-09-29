@@ -16,7 +16,7 @@ export default async function History() {
   return (
     <div className="page-shell">
       <PageIntro eyebrow="LEARNING RECORD" title="수강이력·수료 현황">
-        U-LiVE에서 수강한 과정과 사업단이 확정한 수료 상태를 확인하세요.
+        U-LiVET에서 수강한 과정과 사업단이 확정한 수료 상태를 확인하세요.
       </PageIntro>
       {error ? (
         <div role="status" className="panel">
