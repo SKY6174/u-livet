@@ -40,6 +40,14 @@
 2. 소셜 로그인 3종, 가입·초대·비밀번호 복구 메일, 증명서 검증 주소를 실제 계정으로 확인한다. 전환 기간에는 Supabase의 기존 Redirect URLs와 Google의 이전 origin을 유지한다.
 3. Naver 연결 끊기 callback은 현재 앱의 `/auth/callback`이 연결 해제 알림을 처리하지 않으므로 별도 엔드포인트 설계가 필요하다.
 
+## 2026-09-29 인증 메일 미발송 점검
+
+- 운영 Supabase Auth 로그에서 04:24:36, 04:25:04 UTC의 `/signup` 요청 두 건이 HTTP 500으로 끝났다. DB의 `public.handle_new_user()`가 `MEMBER_ACTIVATION_UNAVAILABLE`을 반환해 SMTP 호출 전에 가입이 중단됐다. 각 요청의 수신 주소와 선택한 가입 유형은 로그만으로 확인하지 못했다.
+- 운영 명부에는 활성 사업단 구성원 9명이 있으나, 점검 시점에 이들과 연결된 Auth 계정 또는 활성화 claim은 없었다. 명부 등록 자체는 Auth 계정 생성이나 인증 메일 발송을 하지 않는다. 가입하려는 사람은 명부에 등록된 이메일로 사업단 구성원 유형의 ‘등록된 구성원 계정 활성화’를 진행해야 한다.
+- 같은 날 `/recover` 요청의 HTTP 200은 메일 발송 증거가 아니다. 계정 존재 여부를 노출하지 않도록 미가입 주소에도 동일한 응답을 보낸다. 활성화 전 구성원에게는 복구 대신 계정 활성화 흐름을 안내한다.
+- 운영 Supabase의 SMTP 발신 주소는 `noreply@u-live.org`이고 Resend의 `u-live.org` 도메인은 Verified였다. 그러나 기존 운영 SMTP 키는 `uc-life.org` 발송만 허용했다. 승인 후 동일 키의 허용 도메인을 `u-live.org`로 바꾸고 이름을 `U-LiVE Supabase SMTP Production`으로 갱신했다. Resend 상세 화면에서 `Sending access`, 도메인 `u-live.org`, 저장 완료 알림을 확인했다. 키 값과 Supabase SMTP 비밀번호는 변경하거나 문서화하지 않았다.
+- 실제 수신 완료는 아직 확인되지 않았다. 실패한 가입 주소·선택 유형·시각을 확인해 명부와 대조한 다음, 승인된 수신 계정으로 가입 인증 메일의 수신과 링크 동작을 검증한다. 재시도에서 500이 계속되면 Supabase Auth 및 DB 로그를, 가입은 성공하지만 수신되지 않으면 Resend 발송 로그와 Supabase SMTP 오류를 순서대로 확인한다.
+
 ## 주의할 주소
 
 - `https://u-live.org/auth/callback`은 앱 복귀 경로다. Google, Kakao, Naver의 운영 제공자 callback은 별도 Supabase 주소를 사용한다.
