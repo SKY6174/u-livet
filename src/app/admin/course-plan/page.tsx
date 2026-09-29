@@ -4,7 +4,7 @@ import { normalizeFilters } from "@/lib/course-plan/model";
 import { getCoursePlan } from "@/lib/course-plan/server";
 
 export const metadata: Metadata = {
-  title: "2026년 교육과정 현황 | U-LiVE",
+  title: "2026년 교육과정 현황 | U-LiVET",
   robots: { index: false, follow: false },
 };
 

@@ -2,7 +2,7 @@ import { ConfirmEmailForm } from "@/components/auth/confirm-email-form";
 import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 
 export const metadata = {
-  title: "이메일 확인 · U-LiVE",
+  title: "이메일 확인 · U-LiVET",
   robots: { index: false, follow: false },
   referrer: "no-referrer",
 };

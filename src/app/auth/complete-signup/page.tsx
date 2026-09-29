@@ -22,10 +22,10 @@ export default async function CompleteSignup({ searchParams }: { searchParams: P
   const needsEmail = naverSignupNeedsEmail(data.user);
   return (
     <div className="mx-auto max-w-lg px-5 py-16">
-      <p className="eyebrow">U-LiVE ACCOUNT</p>
+      <p className="eyebrow">U-LiVET ACCOUNT</p>
       <h1 className="page-title">새 회원가입</h1>
       <p className="mb-8 text-base leading-7 text-slate-600">
-        간편 인증이 완료되었습니다. U-LiVE 회원가입에 필요한 이름·휴대폰 번호와 개인정보 동의를 확인해 주세요.
+        간편 인증이 완료되었습니다. U-LiVET 회원가입에 필요한 이름·휴대폰 번호와 개인정보 동의를 확인해 주세요.
       </p>
       <div className="panel [&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
         {policy && needsEmail ? <NaverSignupEmail next={next} pendingEmail={data.user.email_change_sent_at ? signupEmail(data.user.new_email) ?? undefined : undefined} /> : policy ? <ActionForm action={completeKakaoSignup} label="동의하고 가입 완료" resetOnSuccess={false}>

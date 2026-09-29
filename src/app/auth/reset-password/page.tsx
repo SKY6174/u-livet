@@ -2,7 +2,7 @@ import { RecoveryForm } from "@/components/auth/recovery-form";
 import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 import { getMemberActivationPolicy } from "@/lib/auth/social";
 export const metadata = {
-  title: "새 비밀번호 만들기 · U-LiVE",
+  title: "새 비밀번호 만들기 · U-LiVET",
   robots: { index: false, follow: false },
 };
 export default async function ResetPassword() {

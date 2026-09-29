@@ -61,7 +61,7 @@ export default async function MemberDetail({ params, searchParams }: {
     </section>}
     {view === "delete" && <section className="max-w-2xl rounded-2xl border border-rose-200 bg-white p-6">
       <h2 className="text-lg font-bold">이 구성원을 삭제하시겠습니까?</h2>
-      <p className="my-4 text-sm leading-7 text-slate-600">삭제하면 모든 구성원 목록에서 제외되고 U-LiVE 서비스 이용이 중지됩니다. 기존 강의·수강·증명 이력은 보존됩니다.</p>
+      <p className="my-4 text-sm leading-7 text-slate-600">삭제하면 모든 구성원 목록에서 제외되고 U-LiVET 서비스 이용이 중지됩니다. 기존 강의·수강·증명 이력은 보존됩니다.</p>
       {me.id === id ? <p role="status" className="rounded-lg bg-slate-50 p-4 text-sm">현재 로그인한 자신의 계정은 삭제할 수 없습니다.</p> : <ActionForm action={deleteMember} label="구성원 삭제" className="space-y-4 [&>button]:bg-rose-700 [&>button]:hover:bg-rose-800">
         <input type="hidden" name="person_id" value={id} /><input type="hidden" name="group" value={group} /><input type="hidden" name="revision" value={member.revision} />
         <label className="flex items-start gap-3 text-sm"><input type="checkbox" name="confirmed" value="yes" required className="mt-1 h-4 w-4" /><span><strong>{member.name}</strong> 님의 서비스 이용 중지와 목록 삭제를 확인했습니다.</span></label>

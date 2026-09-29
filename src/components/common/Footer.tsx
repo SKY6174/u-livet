@@ -28,10 +28,11 @@ export default function Footer() {
               울산과학대학교 앵커사업단
             </p>
             <p className="mt-2 text-base leading-relaxed text-teal-50">
-              <strong className="font-semibold text-white">U-LiVE</strong>
+              <strong className="font-semibold text-white">U-LiVE<span className="text-[#b8e5d5]">T</span></strong>
               <span className="mx-2" aria-hidden="true">|</span>
               <span className="inline-block">함께 성장하는 평생직업교육</span>
             </p>
+            <p className="mt-1 text-xs text-teal-100">Ulsan Lifelong Vocational Education &amp; Training</p>
           </div>
         </div>
         <div className="flex min-w-0 flex-col items-start gap-5 lg:justify-self-end">

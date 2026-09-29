@@ -2,7 +2,7 @@ import { getAttendanceBook } from "@/lib/attendance/data";
 import { AttendancePrint } from "@/components/attendance/attendance-print";
 import { PrintButton } from "@/components/attendance/print-button";
 import { Empty } from "@/components/portal/ui";
-export const metadata = { title: "강사 출석 결과 열람 · U-LiVE" };
+export const metadata = { title: "강사 출석 결과 열람 · U-LiVET" };
 export default async function PrintAttendance({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { book } = await getAttendanceBook(id, "instructor");

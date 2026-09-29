@@ -867,7 +867,7 @@ export function StudentDashboard({
               href="/mypage/certificates"
               icon={Award}
               title="사업단 이수증 신청·발급"
-              description="U-LiVE 과정의 수료 확정 후 신청"
+              description="U-LiVET 과정의 수료 확정 후 신청"
             />
             <ServiceLink
               href="/mypage/badges"

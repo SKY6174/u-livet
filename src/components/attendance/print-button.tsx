@@ -7,7 +7,7 @@ export function PrintButton() {
     setBusy(true); setError("");
     try {
       const { downloadReportPdf17 } = await import("@/lib/pdf/report-export");
-      await downloadReportPdf17("U-LiVE-출석부.pdf");
+      await downloadReportPdf17("U-LiVET-출석부.pdf");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "PDF를 만들지 못했습니다. 다시 시도해 주세요.");
     } finally { setBusy(false); }

@@ -7,9 +7,9 @@ import { getSessionIdentity } from "@/lib/auth/session";
 import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.AUTH_SITE_ORIGIN ?? "http://localhost:3100"),
-  title: "U-LiVE | 앵커사업 평생직업교육",
+  title: "U-LiVET | 앵커사업 평생직업교육",
   description:
-    "교육과정 신청부터 학습과 경력까지, 울산과학대학교 앵커사업 평생직업교육.",
+    "U-LiVET — Ulsan Lifelong Vocational Education & Training. 교육과정 신청부터 학습과 경력까지, 울산과학대학교 앵커사업 평생직업교육.",
   icons: {
     icon: { url: "/images/u-live-favicon.png", type: "image/png" },
   },
