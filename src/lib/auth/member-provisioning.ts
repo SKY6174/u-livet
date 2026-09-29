@@ -33,7 +33,7 @@ export async function provisionMember(personId: string, email: string, operator:
   const created = await admin.auth.admin.createUser({
     email: normalizedEmail,
     email_confirm: true,
-    password: randomBytes(48).toString("base64url"),
+    password: `aA1!${randomBytes(48).toString("base64url")}`,
     user_metadata: { member_provisioning_nonce: nonce },
   });
   if (created.error || !created.data.user) {
