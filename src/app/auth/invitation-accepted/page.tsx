@@ -15,14 +15,13 @@ export default function InvitationAccepted() {
           있습니다.
         </p>
         <p className="text-base">
-          관리자 업무를 맡으셨다면 로그인 후 ‘계정 보안’에서 인증 앱을 연결해
-          주세요. 업무 권한은 사업단에서 확인한 뒤 부여합니다.
+          업무 권한은 사업단에서 확인한 뒤 부여합니다.
         </p>
         <Link
-          href="/auth/login?next=%2Fauth%2Fsecurity"
+          href="/auth/login?audience=office"
           className="btn-primary w-full text-base"
         >
-          로그인하고 계정 보안 확인하기
+          로그인하기
         </Link>
       </div>
     </div>

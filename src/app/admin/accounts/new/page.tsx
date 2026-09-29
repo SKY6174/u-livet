@@ -34,7 +34,7 @@ export default async function NewMember({ searchParams }: { searchParams: Promis
           {group === "learner" && <label className="field">생년월일<input name="birth_date" type="date" min="1900-01-01" max={new Date().toISOString().slice(0, 10)} /></label>}
           <label className="field sm:col-span-2">비고<textarea name="notes" maxLength={2000} rows={4} className="w-full rounded-lg border border-slate-300 p-3 font-normal" placeholder="구성원 관리에 필요한 메모" /></label>
         </div>
-        <p className="rounded-lg bg-slate-50 p-3 text-xs leading-6 text-slate-500">등록 즉시 DB에 저장됩니다. 사업단·교내 강사는 로그인 화면의 ‘등록된 구성원 계정 활성화’에서 등록한 이메일로 본인 인증을 마치면 기존 정보에 자동 연결됩니다. 교내 강사는 학교 이메일(@uc.ac.kr)을 입력해 주세요. 교외 강사·수강생은 별도 가입 절차를 이용합니다.</p>
+        <p className="rounded-lg bg-slate-50 p-3 text-xs leading-6 text-slate-500">사업단 구성원과 교내 강사는 대학 이메일(@uc.ac.kr)로 등록해 주세요. 등록하면 로그인 계정이 자동 생성됩니다. 구성원은 로그인 화면의 ‘신규 비밀번호 설정’에서 이메일을 확인하고 첫 비밀번호를 만든 뒤 로그인할 수 있습니다. 교외 강사·수강생은 공개 가입 옵션을 이용할 수 있습니다.</p>
       </ActionForm>
     </section>
   </div>;

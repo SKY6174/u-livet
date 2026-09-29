@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { ActionForm } from "@/components/portal/action-form";
 import { PasswordField } from "./password-field";
 import { acceptInvitation, resetPassword } from "@/app/auth/recovery-actions";
+import type { Policy } from "@/lib/portal/types";
 
-export function RecoveryForm({ invitation = false }: { invitation?: boolean }) {
+export function RecoveryForm({ invitation = false, policy }: { invitation?: boolean; policy?: Policy }) {
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
     const capture = () => {
@@ -40,27 +41,18 @@ export function RecoveryForm({ invitation = false }: { invitation?: boolean }) {
         >
           <input type="hidden" name="token_hash" value={token} />
           <PasswordField signup label="새 비밀번호" />
-          {!invitation && (
-            <>
-              <label className="block text-base" htmlFor="recovery-mfa-code">
-                인증 앱의 6자리 코드
-                <input
-                  id="recovery-mfa-code"
-                  name="mfa_code"
-                  className="min-h-12 rounded-lg border border-slate-300 bg-white px-3 py-3 text-slate-900 mt-2 w-full"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  aria-describedby="recovery-mfa-help"
-                />
+          {!invitation && policy && (
+            <section className="rounded-lg border p-4" aria-labelledby="member-first-password-privacy">
+              <h2 id="member-first-password-privacy" className="text-lg font-semibold">첫 비밀번호 설정 시 개인정보 동의</h2>
+              <p className="mt-2 text-sm text-slate-600">사업단·교내 강사로 처음 비밀번호를 설정하는 경우 아래 내용을 확인하고 동의해 주세요.</p>
+              <p className="mt-3 font-semibold">{policy.title} · {policy.version}</p>
+              <p className="mt-2 whitespace-pre-wrap break-words">{policy.body}</p>
+              <input type="hidden" name="member_privacy_policy_id" value={policy.id} />
+              <label className="mt-4 flex items-start gap-3">
+                <input className="mt-1 h-5 w-5" type="checkbox" name="member_privacy_accepted" />
+                <span>사업단 등록 구성원의 첫 비밀번호 설정에 필요한 개인정보 수집·이용에 동의합니다.</span>
               </label>
-              <p id="recovery-mfa-help" className="text-base text-slate-600">
-                추가 인증을 설정한 계정은 반드시 입력해 주세요. 인증 앱을 연결한
-                적이 없다면 비워 두세요.
-              </p>
-            </>
+            </section>
           )}
           <p className="text-base text-slate-600">
             {invitation

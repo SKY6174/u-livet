@@ -2,7 +2,6 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Identity } from "@/lib/portal/types";
-import { getSecurityContext } from "@/lib/auth/mfa";
 import { isReviewOnly } from "@/lib/deployment/review-mode";
 export const getSessionIdentity = cache(async () => {
   if (isReviewOnly()) return null;
@@ -23,15 +22,6 @@ export const getSessionIdentity = cache(async () => {
 export async function requireIdentity(returnTo = "/mypage") {
   const identity = await getSessionIdentity();
   if (!identity) {
-    const security = await getSecurityContext();
-    if (
-      security?.status.mfa_required &&
-      !security.status.mfa_verified &&
-      !security.status.needs_reset
-    )
-      redirect(
-        `/auth/security?next=${encodeURIComponent(safeReturnTo(returnTo))}`,
-      );
     redirect(`/auth/login?next=${encodeURIComponent(returnTo)}`);
   }
   return identity;

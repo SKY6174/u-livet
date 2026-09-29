@@ -3,7 +3,6 @@ import Link from "next/link";
 import { hasRole, memberLabel, workspaceKind } from "@/lib/auth/workspace-navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { PageIntro } from "@/components/portal/ui";
-import { AccountSecurity } from "@/components/auth/account-security";
 import { getStudentLearning } from "@/lib/student-learning/data";
 import { StudentDashboard } from "@/components/student-learning/dashboard";
 export default async function MyPage() {
@@ -26,10 +25,8 @@ export default async function MyPage() {
         <p className="mt-2 break-all text-slate-600">{me.email}</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link className="btn-secondary" href="/mypage/notifications">연락처·수신 설정</Link>
-          <Link className="btn-secondary" href="/auth/security">계정 보안·추가 인증</Link>
         </div>
       </section>
-      {kind === "office" && <AccountSecurity />}
       {kind === "office" && <Link className="btn-primary" href="/admin">사업단 관리로 이동 →</Link>}
       {hasRole(me, "INSTRUCTOR") && <section className="mt-8" aria-label="나의 강사 정보">
         <h2 className="section-title">통합 My Room 바로가기</h2>
