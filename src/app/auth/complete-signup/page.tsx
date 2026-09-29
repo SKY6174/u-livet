@@ -32,9 +32,11 @@ export default async function CompleteSignup({ searchParams }: { searchParams: P
           <input type="hidden" name="next" value={next} />
           <label className="field text-base">이름 (필수)<input name="name" autoComplete="name" maxLength={100} required /></label>
           <PhoneField />
-          <div className="rounded-xl border p-4 text-base">
-            <h2 className="font-semibold">{policy.title}</h2>
-            <p className="my-3 max-h-56 overflow-y-auto whitespace-pre-wrap leading-7" tabIndex={0}>{policy.body}</p>
+          <div className="space-y-3 text-base">
+            <details className="rounded-xl border p-4">
+              <summary className="min-h-11 cursor-pointer font-semibold leading-7">{policy.title} · {policy.version}</summary>
+              <p className="mt-3 max-h-56 overflow-y-auto whitespace-pre-wrap leading-7" tabIndex={0}>{policy.body}</p>
+            </details>
             <input type="hidden" name="privacy_policy_id" value={policy.id} />
             <label className="flex min-h-11 items-start gap-3 leading-7"><input type="checkbox" name="privacy_accepted" className="mt-1.5 h-5 w-5 shrink-0" required /><span>[필수] 위 개인정보 수집·이용에 동의합니다.</span></label>
           </div>

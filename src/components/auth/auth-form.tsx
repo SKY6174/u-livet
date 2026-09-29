@@ -111,21 +111,20 @@ export function AuthForm({
         )}
         {signup && policy && (
           <div className="space-y-3">
-            <section
-              aria-labelledby="signup-privacy-title"
-              className="rounded-lg border p-4"
-            >
-              <h2 id="signup-privacy-title" className="text-lg font-semibold">
+            <details className="rounded-lg border p-4">
+              <summary className="min-h-11 cursor-pointer text-lg font-semibold leading-7">
                 {policy.title} · {policy.version}
-              </h2>
-              <p className="mt-3 text-base leading-7 text-slate-600">
-                수집 목적·항목·보유기간과 동의를 거부할 때의 제한을 읽고 선택해
-                주세요.
-              </p>
-              <p className="mt-4 whitespace-pre-wrap break-words text-base leading-7">
-                {policy.body}
-              </p>
-            </section>
+              </summary>
+              <div className="pt-3">
+                <p className="text-base leading-7 text-slate-600">
+                  수집 목적·항목·보유기간과 동의를 거부할 때의 제한을 읽고 선택해
+                  주세요.
+                </p>
+                <p className="mt-4 whitespace-pre-wrap break-words text-base leading-7">
+                  {policy.body}
+                </p>
+              </div>
+            </details>
             <input type="hidden" name="privacy_policy_id" value={policy.id} />
             <label className="flex min-h-11 items-start gap-3 py-2 text-base">
               <input
