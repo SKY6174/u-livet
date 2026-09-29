@@ -25,8 +25,9 @@ export async function authenticate(
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
   const audience = loginAudience(form.get("audience")) ?? "learner";
-  if (audience === "internal" && !isSchoolEmail(email)) return { message: "교내 강사는 학교 이메일(@uc.ac.kr)로 로그인해 주세요." };
-  let destination = safeReturnTo(form.get("next"));
+  if ((audience === "office" || audience === "internal") && !isSchoolEmail(email))
+    return { message: "사업단 구성원과 교내 강사는 학교 이메일(@uc.ac.kr)로 로그인해 주세요." };
+  const destination = safeReturnTo(form.get("next"));
   if (
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
     email.length > 254 ||
@@ -77,7 +78,9 @@ export async function authenticate(
       await client.auth.signOut();
       return {
         message:
-          "계정 보안 상태를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+          audience === "office" || audience === "internal"
+            ? "계정 활성화를 완료하지 못했습니다. 등록된 이메일의 확인 링크를 누른 뒤 다시 로그인해 주세요. 이미 확인했다면 사업단에 등록 상태를 문의해 주세요."
+            : "계정 보안 상태를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.",
       };
     }
     const context = await client.rpc("life_login_context");
@@ -87,9 +90,7 @@ export async function authenticate(
     }
     const mismatch = audienceError(audience, (context.data as LoginContext).audience);
     if (mismatch) { await client.auth.signOut(); return { message: mismatch }; }
-    if (security.data.mfa_required && !security.data.mfa_verified) {
-      destination = `/auth/security?next=${encodeURIComponent(destination.startsWith("/auth") ? "/" : destination)}`;
-    } else if (!(await client.rpc("life_identity")).data) {
+    if (!(await client.rpc("life_identity")).data) {
       await client.auth.signOut();
       return {
         message: "계정 이용 상태를 확인할 수 없습니다. 사업단에 문의해 주세요.",
@@ -105,10 +106,11 @@ export async function register(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
+  const audience = loginAudience(form.get("audience")) ?? "learner";
+  if (audience === "office" || audience === "internal")
+    return { message: "사업단에서 등록한 뒤 ‘신규 비밀번호 설정’을 이용해 주세요." };
   if (!publicSignupEnabled()) return { message: PUBLIC_SIGNUP_PENDING };
   if (!authEmailEnabled()) return { message: AUTH_EMAIL_PENDING };
-  const audience = loginAudience(form.get("audience")) ?? "learner";
-  if (audience === "internal" && !isSchoolEmail(String(form.get("email") ?? ""))) return { message: "교내 강사는 학교 이메일(@uc.ac.kr)을 입력해 주세요." };
   const phone = normalizeMobilePhone(form.get("phone"));
   if (!phone) return { message: MOBILE_GUIDANCE };
   const name = String(form.get("name") ?? "").trim();

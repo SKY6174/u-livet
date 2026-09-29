@@ -68,7 +68,7 @@ export function AuthForm({
   const emailForm = (
       <ActionForm
         action={signup ? register : authenticate}
-        label={signup ? (audience === "office" || audience === "internal" ? "계정 활성화 신청" : "가입 신청") : "로그인"}
+        label={signup ? "가입 신청" : "로그인"}
         disabled={reviewOnly}
         botProtection={reviewOnly ? undefined : getBotProtection()}
       >
@@ -82,7 +82,7 @@ export function AuthForm({
         )}
         {signup && <PhoneField />}
         <label className="field text-base">
-          {audience === "internal" ? "학교 이메일 (아이디)" : "이메일 (아이디)"}
+          {audience === "internal" || audience === "office" ? "학교 이메일 (아이디)" : "이메일 (아이디)"}
           <input
             name="email"
             type="email"
@@ -91,7 +91,7 @@ export function AuthForm({
             spellCheck={false}
             inputMode="email"
             maxLength={254}
-            placeholder={audience === "internal" ? "name@uc.ac.kr" : undefined}
+            placeholder={audience === "internal" || audience === "office" ? "name@uc.ac.kr" : undefined}
             required
           />
         </label>
@@ -143,30 +143,9 @@ export function AuthForm({
           </p>
         )}
         {!signup && (audience === "office" || audience === "internal") ? (
-          <div className="group relative flex w-fit max-w-full flex-wrap items-center gap-1">
-            <Link
-              className="flex min-h-11 items-center text-base underline"
-              href={`/auth/signup?audience=${audience}`}
-              aria-describedby="member-activation-help"
-            >
-              등록된 구성원 계정 활성화
-            </Link>
-            <button
-              type="button"
-              className="flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700"
-              aria-label="계정 활성화 안내"
-              aria-describedby="member-activation-help"
-            >
-              <span aria-hidden="true" className="flex h-6 w-6 items-center justify-center rounded-full border border-teal-700 text-sm font-bold text-teal-900">?</span>
-            </button>
-            <span
-              id="member-activation-help"
-              role="tooltip"
-              className="pointer-events-none invisible absolute bottom-full left-0 z-10 mb-2 w-72 max-w-[calc(100vw-3rem)] rounded-xl border border-teal-200 bg-white p-4 text-sm leading-6 text-slate-700 shadow-lg after:absolute after:-bottom-2 after:right-14 after:h-4 after:w-4 after:rotate-45 after:border-b after:border-r after:border-teal-200 after:bg-white group-hover:visible group-focus-within:visible sm:left-auto sm:right-0 sm:after:right-4"
-            >
-              사업단에 미리 등록된 사업단 구성원·교내 강사가 등록 이메일을 인증하고 U-LiVE 전용 비밀번호를 설정하면 기존 구성원 정보와 계정이 연결됩니다.
-            </span>
-          </div>
+          <Link className="btn-secondary w-full text-center" href="/auth/forgot-password?first=1">
+            신규 비밀번호 설정
+          </Link>
         ) : (
           <Link
             className="flex min-h-11 items-center text-base underline"
@@ -181,13 +160,27 @@ export function AuthForm({
     <div className="[&_button[type=submit]]:w-full [&_button[type=submit]]:text-base">
       {showSocialLogin && <SocialLogin next={next} audience={audience} options={socialProviderOptions()}
         emailForm={collapsibleEmail ? emailForm : undefined} />}
+      {!signup && showSocialLogin && publicSignupEnabled() && authEmailEnabled() && <Link
+        className="mb-6 flex min-h-11 items-center text-base font-semibold text-teal-900 underline"
+        href={`/auth/signup?audience=${audience}`}
+      >처음이신가요? 이메일로 회원가입</Link>}
       {!signup && audience === "internal" && <div className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">
         <p className="font-semibold">학교 이메일(@uc.ac.kr)로 이용해 주세요.</p>
-        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LiVE 전용 비밀번호가 필요합니다. 사업단에 수동 등록된 분은 아래 ‘등록된 구성원 계정 활성화’에서 학교 이메일 인증과 비밀번호 설정을 완료해 주세요. 초대받은 분은 초대 이메일의 안내를 이용해 주세요.</p>
-        <Link href="/auth/forgot-password" className="mt-3 flex min-h-11 items-center font-semibold underline">초대받은 계정의 비밀번호 설정·재설정</Link>
+        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LiVE 전용 비밀번호가 필요합니다. 사업단에 등록된 분은 아래 ‘신규 비밀번호 설정’을 이용해 주세요.</p>
         <SupportContact className="mt-2" />
       </div>}
       {!collapsibleEmail && emailForm}
+      {!signup && (audience === "office" || audience === "internal") && (
+        <div className="mt-6 rounded-xl border border-teal-200 bg-teal-50 p-5 text-base leading-7">
+          <h3 className="font-bold text-teal-950">처음 로그인하시나요?</h3>
+          <ol className="mt-2 list-inside list-decimal space-y-1 text-slate-700">
+            <li>사업단에 대학 이메일(@uc.ac.kr)을 먼저 등록해 달라고 요청해 주세요.</li>
+            <li>‘신규 비밀번호 설정’을 눌러 등록 이메일로 받은 링크를 확인하세요.</li>
+            <li>새 비밀번호를 만든 뒤 이 화면에서 로그인하세요.</li>
+          </ol>
+          <SupportContact className="mt-3" />
+        </div>
+      )}
     </div>
   );
 }

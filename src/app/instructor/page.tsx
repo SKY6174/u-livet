@@ -4,7 +4,6 @@ import { requireIdentity } from "@/lib/auth/session";
 import { getWorkspaceOfferings } from "@/lib/portal/data";
 import { getInstructorHomeSummary } from "@/lib/classroom-questions/data";
 import { Empty, PageIntro } from "@/components/portal/ui";
-import { AccountSecurity } from "@/components/auth/account-security";
 import { memberLabel } from "@/lib/auth/workspace-navigation";
 import { 
   BookOpen, 
@@ -60,9 +59,6 @@ export default async function InstructorRoom() {
             <Link className="btn-secondary text-sm" href="/mypage/notifications">
               연락처·수신 설정
             </Link>
-            <Link className="btn-secondary text-sm" href="/auth/security">
-              계정 보안·추가 인증
-            </Link>
             <Link className="btn-secondary text-sm" href="/mypage/instructor">
               강사 이력·등록 심사
             </Link>
@@ -73,7 +69,6 @@ export default async function InstructorRoom() {
         </section>
       </div>
 
-      <AccountSecurity />
       <div className="mb-7 flex flex-wrap gap-3">
         <Link className="btn-primary" href="/operation-documents/plan">책임과정 운영계획서 작성 →</Link>
         <Link className="btn-secondary" href="/operation-documents/result">책임과정 결과보고서 작성 →</Link>

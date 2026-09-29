@@ -12,6 +12,13 @@ export async function getSignupPolicy() {
   return (await getPolicies("ACCOUNT_PRIVACY", result.data))[0];
 }
 
+export async function getMemberActivationPolicy() {
+  const client = await createServerSupabaseClient();
+  const result = await client.rpc("life_member_activation_policy");
+  if (result.error || typeof result.data !== "string") return undefined;
+  return (await getPolicies("ACCOUNT_PRIVACY", result.data))[0];
+}
+
 export async function socialDestination(next: unknown): Promise<string> {
   const client = await createServerSupabaseClient();
   const result = await client.rpc("life_registration_status");
@@ -23,7 +30,6 @@ export async function socialDestination(next: unknown): Promise<string> {
     if (!security.error && security.data?.active && !security.data?.needs_reset) {
       const context = await client.rpc("life_login_context");
       if (context.error || !context.data) { await client.auth.signOut(); return socialLoginRetry(target, "unavailable"); }
-      if (security.data.mfa_required && !security.data.mfa_verified) return `/auth/security?next=${encodeURIComponent(target)}`;
       const identity = await client.rpc("life_identity");
       if (!identity.error && identity.data) return target;
     }

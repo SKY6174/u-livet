@@ -8,6 +8,7 @@ import { isValidPassword, PASSWORD_GUIDANCE } from "@/lib/auth/password-policy";
 import type { ActionState } from "@/lib/portal/types";
 import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
+import { createMemberAdminClient } from "@/lib/auth/member-provisioning";
 
 const REQUEST_MESSAGE =
   "요청을 접수했습니다. 등록된 이메일이면 재설정 안내를 받을 수 있습니다. 반복 요청은 잠시 제한될 수 있습니다. 메일이 오지 않으면 스팸함과 주소를 확인하고, 대기 후에도 오지 않으면 잠시 더 기다리거나 사업단에 문의해 주세요.";
@@ -65,11 +66,8 @@ async function finishPassword(
       : LINK_MESSAGE;
   const tokenHash = String(form.get("token_hash") ?? "");
   const password = String(form.get("password") ?? "");
-  const mfaCode = String(form.get("mfa_code") ?? "").trim();
   if (!/^[a-f0-9]{32,128}$/i.test(tokenHash)) return { message: linkMessage };
   if (!isValidPassword(password)) return { message: PASSWORD_GUIDANCE };
-  if (mfaCode && !/^\d{6}$/.test(mfaCode))
-    return { message: "인증 앱의 숫자 6자리를 입력해 주세요." };
   const guard = await guardAuthRequest("reset", tokenHash, form);
   if (!guard.allowed) return guard.state;
   let client: ReturnType<typeof createRecoveryClient> | undefined;
@@ -88,34 +86,17 @@ async function finishPassword(
       return { message: linkMessage };
     const status = await client.rpc("life_auth_status");
     if (status.error || !status.data?.active) return { message: linkMessage };
-    const factors = await client.auth.mfa.listFactors();
-    if (factors.error) return { message: linkMessage };
-    const verifiedFactors = factors.data.totp.filter(
-      (f) => f.status === "verified",
-    );
-    if (verifiedFactors.length) {
-      let confirmed = false;
-      if (mfaCode) {
-        // Any enrolled app is acceptable; Auth owns attempt limits and validation.
-        for (const factor of verifiedFactors.slice(0, 10)) {
-          const result = await client.auth.mfa.challengeAndVerify({
-            factorId: factor.id,
-            code: mfaCode,
-          });
-          if (!result.error) {
-            confirmed = true;
-            break;
-          }
-          if (result.error.status === 429) break;
-        }
-      }
-      if (!confirmed)
-        return {
-          message:
-            "이 계정은 인증 앱 확인도 필요합니다. 새 재설정 메일을 요청한 뒤 새 비밀번호와 현재 6자리 코드를 함께 입력해 주세요. 인증 앱을 사용할 수 없으면 사업단에 복구를 요청해 주세요.",
-        };
+    const setup = await client.rpc("life_member_setup_required");
+    if (setup.error) return { message: linkMessage };
+    if (setup.data === true) {
+      const policyId = String(form.get("member_privacy_policy_id") ?? "");
+      if (form.get("member_privacy_accepted") !== "on" || !/^[0-9a-f-]{36}$/i.test(policyId))
+        return { message: "첫 비밀번호를 설정하려면 개인정보 안내를 확인하고 동의해 주세요." };
+      const consent = await client.rpc("life_accept_member_privacy", { p_policy: policyId });
+      if (consent.error)
+        return { message: "계정 동의를 확인하지 못했습니다. 새 메일을 요청하거나 사업단에 문의해 주세요." };
     }
-    const update = await client.auth.updateUser({ password });
+    const update = await createMemberAdminClient().auth.admin.updateUserById(proof.data.user.id, { password });
     if (update.error)
       return {
         message:

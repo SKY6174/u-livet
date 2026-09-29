@@ -18,7 +18,7 @@ export default function AcceptInvitation() {
         <li>1. 사용할 비밀번호를 만듭니다.</li>
         <li>2. 초대받은 이메일과 새 비밀번호로 로그인합니다.</li>
         <li>
-          3. 관리자 업무는 인증 앱 연결과 사업단의 권한 확인 후 이용합니다.
+          3. 로그인 후 사업단에서 부여한 업무 권한을 확인합니다.
         </li>
       </ol>
       <div className="panel">

@@ -5,8 +5,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
 import { memberAdmin, memberEntryOperator } from "@/lib/members/data";
-import { isOfficePosition } from "@/lib/auth/login-audience";
+import { isOfficePosition, isSchoolEmail } from "@/lib/auth/login-audience";
 import { memberInput, newMemberInput } from "@/lib/members/model";
+import { provisionMember } from "@/lib/auth/member-provisioning";
 import type { ActionState } from "@/lib/portal/types";
 
 function memberError(message: string) {
@@ -59,10 +60,20 @@ export async function createMember(_: ActionState, form: FormData): Promise<Acti
   const me = await memberEntryOperator();
   const input = newMemberInput(form);
   if (!input || !UUID.test(input.p_request) || !UUID.test(input.p_org)) return { message: "성명, 이메일, 전화번호와 생년월일을 확인해 주세요." };
+  if ((input.p_group === "office" || (input.p_group === "instructor" && input.p_kind === "INTERNAL")) && !isSchoolEmail(input.p_email))
+    return { message: "사업단 구성원과 교내 강사는 대학 이메일(@uc.ac.kr)로 등록해 주세요." };
   if (!me.member_entry_orgs?.some((org) => org.org_id === input.p_org)) return { message: "해당 사업단의 구성원 등록 권한이 없습니다." };
-  const { data, error } = await (await createServerSupabaseClient()).rpc("life_create_member", input);
+  const client = await createServerSupabaseClient();
+  const { data, error } = await client.rpc("life_create_member", input);
   if (error) return { message: memberError(error.message) };
   if (typeof data !== "string" || !UUID.test(data)) return { message: "등록 결과를 확인하지 못했습니다. 같은 화면에서 다시 시도해 주세요." };
+  if (input.p_group === "office" || (input.p_group === "instructor" && input.p_kind === "INTERNAL")) {
+    try {
+      await provisionMember(data, input.p_email, client);
+    } catch {
+      return { message: "구성원 정보는 저장됐지만 로그인 계정 연결을 마치지 못했습니다. 같은 화면에서 다시 제출해 주세요. 계속 실패하면 관리자에게 문의해 주세요." };
+    }
+  }
   revalidatePath("/admin/accounts");
   redirect(`/admin/accounts?group=${input.p_group}&created=1`);
 }
