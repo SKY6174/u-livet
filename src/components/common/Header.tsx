@@ -185,7 +185,7 @@ export default function Header() {
               <p className="text-xs font-semibold text-teal-700">사업단 업무</p>
               <p className="mb-3 mt-2 text-xl font-bold tracking-tight text-slate-900">{previewLink.label}</p>
               <p className="text-sm leading-7 text-slate-600">{previewLink.description}</p>
-              <span className="mt-auto pt-6 text-xs font-medium text-teal-700">U-LiVE · OFFICE WORKSPACE</span>
+              <span className="mt-auto pt-6 text-xs font-medium text-teal-700">U-LiVET · OFFICE WORKSPACE</span>
             </div>
           </div>
         </div>
@@ -207,21 +207,15 @@ export default function Header() {
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
-        <Link href="/" aria-label="U-LiVE — 열린 배움, 더 넓은 내일" className="flex shrink-0 items-center gap-3">
+        <Link href="/" aria-label="U-LiVET — Ulsan Lifelong T-VET" className="flex shrink-0 items-center">
           <Image
-            src="/images/u-live-favicon.png"
+            src="/images/u-livet-logo.svg"
             alt=""
-            width={64}
-            height={61}
-            className="h-14 w-auto shrink-0"
+            width={680}
+            height={190}
+            className="h-14 w-auto shrink-0 sm:h-16"
             priority
           />
-          <span>
-            <strong className="block whitespace-nowrap bg-gradient-to-r from-[#082b68] via-[#0998ba] to-[#087c70] bg-clip-text text-xl font-extrabold tracking-tight text-transparent sm:text-2xl">U-LiVE</strong>
-            <span className="block whitespace-nowrap text-xs text-slate-500">
-              열린 배움, 더 넓은 내일
-            </span>
-          </span>
         </Link>
         <nav aria-label="주 메뉴" className="hidden flex-wrap items-center justify-center gap-x-3 gap-y-3 lg:flex">
           {links.map(renderPrimaryLink)}

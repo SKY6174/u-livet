@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight, BookOpen, Download, History, Search } from "lucide-react";
 import { getManualRelease, manualFile, manualHref, searchManuals } from "@/lib/manuals/data";
 
-export const metadata: Metadata = { title: "이용 매뉴얼 | U-LiVE", description: "운영대상별 업무 안내와 버전별 PDF 매뉴얼" };
+export const metadata: Metadata = { title: "이용 매뉴얼 | U-LiVET", description: "운영대상별 업무 안내와 버전별 PDF 매뉴얼" };
 
 export default async function ManualsPage({ searchParams }: {
   searchParams: Promise<{ q?: string | string[] }>;
@@ -14,7 +14,7 @@ export default async function ManualsPage({ searchParams }: {
   const manuals = searchManuals(release, query);
   return <div className="page-shell">
     <section className="relative overflow-hidden rounded-3xl bg-teal-900 px-6 py-9 text-white sm:px-10 sm:py-12">
-      <p className="mb-4 text-xs font-semibold tracking-widest text-teal-200">U-LiVE GUIDE</p>
+      <p className="mb-4 text-xs font-semibold tracking-widest text-teal-200">U-LiVET GUIDE</p>
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">내 업무에 맞는 이용 매뉴얼</h1>

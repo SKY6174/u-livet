@@ -28,7 +28,7 @@ export default function Footer() {
               울산과학대학교 앵커사업단
             </p>
             <p className="mt-2 text-base leading-relaxed text-teal-50">
-              <strong className="font-semibold text-white">U-LiVE</strong>
+              <strong className="font-semibold text-white">U-LiVET</strong>
               <span className="mx-2" aria-hidden="true">|</span>
               <span className="inline-block">함께 성장하는 평생직업교육</span>
             </p>

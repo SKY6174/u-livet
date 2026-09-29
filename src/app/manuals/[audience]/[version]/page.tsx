@@ -10,7 +10,7 @@ type Props = { params: Promise<{ audience: string; version: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { audience, version } = await params;
   const result = getManual(audience, version);
-  return { title: result ? `${result.manual.title} v${version} | U-LiVE` : "매뉴얼을 찾을 수 없습니다" };
+  return { title: result ? `${result.manual.title} v${version} | U-LiVET` : "매뉴얼을 찾을 수 없습니다" };
 }
 export default async function ManualDetail({ params }: Props) {
   const { audience, version } = await params;
@@ -22,7 +22,7 @@ export default async function ManualDetail({ params }: Props) {
     <nav className="no-print mb-7 flex flex-wrap gap-5 text-sm font-semibold text-teal-800" aria-label="매뉴얼 탐색"><Link href="/manuals" className="underline">이용 매뉴얼</Link><Link href="/manuals/history" className="underline">버전·개정 이력</Link></nav>
     {version !== CURRENT_MANUAL_VERSION && <p className="no-print mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">이 문서는 이전 버전입니다. {latest ? <Link className="font-semibold underline" href={manualHref(latest.manual)}>현재 버전 {CURRENT_MANUAL_VERSION} 보기</Link> : <Link className="underline" href="/manuals">현재 매뉴얼 목록 확인</Link>}</p>}
     <div className="mb-8 border-b border-slate-200 pb-8">
-      <p className="eyebrow">U-LiVE MANUAL · {manual.code}</p>
+      <p className="eyebrow">U-LiVET MANUAL · {manual.code}</p>
       <h1 className="text-3xl font-bold leading-tight sm:text-4xl">{manual.title}</h1>
       <p className="mt-4 text-lg leading-8 text-slate-600">{manual.summary}</p>
       <dl className="mt-6 grid gap-3 text-sm sm:grid-cols-2"><div><dt className="inline font-semibold">대상 </dt><dd className="inline text-slate-600">{manual.audience}</dd></div><div><dt className="inline font-semibold">버전·개정일 </dt><dd className="inline text-slate-600">{version} · {release.releasedOn}</dd></div><div><dt className="inline font-semibold">업무 문의 </dt><dd className="inline text-slate-600">{manual.owner}</dd></div><div><dt className="inline font-semibold">검수 상태 </dt><dd className="inline text-slate-600">{release.status}</dd></div></dl>

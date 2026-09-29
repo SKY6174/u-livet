@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getSessionIdentity, safeReturnTo } from "@/lib/auth/session";
 
 export const metadata = {
-  title: "계정 안내 · U-LiVE",
+  title: "계정 안내 · U-LiVET",
   robots: { index: false, follow: false },
 };
 

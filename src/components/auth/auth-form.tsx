@@ -166,7 +166,7 @@ export function AuthForm({
       >처음이신가요? 이메일로 회원가입</Link>}
       {!signup && audience === "internal" && <div className="mb-6 rounded-xl bg-teal-50 p-5 text-base leading-7">
         <p className="font-semibold">학교 이메일(@uc.ac.kr)로 이용해 주세요.</p>
-        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LiVE 전용 비밀번호가 필요합니다. 사업단에 등록된 분은 아래 ‘신규 비밀번호 설정’을 이용해 주세요.</p>
+        <p className="mt-2">학교 포털 비밀번호와 별개인 U-LiVET 전용 비밀번호가 필요합니다. 사업단에 등록된 분은 아래 ‘신규 비밀번호 설정’을 이용해 주세요.</p>
         <SupportContact className="mt-2" />
       </div>}
       {!collapsibleEmail && emailForm}

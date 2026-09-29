@@ -140,7 +140,7 @@ export async function renderLearnerDocument(type: LearnerDocumentType, v: Learne
       width: fitted.width, height: fitted.height, blendMode: BlendMode.Multiply });
   }
   pdf.setTitle(DOCUMENT_TITLES[type]);
-  pdf.setProducer("U-LiVE / PDF 1.7");
+  pdf.setProducer("U-LiVET / PDF 1.7");
   pdf.setSubject("수강생 작성 서식 · 원본 양식 2026-09");
   return requirePdf17(await pdf.save());
 }

@@ -27,7 +27,7 @@ export default async function Home() {
       <>
         <section className="bg-uc-navy text-white">
           <div className="mx-auto max-w-7xl px-5 py-20 md:py-28">
-            <p className="mb-5 text-sm font-semibold tracking-label text-teal-200">U-LiVE · Lifelong Vocational Education &amp; Training</p>
+            <p className="mb-5 text-sm font-semibold tracking-label text-teal-200">U-LiVET · Ulsan Lifelong Vocation Education &amp; Training</p>
             <h1 className="text-4xl font-bold leading-tight md:text-6xl lg:whitespace-nowrap">
               새로운 배움을, 여기에서 시작하세요.
             </h1>
@@ -100,7 +100,7 @@ export default async function Home() {
         <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 md:grid-cols-[1.35fr_1fr] md:py-24">
           <div>
             <p className="mb-6 text-sm font-semibold tracking-label text-teal-200">
-              U-LiVE · LIFELONG LEARNING
+              U-LiVET · LIFELONG LEARNING
             </p>
             <p className="mb-4 break-words text-lg text-teal-100">{me.name} 님, 반갑습니다.</p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl">

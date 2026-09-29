@@ -7,7 +7,7 @@ import { isReviewOnly } from "@/lib/deployment/review-mode";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 
 export const metadata = {
-  title: "비밀번호 찾기 · U-LiVE",
+  title: "비밀번호 찾기 · U-LiVET",
   robots: { index: false, follow: false },
 };
 export default async function ForgotPassword({ searchParams }: { searchParams: Promise<{ first?: string }> }) {
