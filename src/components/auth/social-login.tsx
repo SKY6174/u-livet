@@ -53,7 +53,7 @@ export function SocialLogin({ next, audience, options, emailForm }: {
       <p className="text-sm leading-6 text-slate-600">
         {audience === "external"
           ? "승인된 교외 강사 계정으로 로그인해 주세요. 처음 가입하시면 기본 회원으로 등록되며, 강사 이력 제출과 사업단의 자격 확인 후 강사 업무를 이용할 수 있습니다."
-          : "처음 이용하시면 로그인 후 이름·휴대폰 번호와 개인정보 동의를 확인합니다."}
+          : "처음 가입하는 학습자에게는 카카오·네이버·구글 간편 로그인을 권장합니다. 로그인 후 이름·휴대폰 번호와 개인정보 동의를 확인합니다. 이미 계정 설정 메일을 받았다면 메일의 링크로 기존 계정을 먼저 설정해 주세요."}
       </p>
       {audience === "external" && <p className="text-sm leading-6 text-slate-600">기존 강사 계정과 간편 로그인 계정의 이메일이 다르면 별도 계정으로 등록될 수 있습니다. 기존 이력이 보이지 않으면 사업단에 문의해 주세요.</p>}
       <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 pt-1">

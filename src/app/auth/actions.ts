@@ -139,7 +139,8 @@ export async function register(
       password,
       options: {
         captchaToken: guard.captchaToken,
-        data: { name, mobile_phone: phone, privacy_policy_id: policy.id, privacy_accepted: true, member_audience: audience },
+        data: { name, email: email.toLowerCase(), mobile_phone: phone,
+          privacy_policy_id: policy.id, privacy_accepted: true, member_audience: audience },
       },
     });
     if (error)

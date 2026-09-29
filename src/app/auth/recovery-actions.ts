@@ -9,6 +9,7 @@ import type { ActionState } from "@/lib/portal/types";
 import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 import { createMemberAdminClient } from "@/lib/auth/member-provisioning";
+import { normalizeMobilePhone } from "@/lib/auth/registration";
 
 const REQUEST_MESSAGE =
   "요청을 접수했습니다. 등록된 이메일이면 재설정 안내를 받을 수 있습니다. 반복 요청은 잠시 제한될 수 있습니다. 메일이 오지 않으면 스팸함과 주소를 확인하고, 대기 후에도 오지 않으면 잠시 더 기다리거나 사업단에 문의해 주세요.";
@@ -66,8 +67,15 @@ async function finishPassword(
       : LINK_MESSAGE;
   const tokenHash = String(form.get("token_hash") ?? "");
   const password = String(form.get("password") ?? "");
+  const policyId = String(form.get("privacy_policy_id") ?? "");
+  const name = String(form.get("name") ?? "").trim();
+  const email = String(form.get("email") ?? "").trim().toLowerCase();
+  const mobile = purpose === "invite" && policyId ? normalizeMobilePhone(form.get("phone")) : null;
   if (!/^[a-f0-9]{32,128}$/i.test(tokenHash)) return { message: linkMessage };
   if (!isValidPassword(password)) return { message: PASSWORD_GUIDANCE };
+  if (purpose === "invite" && policyId && (!name || name.length > 100 || !mobile
+    || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
+    return { message: "이름, 초대받은 이메일, 휴대폰 번호를 확인해 주세요." };
   const guard = await guardAuthRequest("reset", tokenHash, form);
   if (!guard.allowed) return guard.state;
   let client: ReturnType<typeof createRecoveryClient> | undefined;
@@ -84,6 +92,18 @@ async function finishPassword(
     verified = true;
     if (purpose === "invite" && !proof.data.user.invited_at)
       return { message: linkMessage };
+    if (purpose === "invite" && policyId) {
+      if (proof.data.user.email?.toLowerCase() !== email)
+        return { message: "초대받은 이메일 주소를 정확히 입력해 주세요." };
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(policyId)
+        || form.get("privacy_accepted") !== "on")
+        return { message: "개인정보 수집·이용 안내를 확인하고 동의해 주세요." };
+      const acceptance = await client.rpc("life_accept_manual_member_invitation", {
+        p_policy: policyId, p_accepted: true,
+      });
+      if (acceptance.error)
+        return { message: "개인정보 동의 또는 계정 연결을 완료하지 못했습니다. 사업단에 문의해 주세요." };
+    }
     const status = await client.rpc("life_auth_status");
     if (status.error || !status.data?.active) return { message: linkMessage };
     const setup = await client.rpc("life_member_setup_required");
@@ -96,7 +116,12 @@ async function finishPassword(
       if (consent.error)
         return { message: "계정 동의를 확인하지 못했습니다. 새 메일을 요청하거나 사업단에 문의해 주세요." };
     }
-    const update = await createMemberAdminClient().auth.admin.updateUserById(proof.data.user.id, { password });
+    const update = await createMemberAdminClient().auth.admin.updateUserById(proof.data.user.id, {
+      password,
+      ...(purpose === "invite" && policyId ? { user_metadata: {
+        ...proof.data.user.user_metadata, name, email, mobile_phone: mobile,
+      } } : {}),
+    });
     if (update.error)
       return {
         message:

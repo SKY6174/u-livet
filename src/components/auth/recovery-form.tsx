@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ActionForm } from "@/components/portal/action-form";
 import { PasswordField } from "./password-field";
+import { PhoneField } from "./phone-field";
 import { acceptInvitation, resetPassword } from "@/app/auth/recovery-actions";
 import type { Policy } from "@/lib/portal/types";
 
@@ -19,7 +20,7 @@ export function RecoveryForm({ invitation = false, policy }: { invitation?: bool
         window.history.replaceState(
           window.history.state,
           "",
-          window.location.pathname,
+          `${window.location.pathname}${window.location.search}`,
         );
       } else {
         setToken((current) => current ?? "");
@@ -40,6 +41,25 @@ export function RecoveryForm({ invitation = false, policy }: { invitation?: bool
           label={invitation ? "비밀번호 설정하기" : "비밀번호 바꾸기"}
         >
           <input type="hidden" name="token_hash" value={token} />
+          {invitation && policy && (
+            <div className="space-y-3">
+              <p className="text-base text-slate-600">사업단에 등록된 계정을 연결할 이름, 이메일, 휴대폰 번호를 확인해 주세요.</p>
+              <label className="field text-base">이름<input name="name" autoComplete="name" maxLength={100} required /></label>
+              <label className="field text-base">초대받은 이메일<input name="email" type="email" autoComplete="email" maxLength={254} required /></label>
+              <PhoneField />
+              <details className="rounded-lg border p-4">
+                <summary className="min-h-11 cursor-pointer text-lg font-semibold leading-7">
+                  {policy.title} · {policy.version}
+                </summary>
+                <p className="mt-4 whitespace-pre-wrap break-words text-base leading-7">{policy.body}</p>
+              </details>
+              <input type="hidden" name="privacy_policy_id" value={policy.id} />
+              <label className="flex min-h-11 items-start gap-3 py-2 text-base">
+                <input className="mt-1 h-5 w-5 shrink-0" type="checkbox" name="privacy_accepted" required />
+                <span>[필수] 위 개인정보 수집·이용에 동의합니다.</span>
+              </label>
+            </div>
+          )}
           <PasswordField signup label="새 비밀번호" />
           {!invitation && policy && (
             <section className="rounded-lg border p-4" aria-labelledby="member-first-password-privacy">
