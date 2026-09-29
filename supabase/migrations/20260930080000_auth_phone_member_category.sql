@@ -2,7 +2,7 @@ begin;
 
 -- Read-only, service-role snapshot for synchronizing Supabase Auth's native phone
 -- and descriptive app metadata. Database roles remain the authorization source.
-create function public.life_auth_directory_profile(p_user uuid default null, p_person uuid default null)
+create or replace function public.life_auth_directory_profile(p_user uuid default null, p_person uuid default null)
 returns jsonb language sql stable security definer set search_path='' as $$
   with selected as (
     select u.id, u.raw_user_meta_data
@@ -63,7 +63,7 @@ grant execute on function public.life_auth_directory_profile(uuid,uuid) to servi
 
 -- GoTrue's Admin API ignores an empty/null phone. Clear an unverified stale
 -- phone explicitly when the canonical contact becomes shared or unavailable.
-create function public.life_clear_auth_directory_phone(p_user uuid) returns boolean
+create or replace function public.life_clear_auth_directory_phone(p_user uuid) returns boolean
 language plpgsql security definer set search_path='' as $$
 begin
   update auth.users set phone=null where id=p_user and phone is not null
