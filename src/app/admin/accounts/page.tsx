@@ -8,6 +8,8 @@ import { getFilteredMembers, memberAdmin } from "@/lib/members/data";
 import { MEMBER_GROUPS, MEMBER_SORT_OPTIONS, MEMBER_YEARS, memberFilters, memberGroup, memberPage, displayPhone, type MemberGroup } from "@/lib/members/model";
 import { MemberExcel } from "@/components/members/member-excel";
 
+export const maxDuration = 300;
+
 export default async function Members({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const me = await memberAdmin();
   const params = await searchParams;
@@ -27,7 +29,7 @@ export default async function Members({ searchParams }: { searchParams: Promise<
   const columns = ["순번", ...(group === "office" ? ["직책"] : group === "instructor" ? ["교내/교외"] : []), "성명", group === "learner" ? "이메일" : "이메일(아이디)", ...(group === "office" ? ["사무실 전화번호"] : []), phoneHeading, ...(group === "learner" ? ["생년월일", filters.year ? `${filters.year}년 수강과목` : "올해 수강과목", "수강이력"] : group === "instructor" ? ["강의이력"] : []), "비고", "관리"];
   return <div className="page-shell">
     <PageIntro eyebrow="MEMBERS" title="구성원 관리" />
-    <MemberNotice key={notice ?? "none"} kind={notice} />
+    <MemberNotice key={notice ?? "none"} kind={notice} invited={typeof params.invited === "string" ? params.invited : undefined} />
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
     <nav aria-label="구성원 구분" className="flex flex-wrap gap-2">
       {Object.entries(MEMBER_GROUPS).map(([key, label]) => <Link key={key} href={`/admin/accounts?group=${key}`} aria-current={key === group ? "page" : undefined}

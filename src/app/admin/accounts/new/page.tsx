@@ -13,7 +13,7 @@ export default async function NewMember({ searchParams }: { searchParams: Promis
   const group = memberGroup((await searchParams).group);
   const orgs = me.member_entry_orgs!;
   return <div className="page-shell max-w-5xl">
-    <PageIntro eyebrow="NEW MEMBER" title="구성원 수동 등록">입력한 정보는 등록과 동시에 저장됩니다.</PageIntro>
+    <PageIntro eyebrow="NEW MEMBER" title="구성원 수동 등록">저장과 동시에 인증 계정을 만들고 설정 메일을 발송합니다.</PageIntro>
     <nav aria-label="등록할 구성원 구분" className="mb-6 flex flex-wrap gap-2">{Object.entries(MEMBER_GROUPS).map(([key, label]) => <Link key={key} href={`/admin/accounts/new?group=${key}`} aria-current={key === group ? "page" : undefined} className={key === group ? "btn-primary" : "btn-secondary"}>{label}</Link>)}</nav>
     <section className="panel max-w-3xl">
       <h2 className="mb-6 flex items-center gap-2 text-lg font-bold"><UserPlus aria-hidden="true" className="h-5 w-5 text-teal-700" />{MEMBER_GROUPS[group]} 정보</h2>
@@ -34,7 +34,7 @@ export default async function NewMember({ searchParams }: { searchParams: Promis
           {group === "learner" && <label className="field">생년월일<input name="birth_date" type="date" min="1900-01-01" max={new Date().toISOString().slice(0, 10)} /></label>}
           <label className="field sm:col-span-2">비고<textarea name="notes" maxLength={2000} rows={4} className="w-full rounded-lg border border-slate-300 p-3 font-normal" placeholder="구성원 관리에 필요한 메모" /></label>
         </div>
-        <p className="rounded-lg bg-slate-50 p-3 text-xs leading-6 text-slate-500">사업단 구성원과 교내 강사는 대학 이메일(@uc.ac.kr)로 등록해 주세요. 등록하면 로그인 계정이 자동 생성됩니다. 구성원은 로그인 화면의 ‘신규 비밀번호 설정’에서 이메일을 확인하고 첫 비밀번호를 만든 뒤 로그인할 수 있습니다. 교외 강사·수강생은 공개 가입 옵션을 이용할 수 있습니다.</p>
+        <p className="rounded-lg bg-slate-50 p-3 text-xs leading-6 text-slate-500">사업단 구성원과 교내 강사는 대학 이메일(@uc.ac.kr)로 등록해 주세요. 로그인 계정이 자동 생성되며 ‘신규 비밀번호 설정’에서 첫 비밀번호를 만듭니다. 교외 강사·수강생은 계정 설정 메일을 받습니다. 처음 가입하는 학습자에게는 간편 로그인을 권장하고, 이미 설정 메일을 받았다면 해당 링크를 먼저 이용하도록 안내해 주세요.</p>
       </ActionForm>
     </section>
   </div>;

@@ -79,7 +79,7 @@ export function MemberExcel({ group, query, filters, orgs, canEdit }: {
     {message && <p role={error ? "alert" : "status"} className={error ? "text-sm text-red-700" : "text-sm text-teal-800"}>{message}</p>}
     {rows.length > 0 && <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm">
       <div className="flex justify-between gap-3"><h2 className="font-bold">업로드 미리보기 · 신규 {rows.filter(row => !row.person_id).length}명 · 수정 {rows.filter(row => !!row.person_id).length}명</h2><button type="button" aria-label="엑셀 업로드 취소" disabled={busy} onClick={reset}><X size={18} /></button></div>
-      <p className="mt-2 text-slate-700">확정하면 파일 전체를 한 번에 저장합니다. 한 행이라도 실패하면 모두 취소됩니다. 사업단·교내 강사의 계정 활성화와 본인 인증은 별도로 진행됩니다.</p>
+      <p className="mt-2 text-slate-700">확정하면 파일 전체를 한 번에 저장합니다. 신규 행에는 Auth 계정을 만들고 설정 메일을 보냅니다. 명부 저장에 실패하면 전체가 취소되며, 메일 발송 실패 행은 별도로 표시됩니다. 수신자는 이메일 확인과 개인정보 동의를 마쳐야 로그인할 수 있습니다.</p>
       <ol className="mt-3 max-h-40 overflow-y-auto border-t border-teal-200 pt-2">{rows.slice(0, 20).map((row, index) => <li key={row.person_id || row.request_id}>{index + 2}행 · {row.name} · {row.email || "이메일 미등록"} · {row.person_id ? "수정" : "신규"}</li>)}{rows.length > 20 && <li>외 {rows.length - 20}명</li>}</ol>
       <label className="mt-3 flex items-start gap-2"><input type="checkbox" className="mt-1" checked={confirmed} disabled={busy} onChange={event => setConfirmed(event.target.checked)} /><span>미리보기와 사업단을 확인했으며, 개인정보가 포함된 파일을 안전하게 관리하겠습니다.</span></label>
       <button type="button" className="btn-primary mt-3" disabled={busy || !confirmed} onClick={() => void confirmImport()}>{busy ? "저장 중…" : `${rows.length}명 저장 확정`}</button>

@@ -66,6 +66,7 @@ async function finishPassword(
       : LINK_MESSAGE;
   const tokenHash = String(form.get("token_hash") ?? "");
   const password = String(form.get("password") ?? "");
+  const policyId = String(form.get("privacy_policy_id") ?? "");
   if (!/^[a-f0-9]{32,128}$/i.test(tokenHash)) return { message: linkMessage };
   if (!isValidPassword(password)) return { message: PASSWORD_GUIDANCE };
   const guard = await guardAuthRequest("reset", tokenHash, form);
@@ -84,6 +85,16 @@ async function finishPassword(
     verified = true;
     if (purpose === "invite" && !proof.data.user.invited_at)
       return { message: linkMessage };
+    if (purpose === "invite" && policyId) {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(policyId)
+        || form.get("privacy_accepted") !== "on")
+        return { message: "개인정보 수집·이용 안내를 확인하고 동의해 주세요." };
+      const acceptance = await client.rpc("life_accept_manual_member_invitation", {
+        p_policy: policyId, p_accepted: true,
+      });
+      if (acceptance.error)
+        return { message: "개인정보 동의 또는 계정 연결을 완료하지 못했습니다. 사업단에 문의해 주세요." };
+    }
     const status = await client.rpc("life_auth_status");
     if (status.error || !status.data?.active) return { message: linkMessage };
     const setup = await client.rpc("life_member_setup_required");

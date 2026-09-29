@@ -8,6 +8,7 @@ import { memberAdmin, memberEntryOperator } from "@/lib/members/data";
 import { isOfficePosition, isSchoolEmail } from "@/lib/auth/login-audience";
 import { memberInput, newMemberInput } from "@/lib/members/model";
 import { provisionMember } from "@/lib/auth/member-provisioning";
+import { canInviteManualMembers, inviteManualMember } from "@/lib/members/invitations";
 import type { ActionState } from "@/lib/portal/types";
 
 function memberError(message: string) {
@@ -63,17 +64,24 @@ export async function createMember(_: ActionState, form: FormData): Promise<Acti
   if ((input.p_group === "office" || (input.p_group === "instructor" && input.p_kind === "INTERNAL")) && !isSchoolEmail(input.p_email))
     return { message: "사업단 구성원과 교내 강사는 대학 이메일(@uc.ac.kr)로 등록해 주세요." };
   if (!me.member_entry_orgs?.some((org) => org.org_id === input.p_org)) return { message: "해당 사업단의 구성원 등록 권한이 없습니다." };
+  const schoolMember = input.p_group === "office" || (input.p_group === "instructor" && input.p_kind === "INTERNAL");
+  if (!schoolMember && !await canInviteManualMembers(input.p_org)) return { message: "계정 설정 메일이나 개인정보 처리 안내가 준비되지 않았습니다. 사업단에 문의해 주세요." };
   const client = await createServerSupabaseClient();
   const { data, error } = await client.rpc("life_create_member", input);
   if (error) return { message: memberError(error.message) };
   if (typeof data !== "string" || !UUID.test(data)) return { message: "등록 결과를 확인하지 못했습니다. 같은 화면에서 다시 시도해 주세요." };
-  if (input.p_group === "office" || (input.p_group === "instructor" && input.p_kind === "INTERNAL")) {
+  let invitation: "sent" | "existing" | "activated" = "activated";
+  if (schoolMember) {
     try {
       await provisionMember(data, input.p_email, client);
     } catch {
       return { message: "구성원 정보는 저장됐지만 로그인 계정 연결을 마치지 못했습니다. 같은 화면에서 다시 제출해 주세요. 계속 실패하면 관리자에게 문의해 주세요." };
     }
+  } else {
+    const result = await inviteManualMember(data, input.p_email, input.p_org);
+    if (result === "failed") return { message: "구성원 명부는 저장됐지만 계정 설정 메일을 보내지 못했습니다. 같은 화면에서 다시 시도해 주세요." };
+    invitation = result;
   }
   revalidatePath("/admin/accounts");
-  redirect(`/admin/accounts?group=${input.p_group}&created=1`);
+  redirect(`/admin/accounts?group=${input.p_group}&created=1&invited=${invitation}`);
 }
