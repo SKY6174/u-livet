@@ -23,7 +23,7 @@
 
 | 환경 | 홈페이지 | Supabase 기본 OAuth callback |
 | --- | --- | --- |
-| 운영 | https://u-live.org | https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback |
+| 운영 | https://u-livet.org | https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback |
 | 스테이징 | https://staging.u-live.org | https://bfqwntulxabfrimcypvx.supabase.co/auth/v1/callback |
 
 외부 제공자의 Redirect URI는 Supabase 대시보드에 표시된 **해당 제공자의 callback URL을 그대로 복사**한다. 앱의 `/auth/callback`은 Supabase 인증 이후 돌아오는 주소이므로 구분한다. Supabase Redirect URLs에는 해당 홈페이지의 `/auth/callback` 복귀 주소를 허용한다.
@@ -40,17 +40,17 @@
 
 ## 네이버 연결과 검수 과정
 
-1. 네이버 개발자센터에서 서비스 URL `https://uc-life.org`, 개인정보처리방침 `https://uc-life.org/privacy`를 등록한다. 운영 인가 요청에서 확인한 callback은 `https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback`이다.
+1. 네이버 개발자센터에서 서비스 URL `https://u-livet.org`, 개인정보처리방침 `https://u-livet.org/privacy`를 등록한다. 운영 인가 요청에서 확인한 callback은 `https://uoebygejgglgiivzgyks.supabase.co/auth/v1/callback`이다.
 2. 제공 정보는 회원 식별자와 이메일로 제한한다. 이름과 휴대폰은 U-LIFE 가입 화면에서 입력받는다. 네이버 앱의 불필요한 이름·별명·프로필사진·성별·생일·연령·출생연도·휴대폰 제공 항목은 해제한다.
 3. Supabase의 식별자는 `naver`, 앱이 요청하는 값은 `custom:naver`이다. 기존 Client ID와 Secret을 유지한다.
-4. 인가 URL은 `https://nid.naver.com/oauth2.0/authorize`, 토큰 URL은 `https://nid.naver.com/oauth2.0/token`, 사용자 정보 URL은 **`https://uc-life.org/api/auth/naver/userinfo`**로 설정한다. scope는 빈 목록이다. OAuth2 제공자이므로 OIDC discovery나 JWKS는 사용하지 않는다.
+4. 인가 URL은 `https://nid.naver.com/oauth2.0/authorize`, 토큰 URL은 `https://nid.naver.com/oauth2.0/token`, 사용자 정보 URL은 **`https://u-livet.org/api/auth/naver/userinfo`**로 설정한다. scope는 빈 목록이다. OAuth2 제공자이므로 OIDC discovery나 JWKS는 사용하지 않는다.
 5. 사용자 정보 변환 경로가 네이버의 `https://openapi.naver.com/v1/nid/me`를 Bearer 토큰으로 확인한 후 평탄한 `sub`, `email`, `email_verified`만 반환한다. Supabase attribute mapping은 `sub`와 `email`만 같은 이름으로 연결한다. `email_verified`는 보호 필드로 별도 매핑하지 않고 응답의 false 값을 그대로 읽는다. `response.id` 같은 중첩 경로를 직접 매핑하지 않는다.
 6. 네이버는 이메일 확인 상태를 제공하지 않아 `email_verified=false`로 처리한다. 네이버 제공자만 `email_optional=true`로 설정해 회원 식별자로 가입 대기 OAuth 세션을 발급한다. 신규 회원은 U-LIFE 가입 화면에서 원하는 이메일을 입력하고 메일의 인증번호로 확인한다. 확인 후 이름·휴대폰·명시적 개인정보 동의를 완료해야 회원 기능을 이용한다. Supabase 전역 자동 확인과 미확인 이메일 로그인 설정은 변경하지 않는다.
 7. `AUTH_NAVER_ENABLED=true`를 운영에 설정하고 재배포한다. 스테이징은 별도 설정·검증 후 활성화한다.
 
 검수용 캡처 순서:
 
-1. `https://uc-life.org/auth/login?audience=learner`의 활성화된 네이버 로그인 버튼.
+1. `https://u-livet.org/auth/login?audience=learner`의 활성화된 네이버 로그인 버튼.
 2. 버튼을 눌러 열린 네이버 로그인 화면에서 등록자·관리자 또는 테스터 계정으로 인증.
 3. 네이버 정보 제공 동의 화면과 동의한 항목.
 4. 신규 회원은 U-LIFE에서 사용할 이메일을 직접 입력하고 인증 메일의 숫자 코드를 가입 화면에 입력한다. 인증번호와 링크는 제출 이미지에서 가린다.
