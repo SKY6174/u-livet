@@ -10,6 +10,7 @@ import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
 import { createMemberAdminClient } from "@/lib/auth/member-provisioning";
 import { normalizeMobilePhone } from "@/lib/auth/registration";
+import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 
 const REQUEST_MESSAGE =
   "요청을 접수했습니다. 등록된 이메일이면 재설정 안내를 받을 수 있습니다. 반복 요청은 잠시 제한될 수 있습니다. 메일이 오지 않으면 스팸함과 주소를 확인하고, 대기 후에도 오지 않으면 잠시 더 기다리거나 사업단에 문의해 주세요.";
@@ -132,6 +133,8 @@ async function finishPassword(
             : "비밀번호를 바꾸지 못했습니다. 새 재설정 메일을 요청한 뒤 다시 진행해 주세요.",
       };
     changed = true;
+    try { await syncAuthDirectoryFields({ userId: proof.data.user.id }); }
+    catch { console.error("Auth directory sync deferred after password setup"); }
   } catch {
     return { message: linkMessage };
   } finally {

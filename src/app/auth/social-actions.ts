@@ -13,6 +13,7 @@ import type { ActionState } from "@/lib/portal/types";
 import { loginAudience } from "@/lib/auth/login-audience";
 import { socialProvider, socialProviderEnabled } from "@/lib/auth/social-providers";
 import { naverSignupNeedsEmail } from "@/lib/auth/naver-signup";
+import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 
 export async function loginWithKakao(_: ActionState, form: FormData): Promise<ActionState> {
   form.set("provider", "kakao");
@@ -75,6 +76,8 @@ export async function completeKakaoSignup(_: ActionState, form: FormData): Promi
       email: data.user.email?.trim().toLowerCase() ?? null,
     } });
     if (updated.error) return { message: "가입 정보는 저장됐지만 Auth 사용자 정보 반영에 실패했습니다. 화면에서 다시 시도해 주세요." };
+    try { await syncAuthDirectoryFields({ userId: data.user.id }); }
+    catch { console.error("Auth directory sync deferred after social signup"); }
     destination = await socialDestination(form.get("next"));
   } catch { return { message: "가입 서비스에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." }; }
   revalidatePath("/", "layout");

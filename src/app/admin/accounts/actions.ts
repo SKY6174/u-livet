@@ -8,6 +8,7 @@ import { memberAdmin, memberEntryOperator } from "@/lib/members/data";
 import { isOfficePosition, isSchoolEmail } from "@/lib/auth/login-audience";
 import { memberInput, newMemberInput } from "@/lib/members/model";
 import { provisionMember, syncManualMemberAuthMetadata } from "@/lib/auth/member-provisioning";
+import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 import { canInviteManualMembers, inviteManualMember, sendMemberSetupEmail } from "@/lib/members/invitations";
 import type { ActionState } from "@/lib/portal/types";
 
@@ -29,10 +30,11 @@ export async function saveMember(_: ActionState, form: FormData): Promise<Action
   if (!input || !UUID.test(input.p_person)) return { message: "성명, 전화번호, 생년월일과 구분을 확인해 주세요." };
   const { error } = await (await createServerSupabaseClient()).rpc("life_save_member", input);
   if (error) return { message: memberError(error.message) };
-  if (input.p_group === "office" || input.p_kind === "INTERNAL") {
-    try { await syncManualMemberAuthMetadata(input.p_person); }
-    catch { return { message: "구성원 정보는 저장됐지만 Auth 사용자 정보 반영에 실패했습니다. 목록을 새로고침한 뒤 다시 시도해 주세요." }; }
-  }
+  try {
+    if (input.p_group === "office" || input.p_kind === "INTERNAL")
+      await syncManualMemberAuthMetadata(input.p_person);
+    else await syncAuthDirectoryFields({ personId: input.p_person });
+  } catch { return { message: "구성원 정보는 저장됐지만 Auth 사용자 정보 반영에 실패했습니다. 목록을 새로고침한 뒤 다시 시도해 주세요." }; }
   revalidatePath("/", "layout");
   redirect(`/admin/accounts?group=${input.p_group}&saved=1`);
 }
@@ -57,7 +59,10 @@ export async function saveAccountClassification(_: ActionState, form: FormData):
   if (!UUID.test(person) || (position !== "" && !isOfficePosition(position)) || !["", "INTERNAL", "EXTERNAL"].includes(kind)) return { message: "계정 구분을 확인해 주세요." };
   const { error } = await (await createServerSupabaseClient()).rpc("life_set_account_classification", { p_person: person, p_position: position || null, p_kind: kind || null });
   if (error) return { message: memberError(error.message) };
-  try { await syncManualMemberAuthMetadata(person); }
+  try {
+    await syncManualMemberAuthMetadata(person);
+    await syncAuthDirectoryFields({ personId: person });
+  }
   catch { return { message: "계정 구분은 저장됐지만 Auth 사용자 정보 반영에 실패했습니다. 새로고침 후 다시 시도해 주세요." }; }
   revalidatePath("/", "layout");
   return { ok: true, message: "계정 구분을 저장했습니다. 다음 화면 이동부터 적용됩니다." };
