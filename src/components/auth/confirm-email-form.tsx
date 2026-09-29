@@ -16,7 +16,13 @@ export function ConfirmEmailForm() {
     const candidate = new URLSearchParams(window.location.hash.slice(1)).get(
       "token_hash",
     );
-    setToken(candidate && TOKEN_HASH_PATTERN.test(candidate) ? candidate : "");
+    setToken((current) =>
+      candidate !== null
+        ? TOKEN_HASH_PATTERN.test(candidate)
+          ? candidate
+          : ""
+        : current ?? "",
+    );
     window.history.replaceState(
       window.history.state,
       "",

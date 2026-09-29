@@ -21,7 +21,7 @@ export async function confirmEmail(
       token_hash: tokenHash,
       type: "signup",
     });
-    if (proof.error || !proof.data.user || !proof.data.user.email_confirmed_at)
+    if (proof.error || !proof.data.user)
       return { message: INVALID_LINK_MESSAGE };
     await client.auth.signOut({ scope: "local" }).catch(() => undefined);
     return {
