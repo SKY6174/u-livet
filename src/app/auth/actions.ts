@@ -9,6 +9,7 @@ import { normalizeMobilePhone, MOBILE_GUIDANCE } from "@/lib/auth/registration";
 import type { ActionState } from "@/lib/portal/types";
 import { guardAuthRequest, authProviderError } from "@/lib/auth/abuse";
 import { authEmailEnabled, AUTH_EMAIL_PENDING } from "@/lib/auth/email-config";
+import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 import {
   publicSignupEnabled,
   PUBLIC_SIGNUP_PENDING,
@@ -96,6 +97,8 @@ export async function authenticate(
         message: "계정 이용 상태를 확인할 수 없습니다. 사업단에 문의해 주세요.",
       };
     }
+    try { await syncAuthDirectoryFields({ userId: authData.user.id }); }
+    catch { console.error("Auth directory sync deferred after login"); }
   } catch {
     return { message: "로그인 서비스에 연결하지 못했습니다." };
   }
@@ -132,7 +135,7 @@ export async function register(
       message: "현재 개인정보 수집·이용 안내를 확인하고 동의해 주세요.",
     };
   try {
-    const { error } = await (
+    const { data, error } = await (
       await createServerSupabaseClient()
     ).auth.signUp({
       email,
@@ -150,6 +153,10 @@ export async function register(
             "가입을 완료하지 못했습니다. 입력 내용을 확인하거나 잠시 후 다시 시도해 주세요.",
         }
       );
+    if (data.user?.identities?.length) {
+      try { await syncAuthDirectoryFields({ userId: data.user.id }); }
+      catch { console.error("Auth directory sync deferred after signup"); }
+    }
   } catch {
     return { message: "가입 서비스에 연결하지 못했습니다." };
   }

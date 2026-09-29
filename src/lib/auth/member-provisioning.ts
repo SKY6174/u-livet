@@ -1,17 +1,10 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { getSupabaseConfig } from "@/lib/supabase/config";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { isSchoolEmail } from "@/lib/auth/login-audience";
+import { createMemberAdminClient, syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 
-export function createMemberAdminClient() {
-  const config = getSupabaseConfig();
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!config || !key) throw new Error("MEMBER_AUTH_UNAVAILABLE");
-  return createClient(config.url, key, {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-  });
-}
+export { createMemberAdminClient } from "@/lib/auth/auth-directory";
 
 type ManualAuthProfile = {
   person_id: string;
@@ -70,6 +63,7 @@ export async function syncManualMemberAuthMetadata(personId: string) {
     });
     if (updated.error) throw new Error("MEMBER_AUTH_METADATA_UNAVAILABLE");
   }
+  await syncAuthDirectoryFields({ userId: profile.auth_user_id });
   return { linked: true, activated: profile.activation_complete };
 }
 
@@ -99,5 +93,6 @@ export async function provisionMember(personId: string, email: string, operator:
   const linkedAfterCreate = await manualAuthProfile(personId);
   if (linkedAfterCreate?.auth_user_id !== created.data.user.id)
     throw new Error("MEMBER_AUTH_CONFLICT");
+  await syncAuthDirectoryFields({ userId: created.data.user.id });
   return { linked: true, activated: false };
 }

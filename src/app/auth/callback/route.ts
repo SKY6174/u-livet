@@ -4,6 +4,7 @@ import { recoveryOrigin } from "@/lib/auth/recovery";
 import { socialDestination } from "@/lib/auth/social";
 import { socialLoginRetry } from "@/lib/auth/registration";
 import { isReviewOnly } from "@/lib/deployment/review-mode";
+import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 
 export async function GET(request: Request) {
   // Never trust Host / forwarded headers to select the authentication destination.
@@ -36,6 +37,8 @@ export async function GET(request: Request) {
             throw new Error("PROFILE_CLEANUP_FAILED");
           }
         }
+        try { await syncAuthDirectoryFields({ userId: user.id }); }
+        catch { console.error("Auth directory sync deferred after social login"); }
         destination = await socialDestination(params.get("next"));
       }
     }

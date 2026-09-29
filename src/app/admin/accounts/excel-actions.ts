@@ -7,6 +7,7 @@ import { validateMemberExcelRows, type MemberExcelRecord, type MemberExcelRow } 
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
 import { canInviteManualMembers, inviteManualMember, sendMemberSetupEmail } from "@/lib/members/invitations";
 import { provisionMember, syncManualMemberAuthMetadata } from "@/lib/auth/member-provisioning";
+import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 import { UUID } from "@/lib/portal/data";
 
 const validGroup = (group: string): group is MemberGroup => Object.hasOwn(MEMBER_GROUPS, group);
@@ -79,13 +80,14 @@ export async function importMemberExcel(group: string, org: string, rows: Member
       else failedRows.push(item.row);
     }
     const metadataFailedRows: number[] = [];
-    if (group === "office" || group === "instructor") {
-      for (let index = 0; index < verified.length; index++) {
-        const row = verified[index];
-        if (!row.person_id || group === "instructor" && row.kind !== "INTERNAL") continue;
-        try { await syncManualMemberAuthMetadata(row.person_id); }
-        catch { metadataFailedRows.push(index + 2); }
-      }
+    for (let index = 0; index < verified.length; index++) {
+      const row = verified[index];
+      if (!row.person_id) continue;
+      try {
+        if (group === "office" || group === "instructor" && row.kind === "INTERNAL")
+          await syncManualMemberAuthMetadata(row.person_id);
+        else await syncAuthDirectoryFields({ personId: row.person_id });
+      } catch { metadataFailedRows.push(index + 2); }
     }
     revalidatePath("/admin/accounts");
     if (failedRows.length || metadataFailedRows.length) return { ok: false, message: `신규 ${data.created}명·수정 ${data.updated}명 명부 저장, 설정 메일 ${sent}건 발송.${failedRows.length ? ` ${failedRows.join(", ")}행은 계정 생성·발송에 실패했습니다.` : ""}${metadataFailedRows.length ? ` ${metadataFailedRows.join(", ")}행은 Auth 정보 반영에 실패했습니다.` : ""} 목록을 새로고침한 뒤 다시 시도해 주세요.` };
