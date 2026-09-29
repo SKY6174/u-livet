@@ -18,7 +18,7 @@
 ## Risks
 - Auth API and roster DB are separate transactions; the UI must accurately report partial success and allow retries.
 - Email rate limits and batch size may cause partial Excel delivery; each row must be reported without claiming an all-or-nothing email transaction.
-- Preview has no manual roster rows. Production initially had nine unlinked office rows, but a fresh check found all ten roster members already linked, email confirmed, and password set. Do not send a backfill invitation to any of them.
+- Preview has no manual roster rows. Concurrent provisioning linked all ten production office rows to Auth, but only one completed privacy consent and first-password setup. Send first-password mail to the nine pending members after deployment; never mail the completed member.
 
 ## References
 - `docs/02-design/features/anchor-member-manual-entry.design.md`

@@ -38,7 +38,7 @@ const pass = label => { checks++; console.log(`PASS ${label}`); };
 try {
   for (const [group, kind] of [['office', null], ['instructor', 'EXTERNAL'], ['learner', null]]) {
     const person = randomUUID();
-    const email = `codex-auto-${person}@example.invalid`;
+    const email = `codex-auto-${person}@${group === 'office' ? 'uc.ac.kr' : 'example.invalid'}`;
     people.push(person);
     await sql(`begin;
       insert into public.life_people(id,name) values('${person}','[TEST] auto invite');
@@ -47,8 +47,19 @@ try {
       ${kind ? `insert into life_private.account_classifications(person_id,instructor_kind,updated_by)
         values('${person}','${kind}','${actor}');` : ''}
       commit;`);
+    if (group === 'office') {
+      const forged = await admin.auth.admin.generateLink({ type: 'invite', email,
+        options: { data: { member_org_id: org, manual_member_invitation: true,
+          manual_member_invitation_nonce: randomBytes(32).toString('hex') } } });
+      assert(forged.error, 'Invitation without a server permit must be rejected');
+      pass('forged invite marker cannot reserve a manual member');
+    }
+    const nonce = randomBytes(32).toString('hex');
+    const prepared = await admin.rpc('life_prepare_manual_member_invite', { p_person: person, p_nonce: nonce });
+    assert.equal(prepared.error, null, `Invite permit failed for ${group}`);
     const created = await admin.auth.admin.generateLink({ type: 'invite', email,
-      options: { data: { member_org_id: org, manual_member_invitation: true } } });
+      options: { data: { member_org_id: org, manual_member_invitation: true,
+        manual_member_invitation_nonce: nonce } } });
     assert.equal(created.error, null, `Auth invite generation failed for ${group}`);
     const userId = created.data.user.id;
     users.push(userId);
@@ -99,6 +110,49 @@ try {
     assert.equal(updated.error, null, `Password setup failed for ${group}`);
     pass(`${group}: initial password can be set`);
   }
+
+  const [{ policy: firstPolicy, org: firstOrg }] = await sql(`select p.id policy,p.org_id org
+    from public.life_policy_versions p where p.id=life_private.member_activation_policy()`);
+  assert(firstPolicy && firstOrg, 'First-password policy is required');
+  const person = randomUUID();
+  const email = `codex-provision-${person}@uc.ac.kr`;
+  const nonce = randomBytes(32).toString('hex');
+  people.push(person);
+  await sql(`begin;
+    insert into public.life_people(id,name) values('${person}','[TEST] provisional member');
+    insert into life_private.manual_members(person_id,org_id,member_group,email,request_id,request_fingerprint,created_by)
+      values('${person}','${firstOrg}','office','${email}','${randomUUID()}','test','${actor}');
+    insert into life_private.member_profiles(person_id,mobile_phone,updated_by)
+      values('${person}','+821012345678','${actor}');
+    insert into life_private.member_auth_permits(person_id,nonce,expires_at)
+      values('${person}','${nonce}',now()+interval '5 minutes');
+    commit;`);
+  const provisioned = await admin.auth.admin.createUser({ email, email_confirm: true,
+    password: `Aa1!${randomBytes(24).toString('hex')}`,
+    user_metadata: { member_provisioning_nonce: nonce, name: '[TEST] provisional member',
+      email, mobile_phone: '+821012345678', member_group: 'office', member_org_id: firstOrg },
+  });
+  assert.equal(provisioned.error, null, 'Office provisioning failed');
+  users.push(provisioned.data.user.id);
+  let profile = await admin.rpc('life_manual_member_auth_profile', { p_person: person });
+  assert.equal(profile.error, null);
+  assert.equal(profile.data.auth_user_id, provisioned.data.user.id);
+  assert.equal(profile.data.activation_complete, false);
+  assert.equal(provisioned.data.user.user_metadata.mobile_phone, '+821012345678');
+  pass('office provisioning copies roster metadata and remains setup-pending');
+  const recovery = await admin.auth.admin.generateLink({ type: 'recovery', email });
+  assert.equal(recovery.error, null);
+  const firstSession = session();
+  const proof = await firstSession.auth.verifyOtp({ token_hash: recovery.data.properties.hashed_token, type: 'recovery' });
+  assert.equal(proof.error, null);
+  const consent = await firstSession.rpc('life_accept_member_privacy', { p_policy: firstPolicy });
+  assert.equal(consent.error, null, 'First-password consent failed');
+  const finalPassword = await admin.auth.admin.updateUserById(provisioned.data.user.id,
+    { password: `Aa1!${randomBytes(24).toString('hex')}` });
+  assert.equal(finalPassword.error, null);
+  profile = await admin.rpc('life_manual_member_auth_profile', { p_person: person });
+  assert.equal(profile.data.activation_complete, true);
+  pass('office account becomes active only after consent and final password');
 } finally {
   for (const userId of users) {
     const { error } = await admin.auth.admin.deleteUser(userId);

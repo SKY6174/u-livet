@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ActionForm } from "@/components/portal/action-form";
 import { PasswordField } from "./password-field";
+import { PhoneField } from "./phone-field";
 import { acceptInvitation, resetPassword } from "@/app/auth/recovery-actions";
 import type { Policy } from "@/lib/portal/types";
 
@@ -42,6 +43,10 @@ export function RecoveryForm({ invitation = false, policy }: { invitation?: bool
           <input type="hidden" name="token_hash" value={token} />
           {invitation && policy && (
             <div className="space-y-3">
+              <p className="text-base text-slate-600">사업단에 등록된 계정을 연결할 이름, 이메일, 휴대폰 번호를 확인해 주세요.</p>
+              <label className="field text-base">이름<input name="name" autoComplete="name" maxLength={100} required /></label>
+              <label className="field text-base">초대받은 이메일<input name="email" type="email" autoComplete="email" maxLength={254} required /></label>
+              <PhoneField />
               <details className="rounded-lg border p-4">
                 <summary className="min-h-11 cursor-pointer text-lg font-semibold leading-7">
                   {policy.title} · {policy.version}

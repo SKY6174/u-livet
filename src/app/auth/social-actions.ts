@@ -70,6 +70,11 @@ export async function completeKakaoSignup(_: ActionState, form: FormData): Promi
     if (!policy || policy.id !== form.get("privacy_policy_id") || form.get("privacy_accepted") !== "on") return { message: "현재 개인정보 수집·이용 안내를 확인하고 동의해 주세요." };
     const result = await client.rpc("life_complete_registration", { p_name: name, p_phone: phone, p_policy: policy.id, p_accepted: true });
     if (result.error) return { message: "가입을 완료하지 못했습니다. 화면을 새로고침한 뒤 입력 내용과 동의를 확인해 주세요." };
+    const updated = await client.auth.updateUser({ data: {
+      ...data.user.user_metadata, name, mobile_phone: phone,
+      email: data.user.email?.trim().toLowerCase() ?? null,
+    } });
+    if (updated.error) return { message: "가입 정보는 저장됐지만 Auth 사용자 정보 반영에 실패했습니다. 화면에서 다시 시도해 주세요." };
     destination = await socialDestination(form.get("next"));
   } catch { return { message: "가입 서비스에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요." }; }
   revalidatePath("/", "layout");
