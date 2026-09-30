@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { authEmailEnabled } from "@/lib/auth/email-config";
 import { recoveryOrigin } from "@/lib/auth/recovery";
 import { getSupabaseConfig } from "@/lib/supabase/config";
-import { getPolicies } from "@/lib/portal/data";
+import { getPolicies, UUID } from "@/lib/portal/data";
 import { manualAuthProfile } from "@/lib/auth/member-provisioning";
 import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 
@@ -90,6 +90,37 @@ export async function sendMemberSetupEmail(personId: string): Promise<Invitation
     return "sent";
   } catch {
     console.error("Manual member setup email request failed");
+    return "failed";
+  }
+}
+
+export async function sendMemberPasswordResetEmail(personId: string, email: string): Promise<InvitationResult> {
+  if (!UUID.test(personId) || !authEmailEnabled()) return "failed";
+  const config = getSupabaseConfig();
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!config || !serviceKey) return "failed";
+  try {
+    const client = createClient(config.url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(15000) }) },
+    });
+    const { data: link, error: linkError } = await client.from("life_auth_links")
+      .select("auth_user_id").eq("person_id", personId).maybeSingle();
+    if (linkError || !link?.auth_user_id) return "failed";
+    const current = await client.auth.admin.getUserById(link.auth_user_id);
+    if (current.error || current.data.user?.email?.toLowerCase() !== email.toLowerCase()) return "failed";
+    const lastSent = Date.parse(current.data.user.recovery_sent_at ?? "");
+    if (Number.isFinite(lastSent) && Date.now() - lastSent < 10 * 60_000) return "existing";
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: `${recoveryOrigin()}/auth/reset-password`,
+    });
+    if (error) {
+      console.error("Member password reset email failed", { code: error.code, status: error.status });
+      return "failed";
+    }
+    return "sent";
+  } catch {
+    console.error("Member password reset email request failed");
     return "failed";
   }
 }

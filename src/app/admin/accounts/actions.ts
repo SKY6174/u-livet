@@ -4,12 +4,12 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
-import { memberAdmin, memberEntryOperator } from "@/lib/members/data";
+import { getMembers, memberAdmin, memberEntryOperator } from "@/lib/members/data";
 import { isOfficePosition, isSchoolEmail } from "@/lib/auth/login-audience";
 import { memberInput, newMemberInput } from "@/lib/members/model";
 import { provisionMember, syncManualMemberAuthMetadata } from "@/lib/auth/member-provisioning";
 import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
-import { canInviteManualMembers, inviteManualMember, sendMemberSetupEmail } from "@/lib/members/invitations";
+import { canInviteManualMembers, inviteManualMember, sendMemberPasswordResetEmail, sendMemberSetupEmail } from "@/lib/members/invitations";
 import type { ActionState } from "@/lib/portal/types";
 
 function memberError(message: string) {
@@ -98,4 +98,20 @@ export async function createMember(_: ActionState, form: FormData): Promise<Acti
   }
   revalidatePath("/admin/accounts");
   redirect(`/admin/accounts?group=${input.p_group}&created=1&invited=${invitation}`);
+}
+
+export async function sendMemberPasswordReset(_: ActionState, form: FormData): Promise<ActionState> {
+  await memberAdmin(true);
+  const personId = String(form.get("person_id") ?? "");
+  const group = String(form.get("group") ?? "");
+  if (!UUID.test(personId) || !["office", "instructor", "learner"].includes(group))
+    return { message: "재설정 메일 대상을 확인해 주세요." };
+  const { data, error } = await getMembers(group as "office" | "instructor" | "learner", "", 1, personId);
+  const member = data?.items.find(item => item.id === personId);
+  if (error || !member || member.can_edit !== true || member.is_manual || member.is_pool_only || !member.email)
+    return { message: "이 구성원에게 재설정 메일을 보낼 권한이 없거나 연결된 계정이 없습니다." };
+  const result = await sendMemberPasswordResetEmail(personId, member.email);
+  if (result === "existing") return { message: "최근에 재설정 메일을 요청했습니다. 잠시 후 다시 시도해 주세요." };
+  if (result !== "sent") return { message: "재설정 메일 발송 요청에 실패했습니다. 잠시 후 다시 시도해 주세요." };
+  return { ok: true, message: "비밀번호 재설정 메일 발송을 요청했습니다." };
 }
