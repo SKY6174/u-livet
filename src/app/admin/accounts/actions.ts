@@ -10,6 +10,7 @@ import { memberInput, newMemberInput } from "@/lib/members/model";
 import { provisionMember, syncManualMemberAuthMetadata } from "@/lib/auth/member-provisioning";
 import { syncAuthDirectoryFields } from "@/lib/auth/auth-directory";
 import { canInviteManualMembers, inviteManualMember, sendMemberPasswordResetEmail, sendMemberSetupEmail } from "@/lib/members/invitations";
+import { canSendMemberPasswordReset } from "@/lib/members/reset-permission";
 import type { ActionState } from "@/lib/portal/types";
 
 function memberError(message: string) {
@@ -101,7 +102,8 @@ export async function createMember(_: ActionState, form: FormData): Promise<Acti
 }
 
 export async function sendMemberPasswordReset(_: ActionState, form: FormData): Promise<ActionState> {
-  await memberAdmin(true);
+  const me = await memberAdmin(true);
+  if (!canSendMemberPasswordReset(me)) return { message: "비밀번호 재설정 메일 발송 권한이 없습니다." };
   const personId = String(form.get("person_id") ?? "");
   const group = String(form.get("group") ?? "");
   if (!UUID.test(personId) || !["office", "instructor", "learner"].includes(group))

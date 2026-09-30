@@ -8,11 +8,13 @@ import { getFilteredMembers, memberAdmin } from "@/lib/members/data";
 import { MEMBER_GROUPS, MEMBER_SORT_OPTIONS, MEMBER_YEARS, memberFilters, memberGroup, memberPage, displayPhone, type MemberGroup } from "@/lib/members/model";
 import { MemberExcel } from "@/components/members/member-excel";
 import { MemberPasswordResetButton } from "@/components/members/member-password-reset-button";
+import { canSendMemberPasswordReset } from "@/lib/members/reset-permission";
 
 export const maxDuration = 300;
 
 export default async function Members({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const me = await memberAdmin();
+  const canSendPasswordReset = canSendMemberPasswordReset(me);
   const params = await searchParams;
   const group = memberGroup(params.group);
   const query = typeof params.q === "string" ? params.q.trim().slice(0, 100) : "";
@@ -80,7 +82,7 @@ export default async function Members({ searchParams }: { searchParams: Promise<
               const isAdmin = me.roles.some(role => role.role === "SYSTEM_ADMIN");
               const canEdit = isAdmin && (member.can_edit ?? member.can_manage ?? true);
               const canDelete = isAdmin && member.can_manage !== false && !member.is_super_admin && member.id !== me.id;
-              const canResetPassword = canEdit && !!member.email && !member.is_manual && !member.is_pool_only;
+              const canResetPassword = canSendPasswordReset && member.can_edit === true && !!member.email && !member.is_manual && !member.is_pool_only;
               return <tr key={member.id} className="hover:bg-teal-50/30">
                 <td className="px-4 py-5 tabular-nums text-slate-400">{(page - 1) * 20 + index + 1}</td>
                 {group === "office" && <td className="whitespace-nowrap px-4 py-5">{member.office_position ? OFFICE_POSITIONS[member.office_position] : "미등록"}</td>}
