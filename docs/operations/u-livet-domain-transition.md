@@ -18,12 +18,12 @@
 
 ## 소셜 로그인
 
-- Google 운영 OAuth 클라이언트의 JavaScript origin에 `https://u-livet.org`를 추가하고 기존 origin을 유지했다. 브랜딩의 홈과 개인정보처리방침 URL, Authorized domain을 새 주소로 변경했다. Search Console에서 새 도메인의 DNS 소유권을 확인했다. 첫 브랜딩 검증은 소유권 확인 이전에 실패했으며 Google 화면은 확인 후 24시간 기다려 재검증하라고 안내한다. 이전 검증 브랜딩은 그동안 사용자에게 표시된다.
+- Google 운영 OAuth 클라이언트의 JavaScript origin에 `https://u-livet.org`를 추가하고 기존 origin을 유지했다. 브랜딩의 홈과 개인정보처리방침 URL, Authorized domain을 새 주소로 변경했다. Search Console에서 새 도메인의 DNS 소유권을 확인하고 사이트맵을 제출했다. 소유권 확인 뒤 브랜딩 재검증이 통과했고 `Publish branding`을 실행했다. Google 화면에서 검증된 브랜딩이 사용자에게 표시 중임을 확인했다.
 - 네이버 운영 앱의 서비스 URL과 연결 해제 callback을 새 주소로 저장했다. 로그인 callback은 Supabase 주소로 유지한다.
 - 카카오 운영 앱의 대표 도메인을 `https://u-livet.org`로 저장했다. REST API 로그인 리다이렉트 URI는 Supabase callback과 일치해 유지한다.
 
 ## 배포 후 확인
 
-- 새 배포의 `/api/version` revision과 환경, 메일 링크의 공식 origin, 사이트맵 및 OAuth 시작 URL을 확인한다.
-- Google 브랜딩 재검증은 소유권 확인 후 안내된 대기 시간이 지나면 신청하고 결과를 확인한다.
-- 실제 사용자 로그인 완료와 수신함 도착은 승인된 테스트 계정이 있을 때 확인한다.
+- PR #113 병합 커밋 `0fcf0d6bc7d3331ac77823fa5f0926de56503730`의 운영 배포가 Ready인 것을 확인했다. 새 주소의 `/api/version`은 같은 revision과 production 환경을 반환했고 홈, 로그인, 건강 상태, 개인정보처리방침은 HTTP 200이었다. 사이트맵과 canonical은 새 공식 주소를 사용한다.
+- Google, Kakao, Naver의 Supabase OAuth 시작 요청은 각 제공자의 인증 페이지로 302 이동했다. 새 도메인의 Naver userinfo 경로는 토큰이 없는 요청에 예상대로 401을 반환했다.
+- 실제 사용자 로그인 완료와 수신함 도착 및 Resend 발송 로그는 승인된 테스트 계정과 수신 주소가 준비되면 확인한다.
