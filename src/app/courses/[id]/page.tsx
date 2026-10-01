@@ -1,17 +1,24 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, Award, BookOpen } from "lucide-react";
-import { getCourseGuide } from "@/lib/course-guide/data";
+import { canEditGuide, getCourseGuide } from "@/lib/course-guide/data";
+import { getSessionIdentity } from "@/lib/auth/session";
 import { getCourseIntroduction, modeLabel } from "@/lib/portal/data";
 import { PageIntro } from "@/components/portal/ui";
 
 export default async function CourseGuidePage({ params }: { params: Promise<{ id: string }> }) {
   const course = await getCourseGuide((await params).id);
   if (!course) notFound();
-  const offering = course.offering_id ? await getCourseIntroduction(course.offering_id) : null;
+  const [offering, identity] = await Promise.all([
+    course.offering_id ? getCourseIntroduction(course.offering_id) : Promise.resolve(null),
+    getSessionIdentity(),
+  ]);
   return (
     <div className="page-shell">
       <PageIntro eyebrow={`${course.year} · ${course.academy}`} title={course.name}>{course.summary}</PageIntro>
+      {canEditGuide(identity?.roles, course.org_id) && <Link href={`/admin/courses/guides/${course.id}`} className="btn-secondary mb-6">과정 수정</Link>}
+      {course.card_image_url && <div className="relative mb-6 h-48 overflow-hidden rounded-2xl bg-slate-100 sm:h-64"><Image src={course.card_image_url} alt="" fill sizes="(max-width: 1024px) 100vw, 1200px" className="object-cover" unoptimized /></div>}
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <section className="panel"><h2 className="section-title flex items-center gap-2"><BookOpen size={20} className="text-teal-700" aria-hidden="true" />무엇을 배우나요?</h2><ol className="space-y-4">{course.curriculum.map((item, index) => <li key={item} className="flex items-start gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-50 text-xs font-bold text-teal-800">{index + 1}</span><span className="pt-0.5 leading-6 text-slate-700">{item}</span></li>)}</ol></section>

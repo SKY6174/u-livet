@@ -17,13 +17,16 @@ export type CourseGuide = {
   location: string;
   certificate: string | null;
   offering_id: string | null;
+  org_id: string;
+  card_image_url: string | null;
+  revision: number;
 };
 export type CourseGuideSummary = Omit<CourseGuide,
-  "curriculum" | "schedule_history" | "time_label" | "location"
+  "curriculum" | "schedule_history" | "time_label" | "location" | "revision"
 >;
 export type CatalogCourse = Pick<CourseGuide,
   "id" | "name" | "academy" | "summary" | "mode" | "capacity" | "period_label" | "certificate"
-> & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null };
+> & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null; card_image_url: string | null; org_id: string | null };
 export type CatalogSearch = { q?: string | string[]; mode?: string | string[]; view?: string | string[] };
 export function catalogFilters(params: CatalogSearch) {
   const q = (typeof params.q === "string" ? params.q : "").trim().slice(0, 100);
@@ -47,6 +50,7 @@ export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSumm
     ...offerings.filter((offering) => !linked.has(offering.id)).map((offering) => ({
       ...offering, period_label: `${offering.starts_on} ~ ${offering.ends_on}`,
       certificate: null, teaching_hours: null, offeringId: offering.id, href: `/offerings/${offering.id}`,
+      card_image_url: null, org_id: null,
     })),
   ];
 }
