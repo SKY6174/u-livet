@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getCourseCards } from "@/lib/portal/data";
+import type { Identity } from "@/lib/portal/types";
 import { mergeCatalog, type CourseGuide, type CourseGuideSummary } from "./model";
 
 const GUIDE_FIELDS = "id,year,sort_order,name,academy,summary,curriculum,mode,capacity,teaching_hours,period_label,schedule_history,time_label,location,certificate,offering_id,org_id,card_image_url,revision";
@@ -29,7 +30,15 @@ export async function getCourseGuide(id: string) {
   return data as CourseGuide | null;
 }
 
-export function canEditGuide(roles: { role: string; org_id: string }[] | undefined, orgId: string | null) {
-  return !!orgId && !!roles?.some((entry) => entry.org_id === orgId &&
-    (entry.role === "COURSE_MANAGER" || entry.role === "SYSTEM_ADMIN"));
+export function editableGuideOrgs(identity: Identity | null) {
+  if (!identity) return [];
+  return Array.from(new Set([
+    ...identity.roles.filter((entry) => entry.role !== "INSTRUCTOR").map((entry) => entry.org_id),
+    ...(identity.member_group === "office" && identity.member_org_id ? [identity.member_org_id] : []),
+    ...(identity.member_entry_orgs ?? []).map((entry) => entry.org_id),
+  ]));
+}
+
+export function canEditGuide(identity: Identity | null, orgId: string | null) {
+  return !!orgId && editableGuideOrgs(identity).includes(orgId);
 }

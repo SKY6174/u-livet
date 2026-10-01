@@ -14,7 +14,7 @@ export default async function EditGuidePage({ params }: { params: Promise<{ id: 
   const identity = await requireIdentity(`/admin/courses/guides/${id}`);
   const { data, error } = await (await createServerSupabaseClient())
     .from("life_course_guides").select(FIELDS).eq("id", id).eq("published", true).maybeSingle();
-  if (error || !data || !canEditGuide(identity.roles, data.org_id)) notFound();
+  if (error || !data || !canEditGuide(identity, data.org_id)) notFound();
   const course = data as CourseGuide;
   return <div className="page-shell max-w-5xl">
     <Link href="/courses" className="mb-5 inline-block text-sm font-semibold text-teal-800 hover:underline">← 교육과정 찾기</Link>
