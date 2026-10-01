@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LayoutGrid, List, Search } from "lucide-react";
-import { getCourseCatalog } from "@/lib/course-guide/data";
+import { editableGuideOrgs, getCourseCatalog } from "@/lib/course-guide/data";
 import { getSessionIdentity } from "@/lib/auth/session";
 import { catalogFilters, catalogHref, filterCatalog, type CatalogSearch } from "@/lib/course-guide/model";
 import { GuideCard, GuideList } from "@/components/course-guide/catalog";
@@ -9,7 +9,7 @@ import { Empty, PageIntro } from "@/components/portal/ui";
 export default async function Courses(props: { searchParams: Promise<CatalogSearch> }) {
   const filters = catalogFilters(await props.searchParams);
   const [{ courses, unavailable }, identity] = await Promise.all([getCourseCatalog(), getSessionIdentity()]);
-  const editableOrgs = Array.from(new Set(identity?.roles.filter((r) => r.role === "COURSE_MANAGER" || r.role === "SYSTEM_ADMIN").map((r) => r.org_id) ?? []));
+  const editableOrgs = editableGuideOrgs(identity);
   const items = filterCatalog(courses, filters);
   return (
     <div className="page-shell">

@@ -8,6 +8,7 @@ export type Identity = {
   is_super_admin?: boolean;
   office_position?: OfficePosition | null;
   member_group?: "office" | "instructor" | null;
+  member_org_id?: string | null;
   instructor_kind?: "INTERNAL" | "EXTERNAL" | null;
 };
 export type Offering = {

@@ -17,7 +17,7 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
   return (
     <div className="page-shell">
       <PageIntro eyebrow={`${course.year} · ${course.academy}`} title={course.name}>{course.summary}</PageIntro>
-      {canEditGuide(identity?.roles, course.org_id) && <Link href={`/admin/courses/guides/${course.id}`} className="btn-secondary mb-6">과정 수정</Link>}
+      {canEditGuide(identity, course.org_id) && <Link href={`/admin/courses/guides/${course.id}`} className="btn-secondary mb-6">과정 수정</Link>}
       {course.card_image_url && <div className="relative mb-6 h-48 overflow-hidden rounded-2xl bg-slate-100 sm:h-64"><Image src={course.card_image_url} alt="" fill sizes="(max-width: 1024px) 100vw, 1200px" className="object-cover" unoptimized /></div>}
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
