@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, Award, CalendarDays, Clock3, HeartPulse, Lightbulb, Sparkles, Users } from "lucide-react";
 import type { CatalogCourse } from "@/lib/course-guide/model";
 import { modeLabel } from "@/lib/portal/data";
@@ -8,11 +9,12 @@ function academyStyle(academy: string) {
   if (academy.startsWith("로컬창업")) return { Icon: Lightbulb, badge: "bg-amber-50 text-amber-800", accent: "bg-amber-500" };
   return { Icon: Sparkles, badge: "bg-indigo-50 text-indigo-800", accent: "bg-indigo-500" };
 }
-export function GuideCard({ course: c, index }: { course: CatalogCourse; index: number }) {
+export function GuideCard({ course: c, index, canEdit = false }: { course: CatalogCourse; index: number; canEdit?: boolean }) {
   const { Icon, badge, accent } = academyStyle(c.academy);
   return (
-    <Link href={c.href} data-course-card className="group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-teal-300 hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none">
+    <article data-course-card className="group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-teal-300 hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none">
       <div className={`h-1 ${accent}`} />
+      {c.card_image_url && <div className="relative h-32 overflow-hidden bg-slate-100"><Image src={c.card_image_url} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw" className="object-cover" unoptimized /></div>}
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-5 flex items-center justify-between gap-2">
           <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold ${badge}`}><Icon size={14} aria-hidden="true" />{c.academy}</span>
@@ -33,18 +35,21 @@ export function GuideCard({ course: c, index }: { course: CatalogCourse; index: 
             <Award size={16} className={c.certificate ? "mt-0.5 shrink-0 text-teal-700" : "mt-0.5 shrink-0 text-slate-400"} aria-hidden="true" />
             <div><p className="text-slate-500">관련 자격증</p><p className={c.certificate ? "font-semibold text-slate-800" : "text-slate-400"}>{c.certificate ?? "미기재"}</p></div>
           </div>
-          <div className="mt-4 flex items-center justify-between text-sm font-semibold text-teal-800">과정 자세히 보기<ArrowUpRight size={18} aria-hidden="true" /></div>
+          <div className="mt-4 flex items-center justify-between gap-3 text-sm font-semibold text-teal-800">
+            <Link href={c.href} className="inline-flex items-center gap-1 after:absolute after:inset-0 after:content-[''] hover:underline">과정 자세히 보기<ArrowUpRight size={18} aria-hidden="true" /></Link>
+            {canEdit && c.org_id && <Link href={`/admin/courses/guides/${c.id}`} className="relative z-10 rounded-lg border border-teal-200 px-3 py-1.5 text-teal-800 hover:bg-teal-50">수정</Link>}
+          </div>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
-export function GuideList({ courses }: { courses: CatalogCourse[] }) {
+export function GuideList({ courses, editableOrgs = [] }: { courses: CatalogCourse[]; editableOrgs?: string[] }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm" role="region" aria-label="교육과정 목록" tabIndex={0}>
       <table className="w-full min-w-[980px] text-left text-sm">
         <caption className="sr-only">교육과정의 기간, 정원, 교육시수 및 관련 자격증 비교</caption>
-        <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500"><tr>{["순번", "교육과정", "교육기간", "운영방식", "정원 · 시수", "관련 자격증", "안내"].map((label) => <th key={label} scope="col" className="whitespace-nowrap px-5 py-4 font-semibold">{label}</th>)}</tr></thead>
+        <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500"><tr>{["순번", "교육과정", "교육기간", "운영방식", "정원 · 시수", "관련 자격증", "안내", ...(editableOrgs.length ? ["관리"] : [])].map((label) => <th key={label} scope="col" className="whitespace-nowrap px-5 py-4 font-semibold">{label}</th>)}</tr></thead>
         <tbody className="divide-y divide-slate-100">{courses.map((c, index) => (
           <tr key={c.id} className="transition hover:bg-teal-50/40">
             <td className="px-5 py-5 tabular-nums text-slate-400">{String(index + 1).padStart(2, "0")}</td>
@@ -54,6 +59,7 @@ export function GuideList({ courses }: { courses: CatalogCourse[] }) {
             <td className="whitespace-nowrap px-5 py-5 text-slate-600">{c.capacity}명{c.teaching_hours !== null ? ` · ${c.teaching_hours}시간` : ""}</td>
             <td className="max-w-48 break-keep px-5 py-5 text-slate-700">{c.certificate ?? <span className="text-slate-400">미기재</span>}</td>
             <td className="px-5 py-5"><Link href={c.href} className="inline-flex items-center gap-1 whitespace-nowrap font-semibold text-teal-800 hover:underline" aria-label={`${c.name} 자세히 보기`}>상세<ArrowUpRight size={16} aria-hidden="true" /></Link></td>
+            {editableOrgs.length > 0 && <td className="px-5 py-5">{c.org_id && editableOrgs.includes(c.org_id) && <Link href={`/admin/courses/guides/${c.id}`} className="font-semibold text-teal-800 hover:underline" aria-label={`${c.name} 수정`}>수정</Link>}</td>}
           </tr>
         ))}</tbody>
       </table>
