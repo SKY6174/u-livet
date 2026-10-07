@@ -6,7 +6,7 @@
 
 참고 URL: https://anchor.hj.ac.kr/rise/main.do (2026-10-07 데스크톱 1440px, 모바일 360px 확인). 두 줄 헤더, 둥근 배너, 배너 아래 검색, 주요 서비스와 기관정보 순서를 채택한다. 모바일 전체메뉴 버튼 클릭 후 전체메뉴 영역과 카테고리를 확인했다. 참고 사이트의 픽셀 수치를 추정하거나 기관 로고·문구·사진을 복사하지 않는다.
 
-U-LiVET은 교육과정 찾기와 신청 확인을 우선하므로 4개 공통 메뉴와 본인 권한 공간만 주 메뉴에 배치한다. 검색은 기존 `/courses?q=` 필터로 연결한다. 홈에서 실제 모집 중인 DB 과정만 보여주고 공지·과정 자료를 임의 생성하지 않는다. 기존 로그인 홈의 수강생·강사·사업단 업무 구성은 유지한다.
+U-LiVET은 교육과정 찾기와 신청 확인을 우선하므로 4개 공통 메뉴와 본인 권한 공간만 주 메뉴에 배치한다. 검색은 기존 `/courses?q=` 필터로 연결한다. 홈은 기존 공개 과정 조회 `getCourseCards()`를 사용해 공개·접수기간 내인 과정을 먼저 골라 최대 3개를 보여준다. 최근 3개를 먼저 자르면 모집 중인 다른 과정을 놓칠 수 있어 화면 선택 순서를 이렇게 정한다. 공지·과정 자료를 임의 생성하지 않는다. 기존 로그인 홈의 수강생·강사·사업단 업무 구성은 유지한다.
 
 ## 실제 변경 대상 파일
 
@@ -19,9 +19,10 @@ U-LiVET은 교육과정 찾기와 신청 확인을 우선하므로 4개 공통 �
 | `src/components/common/Footer.tsx` | 기관정보 보조 글자와 링크 가독성 |
 | `src/app/page.tsx`, `src/components/portal/ui.tsx` | 공개 홈·실제 모집 과정·공통 카드·빈 상태 |
 | `src/app/courses/page.tsx`, `src/components/course-guide/catalog.tsx` | 검색·카드·리스트 가독성, 모집 정보 표시 |
-| `src/lib/course-guide/model.ts` | 이미 조회된 모집 상태·일시를 화면 모델로 전달. 조회·DB·권한 동작 변경 없음 |
+| `src/lib/course-guide/model.ts` | 이미 조회된 모집 상태·일시를 화면 모델로 전달. DB·권한 동작 변경 없음 |
 | `src/app/courses/[id]/page.tsx`, `src/app/offerings/[id]/page.tsx`, `src/app/offerings/[id]/apply/page.tsx` | 필수 정보·행동을 먼저 배치, 큰 제목·입력·안내 |
 | `src/components/student-learning/dashboard.tsx` | 기존 신청 목록 글자·상태·신청일·취소 버튼의 가독성 |
+| `src/components/course-workspace/course-header.tsx` | 관리자 과정 제목의 30/40px과 모바일 전체 폭, 출력 링크의 기존 행동 유지 |
 | `src/app/admin/offerings/[id]/manage/page.tsx` | 기존 신청 심사 목록의 이름·신청일·상태·결정 가독성 |
 
 기능 권한 기준 `src/lib/auth/workspace-navigation.ts`의 권한·링크 생성은 그대로 사용하고, `/offerings`에서도 교육과정 메뉴의 현재 위치 표시만 보완한다. `src/components/navigation/menu-hint.tsx`는 안내 글자의 최소 16px만 보장한다. 신청 서버 액션·RPC·마이그레이션은 수정하지 않는다.
@@ -36,7 +37,7 @@ rem 기준 루트 16px를 유지해 브라우저 글자 확대를 따른다. 본
 | 페이지 대표 제목 | 모바일 1.875rem(30px), 768px 이상 2.5rem(40px), 줄높이 1.2 |
 | 구역 제목 | 모바일 1.5rem(24px), 768px 이상 1.75rem(28px), 줄높이 1.35 |
 | 카드 제목 | 1.25rem 이상, 긴 제목은 줄바꿈 |
-| 버튼·입력·select | 최소 높이 3rem(48px), 버튼 글자 1.125rem, checkbox는 1.25rem과 48px 이상 label 영역 |
+| 버튼·입력·select | 최소 높이 3rem(48px), 주요 버튼 글자 1.125rem·보조 행동 최소 1rem, checkbox는 1.25rem과 48px 이상 label 영역 |
 | 본문/보조/브랜드 | `#1e293b` / `#475569` / navy `#0f2b5c`, teal `#115e59`, 배경 `#f8fafc` |
 | 간격 | 0.5/0.75/1/1.5/2/3rem 단계. 구역 간 모바일 2.5rem, 데스크톱 4rem |
 | 최대 너비·여백 | 내용 80rem(1280px), 좌우 모바일 1.25rem(20px), 768px 이상 2rem |
@@ -77,3 +78,5 @@ rem 기준 루트 16px를 유지해 브라우저 글자 확대를 따른다. 본
 구현 순서: 토큰·헤더 → 공개 홈 → 카드·상세·신청 → 신청 목록 → 역할/키보드/반응형 및 DB 회귀 → 문서 갱신. 변경 파일 목록·실행 결과·최종 캡처와 남은 사항은 `docs/03-analysis/issue-122-design-refresh.analysis.md`에 기록한다.
 
 검수 체크리스트: 화면 너비·200% 확대, 버튼 48px, 보조 글자 16px, 키보드 메뉴·포커스·활성 메뉴, 비로그인/수강생/담당자/강사 메뉴, 기존 검색 결과·빈 결과, 실제 신청·DB·담당자 조회·재접속, lint/build/관련 회귀. 운영 화면 배포의 commit/health를 확인한다.
+
+재현: `npm ci`, `npm run build`, `node scripts/setup-application-test.mjs` 후 출력된 전용 DB 디렉터리를 `APPLICATION_TEST_DB_DIR`로 지정한다. `npm run test:application-flow -- --production`으로 실제 로그인·신청 fixture를 생성한 다음 `node scripts/verify-design-refresh.mjs`를 실행한다. 비밀번호·세션은 `/tmp`의 비공개 파일만 사용하며 PR에 포함하지 않는다. 디자인 검사 도중 계정·권한·DB를 조작하거나 응답을 mock하지 않는다.

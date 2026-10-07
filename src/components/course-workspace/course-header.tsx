@@ -16,14 +16,14 @@ export function CourseHeader({
   return (
     <header className="mb-8">
       <div className="flex flex-wrap items-start justify-between gap-5">
-        <div className="min-w-0 flex-1">
+        <div className="w-full min-w-0 sm:flex-1">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
             <span className="badge">{statusLabel[o.status]}</span>
             <span className="text-slate-500">
               {o.academy} · {o.year_label}
             </span>
           </div>
-          <h1 className="break-keep text-2xl font-bold leading-snug tracking-tight text-slate-900 md:text-3xl">
+          <h1 className="page-title mb-0 text-slate-900">
             {o.name}
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-500">

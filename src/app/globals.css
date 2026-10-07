@@ -52,9 +52,9 @@ body {
 }
 
 @media screen {
-  main button,
-  main input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
-  main select {
+  #main button,
+  #main input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  #main select {
     min-height: var(--control-height);
   }
 }

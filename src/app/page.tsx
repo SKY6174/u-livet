@@ -23,10 +23,10 @@ const OPEN_REQUEST_STATUSES = new Set(["RECEIVED", "REVIEWING", "APPROVED"]);
 export default async function Home() {
   const me = await getSessionIdentity();
   if (!me) {
-    const catalog = await getCourseCards(true);
+    const catalog = await getCourseCards();
     const now = Date.now();
-    const recruiting = catalog.offerings.filter(o => o.apply_from && o.apply_until &&
-      Date.parse(o.apply_from) <= now && now < Date.parse(o.apply_until));
+    const recruiting = catalog.offerings.filter(o => o.status === "PUBLISHED" && o.apply_from && o.apply_until &&
+      Date.parse(o.apply_from) <= now && now < Date.parse(o.apply_until)).slice(0, 3);
     return (
       <>
         <section className="mx-auto max-w-7xl px-5 pt-6 md:px-8 md:pt-10" aria-labelledby="home-title">

@@ -16,7 +16,7 @@ export default async function Courses(props: { searchParams: Promise<CatalogSear
       <PageIntro eyebrow="COURSES" title="교육과정 찾기">내가 원하는 배움, 나에게 맞는 일정으로 시작하세요.</PageIntro>
       <form action="/courses" className="mb-8 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <input type="hidden" name="view" value={filters.view} />
-        <label className="field w-full flex-1 sm:min-w-[180px]">과정 검색<input name="q" placeholder="과정명, 관심 분야, 자격증" defaultValue={filters.q} maxLength={100} type="search" /></label>
+        <label className="field w-full sm:min-w-[180px] sm:flex-1">과정 검색<input name="q" placeholder="과정명, 관심 분야, 자격증" defaultValue={filters.q} maxLength={100} type="search" /></label>
         <label className="field">운영방식<select name="mode" defaultValue={filters.mode}><option value="">전체</option><option value="ONLINE">온라인</option><option value="OFFLINE">대면</option><option value="BLENDED">혼합</option></select></label>
         <button className="btn-primary gap-2"><Search size={17} aria-hidden="true" />검색</button>
       </form>

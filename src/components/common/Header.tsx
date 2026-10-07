@@ -140,7 +140,7 @@ export default function Header() {
           ref={adminSubmenuRef}
           id="desktop-admin-submenu"
           inert={!openAdminMenu}
-          className={`absolute left-1/2 top-full z-50 w-[42rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 xl:w-[56rem] motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
+          className={`absolute left-1/2 top-[calc(100%-0.75rem)] z-50 w-[42rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 xl:w-[56rem] motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
         >
           <div className="grid max-h-[calc(100dvh-9rem)] grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
             <div className="min-h-0 overflow-y-auto p-3">
