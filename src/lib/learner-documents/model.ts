@@ -102,6 +102,8 @@ export function documentErrors(type: LearnerDocumentType, v: LearnerDocumentValu
   if (v.phone && !/^01[016789]\d{7,8}$/.test(v.phone.replace(/[ -]/g, ""))) errors.phone = "휴대전화 번호를 확인해 주세요.";
   if (!validDate(v.signedOn)) errors.signedOn = "올바른 작성일을 선택해 주세요.";
   if (type === "application") {
+    if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(v.offeringId))
+      errors.courseName = "등록된 개설 과정을 목록에서 선택해 주세요.";
     if (!validDate(v.birthDate) || v.birthDate > koreaToday()) errors.birthDate = "올바른 생년월일을 선택해 주세요.";
     if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) errors.email = "이메일 주소를 확인해 주세요.";
   } else {

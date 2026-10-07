@@ -34,12 +34,8 @@ export default async function LearnerDocumentsPage({ searchParams }: {
     getLearnerDocumentEligibility(),
     getLearnerDocumentProfile(),
   ]);
-  const courses = catalog.courses.map(({ id, name, offeringId, tuition }) => ({
-    id,
-    name,
-    offeringId,
-    tuition,
-  }));
+  const courses = catalog.unavailable ? [] : catalog.courses.flatMap(({ id, name, offeringId, tuition, period_label }) =>
+    offeringId && UUID.test(offeringId) ? [{ id, name, offeringId, tuition, periodLabel: period_label }] : []);
   const availableOfferings = new Set(courses.map(course => course.offeringId).filter(Boolean));
   const initialCourse = courses.find(course => course.id === query.course || course.offeringId === query.course);
   if (query.course && !initialCourse) {
@@ -54,5 +50,6 @@ export default async function LearnerDocumentsPage({ searchParams }: {
       : requestedType;
   return <LearnerDocumentEditor type={type} name={identity.name} email={identity.email} courses={courses}
     requests={requests} eligibility={eligibility} profile={profile} profileUnavailable={profile.unavailable}
+    coursesUnavailable={catalog.unavailable}
     initialCourse={initialCourse} />;
 }

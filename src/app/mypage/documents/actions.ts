@@ -108,10 +108,10 @@ export async function submitLearnerDocument(input: {
     account: input.values.account.trim(),
     accountHolder: input.values.accountHolder.trim(),
   };
+  if (!UUID.test(values.offeringId))
+    return { ok: false, message: "DB에 등록된 개설 과정을 목록에서 선택해 주세요.", fieldErrors: { courseName: "개설 과정을 선택해 주세요." } };
   const db = await createServerSupabaseClient();
   if (values.offeringId) {
-    if (!UUID.test(values.offeringId))
-      return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
     const { data: offering, error } = await db
       .from("life_catalog")
       .select("id,name,tuition")

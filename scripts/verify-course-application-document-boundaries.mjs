@@ -37,13 +37,15 @@ await test("document URLs contain only type and selected ID", () => {
 });
 let authError=false, returnTo, reads=0;
 const profileApi=load("src/lib/learner-documents/profile.ts",{"server-only":{},"./model":model,
+  "@/lib/learner-profile/data":{getLearnerProfile:async()=>({phone:""})},
   "@/lib/supabase/server":{createServerSupabaseClient:async()=>({auth:{getUser:async()=>{reads++;return authError?{data:{user:null},error:new Error("read")}
     :{data:{user:{phone:"821012345678",user_metadata:{mobile_phone:"+821000000000",birth_date:"1990-02-28",unrelated:"private"}}},error:null};}}})}});
 await test("server profile reads authenticated self and exposes only document fields",async()=>{
   assert.deepEqual(await profileApi.getLearnerDocumentProfile(),{phone:"010-1234-5678",birthDate:"1990-02-28",unavailable:false});assert.equal(reads,1);
   authError=true;assert.deepEqual(await profileApi.getLearnerDocumentProfile(),{phone:"",birthDate:"",unavailable:true});authError=false;
 });
-const course={id:"2026-example-course",name:"A과정",offeringId:"10000000-0000-4000-8000-000000000099",tuition:0};
+const course={id:"2026-example-course",name:"A과정",offeringId:"10000000-0000-4000-8000-000000000099",tuition:0,period_label:"2026-10-10 ~ 2026-11-10"};
+const documentCourse={id:course.id,name:course.name,offeringId:course.offeringId,tuition:course.tuition,periodLabel:course.period_label};
 let courses=[course],unavailable=false;
 const page=load("src/app/mypage/documents/page.tsx",{
   "next/link":"a","next/navigation":{notFound:()=>{throw Error("404");}},
@@ -57,7 +59,7 @@ const page=load("src/app/mypage/documents/page.tsx",{
 }).default;
 const render=query=>page({searchParams:Promise.resolve(query)});
 await test("guide slug and offering UUID select same course and preserve login return URL",async()=>{
-  for(const id of [course.id,course.offeringId]){const view=await render({course:id,type:"application"});assert.deepEqual(view.props.initialCourse,course);
+  for(const id of [course.id,course.offeringId]){const view=await render({course:id,type:"application"});assert.deepEqual(view.props.initialCourse,documentCourse);
     assert.equal(returnTo,`/mypage/documents?type=application&course=${id}`);assert.equal(view.props.profile.phone,"010-1234-5678");}
 });
 await test("invalid, repeated, oversized and nonexistent course selection returns404",async()=>{
@@ -68,6 +70,35 @@ await test("unknown type falls back; catalog and own-profile failures show actio
   assert.equal((await render({type:["refund","application"]})).props.type,"application");
   authError=true;assert.equal((await render({})).props.profileUnavailable,true);authError=false;
   courses=[];unavailable=true;const fallback=await render({course:course.id});assert.equal(fallback.props.children[1].props.href,"/mypage/documents");
+});
+await test("only actual offering IDs reach the editor, including distinct same-name cohorts",async()=>{
+  const second={...course,id:"second-guide",offeringId:"10000000-0000-4000-8000-000000000098",period_label:"2026-11-10 ~ 2026-12-10"};
+  courses=[course,second,{...course,id:"unlinked-guide",offeringId:null},{...course,id:"invalid-guide",offeringId:"unknown"}];unavailable=false;
+  const view=await render({});assert.deepEqual(view.props.courses.map(c=>c.offeringId),[course.offeringId,second.offeringId]);
+  assert.equal(view.props.courses[1].periodLabel,second.period_label);
+  await assert.rejects(render({course:"unlinked-guide"}),/404/);
+  unavailable=true;assert.deepEqual((await render({})).props.courses,[]);assert.equal((await render({})).props.coursesUnavailable,true);
+  courses=[];unavailable=false;assert.deepEqual((await render({})).props.courses,[]);assert.equal((await render({})).props.coursesUnavailable,false);
+});
+let dbReads=0,pdfRenders=0,lookup=course,submitted;
+const action=load("src/app/mypage/documents/actions.ts",{
+  "next/cache":{revalidatePath(){}},"@/lib/auth/session":{requireIdentity:async()=>({id:"synthetic"})},
+  "@/lib/learner-documents/model":model,"@/lib/learner-document-workflow/types":{DOCUMENT_KIND:{application:"APPLICATION"}},
+  "@/lib/portal/data":{UUID:/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i},
+  "@/lib/learner-documents/pdf":{renderLearnerDocument:async()=>{pdfRenders++;return Buffer.from("%PDF-1.7\nsynthetic\n");}},
+  "@/lib/supabase/server":{createServerSupabaseClient:async()=>{dbReads++;const query={select(){return this;},eq(){return this;},maybeSingle:async()=>({data:lookup,error:null})};
+    return{from:()=>query,rpc:async(name,args)=>{submitted=args;return{data:"synthetic-request",error:null};}};}}
+}).submitLearnerDocument;
+const values={...model.initialValues("합성 회원","synthetic@example.invalid","위조된 과정명",course.offeringId),phone:"01012345678",birthDate:"1990-02-28",gender:"female",address:"가상로 1",purposes:["자기계발"],privacy:"yes",publicity:"no",portrait:"no",signature:"synthetic-signature"};
+const submit=overrides=>action({type:"application",requestKey:"10000000-0000-4000-8000-000000000011",values:{...values,...overrides}});
+await test("missing or malformed offering is blocked before database or PDF work",async()=>{
+  for(const offeringId of ["","custom-course","../private"]) {const result=await submit({offeringId});assert.equal(result.ok,false);assert.ok(result.fieldErrors.courseName);assert.ok(model.documentErrors("application",{...values,offeringId}).courseName);}
+  assert.equal(dbReads,0);assert.equal(pdfRenders,0);
+});
+await test("unknown DB offering is blocked and actual course name overrides client text",async()=>{
+  lookup=null;assert.equal((await submit({})).ok,false);assert.equal(pdfRenders,0);
+  lookup={id:course.offeringId,name:course.name,tuition:0};assert.equal((await submit({})).ok,true);
+  assert.equal(submitted.f,course.offeringId);assert.equal(submitted.course_name,course.name);assert.equal(pdfRenders,1);
 });
 let options,refresh=false;
 const middleware=load("src/middleware.ts",{
