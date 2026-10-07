@@ -125,24 +125,26 @@ export function courseIsUpcoming(course: Pick<CatalogCourse, "status" | "ends_on
   return course.status !== "ARCHIVED" && (!course.ends_on || course.ends_on >= today);
 }
 
-export function recruitmentLabel(course: Pick<CatalogCourse, "status" | "apply_from" | "apply_until">, now = Date.now()) {
-  if (course.status === "ARCHIVED") return "운영 완료";
+export function recruitmentLabel(course: Pick<CatalogCourse, "status" | "apply_from" | "apply_until" | "ends_on">, now = Date.now()) {
+  if (!courseIsUpcoming(course, now)) return "운영 완료";
   if (course.status === "CLOSED") return "모집 종료";
   if (course.status === "DRAFT") return "모집 준비 중";
   if (course.status !== "PUBLISHED" || !course.apply_from || !course.apply_until) return "모집 안내 확인";
   if (now < Date.parse(course.apply_from)) return "모집 예정";
   return now < Date.parse(course.apply_until) ? "접수 중" : "접수 종료";
 }
-export type CatalogSearch = { q?: string | string[]; mode?: string | string[]; view?: string | string[] };
+export type CatalogSearch = { q?: string | string[]; mode?: string | string[]; view?: string | string[]; state?: string | string[] };
 export function catalogFilters(params: CatalogSearch) {
   const q = (typeof params.q === "string" ? params.q : "").trim().slice(0, 100);
   const mode = typeof params.mode === "string" && ["ONLINE", "OFFLINE", "BLENDED"].includes(params.mode) ? params.mode : "";
-  return { q, mode, view: params.view === "list" ? "list" as const : "cards" as const };
+  const state = params.state === "completed" ? "completed" as const : params.state === "all" ? "all" as const : "current" as const;
+  return { q, mode, state, view: params.view === "list" ? "list" as const : "cards" as const };
 }
 export function catalogHref(filters: ReturnType<typeof catalogFilters>, view: "cards" | "list") {
   const query = new URLSearchParams({ view });
   if (filters.q) query.set("q", filters.q);
   if (filters.mode) query.set("mode", filters.mode);
+  if (filters.state !== "current") query.set("state", filters.state);
   return `/courses?${query}`;
 }
 export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSummary[]): CatalogCourse[] {
@@ -165,7 +167,7 @@ export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSumm
 }
 export function filterCatalog(courses: CatalogCourse[], filters: ReturnType<typeof catalogFilters>, now = Date.now()) {
   const q = filters.q.toLocaleLowerCase("ko-KR").replace(/\s+/g, "");
-  return courses.filter((course) => courseIsUpcoming(course, now) && (!filters.mode || course.mode === filters.mode) &&
+  return courses.filter((course) => (filters.state === "all" || (filters.state === "completed" ? !courseIsUpcoming(course, now) : courseIsUpcoming(course, now))) && (!filters.mode || course.mode === filters.mode) &&
     (!q || `${course.name} ${course.summary} ${course.academy} ${course.certificate ?? ""}`
       .toLocaleLowerCase("ko-KR").replace(/\s+/g, "").includes(q)));
 }

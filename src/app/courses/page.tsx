@@ -18,6 +18,7 @@ export default async function Courses(props: { searchParams: Promise<CatalogSear
         <input type="hidden" name="view" value={filters.view} />
         <label className="field w-full sm:min-w-[180px] sm:flex-1">과정 검색<input name="q" placeholder="과정명, 관심 분야, 자격증" defaultValue={filters.q} maxLength={100} type="search" /></label>
         <label className="field">운영방식<select name="mode" defaultValue={filters.mode}><option value="">전체</option><option value="ONLINE">온라인</option><option value="OFFLINE">대면</option><option value="BLENDED">혼합</option></select></label>
+        <label className="field">운영상태<select name="state" defaultValue={filters.state}><option value="current">진행 중·예정</option><option value="completed">운영 완료</option><option value="all">전체 과정</option></select></label>
         <button className="btn-primary gap-2"><Search size={17} aria-hidden="true" />검색</button>
       </form>
       {unavailable && <p role="alert" className="notice mb-5">일부 교육과정을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.</p>}
@@ -29,7 +30,7 @@ export default async function Courses(props: { searchParams: Promise<CatalogSear
       </div>
       {items.length ? filters.view === "list" ? <GuideList courses={items} editableOrgs={editableOrgs} /> : (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3" data-course-grid>{items.map((course, index) => <GuideCard key={course.id} course={course} index={index} canEdit={!!course.org_id && editableOrgs.includes(course.org_id)} />)}</div>
-      ) : <Empty title={unavailable ? "교육과정을 불러오지 못했습니다" : "조건에 맞는 교육과정이 없습니다"}>{unavailable ? "잠시 후 다시 확인해 주세요." : "다른 검색어를 입력하거나 운영방식을 전체로 변경해 보세요."}</Empty>}
+      ) : <Empty title={unavailable ? "교육과정을 불러오지 못했습니다" : "조건에 맞는 교육과정이 없습니다"}>{unavailable ? "잠시 후 다시 확인해 주세요." : "검색어·운영방식·운영상태 조건을 변경해 다시 검색해 보세요."}</Empty>}
     </div>
   );
 }
