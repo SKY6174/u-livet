@@ -11,9 +11,10 @@ export async function middleware(request: NextRequest) {
     });
   const requestHeaders = new Headers(request.headers);
   // Overwrite any client-supplied value; the protected layout needs the actual
-  // document address to preserve the selected course through login.
+  // address to return to a selected document or profile after login.
   requestHeaders.delete("x-u-live-document-return-to");
-  if (request.nextUrl.pathname === "/mypage/documents" || request.nextUrl.pathname.startsWith("/mypage/documents/"))
+  if (request.nextUrl.pathname === "/mypage/profile" || request.nextUrl.pathname === "/mypage/documents"
+    || request.nextUrl.pathname.startsWith("/mypage/documents/"))
     requestHeaders.set("x-u-live-document-return-to", request.nextUrl.pathname + request.nextUrl.search);
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const config = getSupabaseConfig();
