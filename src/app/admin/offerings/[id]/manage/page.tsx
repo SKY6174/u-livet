@@ -10,7 +10,7 @@ import { configureFinance } from "@/app/finance-actions";
 import type { FinanceConfig } from "@/lib/finance/types";
 import { CourseHeader } from "@/components/course-workspace/course-header";
 import { ResponsibleInstructorSection } from "@/components/course-workspace/responsible-instructor-section";
-import { getManagedCourse } from "@/lib/course-workspace/data";
+import { getCourseRunInfo, getManagedCourse } from "@/lib/course-workspace/data";
 import type { RosterRow } from "@/lib/portal/types";
 import { ApplicationReviewForm } from "@/components/management/application-review-form";
 import { OfferingEditForm } from "@/components/course-workspace/offering-edit-form";
@@ -19,6 +19,7 @@ export default async function ManageOffering(props: {
 }) {
   const params = await props.params;
   const { offering: o, workspace } = await getManagedCourse(params.id);
+  const runInfoPromise = getCourseRunInfo(o.id, o.course_version_id);
   if (o.status === "ARCHIVED")
     return (
       <div className="page-shell">
@@ -26,6 +27,7 @@ export default async function ManageOffering(props: {
           offering={o}
           active="manage"
           operator={workspace?.operator}
+          runInfo={await runInfoPromise}
         />
         <ResponsibleInstructorSection offeringId={o.id} />
         <section className="panel space-y-4">
@@ -54,7 +56,7 @@ export default async function ManageOffering(props: {
         </section>
       </div>
     );
-  const [{ data, error }, policies, financeResult, guideResult] =
+  const [{ data, error }, policies, financeResult, guideResult, runInfo] =
     await Promise.all([
       (await createServerSupabaseClient()).rpc("life_roster", { f: o.id }),
       getPolicies(),
@@ -63,6 +65,7 @@ export default async function ManageOffering(props: {
       }),
       (await createServerSupabaseClient()).from("life_course_guides").select("id")
         .eq("offering_id", o.id).eq("published", true).maybeSingle(),
+      runInfoPromise,
     ]);
   const finance = financeResult.data as FinanceConfig | null;
   const recruitablePolicies = policies.filter(
@@ -74,6 +77,7 @@ export default async function ManageOffering(props: {
         offering={o}
         active="manage"
         operator={workspace?.operator}
+        runInfo={runInfo}
       />
       <OfferingEditForm offering={o} linkedGuideId={guideResult.data?.id ?? null} />
       <section className="panel mb-8">
@@ -93,6 +97,7 @@ export default async function ManageOffering(props: {
               <ActionForm
                 action={configureFinance}
                 label="수강료·납부 안내 저장"
+                submitAlign="right"
               >
                 <input type="hidden" name="f" value={o.id} />
                 <label className="field">
@@ -182,7 +187,7 @@ export default async function ManageOffering(props: {
             <Link className="btn-secondary inline-flex" href={`/admin/policies?org=${o.org_id}`}>정책 초안 작성·승인</Link>
           </div>
           <p className="mb-4 whitespace-pre-wrap">{o.curriculum}</p>
-          <ActionForm action={publishOffering} label="과정 승인·모집 공개">
+          <ActionForm action={publishOffering} label="과정 승인·모집 공개" submitAlign="right">
             <input type="hidden" name="offering" value={o.id} />
             {[
               ["enrollment_policy", "ENROLLMENT", "모집·개인정보 수집·이용 안내"],

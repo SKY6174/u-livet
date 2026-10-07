@@ -48,12 +48,12 @@ export function OperationsDashboard({
   const matches = (c: OperationCourse) => filter === "all" || (filter === "active" ? ["PUBLISHED", "CLOSED"].includes(status(c)) : status(c) === filter);
   const responsibleLabel = (c: OperationCourse) => {
     if (c.workspace && responsibleNames === null) return c.initial_responsible_name
-      ? `${c.initial_responsible_name} · 초기 지정 (기수 책임강사 확인 불가)`
+      ? `${c.initial_responsible_name} · 초기 지정 (현재 책임강사 확인 불가)`
       : "확인 불가";
     if (c.workspace && responsibleNames?.[c.workspace.id]) return responsibleNames[c.workspace.id];
     if (!c.initial_responsible_name) return c.workspace ? "미지정" : "과정 개설 전";
     const basis = c.initial_responsible_basis === "CENTER_DIRECTOR" ? "센터장" : "첫 교내 강사";
-    return `${c.initial_responsible_name} · ${basis}${c.initial_responsible_verified ? "" : " · 계정 인증 전"}${c.workspace ? " · 기수 지정 대기" : " · 기수 개설 전"}`;
+    return `${c.initial_responsible_name} · ${basis}${c.initial_responsible_verified ? "" : " · 계정 인증 전"}${c.workspace ? " · 책임강사 지정 대기" : " · 과정 개설 전"}`;
   };
   const initialInstructorLabel = (c: OperationCourse) => c.initial_instructor_name
     ? `${c.initial_instructor_name}${c.initial_instructor_verified ? "" : " · 계정 인증 전"}`

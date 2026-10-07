@@ -11,12 +11,14 @@ import type { FinanceConfig } from "@/lib/finance/types";
 import { PageIntro } from "@/components/portal/ui";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
+import { parseCourseCurriculum } from "@/lib/course-workspace/curriculum";
 export default async function OfferingPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const params = await props.params;
   const o = await getCourseIntroduction(params.id);
   if (!o) notFound();
+  const curriculum = parseCourseCurriculum(o.curriculum);
   const db = await createServerSupabaseClient();
   const [policies, enrollmentPolicies, { data: offeringPolicy }, { data: financeData }, { data: instructorData }] =
     await Promise.all([
@@ -50,9 +52,17 @@ export default async function OfferingPage(props: {
       <div className="grid items-start gap-8 lg:grid-cols-[1fr_330px]">
         <div className="order-2 min-w-0 space-y-6 lg:order-1">
           <section className="panel">
-            <h2 className="section-title">무엇을 배우나요?</h2>
-            <p className="whitespace-pre-wrap">{o.curriculum}</p>
+            <h2 className="section-title">교육내용</h2>
+            <p className="whitespace-pre-wrap">{curriculum.content}</p>
           </section>
+          {curriculum.audience && <section className="panel">
+            <h2 className="section-title">교육대상</h2>
+            <p className="whitespace-pre-wrap">{curriculum.audience}</p>
+          </section>}
+          {curriculum.preparation && <section className="panel">
+            <h2 className="section-title">준비사항</h2>
+            <p className="whitespace-pre-wrap">{curriculum.preparation}</p>
+          </section>}
           {!!instructors.length && (
             <section className="panel">
               <h2 className="section-title">함께하는 강사</h2>
@@ -113,7 +123,7 @@ export default async function OfferingPage(props: {
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="text-slate-500">{k}</dt>
-                <dd className="mt-1 font-medium">{v}</dd>
+                <dd className="mt-1 whitespace-pre-line font-medium">{v}</dd>
               </div>
             ))}
           </dl>

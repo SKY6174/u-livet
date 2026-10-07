@@ -2,15 +2,18 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { statusLabel } from "@/lib/portal/data";
 import type { Offering } from "@/lib/portal/types";
+import type { CourseRunInfo } from "@/lib/course-workspace/data";
 
 export function CourseHeader({
   offering: o,
   active,
   operator,
+  runInfo,
 }: {
   offering: Offering;
   active: "overview" | "manage" | "reports";
   operator?: string;
+  runInfo?: CourseRunInfo | null;
 }) {
   const base = `/admin/offerings/${o.id}`;
   return (
@@ -22,6 +25,7 @@ export function CourseHeader({
             <span className="text-slate-500">
               {o.academy} · {o.year_label}
             </span>
+            {runInfo && <span className="badge">{runInfo.order}번째 운영 · 총 {runInfo.total}회</span>}
           </div>
           <h1 className="page-title mb-0 text-slate-900">
             {o.name}
