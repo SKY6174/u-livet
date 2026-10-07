@@ -16,6 +16,7 @@ Date: 2026-10-08 (Asia/Seoul). Extends public-course and responsible-instructor 
 - Learning UI uses the new roster with an unmarked legacy-name fallback during a compatible migration rollout.
 - Administrator fields remain available only in their existing protected management screens.
 - The additional operation-menu request changes `CourseActions` in `operations-dashboard.tsx`: remove inline arrow text, use a shared bordered/background button style with wrapping and visible keyboard focus, and put a decorative diagonal ArrowUpRight icon in each button's upper-right corner as subsequently requested. Preserve all destinations and role conditions.
+- Keep the card and list action menu to at most two button rows even when the optional evidence action appears. Use three equal columns, compact button text that wraps inside its own cell, and enough width for the list action column; retain the full action labels and destinations.
 
 ## Validation and release
 - Local database tests cover exact responsibility flags (including duplicate names), responsibility changes, invalid/expired assignment, missing responsibility, active versus withdrawn learner access and public consent/role/state boundaries. Preserve existing public-profile and learner regression checks.
