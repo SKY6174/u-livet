@@ -21,7 +21,8 @@ function load(file, modules) {
 const Link = ({ children, ...props }) => React.createElement('a', props, children);
 const portal = { dateTime: value => value, modeLabel: { ONLINE: '온라인', OFFLINE: '대면', BLENDED: '혼합' } };
 const attendance = load('src/lib/attendance/model.ts', {});
-const model = load('src/lib/student-learning/model.ts', { '@/lib/attendance/model': attendance });
+const catalogModel = load('src/lib/course-guide/model.ts', {});
+const model = load('src/lib/student-learning/model.ts', { '@/lib/attendance/model': attendance, '@/lib/course-guide/model': catalogModel });
 const rail = load('src/components/student-learning/course-recommendation-rail.tsx', {
   'react': React, 'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'lucide-react': icons,
   '@/lib/portal/data': portal,
@@ -48,12 +49,15 @@ const catalog = [
   catalogCourse('guide-pending', pending.name, '디지털', pending.id),
   catalogCourse('guide-other', '다른 분야 과정', '인문'),
   catalogCourse('guide-related', '같은 분야 과정', '디지털'),
+  { ...catalogCourse('expired', '종료된 과정', '디지털'), ends_on: '2026-09-22' },
+  { ...catalogCourse('archived', '보관된 과정', '디지털'), status: 'ARCHIVED', ends_on: '2026-12-31' },
   ...Array.from({ length: 8 }, (_, index) => catalogCourse(`guide-extra-${index}`, `추가 과정 ${index}`, '기타')),
 ];
-const recommended = model.recommendCourses(catalog, [active, pending], 8);
+const recommended = model.recommendCourses(catalog, [active, pending], 8, now);
 assert.equal(recommended.length, 8);
 assert.equal(recommended[0].id, 'guide-related');
 assert.ok(recommended.every(course => ![active.name, pending.name].includes(course.name)));
+assert.ok(recommended.every(course => !['expired', 'archived'].includes(course.id)));
 assert.equal(model.recommendCourses(catalog, [active, pending]).length, 3);
 console.log('PASS recommendation excludes own applications and prioritizes the same field');
 
@@ -70,6 +74,7 @@ assert.ok(html.includes('overflow-x-auto') && html.includes('snap-x'));
 const recommendationMarkup = html.slice(html.indexOf('aria-label="다른 과정 추천 목록"'));
 assert.ok(!recommendationMarkup.includes('현재 수강 수업') && !recommendationMarkup.includes('신청 중 수업'));
 assert.ok(recommendationMarkup.includes('같은 분야 과정'));
+assert.ok(!recommendationMarkup.includes('종료된 과정') && !recommendationMarkup.includes('보관된 과정'));
 console.log('PASS learner home puts own classes first and shows a movable recommendation rail');
 
 const hero = renderToStaticMarkup(React.createElement(home.LearnerHeroSummary, { data, current }));

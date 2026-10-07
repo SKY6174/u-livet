@@ -1,5 +1,5 @@
 import { attendanceIndex, attendanceSummary } from "@/lib/attendance/model";
-import type { CatalogCourse } from "@/lib/course-guide/model";
+import { courseIsUpcoming, type CatalogCourse } from "@/lib/course-guide/model";
 import type { LearningCourse } from "./types";
 export const requestLabels = {
   SUBMITTED: "접수 완료",
@@ -46,6 +46,7 @@ export function recommendCourses(
   catalog: CatalogCourse[],
   courses: LearningCourse[],
   limit = 3,
+  now = Date.now(),
 ) {
   const academies = new Set(
     courses
@@ -57,6 +58,7 @@ export function recommendCourses(
   return catalog
     .filter(
       (c) =>
+        courseIsUpcoming(c, now) &&
         !ids.has(c.id) &&
         !("offering_id" in c && ids.has(String(c.offering_id))) &&
         !names.has(c.name.replace(/\s/g, "")),

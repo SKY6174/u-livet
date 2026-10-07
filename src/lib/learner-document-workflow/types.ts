@@ -90,6 +90,11 @@ export const NEXT_DOCUMENT_STATUSES: Partial<
   APPROVED: ["COMPLETED"],
 };
 
+export function isOpenLearnerDocument(request: Pick<LearnerDocumentRequest, "kind" | "status">) {
+  return request.status === "RECEIVED" || request.status === "REVIEWING" ||
+    (request.status === "APPROVED" && request.kind !== "APPLICATION");
+}
+
 export function documentDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",

@@ -425,7 +425,7 @@ export function StudentDashboard({
     surveys?.filter((s) => !s.submitted_at && !s.closed && s.policy_valid) ??
     [];
   const completed = history?.filter((h) => h.approved_at && !h.stale).length;
-  const recommendations = recommendCourses(catalog.courses, courses);
+  const recommendations = recommendCourses(catalog.courses, courses, 3, now);
   const paid = hub?.scholarships
     .filter((s) => s.paid_on)
     .reduce((sum, s) => sum + s.amount, 0);
@@ -650,6 +650,7 @@ export function StudentDashboard({
                         <TextLink href={`/offerings/${c.id}`}>
                           과정 정보
                         </TextLink>
+                        <TextLink href={`/mypage/applications/${c.application_id}`}>신청 상세·처리 이력</TextLink>
                         <DocumentPopup href={applicationDocumentHref(c.id)} windowName="learner-documents" className="btn-secondary">수강신청원서 작성</DocumentPopup>
                         {c.status === "PENDING_PAYMENT" && (
                           <Link className="btn-primary" href="/mypage/payments">

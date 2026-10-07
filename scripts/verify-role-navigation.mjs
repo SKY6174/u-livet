@@ -46,7 +46,7 @@ const LearnerRequestAlerts = load('src/components/admin/learner-request-alerts.t
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
   [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/operation-documents/plan', '/admin/monitoring', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance', '/admin/instructors'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/operation-documents/plan', '/admin/applications', '/admin/learners', '/admin/monitoring', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance', '/admin/instructors'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/admin/learner-documents', '/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
@@ -89,6 +89,7 @@ await test('office navigation follows the operational workflow', () => {
   assert.deepEqual(sections.map(section => section.title), ['기획·개설', '접수·운영', '마감·수료', '정산·성과', '계정·권한']);
   assert.deepEqual(sections.flatMap(section => section.links.map(link => link.href)), [
     '/admin/development', '/admin/courses', '/operation-documents/plan',
+    '/admin/applications', '/admin/learners',
     '/admin/monitoring', '/admin/learner-documents', '/admin/parking',
     '/operation-documents/result', '/completion', '/credentials',
     '/finance', '/performance', '/admin/instructors',
@@ -110,7 +111,7 @@ await test('learner request alerts count only unresolved requests by document ty
 });
 await test('expert management is an independent office menu with correct nested selection', () => {
   const expert = nav.officeSections(member('COURSE_MANAGER')).flatMap(section => section.links).find(link => link.href === '/admin/instructors');
-  assert.equal(expert.label, '전문가 관리');
+  assert.equal(expert.label, '강사 관리');
   for (const pathname of ['/admin/instructors', '/admin/instructors/documents']) {
     assert.equal(nav.officeActiveHref(pathname), '/admin/instructors');
     assert(nav.primaryActive(pathname, '/admin'));

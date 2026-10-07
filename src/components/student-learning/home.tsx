@@ -58,7 +58,7 @@ export function LearnerHeroSummary({
 
 export function LearnerHome({ data, current }: { data: LearnerHomeData; current: LearningCourse[] }) {
   const recommendations = data.hub && !data.catalog.unavailable
-    ? recommendCourses(data.catalog.courses, data.hub.courses, 8)
+    ? recommendCourses(data.catalog.courses, data.hub.courses, 8, data.now)
     : [];
   const pending = data.hub?.courses.some((course) =>
     !course.active && ["SUBMITTED", "WAITLISTED", "PENDING_PAYMENT", "ACCEPTED"].includes(course.status),

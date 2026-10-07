@@ -17,10 +17,27 @@ const guides=JSON.parse(readFileSync('docs/operations/2026-public-course-guides.
 const model=load('src/lib/course-guide/model.ts');
 const offerings=guides.filter(c=>c.offering_id).map(c=>({...c,id:c.offering_id,status:'ARCHIVED',starts_on:'2026-07-01',ends_on:'2026-07-31'}));
 const courses=model.mergeCatalog(guides,offerings);
+const now=Date.parse('2026-10-07T12:00:00+09:00');
+const visible=model.filterCatalog(courses,model.catalogFilters({}),now);
 await test('16 source courses deduplicate the three linked operational offerings',()=>assert.equal(courses.length,16));
 await test('new public offerings remain discoverable',()=>assert.equal(model.mergeCatalog(guides,[...offerings,{...offerings[0],id:'new-offering'}]).length,17));
-await test('Korean spaced certificate search finds matching course',()=>assert.equal(model.filterCatalog(courses,model.catalogFilters({q:'시니어 요리 지도사'}))[0].id,'2026-silver-food'));
-await test('mode filter, empty results and whitespace search are correct',()=>{assert.equal(model.filterCatalog(courses,model.catalogFilters({mode:'ONLINE'})).length,0);assert.equal(model.filterCatalog(courses,model.catalogFilters({q:'   '})).length,16);});
+await test('Korean spaced certificate search finds upcoming matching course',()=>assert.equal(model.filterCatalog(courses,model.catalogFilters({q:'시니어 요리 지도사'}),now)[0].id,'2026-silver-food'));
+await test('mode filter, empty results and whitespace search are correct',()=>{assert.equal(model.filterCatalog(courses,model.catalogFilters({mode:'ONLINE'}),now).length,0);assert.equal(model.filterCatalog(courses,model.catalogFilters({q:'   '}),now).length,visible.length);});
+await test('ended source guides are hidden and unknown schedules remain visible',()=>{
+  assert.ok(visible.some(c=>c.id==='2026-manual-therapy'));
+  assert.ok(!visible.some(c=>c.id==='2026-park-golf'));
+  assert.ok(visible.every(c=>c.status!=='ARCHIVED' && (!c.ends_on || c.ends_on>='2026-10-07')));
+});
+await test('inclusive course end day changes only at Korean midnight',()=>{
+  const c={ends_on:'2026-10-07'};
+  assert.equal(model.courseIsUpcoming(c,Date.parse('2026-10-07T14:59:59Z')),true);
+  assert.equal(model.courseIsUpcoming(c,Date.parse('2026-10-07T15:00:00Z')),false);
+  assert.equal(model.courseIsUpcoming({...c,status:'ARCHIVED'},now),false);
+  assert.equal(model.guideEndDate('2026.12.20–01.05',2026),'2027-01-05');
+  assert.equal(model.guideEndDate('07.14–07.21',2026),'2026-07-21');
+  assert.equal(model.guideEndDate('2026.02.30',2026),null);
+  assert.equal(model.guideEndDate('2026년 12월 예정',2026),null);
+});
 await test('query arrays and invalid modes cannot break render',()=>assert.deepEqual(model.catalogFilters({q:['a','b'],mode:'invalid',view:['list']}),{q:'',mode:'',view:'cards'}));
 await test('view URL preserves and safely encodes query and mode',()=>{const url=model.catalogHref(model.catalogFilters({q:'목공 & test',mode:'OFFLINE'}),'list');const p=new URL(url,'http://localhost').searchParams;assert.equal(p.get('q'),'목공 & test');assert.equal(p.get('view'),'list');assert.equal(p.get('mode'),'OFFLINE');});
 let dbError=null,throwDb=false;
@@ -37,10 +54,10 @@ const popup={DocumentPopup:({windowName,children,...props})=>React.createElement
 const ui=load('src/components/portal/ui.tsx',{'next/link':Link,'@/lib/portal/data':portalData});
 const catalog=load('src/components/course-guide/catalog.tsx',{'next/link':Link,'@/lib/portal/data':portalData,'@/lib/course-guide/model':model});
 let unavailable=false;
-const page=load('src/app/courses/page.tsx',{'next/link':Link,'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseCatalog:async()=>({courses,unavailable}),editableGuideOrgs:()=>[]},'@/lib/course-guide/model':model,'@/components/course-guide/catalog':catalog,'@/components/portal/ui':ui}).default;
+const page=load('src/app/courses/page.tsx',{'next/link':Link,'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseCatalog:async()=>({courses,unavailable}),editableGuideOrgs:()=>[]},'@/lib/course-guide/model':{...model,filterCatalog:(items,filters)=>model.filterCatalog(items,filters,now)},'@/components/course-guide/catalog':catalog,'@/components/portal/ui':ui}).default;
 const render=async params=>renderToStaticMarkup(await page({searchParams:Promise.resolve(params)}));
-await test('default cards render all16 links, certificates and admission information',async()=>{const html=await render({});assert.equal((html.match(/data-course-card/g)??[]).length,16);assert(html.includes('시니어요리지도사'));assert(html.includes('xl:grid-cols-3'));assert(html.includes('aria-current="page"'));assert(html.includes('신청기간'));assert(html.includes('수강료'));assert(html.includes('운영 완료'));assert(html.includes('모집 안내 확인'));});
-await test('list is accessible table with all16 courses and retained form view',async()=>{const html=await render({view:'list'});assert.equal((html.match(/scope="row"/g)??[]).length,16);assert(html.includes('role="region"'));assert(html.includes('name="view" value="list"'));assert(!html.includes('data-course-card'));});
+await test('cards show current courses, certificates and admission information',async()=>{const html=await render({});assert.equal((html.match(/data-course-card/g)??[]).length,visible.length);assert(html.includes('시니어요리지도사'));assert(html.includes('xl:grid-cols-3'));assert(html.includes('aria-current="page"'));assert(html.includes('신청기간'));assert(html.includes('수강료'));assert(!html.includes('운영 완료'));assert(html.includes('모집 안내 확인'));});
+await test('list is accessible table with current courses and retained form view',async()=>{const html=await render({view:'list'});assert.equal((html.match(/scope="row"/g)??[]).length,visible.length);assert(html.includes('role="region"'));assert(html.includes('name="view" value="list"'));assert(!html.includes('data-course-card'));});
 await test('zero results and partial data are not misleading',async()=>{assert((await render({q:'no-matching-course'})).includes('조건에 맞는'));unavailable=true;assert((await render({})).includes('일부 교육과정을'));unavailable=false;});
 let detail=guides[0];
 const detailPage=load('src/app/courses/[id]/page.tsx',{'next/link':Link,'next/navigation':{notFound:()=>{throw Error('404');}},'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseGuide:async()=>detail,canEditGuide:()=>false},'@/lib/portal/data':portalData,'@/components/portal/ui':ui,'@/lib/learner-documents/model':documentModel,'@/components/instructor-documents/document-popup':popup}).default;

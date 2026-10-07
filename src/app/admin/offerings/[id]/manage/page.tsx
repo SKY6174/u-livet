@@ -4,7 +4,6 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Empty } from "@/components/portal/ui";
 import { ActionForm } from "@/components/portal/action-form";
 import {
-  decideApplication,
   publishOffering,
 } from "@/app/actions";
 import { configureFinance } from "@/app/finance-actions";
@@ -13,6 +12,8 @@ import { CourseHeader } from "@/components/course-workspace/course-header";
 import { ResponsibleInstructorSection } from "@/components/course-workspace/responsible-instructor-section";
 import { getManagedCourse } from "@/lib/course-workspace/data";
 import type { RosterRow } from "@/lib/portal/types";
+import { ApplicationReviewForm } from "@/components/management/application-review-form";
+import { OfferingEditForm } from "@/components/course-workspace/offering-edit-form";
 export default async function ManageOffering(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -69,6 +70,7 @@ export default async function ManageOffering(props: {
         active="manage"
         operator={workspace?.operator}
       />
+      <OfferingEditForm offering={o} />
       <section className="panel mb-8">
         <h2 className="section-title">수강료·환불 규정</h2>
         <p className="mb-4">
@@ -198,6 +200,10 @@ export default async function ManageOffering(props: {
       <h2 className="section-title scroll-mt-6" id="applications">
         신청 심사
       </h2>
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Link className="btn-secondary" href={`/admin/applications?course=${o.id}`}>이 과정의 신청내역 검색</Link>
+        <Link className="btn-secondary" href={`/admin/learners?course=${o.id}`}>이 과정의 수강생 명단</Link>
+      </div>
       {error ? (
         <Empty title="신청 내역을 불러오지 못했습니다" />
       ) : !data?.length ? (
@@ -211,30 +217,14 @@ export default async function ManageOffering(props: {
             >
               <div className="min-w-0">
                 <h3 className="break-words text-xl font-bold">{r.name}</h3>
+                <Link className="mt-2 inline-block underline" href={`/admin/applications/${r.application_id}`}>신청 상세·처리 이력</Link>
                 <dl className="mt-3 flex flex-wrap gap-x-8 gap-y-4 text-base">
                   <div><dt className="text-sm text-slate-600">신청 상태</dt><dd className="mt-1"><span className="badge">{statusLabel[r.status] ?? r.status}</span></dd></div>
                   <div><dt className="text-sm text-slate-600">신청일시</dt><dd className="mt-1 font-medium">{dateTime(r.submitted_at)}</dd></div>
                 </dl>
               </div>
               {["SUBMITTED", "WAITLISTED"].includes(r.status) && (
-                <ActionForm action={decideApplication} label="심사 결과 저장">
-                  <input
-                    type="hidden"
-                    name="application"
-                    value={r.application_id}
-                  />
-                  <label className="field">
-                    결정
-                    <select name="decision" required>
-                      <option value="ACCEPTED">
-                        {o.tuition !== null && o.tuition > 0
-                          ? "선발 · 납부 대기"
-                          : "수강 확정"}
-                      </option>
-                      <option value="REJECTED">미선정</option>
-                    </select>
-                  </label>
-                </ActionForm>
+                <ApplicationReviewForm id={r.application_id} status={r.status} />
               )}
             </article>
           ))}

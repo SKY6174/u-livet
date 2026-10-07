@@ -14,12 +14,11 @@ import { getLearnerHomeData } from "@/lib/student-learning/data";
 import { courseStage } from "@/lib/student-learning/model";
 import { LearnerHeroSummary, LearnerHome } from "@/components/student-learning/home";
 import { getAdminLearnerDocuments } from "@/lib/learner-document-workflow/data";
-import { DOCUMENT_KIND_LABELS } from "@/lib/learner-document-workflow/types";
+import { DOCUMENT_KIND_LABELS, isOpenLearnerDocument } from "@/lib/learner-document-workflow/types";
 import { CourseCard, Empty } from "@/components/portal/ui";
 import { MenuHint } from "@/components/navigation/menu-hint";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 const REQUEST_KINDS = ["APPLICATION", "SCHOLARSHIP", "REFUND"] as const;
-const OPEN_REQUEST_STATUSES = new Set(["RECEIVED", "REVIEWING", "APPROVED"]);
 export default async function Home() {
   const me = await getSessionIdentity();
   if (!me) {
@@ -78,7 +77,7 @@ export default async function Home() {
   const learnerRequests = canReviewRequests
     ? await getAdminLearnerDocuments({ kind: null, status: null, query: "" })
     : undefined;
-  const openRequests = learnerRequests?.requests.filter((request) => OPEN_REQUEST_STATUSES.has(request.status));
+  const openRequests = learnerRequests?.requests.filter(isOpenLearnerDocument);
   const instructorSummary = kind === "instructor" ? await getInstructorHomeSummary() : undefined;
   const instructorCourses = instructorSummary?.length
     ? await getWorkspaceOfferings("id", instructorSummary.map((item) => item.offering_id))

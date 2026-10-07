@@ -25,6 +25,7 @@ function load(file, mocks = {}) {
 const attendance = load("src/lib/attendance/model.ts");
 const model = load("src/lib/student-learning/model.ts", {
   "@/lib/attendance/model": attendance,
+  "@/lib/course-guide/model": load("src/lib/course-guide/model.ts"),
 });
 const menuHint = load("src/components/navigation/menu-hint.tsx");
 let passed = 0;
@@ -249,6 +250,12 @@ const Dashboard = load("src/components/student-learning/dashboard.tsx", {
   "@/lib/portal/evaluation": portal,
   "@/lib/learner-document-workflow/types": documentTypes,
   "@/lib/student-learning/model": model,
+  "@/lib/learner-documents/model": load("src/lib/learner-documents/model.ts", {
+    "../auth/registration": load("src/lib/auth/registration.ts"),
+  }),
+  "@/components/student-learning/learning-record-journey": {
+    LearningRecordJourney: () => null,
+  },
 }).StudentDashboard;
 await test("empty, failed and populated screens keep distinct truthful states and useful navigation", () => {
   const render = (hub, documents = []) =>
