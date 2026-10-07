@@ -10,6 +10,11 @@ function academyStyle(academy: string) {
   if (academy.startsWith("로컬창업")) return { Icon: Lightbulb, badge: "bg-amber-50 text-amber-800", accent: "bg-amber-500" };
   return { Icon: Sparkles, badge: "bg-indigo-50 text-indigo-800", accent: "bg-indigo-500" };
 }
+function RecruitmentDates({ course: c }: { course: CatalogCourse }) {
+  return c.apply_from && c.apply_until ? (
+    <><time className="inline-block whitespace-nowrap" dateTime={c.apply_from}>{dateTime(c.apply_from)}</time>{" ~ "}<time className="inline-block whitespace-nowrap" dateTime={c.apply_until}>{dateTime(c.apply_until)}</time></>
+  ) : "모집 일정 안내 예정";
+}
 export function GuideCard({ course: c, index, canEdit = false }: { course: CatalogCourse; index: number; canEdit?: boolean }) {
   const { Icon, badge, accent } = academyStyle(c.academy);
   return (
@@ -23,11 +28,14 @@ export function GuideCard({ course: c, index, canEdit = false }: { course: Catal
         </div>
         <h2 className="break-words text-xl font-bold leading-snug tracking-tight text-slate-900 group-hover:text-teal-800">{c.name}</h2>
         <p className="mt-3"><span className="badge">{recruitmentLabel(c)}</span></p>
+        <dl className="mt-3 rounded-xl border border-teal-100 bg-teal-50/50 p-3 text-sm">
+          <dt className="font-medium text-teal-800">모집기간</dt>
+          <dd className="mt-1 break-words font-semibold leading-relaxed text-slate-800"><RecruitmentDates course={c} /></dd>
+        </dl>
         <p className="mt-3 text-sm leading-relaxed text-slate-600"><InstructorNames instructors={c.instructors} /></p>
         <p className="mt-3 text-base leading-relaxed text-slate-600">{c.summary}</p>
         <dl className="mt-5 space-y-4 border-t border-slate-100 pt-4 text-base text-slate-600">
           <div><dt className="mb-1 flex items-center gap-2 text-sm"><CalendarDays size={18} aria-hidden="true" />교육기간</dt><dd className="tabular-nums font-medium text-slate-800">{c.period_label}</dd></div>
-          <div><dt className="mb-1 text-sm">신청기간</dt><dd className="font-medium text-slate-800">{c.apply_from && c.apply_until ? `${dateTime(c.apply_from)} ~ ${dateTime(c.apply_until)}` : "별도 모집 안내 확인"}</dd></div>
           <div><dt className="mb-1 text-sm">수강료</dt><dd className="font-medium text-slate-800">{c.tuition === null ? "모집 안내에서 확인" : c.tuition === 0 ? "무료" : `${c.tuition.toLocaleString("ko-KR")}원`}</dd></div>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             <div className="flex items-center gap-2"><dt><Users size={16} className="text-slate-400" aria-hidden="true" /><span className="sr-only">정원</span></dt><dd>{c.capacity}명</dd></div>
@@ -53,14 +61,14 @@ export function GuideList({ courses, editableOrgs = [] }: { courses: CatalogCour
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm" role="region" aria-label="교육과정 목록" tabIndex={0}>
       <table className="w-full min-w-[1200px] text-left text-base">
-        <caption className="sr-only">교육과정의 기간, 정원, 교육시수 및 관련 자격증 비교</caption>
-        <thead className="border-b border-slate-200 bg-slate-50 text-sm text-slate-600"><tr>{["순번", "교육과정 · 모집상태", "교육기간", "신청기간 · 비용", "운영방식", "정원 · 시수", "관련 자격증", "안내", ...(editableOrgs.length ? ["관리"] : [])].map((label) => <th key={label} scope="col" className="whitespace-nowrap px-5 py-4 font-semibold">{label}</th>)}</tr></thead>
+        <caption className="sr-only">교육과정의 모집·교육기간, 정원, 교육시수 및 관련 자격증 비교</caption>
+        <thead className="border-b border-slate-200 bg-slate-50 text-sm text-slate-600"><tr>{["순번", "교육과정 · 모집상태", "모집기간 · 비용", "교육기간", "운영방식", "정원 · 시수", "관련 자격증", "안내", ...(editableOrgs.length ? ["관리"] : [])].map((label) => <th key={label} scope="col" className="whitespace-nowrap px-5 py-4 font-semibold">{label}</th>)}</tr></thead>
         <tbody className="divide-y divide-slate-100">{courses.map((c, index) => (
           <tr key={c.id} className="transition hover:bg-teal-50/40">
             <td className="px-5 py-5 tabular-nums text-slate-400">{String(index + 1).padStart(2, "0")}</td>
             <th scope="row" className="max-w-xs px-5 py-5 font-normal"><span className={`mb-2 inline-block rounded px-2 py-0.5 text-sm font-medium ${academyStyle(c.academy).badge}`}>{c.academy}</span><Link href={c.href} className="block break-words font-semibold text-slate-900 hover:text-teal-800 hover:underline">{c.name}</Link><span className="badge mt-2">{recruitmentLabel(c)}</span><p className="mt-2 text-sm text-slate-600"><InstructorNames instructors={c.instructors} /></p></th>
+            <td className="max-w-xs px-5 py-5 text-slate-600"><p><RecruitmentDates course={c} /></p><p className="mt-2 font-semibold">{c.tuition === null ? "비용 확인 필요" : c.tuition === 0 ? "무료" : `${c.tuition.toLocaleString("ko-KR")}원`}</p></td>
             <td className="whitespace-nowrap px-5 py-5 text-slate-600">{c.period_label}</td>
-            <td className="max-w-xs px-5 py-5 text-slate-600"><p>{c.apply_from && c.apply_until ? `${dateTime(c.apply_from)} ~ ${dateTime(c.apply_until)}` : "별도 모집 안내 확인"}</p><p className="mt-2 font-semibold">{c.tuition === null ? "비용 확인 필요" : c.tuition === 0 ? "무료" : `${c.tuition.toLocaleString("ko-KR")}원`}</p></td>
             <td className="whitespace-nowrap px-5 py-5 text-slate-600">{modeLabel[c.mode]}</td>
             <td className="whitespace-nowrap px-5 py-5 text-slate-600">{c.capacity}명{c.teaching_hours !== null ? ` · ${c.teaching_hours}시간` : ""}</td>
             <td className="max-w-48 break-keep px-5 py-5 text-slate-700">{c.certificate ?? <span className="text-slate-400">미기재</span>}</td>
