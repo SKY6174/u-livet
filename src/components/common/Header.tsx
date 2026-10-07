@@ -57,7 +57,13 @@ export default function Header() {
       <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
         {memberLabel(identity)}
       </span>
-      <span className="max-w-48 break-words whitespace-normal">{identity.name} 님</span>
+      {isOfficeMember(identity) || identity.roles.some(entry => entry.role === "INSTRUCTOR")
+        ? <span className="max-w-48 break-words whitespace-normal">{identity.name} 님</span>
+        : <Link href="/mypage/profile" aria-label={`${identity.name} 님의 내 정보 확인 및 수정`}
+            onClick={() => setOpen(false)}
+            className="max-w-48 break-words whitespace-normal rounded-md px-1 py-2 text-slate-800 underline-offset-4 hover:text-teal-800 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700">
+            {identity.name} 님 <span className="ml-1 text-xs font-semibold text-teal-700">내 정보</span>
+          </Link>}
     </span>
   ) : null;
   const links = primaryLinks(identity, isLoginPage);
