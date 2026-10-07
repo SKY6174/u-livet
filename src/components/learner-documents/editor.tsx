@@ -13,6 +13,7 @@ import {
   DOCUMENT_STATUS_LABELS,
   DOCUMENT_STATUS_TONES,
   documentDate,
+  documentRegistrationMessage,
   type LearnerDocumentEligibility,
   type LearnerDocumentRequest,
 } from "@/lib/learner-document-workflow/types";
@@ -290,8 +291,11 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-700">{request.current_note}</p>
           </summary>
+          {request.kind === "APPLICATION" && request.registration && <p className="mt-3 rounded-lg bg-teal-50 p-3 text-sm leading-6 text-teal-900">{documentRegistrationMessage(request.registration)}</p>}
           <ol className="mt-4 space-y-3 border-t border-slate-200 pt-4">{request.events.map(event => <li key={event.id} className="flex gap-3 text-sm"><Clock3 className="mt-0.5 shrink-0 text-teal-700" size={16} /><div><p className="font-semibold">{DOCUMENT_STATUS_LABELS[event.to_status]} <span className="font-normal text-slate-500">· {documentDate(event.created_at)}</span></p><p className="mt-1 text-slate-600">{event.note}</p></div></li>)}</ol>
           <div className="mt-4 flex flex-wrap gap-2">
+            {request.offering_id && request.registration?.can_apply && <a href={`/offerings/${request.offering_id}/apply`} className="btn-primary">신청 안내·동의 확인 후 수강 신청</a>}
+            {request.offering_id && request.registration?.active && <a href={`/learning/${request.offering_id}`} className="btn-primary">내 강의실 보기</a>}
             <a href={`/api/learner-documents/${request.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700"><Download size={15} />제출 원본</a>
             {request.status === "RECEIVED" && <button type="button" onClick={() => void cancelRequest(request.id)} disabled={cancelling === request.id} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-rose-700 disabled:opacity-50"><XCircle size={15} />{cancelling === request.id ? "취소 중…" : "접수 취소"}</button>}
           </div>

@@ -10,11 +10,13 @@ import {
   DOCUMENT_STATUS_TONES,
   NEXT_DOCUMENT_STATUSES,
   documentDate,
+  documentRegistrationMessage,
   isOpenLearnerDocument,
   type LearnerDocumentKind,
   type LearnerDocumentStatus,
 } from "@/lib/learner-document-workflow/types";
-import { updateLearnerDocumentStatus } from "./actions";
+import { admitLearnerDocument, linkLearnerDocument, updateLearnerDocumentStatus } from "./actions";
+import { statusLabel } from "@/lib/portal/data";
 
 const field = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
 const rowField = "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
@@ -82,7 +84,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
       <section aria-labelledby="document-queue-heading">
         <div className="mb-4 flex items-center justify-between"><h2 id="document-queue-heading" className="text-xl font-bold">접수 문서</h2><span className="text-sm text-slate-500">조회 {requests.length.toLocaleString("ko-KR")}건</span></div>
         {requests.length ? <>
-          <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 수강신청원서 승인은 서류 처리 결과이며 수강 등록과 별도입니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
+          <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 수강 신청과 동의가 접수된 원서는 승인 시 등록 절차로 연결됩니다. 유료 과정은 납부 완료 후 등록이 확정됩니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
           <div role="region" aria-labelledby="document-queue-heading" aria-describedby="document-queue-help" tabIndex={0} className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="w-full min-w-[1320px] table-fixed text-left text-sm">
               <caption className="sr-only">접수 문서 목록. 각 행에서 처리 결과와 수강생 안내를 입력하고 상태를 저장할 수 있습니다.</caption>
@@ -98,7 +100,10 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {requests.map((request, index) => {
-                  const nextStatuses = isOpenLearnerDocument(request) ? NEXT_DOCUMENT_STATUSES[request.status] ?? [] : [];
+                  const nextStatuses = isOpenLearnerDocument(request) ? (NEXT_DOCUMENT_STATUSES[request.status] ?? []).filter(next => next !== "APPROVED" || request.kind !== "APPLICATION" || request.offering_id) : [];
+                  const offeringChoices = (data.offerings ?? []).filter(choice => choice.org_id === request.org_id);
+                  const canLink = request.kind === "APPLICATION" && !request.offering_id && !["REJECTED", "CANCELLED"].includes(request.status);
+                  const registration = request.registration;
                   const formId = `document-status-${request.id}`;
                   const rowLabel = `${index + 1}번 ${request.applicant_name} ${DOCUMENT_KIND_LABELS[request.kind]}`;
                   return <tr key={request.id} className="align-top hover:bg-slate-50/60">
@@ -106,7 +111,23 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                     <th scope="row" className="break-words px-3 py-5 font-normal">
                       <p className="text-xs font-semibold text-teal-700">{DOCUMENT_KIND_LABELS[request.kind]}</p>
                       <p className="mt-2 font-bold leading-6 text-slate-900">{request.course_name}</p>
-                      {request.kind === "APPLICATION" && !request.offering_id && <p className="mt-2 text-xs leading-5 text-amber-800">과정 미연결 원서입니다. 서류 승인만으로 수강 등록되지 않으므로 개설 과정과 신청 상태를 별도로 확인해 주세요.</p>}
+                      {request.kind === "APPLICATION" && registration && <div className="mt-2 space-y-2 text-xs leading-5 text-slate-600">
+                        {request.offering_id && <p>연결 과정: {registration.offering_name}<br />{registration.starts_on} ~ {registration.ends_on}</p>}
+                        <p>{documentRegistrationMessage(registration)}</p>
+                        {registration.can_manage && <a className="inline-block font-semibold text-teal-800 underline" href={`/admin/offerings/${request.offering_id}/manage`}>개설 과정 관리</a>}
+                        {registration.can_manage && registration.application_id && <a className="block font-semibold text-teal-800 underline" href={`/admin/applications/${registration.application_id}`}>수강 신청 확인</a>}
+                      </div>}
+                      {canLink && <div className="mt-3">
+                        {offeringChoices.length ? <form action={linkLearnerDocument} aria-label={`${rowLabel} 과정 연결`} className="space-y-2">
+                          {hiddenFilters}<input type="hidden" name="request_id" value={request.id} /><input type="hidden" name="revision" value={request.revision} />
+                          <label className="block text-xs font-semibold" htmlFor={`document-link-${request.id}`}>실제 개설 기수</label>
+                          <select id={`document-link-${request.id}`} name="offering_id" required defaultValue="" className={rowField}>
+                            <option value="" disabled>연결할 기수를 선택해 주세요</option>
+                            {offeringChoices.map(choice => <option key={choice.id} value={choice.id}>{choice.name} · {choice.starts_on}~{choice.ends_on} · {statusLabel[choice.status] ?? choice.status}</option>)}
+                          </select>
+                          <button type="submit" className="btn-secondary w-full text-xs">과정 연결</button>
+                        </form> : <p className="text-xs leading-5 text-amber-800">담당자가 교육·모집 일정이 유효한 개설 기수를 준비한 후 연결해 주세요.</p>}
+                      </div>}
                       {request.kind === "REFUND" && <p className="mt-3 text-xs leading-5 text-slate-600">자동 산출 반환액<br /><strong className="text-sm text-slate-800">{Number(request.amount ?? 0).toLocaleString("ko-KR")}원</strong></p>}
                     </th>
                     <td className="break-words px-3 py-5">
@@ -146,6 +167,10 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                           <button type="submit" className="btn-primary w-full whitespace-nowrap px-1 text-xs">상태 저장</button>
                         </form>}
                       </div>
+                      {request.kind === "APPLICATION" && ["APPROVED", "COMPLETED"].includes(request.status) && registration?.can_manage && registration.can_admit && <form action={admitLearnerDocument} className="mt-3">
+                        {hiddenFilters}<input type="hidden" name="request_id" value={request.id} /><input type="hidden" name="revision" value={request.revision} />
+                        <button type="submit" className="btn-primary w-full text-xs">수강 등록 확정</button>
+                      </form>}
                       <details className="mt-3">
                         <summary className="min-h-11 cursor-pointer py-2 text-xs font-semibold text-slate-600"><FileClock size={14} className="mr-1 inline-block text-teal-700" aria-hidden="true" />처리 이력 {request.events.length}건</summary>
                         <ol className="mt-1 space-y-3 border-l-2 border-slate-200 pl-3">{request.events.map(event => <li key={event.id} className="break-words text-xs leading-5">

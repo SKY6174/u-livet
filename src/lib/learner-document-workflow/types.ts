@@ -66,7 +66,43 @@ export type LearnerDocumentRequest = {
   updated_at: string;
   resolved_at: string | null;
   events: LearnerDocumentEvent[];
+  registration?: LearnerDocumentRegistration;
 };
+
+export type LearnerDocumentRegistration = {
+  offering_name: string | null;
+  offering_status: string | null;
+  starts_on: string | null;
+  ends_on: string | null;
+  application_id: string | null;
+  application_status: string | null;
+  active: boolean;
+  can_manage: boolean;
+  can_apply: boolean;
+  can_admit: boolean;
+};
+
+export type DocumentOfferingChoice = {
+  id: string;
+  org_id: string;
+  name: string;
+  status: string;
+  starts_on: string;
+  ends_on: string;
+};
+
+export function documentRegistrationMessage(state: LearnerDocumentRegistration) {
+  if (state.active) return "수강 등록 완료 · 내 강의실에서 수업 정보를 확인할 수 있습니다.";
+  if (state.application_status === "PENDING_PAYMENT") return "납부 대기 · 납부 완료 후 수강 등록이 확정됩니다.";
+  if (state.application_status === "REJECTED") return "수강 신청 미선정 · 원서 승인과 신청 심사 결과가 다릅니다.";
+  if (state.application_status === "CANCELLED") return "수강 신청 취소 · 원서 승인 이력은 보관됩니다.";
+  if (state.offering_status === "DRAFT") return "모집 준비 중 · 교육·모집 일정과 신청 안내가 확정되면 수강 신청할 수 있습니다.";
+  if (state.can_admit) return "수강 신청 접수 완료 · 담당자의 수강 등록 확정이 필요합니다.";
+  if (state.application_id) return "수강 등록 대기 · 개설 과정과 신청 상태를 담당자가 확인해야 합니다.";
+  if (state.can_apply) return "수강생 신청 필요 · 과정 안내와 신청 동의를 확인해 수강 신청을 완료해 주세요.";
+  if (state.offering_name) return "수강 등록 미확인 · 현재 신청 가능한 기간이 아닙니다. 담당자에게 개설 일정을 확인해 주세요.";
+  return "과정 연결 필요 · 담당자가 실제 개설 기수를 연결하면 신청·등록 상태를 확인할 수 있습니다.";
+}
 
 export type LearnerDocumentEligibility = {
   offering_id: string;
@@ -80,6 +116,7 @@ export type LearnerDocumentEligibility = {
 export type LearnerDocumentAdminContext = {
   organizations: { id: string; name: string }[];
   requests: LearnerDocumentRequest[];
+  offerings?: DocumentOfferingChoice[];
 };
 
 export const NEXT_DOCUMENT_STATUSES: Partial<

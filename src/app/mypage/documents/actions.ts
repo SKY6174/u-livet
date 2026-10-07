@@ -117,11 +117,19 @@ export async function submitLearnerDocument(input: {
       .select("id,name,tuition")
       .eq("id", values.offeringId)
       .maybeSingle();
-    if (error || !offering)
+    if (error)
       return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
-    values.courseName = String(offering.name);
+    // A published guide can accept preparatory documents before its draft
+    // offering is in the public admissions catalog.
+    if (!offering && type === "application") {
+      const { data: guide, error: guideError } = await db.from("life_course_guides")
+        .select("name").eq("offering_id", values.offeringId).eq("published", true).maybeSingle();
+      if (guideError || !guide) return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
+      values.courseName = String(guide.name);
+    } else if (!offering) return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
+    else values.courseName = String(offering.name);
     if (type === "refund") {
-      const tuition = offering.tuition === null ? null : Number(offering.tuition);
+      const tuition = offering?.tuition == null ? null : Number(offering.tuition);
       Object.assign(values, refundAmounts(tuition, values.refundOccurrence));
     }
   }
