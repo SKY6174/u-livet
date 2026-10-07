@@ -29,7 +29,7 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
         </div>
         <aside className="panel order-1 lg:order-2">
           <h2 className="section-title">교육 안내</h2>
-          <dl className="space-y-5 text-sm">{[["교육기간", course.period_label], ["요일 · 시간", course.time_label], ["교육장소", course.location], ["운영방식", modeLabel[course.mode]], ["모집정원", `${course.capacity}명`], ["교육시수", `${course.teaching_hours}시간`]].map(([label, value]) => <div key={label}><dt className="text-slate-500">{label}</dt><dd className="mt-1.5 font-medium leading-6 text-slate-900">{value}</dd></div>)}</dl>
+          <dl className="space-y-5 text-sm">{[["교육기간", course.period_label], ["요일 · 시간", course.time_label], ["교육장소", course.location], ["운영방식", modeLabel[course.mode]], ["모집정원", `${course.capacity}명`], ["교육시수", `${course.teaching_hours}시간`]].map(([label, value]) => <div key={label}><dt className="text-slate-500">{label}</dt><dd className="mt-1.5 whitespace-pre-line font-medium leading-6 text-slate-900">{value}</dd></div>)}</dl>
           <p className="notice mt-6">수강료와 신청 일정은 별도 모집 안내를 확인해 주세요.</p>
           <DocumentPopup href={applicationDocumentHref(course.id)} windowName="learner-documents" className="btn-primary mt-4 w-full justify-center">수강신청원서 작성</DocumentPopup>
           {offering && <Link href={`/offerings/${offering.id}`} className="btn-secondary mt-4 w-full justify-center gap-2">{offering.status === "ARCHIVED" ? "지난 운영 과정 보기" : "수강신청 안내 확인"}<ArrowUpRight size={16} aria-hidden="true" /></Link>}
