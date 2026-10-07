@@ -6,7 +6,7 @@
 
 - 공식 운영 주소는 `https://u-livet.org`다. Vercel 프로젝트 `u-live`에서 apex가 Production이고 `www.u-livet.org`는 apex로 308 이동한다. 두 주소 모두 Vercel에서 Valid Configuration으로 확인했다.
 - `u-live.org`와 `www.u-live.org`는 경로·쿼리를 유지하며 `https://u-livet.org`로 308 이동한다. 기존 `uc-life.org`와 `www.uc-life.org`는 같은 목적지로 301, `uc-life.vercel.app`은 308 이동한다. Vercel의 연쇄 이동 제한 때문에 각 주소의 목적지를 공식 주소로 직접 지정했다.
-- `staging.u-live.org`와 `staging.uc-life.org`의 Preview 동작은 유지한다.
+- 당시에는 `staging.u-live.org`와 `staging.uc-life.org`의 Preview 동작을 유지했다. 이후 스테이징 주소는 `https://staging.u-livet.org`로 이전했다. 현재 설정과 검증 결과는 [스테이징 주소 전환 기록](u-livet-domain-reference-cleanup.md)을 참고한다.
 - 공용 DNS의 Vercel nameserver, 새 도메인의 A 레코드, TLS 및 `/api/version` HTTP 200을 확인했다. 이 컴퓨터의 기본 DNS 캐시가 한동안 새 도메인을 해석하지 못해 `curl --resolve`와 공용 DNS 서버로 별도 확인했다.
 
 ## 인증과 메일
