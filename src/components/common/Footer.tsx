@@ -4,7 +4,7 @@ import { SupportContact } from "./support-contact";
 import anchorFooterLogo from "../../../public/images/anchor-footer-white.png";
 
 const FOOTER_LINK_CLASS =
-  "rounded-sm underline-offset-4 hover:underline focus-visible:outline-white";
+  "inline-flex min-h-12 items-center rounded-sm underline-offset-4 hover:underline focus-visible:outline-white";
 
 export default function Footer() {
   return (
@@ -32,7 +32,7 @@ export default function Footer() {
               <span className="mx-2" aria-hidden="true">|</span>
               <span className="inline-block">함께 성장하는 평생직업교육</span>
             </p>
-            <p className="mt-1 text-xs text-teal-100">Ulsan Lifelong Vocational Education &amp; Training</p>
+            <p className="mt-2 text-sm leading-relaxed text-teal-100">Ulsan Lifelong Vocational Education &amp; Training</p>
           </div>
         </div>
         <div className="flex min-w-0 flex-col items-start gap-5 lg:justify-self-end">

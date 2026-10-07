@@ -90,6 +90,7 @@ export function primaryLinks(member: Member | null, loginPage = false) {
   return links;
 }
 export function primaryActive(path: string, href: string) {
+  if (href === "/courses") return within(path, "/courses") || within(path, "/offerings");
   if (href === "/admin") return ["/admin", "/operation-documents", "/completion", "/credentials", "/finance", "/performance"].some((base) => within(path, base));
   if (href === "/instructor") return ["/instructor", "/development", "/mypage", "/auth/security", "/quality"].some(base => within(path, base));
   return within(path, href);

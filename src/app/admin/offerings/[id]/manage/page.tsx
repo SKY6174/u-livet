@@ -209,11 +209,12 @@ export default async function ManageOffering(props: {
               key={r.application_id}
               className="panel flex flex-wrap justify-between gap-5"
             >
-              <div>
-                <h3 className="font-bold">{r.name}</h3>
-                <p className="mt-2 text-sm">
-                  {statusLabel[r.status]} · {dateTime(r.submitted_at)}
-                </p>
+              <div className="min-w-0">
+                <h3 className="break-words text-xl font-bold">{r.name}</h3>
+                <dl className="mt-3 flex flex-wrap gap-x-8 gap-y-4 text-base">
+                  <div><dt className="text-sm text-slate-600">신청 상태</dt><dd className="mt-1"><span className="badge">{statusLabel[r.status] ?? r.status}</span></dd></div>
+                  <div><dt className="text-sm text-slate-600">신청일시</dt><dd className="mt-1 font-medium">{dateTime(r.submitted_at)}</dd></div>
+                </dl>
               </div>
               {["SUBMITTED", "WAITLISTED"].includes(r.status) && (
                 <ActionForm action={decideApplication} label="심사 결과 저장">

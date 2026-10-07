@@ -8,6 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        xs: ["1rem", { lineHeight: "1.6" }],
+        sm: ["1rem", { lineHeight: "1.6" }],
+        base: ["1.125rem", { lineHeight: "1.6" }],
+      },
       colors: {
         // 울산과학대학교 앵커사업단 브랜드 컬러 팔레트
         uc: {

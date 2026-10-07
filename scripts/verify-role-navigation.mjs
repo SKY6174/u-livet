@@ -174,23 +174,32 @@ await test('office hub rejects guests/learners/teachers and permits each actual 
     me = member(...roles);
     const readsBefore = learnerRequestReads;
     const output = renderToStaticMarkup(await Admin({ searchParams: Promise.resolve({}) }));
-    assert(output.includes('role="tooltip"'));
+    for (const { links } of nav.officeSections(me)) {
+      for (const link of links) assert(output.includes(link.description), `accessible description: ${link.href}`);
+    }
     for (const href of expected) assert(output.includes(`href="${href}"`), href + kind);
     assert.equal(output.includes('실시간 수강생 요청'), roles.some(role => ['SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE'].includes(role)));
     assert.equal(learnerRequestReads - readsBefore, roles.some(role => ['SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE'].includes(role)) ? 1 : 0);
     await AdminLayout({ children: null });
   }
 });
-await test('every pre-existing course subtree retains a manager gate when the hub is widened', async () => {
+await test('course subtrees retain their existing server role gates', async () => {
   const redirectOnly = ['finance', 'performance', 'kpi'];
   for (const dir of readdirSync('src/app/admin', { withFileTypes: true }).filter(dir => dir.isDirectory())) {
     if (['accounts', 'course-requests', 'learner-documents', 'parking'].includes(dir.name)) continue; // pages enforce their own role gates
     if (redirectOnly.includes(dir.name)) continue; // no data; destination layout gates it
     const gate = load(`src/app/admin/${dir.name}/layout.tsx`, { '@/components/navigation/office-section': section }).default;
+    const run = async () => {
+      const output = await gate({ children: null });
+      if (React.isValidElement(output) && typeof output.type === 'function') return output.type(output.props);
+      return output;
+    };
     for (const roles of [[], ['INSTRUCTOR'], ['SYSTEM_ADMIN'], ['CERTIFIER'], ['FINANCE'], ['PERFORMANCE']]) {
-      me = member(...roles); await assert.rejects(gate({ children: null }), /NOT_FOUND/);
+      me = member(...roles);
+      if (dir.name === 'courses' && roles.includes('SYSTEM_ADMIN')) await run();
+      else await assert.rejects(run, /NOT_FOUND/);
     }
-    me = member('COURSE_MANAGER'); await gate({ children: null });
+    me = member('COURSE_MANAGER'); await run();
   }
 });
 await test('completion, certificate, finance and performance layouts enforce their own roles', async () => {
@@ -229,7 +238,10 @@ await test('My Room unifies instructor and dual-role accounts without querying l
   }
   for(const pathname of ['/instructor/records','/mypage/instructor','/mypage/notifications','/mypage/certificates','/auth/security','/development','/quality/any']) assert(nav.primaryActive(pathname,'/instructor'));
   assert(!nav.primaryActive('/instructor-other','/instructor'));
-  me=member('COURSE_MANAGER'); assert(renderToStaticMarkup(await MyPage()).includes('연결된 인증 앱 관리'));
+  for (const pathname of ['/courses', '/courses/guide', '/offerings/fixture', '/offerings/fixture/apply']) assert(nav.primaryActive(pathname, '/courses'));
+  assert(!nav.primaryActive('/offerings-other', '/courses'));
+  me=member('COURSE_MANAGER'); const account = renderToStaticMarkup(await MyPage());
+  assert(account.includes('aria-label="내 계정 정보"')); assert(account.includes('href="/mypage/notifications"'));
   const before=appReads; me=member(); assert(renderToStaticMarkup(await MyPage()).includes('학생 대시보드')); assert.equal(appReads,before+1);
 });
 let cursor = 0;

@@ -8,14 +8,14 @@ import {
 } from "lucide-react";
 import { getSessionIdentity } from "@/lib/auth/session";
 import { hasRole, officeSections, workspaceKind } from "@/lib/auth/workspace-navigation";
-import { getWorkspaceOfferings } from "@/lib/portal/data";
+import { getCourseCards, getWorkspaceOfferings } from "@/lib/portal/data";
 import { getInstructorHomeSummary } from "@/lib/classroom-questions/data";
 import { getLearnerHomeData } from "@/lib/student-learning/data";
 import { courseStage } from "@/lib/student-learning/model";
 import { LearnerHeroSummary, LearnerHome } from "@/components/student-learning/home";
 import { getAdminLearnerDocuments } from "@/lib/learner-document-workflow/data";
 import { DOCUMENT_KIND_LABELS } from "@/lib/learner-document-workflow/types";
-import { Empty } from "@/components/portal/ui";
+import { CourseCard, Empty } from "@/components/portal/ui";
 import { MenuHint } from "@/components/navigation/menu-hint";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 const REQUEST_KINDS = ["APPLICATION", "SCHOLARSHIP", "REFUND"] as const;
@@ -23,31 +23,51 @@ const OPEN_REQUEST_STATUSES = new Set(["RECEIVED", "REVIEWING", "APPROVED"]);
 export default async function Home() {
   const me = await getSessionIdentity();
   if (!me) {
+    const catalog = await getCourseCards(true);
+    const now = Date.now();
+    const recruiting = catalog.offerings.filter(o => o.apply_from && o.apply_until &&
+      Date.parse(o.apply_from) <= now && now < Date.parse(o.apply_until));
     return (
       <>
-        <section className="bg-uc-navy text-white">
-          <div className="mx-auto max-w-7xl px-5 py-20 md:py-28">
-            <p className="mb-5 text-sm font-semibold tracking-label text-teal-200">U-LiVET · Ulsan Lifelong Vocational Education &amp; Training</p>
-            <h1 className="text-4xl font-bold leading-tight md:text-6xl lg:whitespace-nowrap">
-              새로운 배움을, 여기에서 시작하세요.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200">
-              울산과학대학교 앵커사업단의 평생직업교육과정을 살펴보고 나에게 맞는 배움을 찾아보세요.
-            </p>
-            <Link href="/courses" className="mt-8 inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-bold text-uc-navy">
-              교육과정 둘러보기 <ArrowUpRight className="ml-3 h-5 w-5" aria-hidden="true" />
-            </Link>
+        <section className="mx-auto max-w-7xl px-5 pt-6 md:px-8 md:pt-10" aria-labelledby="home-title">
+          <div className="relative overflow-hidden rounded-3xl bg-uc-navy px-6 py-10 text-white sm:px-10 md:py-16">
+            <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full border-[3rem] border-white/5" />
+            <div className="relative max-w-3xl">
+              <p className="mb-5 text-sm font-semibold tracking-label text-teal-200">울산과학대학교 앵커사업단 · U-LiVET</p>
+              <h1 id="home-title" className="page-title text-white">열린 배움,<br /><span className="text-teal-200">더 넓은 내일.</span></h1>
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-100">일과 생활에 필요한 새로운 배움.<br className="hidden sm:block" /> 나에게 맞는 평생직업교육과정을 만나보세요.</p>
+              <Link href="/courses" className="mt-7 inline-flex min-h-12 items-center gap-3 rounded-xl bg-white px-6 py-3 text-base font-bold text-uc-navy hover:bg-teal-50">
+                교육과정 보기 <ArrowUpRight className="h-5 w-5 shrink-0" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
+          <form action="/courses" className="mt-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-end" role="search" aria-label="교육과정 검색">
+            <label className="field flex-1">어떤 배움을 찾으세요?<input name="q" maxLength={100} placeholder="과정명 또는 관심 분야" type="search" /></label>
+            <button className="btn-primary sm:shrink-0" type="submit">교육과정 검색</button>
+          </form>
         </section>
-        <section className="page-shell grid gap-4 md:grid-cols-2" aria-label="시작하기">
-          <Link href="/about" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-teal-500">
-            <h2 className="text-xl font-bold">앵커사업 소개</h2>
-            <p className="mt-2 text-slate-600">지역과 함께하는 평생직업교육의 목표를 확인하세요.</p>
-          </Link>
-          <Link href="/auth/login" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-teal-500">
-            <h2 className="text-xl font-bold">나의 공간 로그인</h2>
-            <p className="mt-2 text-slate-600">초대받은 계정으로 학습과 업무를 이어가세요.</p>
-          </Link>
+        <section className="page-shell" aria-labelledby="recruiting-title">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <h2 id="recruiting-title" className="section-title mb-0">지금 신청할 수 있는 교육과정</h2>
+            <Link href="/courses" className="btn-secondary">전체 교육과정 보기 →</Link>
+          </div>
+          {catalog.unavailable ? <Empty title="모집 정보를 불러오지 못했습니다">잠시 후 다시 확인해 주세요.</Empty>
+            : recruiting.length ? <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{recruiting.map(o => <CourseCard key={o.id} offering={o} />)}</div>
+            : <Empty title="현재 신청 가능한 과정을 준비하고 있습니다">교육과정 소개에서 운영 과정과 교육내용을 먼저 살펴보세요.</Empty>}
+        </section>
+        <section className="mx-auto max-w-7xl px-5 pb-6 md:px-8" aria-labelledby="start-title">
+          <h2 id="start-title" className="section-title">배움의 시작부터, 차근차근</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              { href: "/terms", title: "수강신청 안내", detail: "신청 방법과 수강료·수료 안내를 확인하세요.", number: "01" },
+              { href: "/mypage", title: "나의 신청 확인", detail: "로그인 후 신청 상태와 수업 일정을 확인하세요.", number: "02" },
+              { href: "/about", title: "앵커사업 소개", detail: "지역과 함께하는 평생직업교육을 알아보세요.", number: "03" },
+            ].map(item => <Link key={item.href} href={item.href} className="panel transition hover:border-teal-600">
+              <span className="text-sm font-bold text-teal-800">{item.number}</span>
+              <h3 className="mt-3 text-xl font-bold">{item.title} →</h3>
+              <p className="mt-3 text-base leading-relaxed text-slate-600">{item.detail}</p>
+            </Link>)}
+          </div>
         </section>
       </>
     );
@@ -103,7 +123,7 @@ export default async function Home() {
               U-LiVET · LIFELONG LEARNING
             </p>
             <p className="mb-4 break-words text-lg text-teal-100">{me.name} 님, 반갑습니다.</p>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl">
+            <h1 className="page-title text-white">
               {welcome.title}
               <br />
               <span className="text-teal-200">{welcome.accent}</span>

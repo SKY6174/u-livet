@@ -604,7 +604,7 @@ export function StudentDashboard({
               open={pending.length > 0}
               className="rounded-2xl border border-slate-200 bg-white"
             >
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 p-5 text-sm font-semibold">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 p-5 text-xl font-semibold">
                 신청 현황
                 <span className="flex items-center gap-3 text-slate-500">
                   {hub ? `${applications.length}건` : "확인 중"}
@@ -629,9 +629,9 @@ export function StudentDashboard({
                       <span className="badge">
                         {statusLabel[c.status] ?? c.status}
                       </span>
-                      <h3 className="mt-2 font-semibold">{c.name}</h3>
-                      <p className="mt-1 text-xs text-slate-500">
-                        신청 {dateTime(c.submitted_at)}
+                      <h3 className="mt-3 break-words text-xl font-semibold">{c.name}</h3>
+                      <p className="mt-2 text-base text-slate-600">
+                        신청일시 {dateTime(c.submitted_at)}
                       </p>
                       <div className="mt-3 flex flex-wrap items-center gap-3">
                         <TextLink href={`/offerings/${c.id}`}>
@@ -649,7 +649,7 @@ export function StudentDashboard({
                           "ACCEPTED",
                         ].includes(c.status) && (
                           <details>
-                            <summary className="cursor-pointer text-xs text-slate-500 underline">
+                            <summary className="flex min-h-12 cursor-pointer items-center text-base text-slate-600 underline">
                               신청 취소
                             </summary>
                             <div className="mt-3">
