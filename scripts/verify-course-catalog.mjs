@@ -30,18 +30,32 @@ const api=load('src/lib/course-guide/data.ts',{'./model':model,'@/lib/supabase/s
 await test('DB-backed catalog reads guides and preserves linked deduplication',async()=>{assert.equal((await api.getCourseCatalog()).courses.length,16);assert(selections.every(s=>!s.includes('*')));});
 await test('failed DB guides report partial availability',async()=>{dbError={message:'unavailable'};const r=await api.getCourseCatalog();assert.equal(r.unavailable,true);assert.equal(r.courses.length,3);await assert.rejects(api.getCourseGuide('2026-manual-therapy'),/불러오지/);dbError=null;});
 await test('connection failure handled and invalid detail IDs not queried',async()=>{throwDb=true;assert.equal((await api.getCourseCatalog()).unavailable,true);assert.equal(await api.getCourseGuide('../bad'),null);throwDb=false;});
-const portalData={modeLabel:{OFFLINE:'대면',ONLINE:'온라인',BLENDED:'혼합'},getCourseIntroduction:async()=>null};
+const portalData={modeLabel:{OFFLINE:'대면',ONLINE:'온라인',BLENDED:'혼합'},getCourseIntroduction:async()=>null,dateTime:value=>value??'미기재'};
 const Link=({children,scroll,...props})=>React.createElement('a',props,children);
 const ui=load('src/components/portal/ui.tsx',{'next/link':Link,'@/lib/portal/data':portalData});
-const catalog=load('src/components/course-guide/catalog.tsx',{'next/link':Link,'@/lib/portal/data':portalData});
+const catalog=load('src/components/course-guide/catalog.tsx',{'next/link':Link,'@/lib/portal/data':portalData,'@/lib/course-guide/model':model});
 let unavailable=false;
-const page=load('src/app/courses/page.tsx',{'next/link':Link,'@/lib/course-guide/data':{getCourseCatalog:async()=>({courses,unavailable})},'@/lib/course-guide/model':model,'@/components/course-guide/catalog':catalog,'@/components/portal/ui':ui}).default;
+const page=load('src/app/courses/page.tsx',{'next/link':Link,'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseCatalog:async()=>({courses,unavailable}),editableGuideOrgs:()=>[]},'@/lib/course-guide/model':model,'@/components/course-guide/catalog':catalog,'@/components/portal/ui':ui}).default;
 const render=async params=>renderToStaticMarkup(await page({searchParams:Promise.resolve(params)}));
-await test('default cards render all16 links and certificate labels',async()=>{const html=await render({});assert.equal((html.match(/data-course-card/g)??[]).length,16);assert(html.includes('시니어요리지도사'));assert(html.includes('xl:grid-cols-4'));assert(html.includes('aria-current="page"'));});
+await test('default cards render all16 links, certificates and admission information',async()=>{const html=await render({});assert.equal((html.match(/data-course-card/g)??[]).length,16);assert(html.includes('시니어요리지도사'));assert(html.includes('xl:grid-cols-3'));assert(html.includes('aria-current="page"'));assert(html.includes('신청기간'));assert(html.includes('수강료'));assert(html.includes('운영 완료'));assert(html.includes('모집 안내 확인'));});
 await test('list is accessible table with all16 courses and retained form view',async()=>{const html=await render({view:'list'});assert.equal((html.match(/scope="row"/g)??[]).length,16);assert(html.includes('role="region"'));assert(html.includes('name="view" value="list"'));assert(!html.includes('data-course-card'));});
 await test('zero results and partial data are not misleading',async()=>{assert((await render({q:'no-matching-course'})).includes('조건에 맞는'));unavailable=true;assert((await render({})).includes('일부 교육과정을'));unavailable=false;});
 let detail=guides[0];
-const detailPage=load('src/app/courses/[id]/page.tsx',{'next/link':Link,'next/navigation':{notFound:()=>{throw Error('404');}},'@/lib/course-guide/data':{getCourseGuide:async()=>detail},'@/lib/portal/data':portalData,'@/components/portal/ui':ui}).default;
+const detailPage=load('src/app/courses/[id]/page.tsx',{'next/link':Link,'next/navigation':{notFound:()=>{throw Error('404');}},'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseGuide:async()=>detail,canEditGuide:()=>false},'@/lib/portal/data':portalData,'@/components/portal/ui':ui}).default;
 await test('details show pending dates and schedule history without opening admissions',async()=>{const html=renderToStaticMarkup(await detailPage({params:Promise.resolve({id:detail.id})}));assert(html.includes('2026년 12월 예정'));assert(html.includes('일정 변경 안내'));assert(html.includes('관련 자격증 미기재'));assert(!html.includes('/apply'));});
 await test('unknown or unpublished details return404',async()=>{detail=null;await assert.rejects(detailPage({params:Promise.resolve({id:'private'})}),/404/);});
+await test('recruitment labels use actual windows and do not invent missing admissions',()=>{
+  const c={status:'PUBLISHED',apply_from:'2026-10-07T00:00:00Z',apply_until:'2026-10-08T00:00:00Z'};
+  assert.equal(model.recruitmentLabel(c,Date.parse(c.apply_from)-1),'모집 예정');
+  assert.equal(model.recruitmentLabel(c,Date.parse(c.apply_from)),'접수 중');
+  assert.equal(model.recruitmentLabel(c,Date.parse(c.apply_until)),'접수 종료');
+  assert.equal(model.recruitmentLabel({status:null}),'모집 안내 확인');
+  assert.equal(model.recruitmentLabel({status:'ARCHIVED'}),'운영 완료');
+  assert.equal(model.recruitmentLabel({status:'CLOSED'}),'모집 종료');
+  assert.equal(model.recruitmentLabel({status:'DRAFT'}),'모집 준비 중');
+});
+await test('linked course guides retain actual admission dates and price',()=>{
+  const c=model.mergeCatalog([guides.find(g=>g.offering_id)],[{...offerings[0],tuition:0,apply_from:'2026-10-07T00:00:00Z',apply_until:'2026-10-08T00:00:00Z'}])[0];
+  assert.equal(c.tuition,0);assert.equal(c.status,'ARCHIVED');assert.equal(c.apply_from,'2026-10-07T00:00:00Z');
+});
 console.log(`${checks} course catalog checks passed.`);

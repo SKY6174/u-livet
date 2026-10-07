@@ -26,7 +26,17 @@ export type CourseGuideSummary = Omit<CourseGuide,
 >;
 export type CatalogCourse = Pick<CourseGuide,
   "id" | "name" | "academy" | "summary" | "mode" | "capacity" | "period_label" | "certificate"
-> & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null; card_image_url: string | null; org_id: string | null };
+> & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null; card_image_url: string | null; org_id: string | null;
+  status?: string | null; apply_from?: string | null; apply_until?: string | null };
+
+export function recruitmentLabel(course: Pick<CatalogCourse, "status" | "apply_from" | "apply_until">, now = Date.now()) {
+  if (course.status === "ARCHIVED") return "운영 완료";
+  if (course.status === "CLOSED") return "모집 종료";
+  if (course.status === "DRAFT") return "모집 준비 중";
+  if (course.status !== "PUBLISHED" || !course.apply_from || !course.apply_until) return "모집 안내 확인";
+  if (now < Date.parse(course.apply_from)) return "모집 예정";
+  return now < Date.parse(course.apply_until) ? "접수 중" : "접수 종료";
+}
 export type CatalogSearch = { q?: string | string[]; mode?: string | string[]; view?: string | string[] };
 export function catalogFilters(params: CatalogSearch) {
   const q = (typeof params.q === "string" ? params.q : "").trim().slice(0, 100);
@@ -45,7 +55,9 @@ export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSumm
   return [
     ...guides.map((guide) => {
       const offering = guide.offering_id ? offeringById.get(guide.offering_id) : null;
-      return { ...guide, offeringId: guide.offering_id, tuition: offering?.tuition ?? null, href: `/courses/${guide.id}` };
+      return { ...guide, offeringId: guide.offering_id, tuition: offering?.tuition ?? null,
+        status: offering?.status ?? null, apply_from: offering?.apply_from ?? null, apply_until: offering?.apply_until ?? null,
+        href: `/courses/${guide.id}` };
     }),
     ...offerings.filter((offering) => !linked.has(offering.id)).map((offering) => ({
       ...offering, period_label: `${offering.starts_on} ~ ${offering.ends_on}`,

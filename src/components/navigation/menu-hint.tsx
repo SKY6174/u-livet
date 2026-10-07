@@ -122,7 +122,7 @@ export function MenuHint({ label, description }: MenuHintProps) {
     const measure = () => {
       const bounds = link.getBoundingClientRect();
       const width = Math.max(1, Math.min(MAX_WIDTH, window.innerWidth - VIEWPORT_INSET * 2));
-      const fontSize = `calc(${getComputedStyle(label).fontSize} - 3.2px)`;
+      const fontSize = `max(1rem, calc(${getComputedStyle(label).fontSize} - 3.2px))`;
       tooltip.style.fontSize = fontSize;
       const height = tooltip.offsetHeight;
       const center = bounds.left + bounds.width / 2;
@@ -169,7 +169,7 @@ export function MenuHint({ label, description }: MenuHintProps) {
           aria-hidden="true"
           className={`pointer-events-none fixed z-[100] rounded-xl border border-pink-300/55 bg-pink-200/35 px-4 py-3 text-left font-normal normal-case leading-relaxed tracking-normal shadow-xl backdrop-blur-sm after:absolute after:left-[var(--hint-arrow-left)] after:-translate-x-1/2 after:border-x-8 after:border-x-transparent after:content-[''] ${placement ? "visible" : "invisible"} ${placement?.side === "above" ? "after:-bottom-3 after:border-t-[12px] after:border-t-pink-200/35" : "after:-top-3 after:border-b-[12px] after:border-b-pink-200/35"}`}
           style={{
-            fontSize: placement?.fontSize ?? "calc(1em - 3.2px)",
+            fontSize: placement?.fontSize ?? "max(1rem, calc(1em - 3.2px))",
             color: placement?.textColor ?? "#0f172a",
             textShadow: placement?.textColor === "#ffffff" ? "0 1px 2px rgba(15, 23, 42, 0.7)" : "0 1px 1px rgba(255, 255, 255, 0.7)",
             width: placement?.width ?? Math.max(1, Math.min(MAX_WIDTH, window.innerWidth - VIEWPORT_INSET * 2)),

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
-import { getOffering, getPolicies } from "@/lib/portal/data";
+import { dateTime, getOffering, getPolicies } from "@/lib/portal/data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FinanceConfig } from "@/lib/finance/types";
 import { applyForCourse } from "@/app/actions";
@@ -34,6 +34,14 @@ export default async function ApplyPage(props: {
       <PageIntro eyebrow="APPLICATION" title="수강신청">
         {o.name}
       </PageIntro>
+      <section className="panel mb-6" aria-labelledby="application-info-title">
+        <h2 id="application-info-title" className="section-title">신청 전 확인하세요</h2>
+        <dl className="grid gap-5 text-base sm:grid-cols-2">
+          <div><dt className="text-sm text-slate-600">교육기간</dt><dd className="mt-1 font-semibold">{o.starts_on} ~ {o.ends_on}</dd></div>
+          <div><dt className="text-sm text-slate-600">수강료</dt><dd className="mt-1 font-semibold">{o.tuition === null ? "별도 안내 확인" : o.tuition === 0 ? "무료" : `${o.tuition.toLocaleString("ko-KR")}원`}</dd></div>
+          <div className="sm:col-span-2"><dt className="text-sm text-slate-600">신청기간</dt><dd className="mt-1 font-semibold">{dateTime(o.apply_from)} ~ {dateTime(o.apply_until)}</dd></div>
+        </dl>
+      </section>
       <div className="panel">
         <ActionForm
           action={applyForCourse}
@@ -65,9 +73,9 @@ export default async function ApplyPage(props: {
                 {policy.title} · {policy.version}
               </p>
               <p className="whitespace-pre-wrap">{policy.body}</p>
-              <label className="flex items-start gap-3 border-t pt-5">
+              <label className="flex min-h-12 items-start gap-3 border-t py-5 text-base leading-relaxed">
                 <input
-                  className="mt-1"
+                  className="mt-1 h-5 w-5 shrink-0"
                   type="checkbox"
                   name="consent"
                   required

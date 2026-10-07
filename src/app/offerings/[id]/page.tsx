@@ -43,7 +43,7 @@ export default async function OfferingPage(props: {
         <p className="notice mb-6">운영이 완료된 과정입니다. 교육내용을 소개하며 현재 수강신청을 받지 않습니다.</p>
       )}
       <div className="grid items-start gap-8 lg:grid-cols-[1fr_330px]">
-        <div className="space-y-6">
+        <div className="order-2 min-w-0 space-y-6 lg:order-1">
           <section className="panel">
             <h2 className="section-title">무엇을 배우나요?</h2>
             <p className="whitespace-pre-wrap">{o.curriculum}</p>
@@ -73,8 +73,9 @@ export default async function OfferingPage(props: {
             </p>
           </section>
         </div>
-        <aside className="panel space-y-5">
-          <dl className="space-y-4 text-sm">
+        <aside className="panel order-1 space-y-5 lg:order-2" aria-label="신청에 필요한 정보">
+          <h2 className="section-title">수강신청 안내</h2>
+          <dl className="space-y-4 text-base">
             {[
               ["교육기간", `${o.starts_on} ~ ${o.ends_on}`],
               [

@@ -46,7 +46,7 @@ export function CourseCard({ offering: o }: { offering: CourseSummary }) {
       href={`/offerings/${o.id}`}
       className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-teal-700 hover:shadow-md"
     >
-      <div className="mb-6 flex justify-between gap-3 text-xs font-semibold">
+      <div className="mb-6 flex flex-wrap justify-between gap-3 text-sm font-semibold">
         <span className="rounded bg-teal-50 px-2 py-1 text-teal-800">
           {o.academy}
         </span>
@@ -58,20 +58,24 @@ export function CourseCard({ offering: o }: { offering: CourseSummary }) {
         {o.name}
       </h2>
       <p className="mt-3 line-clamp-2 text-sm text-slate-600">{o.summary}</p>
-      <dl className="mt-6 space-y-1 border-t pt-4 text-sm">
-        <div className="flex gap-3">
+      <dl className="mt-6 space-y-3 border-t pt-4 text-base">
+        <div>
           <dt className="text-slate-500">교육기간</dt>
           <dd>
             {o.starts_on} ~ {o.ends_on}
           </dd>
         </div>
-        <div className="flex gap-3">
+        <div>
+          <dt className="text-slate-500">신청기간</dt>
+          <dd>{o.apply_from && o.apply_until ? `${new Date(o.apply_from).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })} ~ ${new Date(o.apply_until).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}` : "별도 안내"}</dd>
+        </div>
+        <div>
           <dt className="text-slate-500">운영방식</dt>
           <dd>
             {modeLabel[o.mode]} · {o.capacity}명
           </dd>
         </div>
-        <div className="flex gap-3">
+        <div>
           <dt className="text-slate-500">수강료</dt>
           <dd>
             {o.tuition === null ? "원본 미기재" : o.tuition === 0
@@ -80,7 +84,7 @@ export function CourseCard({ offering: o }: { offering: CourseSummary }) {
           </dd>
         </div>
       </dl>
-      <span className="mt-5 inline-block text-sm font-semibold text-teal-800">
+      <span className="mt-5 inline-flex min-h-12 items-center text-base font-semibold text-teal-800">
         과정 자세히 보기 →
       </span>
     </Link>

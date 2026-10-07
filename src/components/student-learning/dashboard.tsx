@@ -94,7 +94,7 @@ function TextLink({
   return (
     <Link
       href={href}
-      className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-800 hover:underline"
+      className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-teal-800 hover:underline"
     >
       {children}
       <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
@@ -304,7 +304,7 @@ function CourseCard({
                 {c.lessons.map((l) => (
                   <li key={l.id}>
                     <Link
-                      className="flex min-h-11 items-center gap-3 rounded-lg bg-slate-50 p-3 text-sm hover:bg-teal-50"
+                      className="flex min-h-12 items-center gap-3 rounded-lg bg-slate-50 p-3 text-base hover:bg-teal-50"
                       href={`/learning/${c.id}`}
                     >
                       <BookOpen
@@ -470,11 +470,11 @@ export function StudentDashboard({
         />
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div>
-            <p className="mb-4 flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-teal-200">
+            <p className="mb-4 flex items-center gap-2 text-sm font-semibold tracking-label text-teal-200">
               <span className="h-1.5 w-1.5 rounded-full bg-teal-200" />
               MY LEARNING JOURNEY
             </p>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <h1 className="page-title mb-0">
               {name}님의 학습
             </h1>
             <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
@@ -590,7 +590,7 @@ export function StudentDashboard({
               <div className="mt-7 flex flex-wrap justify-center gap-4 border-t border-slate-100 pt-5 text-xs text-slate-500">
                 {["과정 선택", "수강 신청", "학습 시작"].map((s, i) => (
                   <span key={s} className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold">
                       {i + 1}
                     </span>
                     {s}
@@ -604,7 +604,7 @@ export function StudentDashboard({
               open={pending.length > 0}
               className="rounded-2xl border border-slate-200 bg-white"
             >
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 p-5 text-sm font-semibold">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 p-5 text-xl font-semibold">
                 신청 현황
                 <span className="flex items-center gap-3 text-slate-500">
                   {hub ? `${applications.length}건` : "확인 중"}
@@ -629,9 +629,9 @@ export function StudentDashboard({
                       <span className="badge">
                         {statusLabel[c.status] ?? c.status}
                       </span>
-                      <h3 className="mt-2 font-semibold">{c.name}</h3>
-                      <p className="mt-1 text-xs text-slate-500">
-                        신청 {dateTime(c.submitted_at)}
+                      <h3 className="mt-3 break-words text-xl font-semibold">{c.name}</h3>
+                      <p className="mt-2 text-base text-slate-600">
+                        신청일시 {dateTime(c.submitted_at)}
                       </p>
                       <div className="mt-3 flex flex-wrap items-center gap-3">
                         <TextLink href={`/offerings/${c.id}`}>
@@ -649,7 +649,7 @@ export function StudentDashboard({
                           "ACCEPTED",
                         ].includes(c.status) && (
                           <details>
-                            <summary className="cursor-pointer text-xs text-slate-500 underline">
+                            <summary className="flex min-h-12 cursor-pointer items-center text-base text-slate-600 underline">
                               신청 취소
                             </summary>
                             <div className="mt-3">
@@ -1171,13 +1171,13 @@ export function StudentDashboard({
         </p>
         <div className="flex flex-wrap gap-5">
           <Link
-            className="inline-flex min-h-11 items-center hover:text-teal-800"
+            className="inline-flex min-h-12 items-center hover:text-teal-800"
             href="/mypage/notifications"
           >
             연락처·수신 설정
           </Link>
           <Link
-            className="inline-flex min-h-11 items-center hover:text-teal-800"
+            className="inline-flex min-h-12 items-center hover:text-teal-800"
             href="/auth/security"
           >
             계정 보안·추가 인증

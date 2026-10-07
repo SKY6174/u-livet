@@ -22,14 +22,14 @@ const OFFICE_HOME_LINK = {
 };
 
 const primaryLinkClass = (active: boolean) =>
-  `inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-lg px-3 text-sm font-semibold transition-colors ${
+  `inline-flex min-h-12 items-center gap-1 whitespace-nowrap rounded-lg px-4 text-xl font-semibold transition-colors ${
     active
       ? "bg-teal-50 font-bold text-teal-900 ring-1 ring-teal-200"
       : "text-slate-800 hover:bg-teal-50 hover:text-teal-900"
   }`;
 
 const submenuLinkClass = (active: boolean) =>
-  `flex min-h-11 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
+  `flex min-h-12 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
     active
       ? "bg-teal-50 text-teal-900"
       : "text-slate-700 hover:bg-slate-50 hover:text-teal-900"
@@ -45,6 +45,7 @@ export default function Header() {
   const [previewHref, setPreviewHref] = useState<string | null>(null);
   const adminSubmenuRef = useRef<HTMLDivElement>(null);
   const adminMenuToggleRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuToggleRef = useRef<HTMLButtonElement>(null);
   const closeAdminMenu = () => {
     if (adminSubmenuRef.current?.contains(document.activeElement)) {
       adminMenuToggleRef.current?.focus({ preventScroll: true });
@@ -56,7 +57,7 @@ export default function Header() {
       <span className="rounded-md bg-teal-50 px-2 py-1 text-sm font-semibold text-teal-800">
         {memberLabel(identity)}
       </span>
-      <span>{identity.name} 님</span>
+      <span className="max-w-48 break-words whitespace-normal">{identity.name} 님</span>
     </span>
   ) : null;
   const links = primaryLinks(identity, isLoginPage);
@@ -88,7 +89,7 @@ export default function Header() {
     return (
       <div
         key={href}
-        className="relative"
+        className="static"
         onMouseEnter={() => {
           setPreviewHref(null);
           setOpenAdminMenu(true);
@@ -114,7 +115,7 @@ export default function Header() {
           <Link
             href={href}
             aria-current={adminActive ? (pathname === href ? "page" : "true") : undefined}
-            className={`inline-flex min-h-11 items-center rounded-lg pl-3 pr-1 text-sm font-semibold ${adminActive ? "text-teal-900" : "text-slate-800"}`}
+            className={`inline-flex min-h-12 items-center rounded-lg pl-4 pr-1 text-xl font-semibold ${adminActive ? "text-teal-900" : "text-slate-800"}`}
             onFocus={() => {
               setPreviewHref(null);
               setOpenAdminMenu(true);
@@ -129,7 +130,7 @@ export default function Header() {
             aria-label="사업단 관리 하위 메뉴"
             aria-expanded={openAdminMenu}
             aria-controls="desktop-admin-submenu"
-            className="inline-flex min-h-11 w-8 items-center justify-center rounded-lg text-slate-600 hover:text-teal-900"
+            className="inline-flex min-h-12 w-12 items-center justify-center rounded-lg text-slate-600 hover:text-teal-900"
             onClick={() => openAdminMenu ? closeAdminMenu() : setOpenAdminMenu(true)}
           >
             <ChevronDown aria-hidden="true" className={`h-4 w-4 motion-safe:transition-transform ${openAdminMenu ? "rotate-180" : ""}`} />
@@ -139,7 +140,7 @@ export default function Header() {
           ref={adminSubmenuRef}
           id="desktop-admin-submenu"
           inert={!openAdminMenu}
-          className={`absolute left-1/2 top-full z-50 w-[42rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 xl:w-[56rem] motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
+          className={`absolute left-1/2 top-[calc(100%-0.75rem)] z-50 w-[42rem] max-w-[calc(100vw-2.5rem)] -translate-x-1/2 pt-3 xl:w-[56rem] motion-safe:transition-[opacity,transform] motion-safe:duration-200 ${openAdminMenu ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none translate-y-1 opacity-0"}`}
         >
           <div className="grid max-h-[calc(100dvh-9rem)] grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
             <div className="min-h-0 overflow-y-auto p-3">
@@ -194,44 +195,48 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="relative z-40 border-b border-slate-200 bg-white" onKeyDown={(event) => {
+      if (event.key === "Escape" && open) {
+        event.preventDefault();
+        setOpen(false);
+        setOpenMobileAdminMenu(false);
+        mobileMenuToggleRef.current?.focus();
+      }
+    }}>
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:block focus:p-3"
       >
         본문으로 바로가기
       </a>
-      <div className="bg-uc-navy px-5 py-2 text-xs text-white">
+      <div className="bg-uc-navy px-5 py-2 text-sm text-white">
         <div className="mx-auto max-w-7xl">
           울산과학대학교 앵커사업단 | 개방형 평생직업교육
         </div>
       </div>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
-        <Link href="/" aria-label="U-LiVET — 열린 배움, 더 넓은 내일" className="flex shrink-0 items-center gap-3">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 md:px-8">
+        <Link href="/" aria-label="U-LiVET — 열린 배움, 더 넓은 내일" className="flex min-w-0 items-center gap-3">
           <Image
             src="/images/u-live-favicon.png"
             alt=""
             width={64}
             height={61}
-            className="h-14 w-auto shrink-0"
+            className="h-12 w-auto shrink-0 sm:h-14"
             priority
           />
           <span>
             <strong className="block whitespace-nowrap text-xl font-extrabold tracking-tight text-[#082b68] sm:text-2xl">U-LiVE<span className="text-[#6b9fc4]">T</span></strong>
-            <span className="block whitespace-nowrap text-xs text-slate-500">
+            <span className="block text-sm text-slate-600">
               열린 배움, 더 넓은 내일
             </span>
           </span>
         </Link>
-        <nav aria-label="주 메뉴" className="hidden flex-wrap items-center justify-center gap-x-3 gap-y-3 lg:flex">
-          {links.map(renderPrimaryLink)}
-        </nav>
         <div className="hidden flex-wrap items-center justify-end gap-4 text-sm lg:flex">
           {identity ? (
             <>
               {userLabel}
               <form action={signOut}>
-                <button className="text-slate-600 underline">로그아웃</button>
+                <button className="min-h-12 rounded-lg px-3 text-slate-600 underline">로그아웃</button>
               </form>
             </>
           ) : !isLoginPage ? (
@@ -241,10 +246,12 @@ export default function Header() {
           ) : null}
         </div>
         <button
-          className="rounded-lg border p-2 lg:hidden"
+          ref={mobileMenuToggleRef}
+          type="button"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
-          aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
+          aria-label={open ? "전체메뉴 닫기" : "전체메뉴 열기"}
           onClick={() => {
             setOpen(!open);
             setOpenMobileAdminMenu(false);
@@ -253,11 +260,16 @@ export default function Header() {
           {open ? <X /> : <Menu />}
         </button>
       </div>
+      <div className="hidden border-t border-slate-100 lg:block">
+        <nav aria-label="주 메뉴" className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-8 py-3">
+          {links.map(renderPrimaryLink)}
+        </nav>
+      </div>
       {open && (
         <nav
           id="mobile-menu"
           aria-label="모바일 메뉴"
-          className="grid max-h-[calc(100dvh-8rem)] gap-1 overflow-y-auto border-t p-4 lg:hidden"
+          className="grid max-h-[70dvh] gap-1 overflow-y-auto border-t p-4 text-xl lg:hidden"
         >
           {links.map(({ label, href }) => {
             if (href !== "/admin" || adminLinks.length === 0) {
@@ -268,7 +280,7 @@ export default function Header() {
                   key={href}
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className={`rounded-lg p-3 hover:bg-slate-50 ${active ? "bg-teal-50 font-bold text-teal-900" : ""}`}
+                  className={`flex min-h-12 items-center rounded-lg p-3 hover:bg-slate-50 ${active ? "bg-teal-50 font-bold text-teal-900" : ""}`}
                 >
                   {label}
                 </Link>

@@ -7,6 +7,17 @@
    ============================================================================== */
 
 :root {
+  --font-body: 1.125rem;
+  --font-support: 1rem;
+  --font-menu: 1.25rem;
+  --color-ink: #1e293b;
+  --color-muted: #475569;
+  --color-brand: #115e59;
+  --content-width: 80rem;
+  --control-height: 3rem;
+  --radius-control: 0.75rem;
+  --radius-panel: 1rem;
+  --space-unit: 0.5rem;
   /* Shared tracking for current and future menu/page labels. */
   --tracking-label: 0.05em;
   --tracking-label-compact: 0.025em;
@@ -24,16 +35,28 @@ html {
 }
 
 body {
-  color: #1e293b;
+  color: var(--color-ink);
   background-color: #f8fafc;
-  font-size: 16px; /* 기본 폰트 크기를 16px로 유지하여 높은 가독성 확보 */
+  font-size: var(--font-body);
   line-height: 1.6;
 }
 
 /* 직관적인 포커스 링 (웹 접근성 강화) */
 :focus-visible {
-  outline: 2px solid #0066cc;
-  outline-offset: 2px;
+  outline: 3px solid #0066cc;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+@media screen {
+  #main button,
+  #main input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  #main select {
+    min-height: var(--control-height);
+  }
 }
 
 /* 수료증 및 증명서 인쇄용 스타일 */
@@ -60,33 +83,33 @@ body {
 
 @layer components {
   .page-shell {
-    @apply mx-auto max-w-7xl px-5 py-12;
+    @apply mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-12;
   }
   .page-title {
-    @apply mb-4 text-3xl font-bold leading-tight tracking-tight md:text-4xl;
+    @apply mb-4 text-[1.875rem] font-bold leading-tight tracking-tight md:text-[2.5rem];
   }
   .eyebrow {
     @apply mb-3 text-xs font-bold uppercase tracking-label text-teal-800;
   }
   .section-title {
-    @apply mb-5 text-xl font-bold;
+    @apply mb-5 text-2xl font-bold leading-snug md:text-[1.75rem];
   }
   .panel {
-    @apply rounded-2xl border border-slate-200 bg-white p-6;
+    @apply min-w-0 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6;
   }
   .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center rounded-lg bg-teal-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-900 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-12 items-center justify-center rounded-xl bg-teal-800 px-5 py-3 text-base font-semibold text-white transition hover:bg-teal-900 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-secondary {
-    @apply inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold hover:bg-slate-100;
+    @apply inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-base font-semibold hover:bg-slate-100;
   }
   .field {
-    @apply flex min-w-0 flex-col gap-2 text-sm font-medium;
+    @apply flex min-w-0 flex-col gap-2 text-base font-medium;
   }
   .field input,
   .field select,
   .field textarea {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-base font-normal;
+    @apply min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base font-normal;
   }
   .notice {
     @apply rounded-lg bg-slate-100 p-4 text-sm leading-relaxed text-slate-700;
