@@ -29,6 +29,22 @@ export type CatalogCourse = Pick<CourseGuide,
 > & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null; card_image_url: string | null; org_id: string | null;
   status?: string | null; apply_from?: string | null; apply_until?: string | null; ends_on?: string | null };
 
+function isGuideRoom(value: string) { return /\d/.test(value) && /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*호?$/.test(value); }
+
+export function splitGuideLocation(location: string) {
+  const parts = location.split(",").map(part => part.trim());
+  let rooms = 0;
+  while (rooms < parts.length && isGuideRoom(parts[rooms])) rooms++;
+  return { roomNumber: parts.slice(0, rooms).join(", "), roomName: parts.slice(rooms).join(", ") };
+}
+
+export function formatGuideLocation(roomNumber: string, roomName: string): string | null {
+  const rooms = roomNumber.trim(), name = roomName.trim();
+  if (rooms && rooms.split(",").some(room => !isGuideRoom(room.trim()))) return null;
+  const location = [rooms, name].filter(Boolean).join(", ");
+  return location.length >= 1 && location.length <= 160 ? location : null;
+}
+
 export const GUIDE_WEEKDAYS = ["월", "화", "수", "목", "금", "토", "일"] as const;
 export const MAX_GUIDE_SCHEDULE_ROWS = 7;
 export type GuideScheduleRow = { day: string; startTime: string; endTime: string };
