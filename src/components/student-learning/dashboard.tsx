@@ -26,7 +26,7 @@ import type { LucideIcon } from "lucide-react";
 import { ActionForm } from "@/components/portal/action-form";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
-import { DOCUMENT_STATUS_LABELS, documentDate } from "@/lib/learner-document-workflow/types";
+import { DOCUMENT_STATUS_LABELS, documentDate, documentRegistrationMessage } from "@/lib/learner-document-workflow/types";
 import { LearningRecordJourney } from "@/components/student-learning/learning-record-journey";
 import { decideApplication } from "@/app/actions";
 import { submitLearningRequest } from "@/app/learning-request-actions";
@@ -708,7 +708,7 @@ export function StudentDashboard({
               <div className="mt-4 divide-y divide-slate-100">
                 {applicationDocuments.slice(0, 5).map((document) => {
                   const linkedCourse = document.offering_id ? courses.find((course) => course.id === document.offering_id && course.active) : undefined;
-                  const registrationMessage = !hub
+                  const registrationMessage = document.registration ? documentRegistrationMessage(document.registration) : !hub
                     ? "학습 정보를 불러오지 못해 수강 등록 여부를 확인할 수 없습니다. 다시 불러온 뒤 확인해 주세요."
                     : linkedCourse
                       ? courseStage(linkedCourse, today) === "current"
@@ -727,6 +727,8 @@ export function StudentDashboard({
                         {registrationMessage}
                       </p>
                     )}
+                    {document.offering_id && document.registration?.can_apply && <TextLink href={`/offerings/${document.offering_id}/apply`}>신청 안내·동의 확인 후 수강 신청</TextLink>}
+                    {document.offering_id && document.registration?.active && <TextLink href={`/learning/${document.offering_id}`}>내 강의실 보기</TextLink>}
                   </article>;
                 })}
               </div>
