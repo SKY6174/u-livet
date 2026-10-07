@@ -3,4 +3,4 @@
 # ==============================================================================
 User-agent: *
 Allow: /
-Sitemap: https://u-live.org/sitemap.xml
+Sitemap: https://u-livet.org/sitemap.xml
