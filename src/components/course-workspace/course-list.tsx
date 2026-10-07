@@ -128,7 +128,7 @@ export function CourseList({ courses }: { courses: CourseWorkspace[] }) {
               <div className="flex-1 p-5 sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
                   <span
-                    className={`rounded-full px-3 py-1 ${c.status === "ARCHIVED" ? "bg-slate-100 text-slate-600" : c.status === "DRAFT" ? "bg-amber-50 text-amber-800" : "bg-teal-50 text-teal-800"}`}
+                    className={`rounded-full border px-3 py-1 ${c.status === "ARCHIVED" ? "border-violet-200 bg-violet-50 text-violet-900" : c.status === "DRAFT" ? "border-amber-200 bg-amber-50 text-amber-900" : "border-teal-200 bg-teal-50 text-teal-900"}`}
                   >
                     {c.status === "ARCHIVED"
                       ? "운영 완료 · 보고서 보관"
