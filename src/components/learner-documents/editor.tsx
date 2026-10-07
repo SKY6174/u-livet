@@ -75,12 +75,12 @@ function Consent({ id, title, value, onChange, children, error }: {
   </fieldset>;
 }
 
-type DocumentCourse = { id: string; name: string; offeringId: string | null; tuition: number | null };
+type DocumentCourse = { id: string; name: string; offeringId: string; tuition: number | null; periodLabel?: string };
 
-export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, eligibility, initialCourse, profile, profileUnavailable }: {
+export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, eligibility, initialCourse, profile, profileUnavailable, coursesUnavailable }: {
   type: LearnerDocumentType; name: string; email: string; courses: DocumentCourse[];
   requests: LearnerDocumentRequest[]; eligibility: LearnerDocumentEligibility[]; initialCourse?: DocumentCourse;
-  profile?: LearnerDocumentProfile; profileUnavailable?: boolean;
+  profile?: LearnerDocumentProfile; profileUnavailable?: boolean; coursesUnavailable?: boolean;
 }) {
   const router = useRouter();
   const refundCourses = courses.filter(course => course.offeringId && eligibility.some(item => item.offering_id === course.offeringId && item.refund_allowed));
@@ -119,13 +119,10 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     setNotice("");
     requestKeys.current[type] = undefined;
   }
-  function updateCourse(courseName: string, offeringId?: string) {
-    const course = offeringId
-      ? courses.find(item => item.offeringId === offeringId)
-      : courses.find(item => item.name === courseName);
-    const normalizedName = course?.name ?? courseName;
+  function updateCourse(offeringId: string) {
+    const course = courses.find(item => item.offeringId === offeringId);
     setForms(old => {
-      const next = { ...old[type], courseName: normalizedName, offeringId: course?.offeringId ?? "" };
+      const next = { ...old[type], courseName: course?.name ?? "", offeringId: course?.offeringId ?? "" };
       if (type === "refund") Object.assign(next, refundAmounts(course?.tuition ?? null, next.refundOccurrence));
       return { ...old, [type]: next };
     });
@@ -305,15 +302,17 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
         <div className="min-w-0 space-y-5">
           <Section number="01" title="과정과 인적사항">
             <div className="space-y-5">
-              {!application ? <div>
-                <label htmlFor="courseName" className="mb-2 block text-sm font-semibold text-slate-700">과정명</label>
-                <select id="courseName" name="courseName" value={values.offeringId} onChange={e => updateCourse("", e.target.value)} className="learner-field" aria-invalid={!!errors.courseName}>
-                  <option value="">{refund ? "승인된 수강 과정을 선택해 주세요" : "수료 인정된 과정을 선택해 주세요"}</option>
-                  {(refund ? refundCourses : scholarshipCourses).map(course => <option key={course.id} value={course.offeringId ?? ""}>{course.name}{refund ? course.tuition === null ? " · 수강료 미등록" : ` · ${course.tuition.toLocaleString("ko-KR")}원` : ""}</option>)}
+              <div>
+                <label htmlFor="courseName" className="mb-2 block text-sm font-semibold text-slate-700">{application ? "신청과정명" : "과정명"}</label>
+                <select id="courseName" name="courseName" value={values.offeringId} onChange={e => updateCourse(e.target.value)} className="learner-field" aria-invalid={!!errors.courseName}
+                  aria-describedby="courseName-help" disabled={application && !courses.length}>
+                  <option value="">{application ? "개설 과정을 선택해 주세요" : refund ? "승인된 수강 과정을 선택해 주세요" : "수료 인정된 과정을 선택해 주세요"}</option>
+                  {(application ? courses : refund ? refundCourses : scholarshipCourses).map(course => <option key={course.id} value={course.offeringId}>{course.name}{course.periodLabel ? ` · ${course.periodLabel}` : ""}{refund ? course.tuition === null ? " · 수강료 미등록" : ` · ${course.tuition.toLocaleString("ko-KR")}원` : ""}</option>)}
                 </select>
-                {errors.courseName && <p className="mt-1.5 text-xs leading-5 text-red-700">{errors.courseName}</p>}
-              </div> : <Field {...input("courseName")} onChange={e => updateCourse(e.target.value)} label="신청과정명" list="learner-courses" maxLength={100} hint="과정 목록에서 선택하거나 과정명을 직접 입력해 주세요." />}
-              {application && <datalist id="learner-courses">{courses.map(c => <option key={c.id} value={c.name} />)}</datalist>}
+                <p id="courseName-help" className={`mt-1.5 text-xs leading-5 ${errors.courseName || coursesUnavailable ? "text-red-700" : "text-slate-500"}`}>
+                  {errors.courseName || (application ? coursesUnavailable ? "개설 과정 목록을 불러오지 못했습니다. 페이지를 새로 고쳐 주세요." : !courses.length ? "현재 원서를 작성할 개설 과정이 없습니다." : "개설 과정과 교육기간을 확인해 선택해 주세요." : refund ? "원서가 승인된 수강 과정을 선택해 주세요." : "수료 인정된 과정을 선택해 주세요.")}
+                </p>
+              </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field {...input("name")} label="성명" maxLength={30} autoComplete="name" />
                 <Field {...input("phone")} label="휴대전화" type="tel" maxLength={14} autoComplete="tel" placeholder="010-0000-0000" />

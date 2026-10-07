@@ -40,8 +40,9 @@ const app=spawn(process.execPath,["node_modules/next/dist/bin/next","start","-p"
 app.stderr.on("data",chunk=>{if(/EADDRINUSE/.test(String(chunk))) console.error("Port3101 is occupied.");});
 let browser;
 async function prefilled(page,name) {
-  await page.locator("#courseName").waitFor();
-  assert.equal(await page.locator("#courseName").inputValue(),name);
+  await page.locator("select#courseName").waitFor();
+  assert.ok((await page.locator("#courseName option:checked").textContent()).startsWith(name));
+  assert.match(await page.locator("#courseName").inputValue(),/^[0-9a-f-]{36}$/);
   assert.equal(await page.locator("#name").inputValue(),learner.name);
   assert.equal(await page.locator("#email").inputValue(),learner.email);
   assert.equal(await page.locator("#phone").inputValue(),"010-0000-1211");
