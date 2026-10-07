@@ -26,6 +26,7 @@ import type { LucideIcon } from "lucide-react";
 import { ActionForm } from "@/components/portal/action-form";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
+import { DOCUMENT_STATUS_LABELS, documentDate } from "@/lib/learner-document-workflow/types";
 import { LearningRecordJourney } from "@/components/student-learning/learning-record-journey";
 import { decideApplication } from "@/app/actions";
 import { submitLearningRequest } from "@/app/learning-request-actions";
@@ -409,7 +410,7 @@ export function StudentDashboard({
   name: string;
   data: StudentLearningData;
 }) {
-  const { hub, history, surveys, catalog, now } = data;
+  const { hub, history, surveys, documents, catalog, now } = data;
   const today = new Date(now + 9 * 3600000).toISOString().slice(0, 10);
   const courses = hub?.courses ?? [];
   const current = courses.filter((c) => courseStage(c, today) === "current");
@@ -428,6 +429,10 @@ export function StudentDashboard({
   const paid = hub?.scholarships
     .filter((s) => s.paid_on)
     .reduce((sum, s) => sum + s.amount, 0);
+  const applicationDocuments = documents?.filter((document) => document.kind === "APPLICATION") ?? [];
+  const approvedDocuments = applicationDocuments.filter((document) =>
+    ["APPROVED", "COMPLETED"].includes(document.status),
+  );
   const metrics = [
     {
       label: "나의 수업",
@@ -442,6 +447,13 @@ export function StudentDashboard({
       unit: "건",
       icon: Clock3,
       href: "#applications",
+    },
+    {
+      label: "승인된 원서",
+      value: documents ? approvedDocuments.length : "—",
+      unit: "건",
+      icon: Check,
+      href: "#application-documents",
     },
     {
       label: "수료한 과정",
@@ -491,7 +503,7 @@ export function StudentDashboard({
             <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
           </Link>
         </div>
-        <div className="mt-8 grid grid-cols-2 gap-3 border-t border-white/15 pt-6 md:grid-cols-4 md:gap-6">
+        <div className="mt-8 grid grid-cols-2 gap-3 border-t border-white/15 pt-6 md:grid-cols-3 xl:grid-cols-5 md:gap-6">
           {metrics.map(({ label, value, unit, icon: Icon, href }) => (
             <Link
               key={label}
@@ -684,6 +696,42 @@ export function StudentDashboard({
               </div>
             </details>
           </div>
+          <section id="application-documents" className="mt-6 scroll-mt-40 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="application-documents-title">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 id="application-documents-title" className="text-lg font-semibold">수강신청원서 처리 현황</h3>
+              <span className="text-sm text-slate-500">{documents ? `${applicationDocuments.length}건` : "확인 중"}</span>
+            </div>
+            {!documents ? (
+              <div className="mt-4"><Missing>원서 처리 현황을 불러오지 못했습니다.</Missing></div>
+            ) : applicationDocuments.length ? (
+              <div className="mt-4 divide-y divide-slate-100">
+                {applicationDocuments.slice(0, 5).map((document) => {
+                  const linkedCourse = document.offering_id ? courses.find((course) => course.id === document.offering_id && course.active) : undefined;
+                  const registrationMessage = !hub
+                    ? "학습 정보를 불러오지 못해 수강 등록 여부를 확인할 수 없습니다. 다시 불러온 뒤 확인해 주세요."
+                    : linkedCourse
+                      ? courseStage(linkedCourse, today) === "current"
+                        ? "원서 승인과 수강 등록이 확인되었습니다. 수업 정보는 내 강의실에서 확인하세요."
+                        : "수강 등록 기록이 확인됩니다. 종료된 과정의 기록은 학습 이력에서 확인하세요."
+                      : "원서 서류가 승인되었습니다. 아직 수강 등록은 확인되지 않았습니다. 원서 승인은 수강 확정과 별도이며, 개설·모집 중인 과정의 신청 안내를 확인해 주세요.";
+                  return <article key={document.id} className="py-4 first:pt-0 last:pb-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="font-semibold text-slate-900">{document.course_name}</h4>
+                      <span className="rounded-full border border-teal-200 bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-800">원서 {DOCUMENT_STATUS_LABELS[document.status]}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-500">접수 {documentDate(document.submitted_at)}</p>
+                    {document.current_note && <p className="mt-2 text-sm text-slate-700">담당자 안내: {document.current_note}</p>}
+                    {["APPROVED", "COMPLETED"].includes(document.status) && (
+                      <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+                        {registrationMessage}
+                      </p>
+                    )}
+                  </article>;
+                })}
+              </div>
+            ) : <p className="mt-4 text-sm text-slate-500">제출한 수강신청원서가 없습니다.</p>}
+            <TextLink href="/mypage/documents">서류 처리 이력 보기</TextLink>
+          </section>
         </section>
         <aside className="space-y-5 lg:pt-1" aria-label="학습 일정과 할 일">
           <section className="rounded-2xl border border-teal-100 bg-gradient-to-br from-[#edf8f3] to-[#f3f9f8] p-6">

@@ -81,7 +81,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
       <section aria-labelledby="document-queue-heading">
         <div className="mb-4 flex items-center justify-between"><h2 id="document-queue-heading" className="text-xl font-bold">접수 문서</h2><span className="text-sm text-slate-500">조회 {requests.length.toLocaleString("ko-KR")}건</span></div>
         {requests.length ? <>
-          <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
+          <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 수강신청원서 승인은 서류 처리 결과이며 수강 등록과 별도입니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
           <div role="region" aria-labelledby="document-queue-heading" aria-describedby="document-queue-help" tabIndex={0} className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="w-full min-w-[1320px] table-fixed text-left text-sm">
               <caption className="sr-only">접수 문서 목록. 각 행에서 처리 결과와 수강생 안내를 입력하고 상태를 저장할 수 있습니다.</caption>
@@ -105,6 +105,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                     <th scope="row" className="break-words px-3 py-5 font-normal">
                       <p className="text-xs font-semibold text-teal-700">{DOCUMENT_KIND_LABELS[request.kind]}</p>
                       <p className="mt-2 font-bold leading-6 text-slate-900">{request.course_name}</p>
+                      {request.kind === "APPLICATION" && !request.offering_id && <p className="mt-2 text-xs leading-5 text-amber-800">과정 미연결 원서입니다. 서류 승인만으로 수강 등록되지 않으므로 개설 과정과 신청 상태를 별도로 확인해 주세요.</p>}
                       {request.kind === "REFUND" && <p className="mt-3 text-xs leading-5 text-slate-600">자동 산출 반환액<br /><strong className="text-sm text-slate-800">{Number(request.amount ?? 0).toLocaleString("ko-KR")}원</strong></p>}
                     </th>
                     <td className="break-words px-3 py-5">
