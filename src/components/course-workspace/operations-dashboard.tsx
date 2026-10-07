@@ -10,10 +10,10 @@ const status = (c: OperationCourse) => c.workspace?.status ?? "DRAFT";
 const stateLabel = (c: OperationCourse) => ({ DRAFT: "개설 준비", ARCHIVED: "운영 완료·보관", PUBLISHED: "모집 공개", CLOSED: "모집 종료" })[status(c)] ?? "개설 준비";
 function CourseActions({ course: c, manager, org }: { course: OperationCourse; manager: boolean; org: string }) {
   return <div className="flex flex-wrap gap-3 text-sm font-semibold text-teal-800">
-    {manager && (c.workspace ? <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}`}>과정 운영 →</Link> : c.source_id && <Link className="hover:underline" href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>개설 준비 →</Link>)}
-    {manager && c.workspace && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>책임강사 지정 →</Link>}
-    {manager && c.workspace && <Link className="hover:underline" href={`/operation-documents/${c.workspace.id}/plan`}>계획서 →</Link>}
-    <Link className="hover:underline" href={`/courses/${c.id}`}>과정 소개</Link>
+    {manager && (c.workspace ? <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}`}>과정 정보 관리 →</Link> : c.source_id && <Link className="hover:underline" href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>과정 개설 준비 →</Link>)}
+    {manager && c.workspace && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>강사 배정 →</Link>}
+    {manager && c.workspace && <Link className="hover:underline" href={`/operation-documents/${c.workspace.id}/plan`}>운영계획서 작성 →</Link>}
+    <Link className="hover:underline" href={`/courses/${c.id}`}>수강생 화면 보기</Link>
     {manager && c.workspace?.report_revision && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/reports`}>증빙·지급자료</Link>}
   </div>;
 }

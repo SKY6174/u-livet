@@ -28,7 +28,6 @@ export function OfferingEditForm({ offering: o, linkedGuideId }: { offering: Off
         </div>
       </section>
       <section className="space-y-5 rounded-xl border border-slate-200 p-4 sm:p-5">
-        <h3 className="font-bold">수강생에게 보여줄 안내</h3>
         <label className="field">과정 소개
           <span className="text-sm font-normal text-slate-600">수강생이 이 과정에서 무엇을 배우고 어떤 경험을 하는지 쉽게 이해할 수 있도록 설명해 주세요.</span>
           <textarea name="summary" rows={4} maxLength={3000} defaultValue={o.summary} required />
