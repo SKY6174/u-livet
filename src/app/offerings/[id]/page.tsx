@@ -9,6 +9,7 @@ import {
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FinanceConfig } from "@/lib/finance/types";
 import { PageIntro } from "@/components/portal/ui";
+import { ScholarshipNotice } from "@/components/portal/scholarship-notice";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
 import { parseCourseCurriculum } from "@/lib/course-workspace/curriculum";
@@ -28,7 +29,7 @@ export default async function OfferingPage(props: {
       o.status === "ARCHIVED" ? { data: null } : db.rpc("life_offering_finance", { f: o.id }),
       o.status === "ARCHIVED" ? { data: [] } : db.rpc("life_public_instructors", { f: o.id }),
     ]);
-  const completion = policies.find((p) => p.id === o.completion_policy_id);
+  const completion = policies.find((p) => p.id === o.completion_policy_id && !p.title.startsWith("[검증용]"));
   const enrollment = enrollmentPolicies.find((p) => p.id === offeringPolicy?.enrollment_policy_id);
   const finance = financeData as FinanceConfig | null;
   const instructors = (instructorData ?? []) as {
@@ -88,6 +89,7 @@ export default async function OfferingPage(props: {
               {completion?.body ?? "수료기준을 확인 중입니다."}
             </p>
           </section>
+          <ScholarshipNotice />
           {enrollment && (
             <section className="panel">
               <h2 className="section-title">모집·개인정보 수집·이용 안내</h2>
