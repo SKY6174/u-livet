@@ -112,3 +112,18 @@ export async function linkLearnerDocument(form: FormData) {
 export async function admitLearnerDocument(form: FormData) {
   await processDocumentLink(form, true);
 }
+
+export async function deleteLearnerDocument(form: FormData) {
+  await requireIdentity("/admin/learner-documents");
+  const requestId = String(form.get("request_id") ?? "");
+  const revision = Number(form.get("revision"));
+  if (!UUID.test(requestId) || !Number.isSafeInteger(revision) || revision < 1)
+    redirect(returnPath(form, "삭제할 문서 정보를 확인해 주세요.", false));
+  const { error } = await (await createServerSupabaseClient()).rpc("life_delete_learner_document", {
+    r: requestId,
+    expected_revision: revision,
+  });
+  if (error) redirect(returnPath(form, ERRORS[error.message] ?? "문서를 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.", false));
+  revalidateDocuments();
+  redirect(returnPath(form, "접수 문서를 삭제했습니다. 원본과 처리 기록은 보관됩니다.", true));
+}

@@ -1,0 +1,62 @@
+// Real local Next action -> RPC -> DB; one disposable synthetic document.
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {randomUUID} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {chromium} from 'playwright';
+const base=process.env.APPLICATION_TEST_UI_URL;
+assert.equal(base,'http://127.0.0.1:3160');
+const container='supabase_db_uc-life-issues';
+assert.equal(JSON.parse(execFileSync('docker',['inspect',container],{encoding:'utf8'}))[0].Config.Labels['com.supabase.cli.project'],'uc-life-issues');
+const {ids,learner,manager,password}=JSON.parse(readFileSync('/tmp/u-livet-issues-browser-fixtures.json','utf8'));
+const sql=q=>execFileSync('docker',['exec','-i',container,'psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-qtA'],{input:q,encoding:'utf8',stdio:['pipe','pipe','pipe']}).trim();
+const id=randomUUID(),label='[검증용] 삭제 확인 '+id.slice(0,8);
+assert.ok(sql(`select name from public.life_offerings where id='${ids.offering}'`).startsWith('[검증용]'));
+sql(`insert into public.life_learner_document_requests(id,org_id,person_id,offering_id,request_key,kind,course_name,applicant_name,phone_masked,status) values('${id}','${ids.org}','${learner.person}','${ids.offering}',gen_random_uuid(),'APPLICATION','${label}','[검증용] 합성 수강생','010-****-1211','COMPLETED');`);
+const browser=await chromium.launch({headless:true});
+try{
+ const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage();
+ const failures=[];page.on('pageerror',e=>failures.push(e.message));
+ const target='/admin/learner-documents?kind=APPLICATION&status=COMPLETED&q='+encodeURIComponent(label);
+ await page.goto(base+'/auth/login?audience=learner&next='+encodeURIComponent(target));
+ const email=page.locator('input[name="email"]');
+ if(!await email.isVisible())await page.getByText('이메일로 로그인',{exact:true}).click();
+ await email.fill(manager.email);await page.locator('input[name="password"]').fill(password);
+ await page.getByRole('button',{name:'로그인',exact:true}).click();
+ await page.waitForURL(url=>url.pathname==='/admin/learner-documents');
+ const row=page.getByRole('row').filter({hasText:label});await row.waitFor();
+ assert.equal(await page.getByRole('columnheader',{name:'관리',exact:true}).count(),1);
+ assert.equal(await row.locator('td,th').count(),10);
+ const trigger=row.getByRole('button',{name:/삭제$/});await trigger.click();
+ const dialog=page.getByRole('dialog');await dialog.waitFor({state:'visible'});
+ assert.ok(await dialog.getByText(label+' · 수강신청원서',{exact:true}).isVisible());
+ assert.equal(await page.evaluate(()=>document.activeElement?.textContent),'취소');
+ await dialog.getByRole('button',{name:'취소',exact:true}).click();await dialog.waitFor({state:'hidden'});
+ assert.equal(sql(`select deleted_at is null from public.life_learner_document_requests where id='${id}'`),'t');
+ assert.equal(await trigger.evaluate(el=>el===document.activeElement),true);
+ console.log('PASS ten columns, terminal-row deletion, confirmation, initial/cancel focus and cancellation without mutation');
+ await trigger.click();await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
+ assert.equal(sql(`select revision from public.life_learner_document_requests where id='${id}'`),'1');
+ await page.setViewportSize({width:390,height:844});await trigger.click();await dialog.waitFor({state:'visible'});
+ const box=await dialog.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=390);
+ await page.screenshot({path:'/tmp/u-livet-document-delete-confirmation.png'});
+ console.log('PASS Escape cancellation and mobile confirmation layout');
+ await page.route('**/admin/learner-documents*',async route=>{
+  if(route.request().method()==='POST')await new Promise(resolve=>setTimeout(resolve,1000));
+  await route.continue();
+ });
+ await dialog.getByRole('button',{name:'삭제 확인',exact:true}).click();
+ assert.equal(await dialog.getByRole('button',{name:'삭제 중…',exact:true}).isDisabled(),true);
+ assert.equal(await dialog.getByRole('button',{name:'취소',exact:true}).isDisabled(),true);
+ console.log('PASS pending action disables confirmation and cancel to prevent duplicate submission');
+ await page.getByRole('status').filter({hasText:'접수 문서를 삭제했습니다.'}).waitFor();
+ assert.equal(await page.getByRole('row').filter({hasText:label}).count(),0);
+ const url=new URL(page.url());assert.equal(url.searchParams.get('kind'),'APPLICATION');assert.equal(url.searchParams.get('status'),'COMPLETED');assert.equal(url.searchParams.get('q'),label);
+ assert.equal(sql(`select deleted_at is not null and deleted_by='${manager.person}' and revision=2 and status='COMPLETED' from public.life_learner_document_requests where id='${id}'`),'t');
+ assert.equal(sql(`select count(*) from public.life_audit_events where entity_id='${id}' and action='LEARNER_DOCUMENT_DELETED'`),'1');
+ assert.deepEqual(failures,[]);
+ console.log('PASS confirmed deletion reaches secured RPC, retains disposition and audit, removes filtered row, and reports success without browser errors');
+}finally{
+ await browser.close();
+ sql(`begin;delete from public.life_audit_events where entity_id='${id}';delete from public.life_learner_document_requests where id='${id}' and course_name='${label}';commit;`);
+}
