@@ -18,9 +18,11 @@ export function OfferingEditForm({ offering: o, linkedGuideId }: { offering: Off
         <div className="grid gap-4 md:grid-cols-2">
           <label className="field">과정명<input name="name" maxLength={200} defaultValue={o.name} required /></label>
           <label className="field">정원<input type="number" name="capacity" min={1} max={1000} defaultValue={o.capacity} required /></label>
-          <label className="field">모집 상태<select name="status" defaultValue={o.status}>{o.status === "DRAFT" ? <option value="DRAFT">개설 초안</option> : <><option value="PUBLISHED">모집 공개</option><option value="CLOSED">모집 종료</option></>}</select></label>
-          <label className="field">선발방식<select name="selection_method" defaultValue={o.selection_method ?? "REVIEW"}><option value="REVIEW">심사</option><option value="FIRST_COME">선착순</option></select></label>
-          <label className="field md:col-span-2">운영방식<select name="mode" defaultValue={o.mode}><option value="OFFLINE">대면</option><option value="ONLINE">온라인</option><option value="BLENDED">혼합</option></select></label>
+          <div className="grid gap-4 md:col-span-2 md:grid-cols-3">
+            <label className="field">모집 상태<select name="status" defaultValue={o.status}>{o.status === "DRAFT" ? <option value="DRAFT">개설 초안</option> : <><option value="PUBLISHED">모집 공개</option><option value="CLOSED">모집 종료</option></>}</select></label>
+            <label className="field">선발방식<select name="selection_method" defaultValue={o.selection_method ?? "REVIEW"}><option value="REVIEW">심사</option><option value="FIRST_COME">선착순</option></select></label>
+            <label className="field">운영방식<select name="mode" defaultValue={o.mode}><option value="OFFLINE">대면</option><option value="ONLINE">온라인</option><option value="BLENDED">혼합</option></select></label>
+          </div>
           {([["apply_from", "접수 시작"], ["apply_until", "접수 마감"]] as const).map(([name, label]) => <label className="field" key={name}>{label} (한국시간)<input type="datetime-local" name={name} defaultValue={koreanInput(o[name])} required /></label>)}
           {([["starts_on", "교육 시작일"], ["ends_on", "교육 종료일"]] as const).map(([name, label]) => <label className="field" key={name}>{label}<input type="date" name={name} defaultValue={o[name]} required /></label>)}
         </div>
