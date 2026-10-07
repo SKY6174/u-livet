@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { formatGuidePeriod, formatGuideSchedule, GUIDE_WEEKDAYS, MAX_GUIDE_SCHEDULE_ROWS, parseGuidePeriod, parseGuideSchedule, type CourseGuide, type GuideScheduleRow } from "@/lib/course-guide/model";
+import { formatGuideLocation, formatGuidePeriod, formatGuideSchedule, GUIDE_WEEKDAYS, MAX_GUIDE_SCHEDULE_ROWS, parseGuidePeriod, parseGuideSchedule, splitGuideLocation, type CourseGuide, type GuideScheduleRow } from "@/lib/course-guide/model";
 
 const ACADEMIES = ["스마트테크 아카데미", "라이프케어 아카데미", "로컬창업 아카데미", "팝업 아카데미"];
 const inputClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-200";
@@ -19,6 +19,7 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
   const [message, setMessage] = useState("");
   const initialPeriod = parseGuidePeriod(course.period_label, course.year);
   const initialSchedule = parseGuideSchedule(course.time_label);
+  const initialLocation = splitGuideLocation(course.location);
   const [startDate, setStartDate] = useState(initialPeriod?.startDate ?? "");
   const [endDate, setEndDate] = useState(initialPeriod?.endDate ?? "");
   const [schedule, setSchedule] = useState(() => (initialSchedule ?? [{ day: "", startTime: "", endTime: "" }]).map((row, index) => ({ ...row, key: String(index) })));
@@ -58,6 +59,10 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
     event.preventDefault();
     if (busy || uploading) return;
     const form = new FormData(event.currentTarget);
+    const roomNumber = String(form.get("room_number") ?? "").trim();
+    const roomName = String(form.get("room_name") ?? "").trim();
+    const location = roomNumber === initialLocation.roomNumber && roomName === initialLocation.roomName ? course.location : formatGuideLocation(roomNumber, roomName);
+    if (!location) { setMessage("호실 또는 호실명을 입력해 주세요. 호실은 2-418, G-110 형식으로 입력하고 교육장소는 합계 160자 이내로 작성해 주세요."); return; }
     const periodLabel = periodRequired ? periodPreview : course.period_label;
     const timeLabel = scheduleRequired ? formatGuideSchedule(schedule) : course.time_label;
     if (!periodLabel) { setMessage("교육 시작일과 종료일을 확인해 주세요. 종료일은 시작일보다 빠를 수 없습니다."); return; }
@@ -75,7 +80,7 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
       teaching_hours: Number(form.get("teaching_hours")),
       period_label: periodLabel,
       schedule_history: lines("schedule_history"), time_label: timeLabel,
-      location: String(form.get("location") ?? "").trim(),
+      location,
       certificate: String(form.get("certificate") ?? "").trim() || null,
       card_image_url: url || null,
     };
@@ -127,10 +132,15 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
       </div>)}
       <button type="button" disabled={busy || schedule.length >= MAX_GUIDE_SCHEDULE_ROWS} className="btn-secondary" onClick={() => { setScheduleEdited(true); setSchedule(rows => [...rows, { key: crypto.randomUUID(), day: "", startTime: "", endTime: "" }]); }}>요일·시간 추가</button>
     </fieldset>
-    <div className="grid gap-5 sm:grid-cols-2">
-      <label className="text-sm font-semibold">교육장소<input className={inputClass} name="location" required maxLength={160} defaultValue={course.location} /></label>
-      <label className="text-sm font-semibold">관련 자격증<input className={inputClass} name="certificate" maxLength={160} defaultValue={course.certificate ?? ""} /></label>
-    </div>
+    <fieldset className="min-w-0">
+      <legend className="mb-3 text-sm font-semibold">교육장소</legend>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <label className="min-w-0 text-sm font-semibold">호실<input className={inputClass} name="room_number" maxLength={160} placeholder="2-418" defaultValue={initialLocation.roomNumber} /></label>
+        <label className="min-w-0 text-sm font-semibold">호실명<input className={inputClass} name="room_name" maxLength={160} placeholder="비앤비네오필라테스센터" defaultValue={initialLocation.roomName} /></label>
+      </div>
+      <p className="mt-2 text-xs text-slate-500">여러 호실은 쉼표로 구분해 주세요. 외부 교육장소는 호실명만 입력할 수 있습니다.</p>
+    </fieldset>
+    <label className="block text-sm font-semibold">관련 자격증<input className={inputClass} name="certificate" maxLength={160} defaultValue={course.certificate ?? ""} /></label>
     <label className="block text-sm font-semibold">일정 변경 안내 · 한 줄에 한 항목<textarea className={inputClass} name="schedule_history" rows={3} defaultValue={course.schedule_history.join("\n")} /></label>
     <div className="rounded-xl bg-slate-50 p-5">
       <label className="block text-sm font-semibold">이미지 파일 올리기<input className="mt-2 block w-full text-sm" type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading || busy} onChange={(event) => { void uploadImage(event.target.files?.[0]); event.target.value = ""; }} /></label>

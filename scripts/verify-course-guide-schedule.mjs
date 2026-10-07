@@ -63,4 +63,19 @@ check('catalog date filter accepts normalized period and midnight boundary', () 
   assert.equal(m.courseIsUpcoming(c, Date.parse('2026-12-05T14:59:59Z')), true);
   assert.equal(m.courseIsUpcoming(c, Date.parse('2026-12-05T15:00:00Z')), false);
 });
-console.log(`${count} course guide schedule checks passed.`);
+check('location separates room codes, multiple rooms and external room names', () => {
+  assert.deepEqual(m.splitGuideLocation('2-418, 비앤비네오필라테스센터'), { roomNumber: '2-418', roomName: '비앤비네오필라테스센터' });
+  assert.deepEqual(m.splitGuideLocation('1-302, 331'), { roomNumber: '1-302, 331', roomName: '' });
+  assert.deepEqual(m.splitGuideLocation('청년스테이지ON'), { roomNumber: '', roomName: '청년스테이지ON' });
+  assert.deepEqual(m.splitGuideLocation('G-110, 지역파크골프장'), { roomNumber: 'G-110', roomName: '지역파크골프장' });
+  assert.equal(m.formatGuideLocation('', ' 외부 센터 '), '외부 센터');
+  assert.equal(m.formatGuideLocation('2-418', ''), '2-418');
+  assert.equal(m.formatGuideLocation('', ''), null);
+  assert.equal(m.formatGuideLocation('본관', '강의실'), null);
+  assert.equal(m.formatGuideLocation('2-418', '가'.repeat(160)), null);
+  for (const guide of JSON.parse(readFileSync('docs/operations/2026-public-course-guides.json')).courses) {
+    const parts = m.splitGuideLocation(guide.location);
+    assert.equal(m.formatGuideLocation(parts.roomNumber, parts.roomName), guide.location);
+  }
+});
+console.log(`${count} course guide schedule/location checks passed.`);
