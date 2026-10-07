@@ -54,13 +54,15 @@ export default async function ManageOffering(props: {
         </section>
       </div>
     );
-  const [{ data, error }, policies, financeResult] =
+  const [{ data, error }, policies, financeResult, guideResult] =
     await Promise.all([
       (await createServerSupabaseClient()).rpc("life_roster", { f: o.id }),
       getPolicies(),
       (await createServerSupabaseClient()).rpc("life_offering_finance", {
         f: o.id,
       }),
+      (await createServerSupabaseClient()).from("life_course_guides").select("id")
+        .eq("offering_id", o.id).eq("published", true).maybeSingle(),
     ]);
   const finance = financeResult.data as FinanceConfig | null;
   const recruitablePolicies = policies.filter(
@@ -73,7 +75,7 @@ export default async function ManageOffering(props: {
         active="manage"
         operator={workspace?.operator}
       />
-      <OfferingEditForm offering={o} />
+      <OfferingEditForm offering={o} linkedGuideId={guideResult.data?.id ?? null} />
       <section className="panel mb-8">
         <h2 className="section-title">수강료·환불 규정</h2>
         <p className="mb-4">

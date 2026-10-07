@@ -6,6 +6,7 @@ import { getSessionIdentity } from "@/lib/auth/session";
 import { UUID } from "@/lib/portal/data";
 import type { ActionState } from "@/lib/portal/types";
 import { OPENING_SOURCE, openingDateOrderError, openingValues, validOpeningValues } from "@/lib/course-opening/working-copy";
+import { validCourseLocation } from "@/lib/course-guide/locations";
 
 const errors: Record<string, string> = {
   MFA_REAUTH_REQUIRED: MFA_REAUTH_MESSAGE,
@@ -112,11 +113,12 @@ export async function updateOffering(_: ActionState, f: FormData): Promise<Actio
   if (!validId(f, "offering") || !value(f, "revision") || !Number.isSafeInteger(revision) || revision < 1)
     return { message: "과정 정보가 변경되었습니다. 새로고침 후 다시 확인해 주세요." };
   const fields: Record<string, string | number> = {};
-  for (const [key, max] of [["name", 200], ["location", 200], ["summary", 3000], ["curriculum", 20000]] as const) {
+  for (const [key, max] of [["name", 160], ["location", 160], ["summary", 3000], ["curriculum", 20000]] as const) {
     const text = value(f, key);
     if (!text || text.length > max) return { message: "필수 입력 항목과 글자 수를 확인해 주세요." };
     fields[key] = text;
   }
+  if (!validCourseLocation(fields.location as string)) return { message: "교육장소는 최대 3곳까지 각각 입력하고 전체 160자 이내로 작성해 주세요." };
   const capacity = Number(value(f, "capacity"));
   if (!Number.isInteger(capacity) || capacity < 1 || capacity > 1000 ||
     !["ONLINE", "OFFLINE", "BLENDED"].includes(value(f, "mode")) ||
