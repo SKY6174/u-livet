@@ -9,6 +9,8 @@ import {
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FinanceConfig } from "@/lib/finance/types";
 import { PageIntro } from "@/components/portal/ui";
+import { DocumentPopup } from "@/components/instructor-documents/document-popup";
+import { applicationDocumentHref } from "@/lib/learner-documents/model";
 export default async function OfferingPage(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -112,10 +114,11 @@ export default async function OfferingPage(props: {
               <p className="mt-3 whitespace-pre-wrap text-sm">{finance.body}</p>
             </details>
           )}
+          <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary w-full justify-center">수강신청원서 작성</DocumentPopup>
           {open ? (
             <Link
               href={`/offerings/${o.id}/apply`}
-              className="btn-primary block text-center"
+              className="btn-secondary block text-center"
             >
               수강신청 안내 확인
             </Link>

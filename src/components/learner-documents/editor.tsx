@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Clock3, Download, FileCheck2, FileText, LockKeyhole, Send, ShieldCheck, XCircle } from "lucide-react";
 import { PdfPreview } from "@/components/instructor-documents/pdf-preview";
 import { BANKS, DOCUMENT_TITLES, PURPOSES, REFUND_OCCURRENCES, documentErrors, initialValues, koreaToday, refundAmounts,
-  type ConsentChoice, type LearnerDocumentType, type LearnerDocumentValues } from "@/lib/learner-documents/model";
+  type ConsentChoice, type LearnerDocumentType, type LearnerDocumentValues, type LearnerDocumentProfile } from "@/lib/learner-documents/model";
 import type { LearnerPdfAssets } from "@/lib/learner-documents/pdf";
 import {
   DOCUMENT_KIND_LABELS,
@@ -76,9 +76,10 @@ function Consent({ id, title, value, onChange, children, error }: {
 
 type DocumentCourse = { id: string; name: string; offeringId: string | null; tuition: number | null };
 
-export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, eligibility, initialCourse }: {
+export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, eligibility, initialCourse, profile, profileUnavailable }: {
   type: LearnerDocumentType; name: string; email: string; courses: DocumentCourse[];
   requests: LearnerDocumentRequest[]; eligibility: LearnerDocumentEligibility[]; initialCourse?: DocumentCourse;
+  profile?: LearnerDocumentProfile; profileUnavailable?: boolean;
 }) {
   const router = useRouter();
   const refundCourses = courses.filter(course => course.offeringId && eligibility.some(item => item.offering_id === course.offeringId && item.refund_allowed));
@@ -87,9 +88,9 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
   const scholarshipInitialCourse = initialCourse?.offeringId && scholarshipCourses.some(course => course.offeringId === initialCourse.offeringId) ? initialCourse : scholarshipCourses[0];
   const [type, setType] = useState(initialType);
   const [forms, setForms] = useState(() => ({
-    application: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null),
-    scholarship: initialValues(name, email, scholarshipInitialCourse?.name, scholarshipInitialCourse?.offeringId ?? "", scholarshipInitialCourse?.tuition ?? null),
-    refund: initialValues(name, email, refundInitialCourse?.name, refundInitialCourse?.offeringId ?? "", refundInitialCourse?.tuition ?? null),
+    application: initialValues(name, email, initialCourse?.name, initialCourse?.offeringId ?? "", initialCourse?.tuition ?? null, profile),
+    scholarship: initialValues(name, email, scholarshipInitialCourse?.name, scholarshipInitialCourse?.offeringId ?? "", scholarshipInitialCourse?.tuition ?? null, profile),
+    refund: initialValues(name, email, refundInitialCourse?.name, refundInitialCourse?.offeringId ?? "", refundInitialCourse?.tuition ?? null, profile),
   }));
   const values = forms[type];
   const [rendered, setRendered] = useState<{ type: LearnerDocumentType; values: LearnerDocumentValues; bytes: Uint8Array } | null>(null);
@@ -269,6 +270,8 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
           ))}
         </div>
         <p className="text-sm text-slate-600">같은 창에서 세 서식을 작성하세요. 서식을 전환해도 입력한 내용은 유지됩니다.</p>
+        <p className="mt-2 text-sm text-slate-600">과정과 가입 정보를 확인하고 나머지 항목·서명·동의를 작성해 주세요.</p>
+        {profileUnavailable && <p role="status" className="notice mt-3">가입 연락처를 불러오지 못했습니다. 휴대전화 등 빈 항목을 직접 입력해 주세요.</p>}
         {(!canUseRefund || !canUseScholarship) && <div className="mt-3 space-y-1 text-xs leading-5 text-slate-500">
           {!canUseRefund && <p className="flex items-center gap-2"><LockKeyhole size={14} aria-hidden="true" />수강료 환불신청서는 수강신청원서 승인 후 이용할 수 있습니다.</p>}
           {!canUseScholarship && <p className="flex items-center gap-2"><LockKeyhole size={14} aria-hidden="true" />장학금 지급신청서는 수강신청원서 승인과 수료 인정 후 이용할 수 있습니다.</p>}
