@@ -42,7 +42,7 @@ const client = createClient('https://synthetic.invalid', 'synthetic-public-key',
 });
 const catalog = load('src/lib/course-guide/data.ts', {
   './model': model,
-  '@/lib/portal/data': { getCourseCards: async () => ({ offerings: [], unavailable: false }) },
+  '@/lib/portal/data': { getCourseCards: async () => ({ offerings: [], unavailable: false }), getCourseInstructorNames: async () => ({}) },
   '@/lib/supabase/server': { createServerSupabaseClient: async () => client },
 });
 await test('catalog projects summary fields while preserving publication and sort filters', async () => {
@@ -66,8 +66,9 @@ await test('catalog projects summary fields while preserving publication and sor
 });
 await test('detail retains curriculum, location and schedule history', async () => {
   const result = await catalog.getCourseGuide(source[0].id);
-  for (const key of ['curriculum', 'schedule_history', 'time_label', 'location'])
+  for (const key of ['curriculum', 'schedule_history', 'location'])
     assert.deepEqual(result[key], source[0][key]);
+  assert.equal(result.time_label, '월 17:00 - 21:00\n수 17:00 - 21:00\n금 17:00 - 21:00');
 });
 await test('catalog failure remains unavailable', async () => {
   failure = true;

@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { CourseIntroduction, CourseSummary, Offering, Policy, WorkspaceOffering } from "./types";
+import type { CourseIntroduction, CourseSummary, InstructorName, Offering, Policy, WorkspaceOffering } from "./types";
 export const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const modeLabel = { ONLINE: "온라인", OFFLINE: "대면", BLENDED: "혼합" };
@@ -53,6 +53,22 @@ export async function getCourseIntroduction(id: string) {
       .rpc("life_course_introductions", { f: id }, { get: true })
       .maybeSingle();
     return error ? null : (data as CourseIntroduction | null);
+  } catch {
+    return null;
+  }
+}
+export async function getCourseInstructorNames(ids: string[]): Promise<Record<string, InstructorName[]> | null> {
+  if (!ids.length) return {};
+  if (!ids.every((id) => UUID.test(id))) return null;
+  try {
+    const { data, error } = await (await createServerSupabaseClient())
+      .rpc("life_course_instructor_names", { f: Array.from(new Set(ids)) });
+    if (error) return null;
+    const names: Record<string, InstructorName[]> = {};
+    for (const row of (data ?? []) as (InstructorName & { offering_id: string })[]) {
+      (names[row.offering_id] ??= []).push({ name: row.name, responsible: row.responsible });
+    }
+    return names;
   } catch {
     return null;
   }

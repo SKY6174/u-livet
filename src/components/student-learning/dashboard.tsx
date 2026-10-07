@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MenuHint } from "@/components/navigation/menu-hint";
+import { InstructorNames } from "@/components/portal/instructor-names";
 import {
   ArrowDown,
   ArrowRight,
@@ -177,7 +178,7 @@ function CourseCard({
               className="mt-0.5 h-4 w-4 shrink-0 text-slate-400"
               aria-hidden="true"
             />
-            {c.instructors.join(" · ") || "강사 배정 안내 예정"}
+            <InstructorNames instructors={c.instructor_roster ?? c.instructors.map((name) => ({ name, responsible: false }))} />
           </p>
           <p className="flex items-start gap-2">
             <MapPin

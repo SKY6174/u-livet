@@ -1,4 +1,4 @@
-import type { CourseSummary } from "@/lib/portal/types";
+import type { CourseSummary, InstructorName } from "@/lib/portal/types";
 
 export type CourseGuide = {
   id: string;
@@ -27,7 +27,8 @@ export type CourseGuideSummary = Omit<CourseGuide,
 export type CatalogCourse = Pick<CourseGuide,
   "id" | "name" | "academy" | "summary" | "mode" | "capacity" | "period_label" | "certificate"
 > & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null; card_image_url: string | null; org_id: string | null;
-  status?: string | null; apply_from?: string | null; apply_until?: string | null; ends_on?: string | null };
+  status?: string | null; apply_from?: string | null; apply_until?: string | null; ends_on?: string | null;
+  instructors?: InstructorName[] | null };
 
 function isGuideRoom(value: string) { return /\d/.test(value) && /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*호?$/.test(value); }
 

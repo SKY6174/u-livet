@@ -27,9 +27,11 @@ const rail = load('src/components/student-learning/course-recommendation-rail.ts
   'react': React, 'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'lucide-react': icons,
   '@/lib/portal/data': portal,
 });
+const instructorNames = load('src/components/portal/instructor-names.tsx', { 'react': React, 'react/jsx-runtime': jsx });
 const home = load('src/components/student-learning/home.tsx', {
   'react/jsx-runtime': jsx, 'next/link': { default: Link }, 'lucide-react': icons,
   './course-recommendation-rail': rail,
+  '@/components/portal/instructor-names': instructorNames,
   '@/lib/student-learning/model': model, '@/lib/portal/data': portal,
 });
 const now = Date.parse('2026-09-23T10:00:00+09:00');

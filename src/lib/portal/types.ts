@@ -1,5 +1,7 @@
 import type { OfficePosition } from "@/lib/auth/login-audience";
 
+export type InstructorName = { name: string; responsible: boolean };
+
 export type Identity = {
   id: string;
   name: string;

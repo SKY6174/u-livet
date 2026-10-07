@@ -1,4 +1,5 @@
 import type { ClassSession } from "@/lib/portal/evaluation";
+import type { InstructorName } from "@/lib/portal/types";
 export type LearningSession = ClassSession & {
   credited_minutes: number | null;
 };
@@ -16,6 +17,7 @@ export type LearningCourse = {
   starts_on: string;
   ends_on: string;
   instructors: string[];
+  instructor_roster?: InstructorName[];
   completion: {
     title: string;
     version: string;
