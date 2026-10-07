@@ -198,11 +198,40 @@ const portal = {
   statusLabel: { ACCEPTED: "수강 확정" },
   outcomeLabels: {},
 };
+const documentTypes = load("src/lib/learner-document-workflow/types.ts");
+const approvedDocument = {
+  id: "document-1", kind: "APPLICATION", offering_id: null,
+  course_name: "도수물리치료인력양성과정", status: "APPROVED",
+  submitted_at: "2026-09-23T11:44:00Z", current_note: "승인되었습니다.",
+};
+let documentResponse = { data: [approvedDocument], error: null };
+const learningData = load("src/lib/student-learning/data.ts", {
+  "@/lib/supabase/server": {
+    createServerSupabaseClient: async () => ({
+      rpc: async (name) => name === "life_my_learner_documents"
+        ? documentResponse
+        : { data: name === "life_my_learning" ? { courses: [], scholarships: [], organizations: [], requests: [] } : [], error: null },
+    }),
+  },
+  "@/lib/course-guide/data": { getCourseCatalog: async () => ({ courses: [], unavailable: false }) },
+});
+await test("learning data loads own approved documents and preserves document-query failures", async () => {
+  assert.deepEqual((await learningData.getStudentLearning()).documents, [approvedDocument]);
+  documentResponse = { data: null, error: { message: "unavailable" } };
+  assert.equal((await learningData.getStudentLearning()).documents, null);
+  documentResponse = { data: [approvedDocument], error: null };
+});
 const Dashboard = load("src/components/student-learning/dashboard.tsx", {
   "next/link": "a",
   "@/components/navigation/menu-hint": menuHint,
   "@/components/instructor-documents/document-popup": {
     DocumentPopup: ({ children, href }) => React.createElement("a", { href }, children),
+  },
+  "@/lib/learner-documents/model": {
+    applicationDocumentHref: (id) => `/mypage/documents?type=application&course=${id}`,
+  },
+  "@/components/student-learning/learning-record-journey": {
+    LearningRecordJourney: () => null,
   },
   "@/components/portal/action-form": {
     ActionForm: ({ children, label }) =>
@@ -218,10 +247,11 @@ const Dashboard = load("src/components/student-learning/dashboard.tsx", {
   "@/lib/attendance/model": attendance,
   "@/lib/portal/data": portal,
   "@/lib/portal/evaluation": portal,
+  "@/lib/learner-document-workflow/types": documentTypes,
   "@/lib/student-learning/model": model,
 }).StudentDashboard;
 await test("empty, failed and populated screens keep distinct truthful states and useful navigation", () => {
-  const render = (hub) =>
+  const render = (hub, documents = []) =>
     renderToStaticMarkup(
       React.createElement(Dashboard, {
         name: "김배움",
@@ -229,6 +259,7 @@ await test("empty, failed and populated screens keep distinct truthful states an
           hub,
           history: [],
           surveys: [],
+          documents,
           catalog: { courses: [], unavailable: false },
           now,
         },
@@ -264,5 +295,13 @@ await test("empty, failed and populated screens keep distinct truthful states an
   assert(full.includes("120,000"));
   assert(full.includes("/learning/offering/attendance"));
   assert(full.includes("주차별 학습자료"));
+  const approved = render({ courses: [], scholarships: [], organizations: [], requests: [] }, [approvedDocument]);
+  assert(approved.includes("승인된 원서"));
+  assert(approved.includes("도수물리치료인력양성과정"));
+  assert(approved.includes("아직 수강 등록은 확인되지 않았습니다"));
+  assert(approved.includes("내 강의실"));
+  const documentsFailed = render({ courses: [], scholarships: [], organizations: [], requests: [] }, null);
+  assert(documentsFailed.includes("원서 처리 현황을 불러오지 못했습니다"));
+  assert(!documentsFailed.includes("제출한 수강신청원서가 없습니다"));
 });
 console.log(`${passed} student learning checks passed.`);
