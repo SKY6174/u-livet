@@ -1,0 +1,45 @@
+{
+  "verifiedAt": "2026-10-07T06:20:24.025Z",
+  "environment": {
+    "project": "uc-life-issues",
+    "api": "http://127.0.0.1:56321",
+    "app": "http://127.0.0.1:3100"
+  },
+  "application": {
+    "id": "1bec7105-916f-4c76-8ea5-237f27cc43c4",
+    "offering_id": "f154cbf5-ea11-4963-9f66-da558fa8babf",
+    "person_id": "5203120c-7721-47dc-8dd5-eece64a10edf",
+    "status": "SUBMITTED",
+    "submitted_at": "2026-10-07T06:20:19.49401+00:00"
+  },
+  "roster": {
+    "application_id": "1bec7105-916f-4c76-8ea5-237f27cc43c4",
+    "person_id": "5203120c-7721-47dc-8dd5-eece64a10edf",
+    "name": "[검증용] 수강생",
+    "status": "SUBMITTED",
+    "submitted_at": "2026-10-07T06:20:19.49401+00:00"
+  },
+  "displayTime": "2026. 10. 7. 오후 3:20",
+  "managePath": "/admin/offerings/f154cbf5-ea11-4963-9f66-da558fa8babf/manage",
+  "checks": [
+    "신청 전 DB 행 0건",
+    "실제 수강생 로그인·신청 서버 액션 완료",
+    "DB에 동일 과정·수강생·신청시각·심사 대기 저장",
+    "담당자 life_roster의 신청 ID·수강생·상태·시각 일치",
+    "관리자 화면 과정·신청자·한국시간·상태 및 캡처",
+    "새 브라우저 context 로그인 후 동일 신청 유지",
+    "수강생 나의 학습에서도 동일 과정 확인",
+    "중복 제출 동일 ID·신청 1건·동의 1건",
+    "수강생 신청자 명단 접근 차단",
+    "비담당 관리자 신청자 명단 접근 차단",
+    "비로그인 신청자 명단 접근 차단",
+    "비담당 관리자 직접 테이블 조회 RLS 차단",
+    "잘못된 모집 정책 신청 거부",
+    "접수 마감 신청 거부",
+    "실패한 신청은 DB에 저장되지 않음"
+  ],
+  "screenshots": [
+    "admin-roster.png"
+  ],
+  "limitation": "전용 로컬 최신 스키마에서 검증. 운영 DB의 실제 신청 건 검증 결과가 아님."
+}
