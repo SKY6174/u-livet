@@ -86,12 +86,12 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
         {requests.length ? <>
           <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 수강 신청과 동의가 접수된 원서는 승인 시 등록 절차로 연결됩니다. 유료 과정은 납부 완료 후 등록이 확정됩니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
           <div role="region" aria-labelledby="document-queue-heading" aria-describedby="document-queue-help" tabIndex={0} className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-            <table className="w-full min-w-[1320px] table-fixed text-left text-sm">
+            <table className="w-full min-w-[1480px] table-fixed text-left text-sm">
               <caption className="sr-only">접수 문서 목록. 각 행에서 처리 결과와 수강생 안내를 입력하고 상태를 저장할 수 있습니다.</caption>
-              <colgroup>{[4, 19, 11, 11, 14, 17.6, 11.4, 12].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
+              <colgroup>{[3.5, 16.5, 10, 10, 12, 9.5, 15.5, 10.5, 12.5].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
               <thead className="border-b border-slate-200 bg-slate-50 text-slate-700">
                 <tr>
-                  {["순번", "과정", "신청자", "신청시각", "처리 결과", "수강생 안내 내용", "첨부문서", "비고"].map(label => (
+                  {["순번", "과정", "신청자", "신청시각", "처리 결과", "처리자", "수강생 안내 내용", "첨부문서", "비고"].map(label => (
                     <th key={label} scope="col" className={`px-3 py-4 font-semibold ${label === "순번" ? "text-center" : ""}`}>
                       {label}{label === "신청자" && <span className="mt-1 block text-xs font-normal text-slate-500">성명 · 전화번호</span>}
                     </th>
@@ -147,6 +147,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                         </select>
                       </> : <span className="inline-block py-2 text-slate-500">처리 종결</span>}
                     </td>
+                    <td className="break-words px-3 py-5 text-slate-700">{request.reviewer_name || "—"}</td>
                     <td className="px-3 py-5">
                       <p className="truncate leading-6 text-slate-600" title={request.current_note || undefined}>{request.current_note || "등록된 안내가 없습니다."}</p>
                       {nextStatuses.length > 0 && <div className="mt-3">
