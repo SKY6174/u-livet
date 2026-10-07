@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { CourseGuide } from "@/lib/course-guide/model";
+import { formatGuidePeriod, formatGuideSchedule, GUIDE_WEEKDAYS, MAX_GUIDE_SCHEDULE_ROWS, parseGuidePeriod, parseGuideSchedule, type CourseGuide, type GuideScheduleRow } from "@/lib/course-guide/model";
 
 const ACADEMIES = ["스마트테크 아카데미", "라이프케어 아카데미", "로컬창업 아카데미", "팝업 아카데미"];
 const inputClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-200";
@@ -17,6 +17,19 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const initialPeriod = parseGuidePeriod(course.period_label, course.year);
+  const initialSchedule = parseGuideSchedule(course.time_label);
+  const [startDate, setStartDate] = useState(initialPeriod?.startDate ?? "");
+  const [endDate, setEndDate] = useState(initialPeriod?.endDate ?? "");
+  const [schedule, setSchedule] = useState(() => (initialSchedule ?? [{ day: "", startTime: "", endTime: "" }]).map((row, index) => ({ ...row, key: String(index) })));
+  const [scheduleEdited, setScheduleEdited] = useState(false);
+  const periodRequired = !!initialPeriod || !!startDate || !!endDate;
+  const scheduleRequired = !!initialSchedule || scheduleEdited;
+  const periodPreview = formatGuidePeriod(startDate, endDate);
+  function updateSchedule(key: string, field: keyof GuideScheduleRow, value: string) {
+    setScheduleEdited(true);
+    setSchedule(rows => rows.map(row => row.key === key ? { ...row, [field]: value } : row));
+  }
   let previewUrl: string | null = null;
   try {
     const parsed = new URL(imageUrl);
@@ -45,6 +58,10 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
     event.preventDefault();
     if (busy || uploading) return;
     const form = new FormData(event.currentTarget);
+    const periodLabel = periodRequired ? periodPreview : course.period_label;
+    const timeLabel = scheduleRequired ? formatGuideSchedule(schedule) : course.time_label;
+    if (!periodLabel) { setMessage("교육 시작일과 종료일을 확인해 주세요. 종료일은 시작일보다 빠를 수 없습니다."); return; }
+    if (!timeLabel) { setMessage("각 행의 요일과 시작·종료 시간을 입력해 주세요. 종료시간은 시작시간보다 늦어야 합니다."); return; }
     const url = String(form.get("card_image_url") ?? "").trim();
     if (url) {
       try { if (new URL(url).protocol !== "https:") throw new Error(); }
@@ -56,8 +73,8 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
       summary: String(form.get("summary") ?? "").trim(), curriculum: lines("curriculum"),
       mode: String(form.get("mode") ?? ""), capacity: Number(form.get("capacity")),
       teaching_hours: Number(form.get("teaching_hours")),
-      period_label: String(form.get("period_label") ?? "").trim(),
-      schedule_history: lines("schedule_history"), time_label: String(form.get("time_label") ?? "").trim(),
+      period_label: periodLabel,
+      schedule_history: lines("schedule_history"), time_label: timeLabel,
       location: String(form.get("location") ?? "").trim(),
       certificate: String(form.get("certificate") ?? "").trim() || null,
       card_image_url: url || null,
@@ -93,8 +110,24 @@ export function GuideEditForm({ course }: { course: CourseGuide }) {
       <label className="text-sm font-semibold">교육시수<input className={inputClass} name="teaching_hours" type="number" min={1} max={999} required defaultValue={course.teaching_hours} /></label>
     </div>
     <div className="grid gap-5 sm:grid-cols-2">
-      <label className="text-sm font-semibold">교육기간<input className={inputClass} name="period_label" required maxLength={160} defaultValue={course.period_label} /></label>
-      <label className="text-sm font-semibold">요일 · 시간<input className={inputClass} name="time_label" required maxLength={160} defaultValue={course.time_label} /></label>
+      <label className="min-w-0 text-sm font-semibold">교육시작일<input className={`${inputClass} min-w-0`} name="start_date" type="date" max="9999-12-31" required={periodRequired} value={startDate} onChange={event => setStartDate(event.target.value)} /></label>
+      <label className="min-w-0 text-sm font-semibold">교육종료일<input className={`${inputClass} min-w-0`} name="end_date" type="date" min={startDate || undefined} max="9999-12-31" required={periodRequired} value={endDate} onChange={event => setEndDate(event.target.value)} /></label>
+    </div>
+    <p className="text-sm text-slate-600">{periodPreview ? `교육기간: ${periodPreview}` : !initialPeriod ? `기존 교육기간 안내: ${course.period_label}` : "교육 시작일과 종료일을 입력해 주세요."}</p>
+    <fieldset className="min-w-0 space-y-4">
+      <legend className="mb-3 text-sm font-semibold">요일별 교육시간</legend>
+      {!initialSchedule && <p className="text-sm text-slate-600">기존 요일·시간 안내: {course.time_label}</p>}
+      {schedule.map((row, index) => <div key={row.key} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <label className="min-w-0 text-sm font-semibold">요일<select className={inputClass} name={`weekday_${index}`} aria-label={`요일 ${index + 1}`} required={scheduleRequired} value={row.day} onChange={event => updateSchedule(row.key, "day", event.target.value)}><option value="">요일 선택</option>{GUIDE_WEEKDAYS.map(day => <option key={day} value={day}>{day}요일</option>)}</select></label>
+          <label className="min-w-0 text-sm font-semibold">시작시간<input className={`${inputClass} min-w-0`} name={`start_time_${index}`} aria-label={`시작시간 ${index + 1}`} type="time" required={scheduleRequired} value={row.startTime} onChange={event => updateSchedule(row.key, "startTime", event.target.value)} /></label>
+          <label className="min-w-0 text-sm font-semibold">종료시간<input className={`${inputClass} min-w-0`} name={`end_time_${index}`} aria-label={`종료시간 ${index + 1}`} type="time" required={scheduleRequired} value={row.endTime} onChange={event => updateSchedule(row.key, "endTime", event.target.value)} /></label>
+        </div>
+        {schedule.length > 1 && <button type="button" disabled={busy} className="mt-3 min-h-10 text-sm font-semibold text-slate-600 hover:text-red-700" aria-label={`시간표 ${index + 1} 삭제`} onClick={() => { setScheduleEdited(true); setSchedule(rows => rows.filter(item => item.key !== row.key)); }}>시간표 삭제</button>}
+      </div>)}
+      <button type="button" disabled={busy || schedule.length >= MAX_GUIDE_SCHEDULE_ROWS} className="btn-secondary" onClick={() => { setScheduleEdited(true); setSchedule(rows => [...rows, { key: crypto.randomUUID(), day: "", startTime: "", endTime: "" }]); }}>요일·시간 추가</button>
+    </fieldset>
+    <div className="grid gap-5 sm:grid-cols-2">
       <label className="text-sm font-semibold">교육장소<input className={inputClass} name="location" required maxLength={160} defaultValue={course.location} /></label>
       <label className="text-sm font-semibold">관련 자격증<input className={inputClass} name="certificate" maxLength={160} defaultValue={course.certificate ?? ""} /></label>
     </div>

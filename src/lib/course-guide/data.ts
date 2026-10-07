@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getCourseCards } from "@/lib/portal/data";
 import type { Identity } from "@/lib/portal/types";
-import { mergeCatalog, type CourseGuide, type CourseGuideSummary } from "./model";
+import { formatGuideSchedule, guidePeriodLabel, mergeCatalog, parseGuideSchedule, type CourseGuide, type CourseGuideSummary } from "./model";
 
 const GUIDE_FIELDS = "id,year,sort_order,name,academy,summary,curriculum,mode,capacity,teaching_hours,period_label,schedule_history,time_label,location,certificate,offering_id,org_id,card_image_url,revision";
 const GUIDE_SUMMARY_FIELDS = "id,year,sort_order,name,academy,summary,mode,capacity,teaching_hours,period_label,certificate,offering_id,org_id,card_image_url";
@@ -27,7 +27,11 @@ export async function getCourseGuide(id: string) {
   const { data, error } = await (await createServerSupabaseClient())
     .from("life_course_guides").select(GUIDE_FIELDS).eq("published", true).eq("id", id).maybeSingle();
   if (error) throw new Error("교육과정 안내를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
-  return data as CourseGuide | null;
+  if (!data) return null;
+  const course = data as CourseGuide;
+  const schedule = parseGuideSchedule(course.time_label);
+  return { ...course, period_label: guidePeriodLabel(course.period_label, course.year),
+    time_label: schedule ? formatGuideSchedule(schedule)! : course.time_label };
 }
 
 export function editableGuideOrgs(identity: Identity | null) {
