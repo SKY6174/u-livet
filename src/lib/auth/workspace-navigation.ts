@@ -36,6 +36,10 @@ export function officeSections(member: Member) {
       ] : []),
     ] },
     { title: "접수·운영", links: [
+      ...(manager ? [
+        { label: "신청내역 관리", href: "/admin/applications", description: "담당 과정의 신청을 검색하고 승인·반려 사유와 이력을 확인합니다." },
+        { label: "수강생 관리", href: "/admin/learners", description: "담당 과정의 수강생과 신청·수강 이력을 확인합니다." },
+      ] : []),
       ...(manager ? [{ label: "과정 모니터링", href: "/admin/monitoring", description: "과정별 신청·수업·출결·수료 현황을 확인합니다." }] : []),
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN", "FINANCE") ? [{ label: "수강생 서류", href: "/admin/learner-documents", description: "수강신청·장학금·환불 서류의 접수 원본과 처리 이력을 관리합니다." }] : []),
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [{ label: "무료 주차권 관리", href: "/admin/parking", description: "과정별 담당 센터, 발급 신청·승인, 재고와 사용대장을 관리합니다." }] : []),
@@ -55,7 +59,7 @@ export function officeSections(member: Member) {
     ] },
     { title: "계정·권한", links: [
       ...(manager ? [
-        { label: "전문가 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
+        { label: "강사 관리", href: "/admin/instructors", description: "교내·교외·보조강사 대장, 비공개 서류와 교육과정 활동·수당 지급을 관리합니다." },
       ] : []),
       ...((hasRole(member, "SYSTEM_ADMIN") || !!member.member_entry_orgs?.length) ? [{ label: "구성원 관리", href: "/admin/accounts", description: "사업단·강사·수강생의 정보와 활동 이력을 관리합니다." }] : []),
     ] },
@@ -68,7 +72,7 @@ export function officeActiveHref(path: string) {
   if (within(path, "/operation-documents/result") || /^\/operation-documents\/[^/]+\/result(?:\/|$)/.test(path)) return "/operation-documents/result";
   if (within(path, "/operation-documents")) return "/operation-documents/plan";
   if (within(path, "/admin/reports") || /^\/admin\/offerings\/[^/]+\/reports(?:\/|$)/.test(path)) return "/operation-documents/result";
-  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/development", "/admin/monitoring", "/admin/instructors", "/admin/parking", "/admin/learner-documents"])
+  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/development", "/admin/monitoring", "/admin/instructors", "/admin/applications", "/admin/learners", "/admin/parking", "/admin/learner-documents"])
     if (within(path, href)) return href;
   return path === "/admin" ? "/admin" : "/admin/courses";
 }

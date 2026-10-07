@@ -21,13 +21,19 @@ const errors: Record<string, string> = {
     "납부 내역이 있습니다. 나의 납부·환불에서 수강취소와 환불을 신청해 주세요.",
   PAID_ENROLLMENT_NOT_ENABLED: "유료 과정의 수납 기능은 준비 중입니다.",
   DEADLINE_PASSED: "과제 제출 기한이 지났습니다.",
-  REVISION_CHANGED: "제출물이 변경되었습니다. 새로고침 후 다시 채점해 주세요.",
+  REVISION_CHANGED: "정보가 변경되었습니다. 새로고침 후 다시 확인해 주세요.",
   RESPONSIBLE_INSTRUCTOR: "현재 책임강사는 배정을 해제할 수 없습니다. 다른 강사를 책임강사로 지정한 뒤 다시 시도해 주세요.",
   INVALID_TRANSITION: "현재 상태에서는 이 작업을 처리할 수 없습니다.",
   ALREADY_REGISTERED: "이미 등록된 과정입니다. 문서 목록을 새로고침해 주세요.",
   INVALID_SOURCE: "연결할 원문 과정을 찾지 못했습니다.",
   INVALID_YEAR_OR_ORG: "앵커사업단의 2026년 사업연도를 선택해 주세요.",
   WITHDRAWAL_REVIEW_REQUIRED: "교육 시작 후 취소는 사업단 확인이 필요합니다.",
+  REASON_REQUIRED: "반려 사유를 1~1,000자로 입력해 주세요.",
+  STATUS_CHANGED: "신청 상태가 변경되었습니다. 새로고침 후 다시 확인해 주세요.",
+  COURSE_READ_ONLY: "보관되거나 운영자료가 마감된 과정은 수정할 수 없습니다.",
+  INVALID_DATES_OR_CAPACITY: "정원과 날짜를 확인해 주세요. 접수 마감은 교육 시작 전이어야 합니다.",
+  SELECTION_LOCKED: "신청이 접수된 과정의 선발방식은 변경할 수 없습니다.",
+  SCHEDULE_OUTSIDE_PERIOD: "등록된 수업 일정이 교육기간을 벗어납니다. 수업 일정을 먼저 확인해 주세요.",
 };
 async function mutate(
   rpc: string,
@@ -87,10 +93,43 @@ export async function decideApplication(
     !["ACCEPTED", "REJECTED", "CANCELLED"].includes(value(f, "decision"))
   )
     return { message: "신청 정보를 확인해 주세요." };
-  return mutate("life_decide", {
+  if (value(f, "decision") === "CANCELLED") return mutate("life_decide", {
     a: value(f, "application"),
-    decision: value(f, "decision"),
+    decision: "CANCELLED",
   });
+  if (!["SUBMITTED", "WAITLISTED"].includes(value(f, "expected_status")))
+    return { message: "신청 상태를 새로고침 후 다시 확인해 주세요." };
+  const reason = value(f, "reason");
+  if (reason.length > 1000 || (value(f, "decision") === "REJECTED" && !reason))
+    return { message: errors.REASON_REQUIRED };
+  return mutate("life_review_application", {
+    a: value(f, "application"), decision: value(f, "decision"),
+    reason, expected_status: value(f, "expected_status"),
+  });
+}
+export async function updateOffering(_: ActionState, f: FormData): Promise<ActionState> {
+  const revision = Number(value(f, "revision"));
+  if (!validId(f, "offering") || !value(f, "revision") || !Number.isSafeInteger(revision) || revision < 1)
+    return { message: "과정 정보가 변경되었습니다. 새로고침 후 다시 확인해 주세요." };
+  const fields: Record<string, string | number> = {};
+  for (const [key, max] of [["name", 200], ["location", 200], ["summary", 3000], ["curriculum", 20000]] as const) {
+    const text = value(f, key);
+    if (!text || text.length > max) return { message: "필수 입력 항목과 글자 수를 확인해 주세요." };
+    fields[key] = text;
+  }
+  const capacity = Number(value(f, "capacity"));
+  if (!Number.isInteger(capacity) || capacity < 1 || capacity > 1000 ||
+    !["ONLINE", "OFFLINE", "BLENDED"].includes(value(f, "mode")) ||
+    !["DRAFT", "PUBLISHED", "CLOSED"].includes(value(f, "status")) ||
+    !["REVIEW", "FIRST_COME"].includes(value(f, "selection_method"))) return { message: "정원·운영방식·모집 상태를 확인해 주세요." };
+  for (const key of ["apply_from", "apply_until", "starts_on", "ends_on"]) {
+    const text = value(f, key);
+    if (!(key.startsWith("apply") ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/ : /^\d{4}-\d{2}-\d{2}$/).test(text))
+      return { message: "날짜와 시간을 확인해 주세요." };
+    fields[key] = key.startsWith("apply") ? `${text}+09:00` : text;
+  }
+  Object.assign(fields, { capacity, mode: value(f, "mode"), status: value(f, "status"), selection_method: value(f, "selection_method") });
+  return mutate("life_update_offering", { f: value(f, "offering"), expected_revision: revision, fields });
 }
 export async function readLesson(
   _: ActionState,

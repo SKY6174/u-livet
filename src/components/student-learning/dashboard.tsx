@@ -638,6 +638,7 @@ export function StudentDashboard({
                         <TextLink href={`/offerings/${c.id}`}>
                           과정 정보
                         </TextLink>
+                        <TextLink href={`/mypage/applications/${c.application_id}`}>신청 상세·처리 이력</TextLink>
                         <DocumentPopup href={applicationDocumentHref(c.id)} windowName="learner-documents" className="btn-secondary">수강신청원서 작성</DocumentPopup>
                         {c.status === "PENDING_PAYMENT" && (
                           <Link className="btn-primary" href="/mypage/payments">
