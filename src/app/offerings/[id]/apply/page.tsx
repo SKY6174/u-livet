@@ -7,6 +7,8 @@ import type { FinanceConfig } from "@/lib/finance/types";
 import { applyForCourse } from "@/app/actions";
 import { ActionForm } from "@/components/portal/action-form";
 import { PageIntro } from "@/components/portal/ui";
+import { DocumentPopup } from "@/components/instructor-documents/document-popup";
+import { applicationDocumentHref } from "@/lib/learner-documents/model";
 export default async function ApplyPage(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -41,6 +43,7 @@ export default async function ApplyPage(props: {
           <div><dt className="text-sm text-slate-600">수강료</dt><dd className="mt-1 font-semibold">{o.tuition === null ? "별도 안내 확인" : o.tuition === 0 ? "무료" : `${o.tuition.toLocaleString("ko-KR")}원`}</dd></div>
           <div className="sm:col-span-2"><dt className="text-sm text-slate-600">신청기간</dt><dd className="mt-1 font-semibold">{dateTime(o.apply_from)} ~ {dateTime(o.apply_until)}</dd></div>
         </dl>
+        <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary mt-6">이 과정의 수강신청원서 작성</DocumentPopup>
       </section>
       <div className="panel">
         <ActionForm

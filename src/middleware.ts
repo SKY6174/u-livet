@@ -9,7 +9,13 @@ export async function middleware(request: NextRequest) {
       status: 403,
       headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "X-Content-Type-Options": "nosniff" },
     });
-  let response = NextResponse.next({ request });
+  const requestHeaders = new Headers(request.headers);
+  // Overwrite any client-supplied value; the protected layout needs the actual
+  // document address to preserve the selected course through login.
+  requestHeaders.delete("x-u-live-document-return-to");
+  if (request.nextUrl.pathname === "/mypage/documents" || request.nextUrl.pathname.startsWith("/mypage/documents/"))
+    requestHeaders.set("x-u-live-document-return-to", request.nextUrl.pathname + request.nextUrl.search);
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
   const config = getSupabaseConfig();
   if (!config) return response;
   if (!reviewOnly) {
@@ -18,7 +24,8 @@ export async function middleware(request: NextRequest) {
         getAll: () => request.cookies.getAll(),
         setAll(items: { name: string; value: string; options: CookieOptions }[]) {
           items.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
+          requestHeaders.set("cookie", request.cookies.toString());
+          response = NextResponse.next({ request: { headers: requestHeaders } });
           items.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );

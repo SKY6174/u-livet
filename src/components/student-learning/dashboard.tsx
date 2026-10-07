@@ -25,6 +25,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { ActionForm } from "@/components/portal/action-form";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
+import { applicationDocumentHref } from "@/lib/learner-documents/model";
 import { LearningRecordJourney } from "@/components/student-learning/learning-record-journey";
 import { decideApplication } from "@/app/actions";
 import { submitLearningRequest } from "@/app/learning-request-actions";
@@ -637,6 +638,7 @@ export function StudentDashboard({
                         <TextLink href={`/offerings/${c.id}`}>
                           과정 정보
                         </TextLink>
+                        <DocumentPopup href={applicationDocumentHref(c.id)} windowName="learner-documents" className="btn-secondary">수강신청원서 작성</DocumentPopup>
                         {c.status === "PENDING_PAYMENT" && (
                           <Link className="btn-primary" href="/mypage/payments">
                             납부 안내 확인

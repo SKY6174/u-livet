@@ -32,6 +32,8 @@ await test('failed DB guides report partial availability',async()=>{dbError={mes
 await test('connection failure handled and invalid detail IDs not queried',async()=>{throwDb=true;assert.equal((await api.getCourseCatalog()).unavailable,true);assert.equal(await api.getCourseGuide('../bad'),null);throwDb=false;});
 const portalData={modeLabel:{OFFLINE:'대면',ONLINE:'온라인',BLENDED:'혼합'},getCourseIntroduction:async()=>null,dateTime:value=>value??'미기재'};
 const Link=({children,scroll,...props})=>React.createElement('a',props,children);
+const documentModel=load('src/lib/learner-documents/model.ts',{'../auth/registration':load('src/lib/auth/registration.ts')});
+const popup={DocumentPopup:({windowName,children,...props})=>React.createElement('a',props,children)};
 const ui=load('src/components/portal/ui.tsx',{'next/link':Link,'@/lib/portal/data':portalData});
 const catalog=load('src/components/course-guide/catalog.tsx',{'next/link':Link,'@/lib/portal/data':portalData,'@/lib/course-guide/model':model});
 let unavailable=false;
@@ -41,8 +43,9 @@ await test('default cards render all16 links, certificates and admission informa
 await test('list is accessible table with all16 courses and retained form view',async()=>{const html=await render({view:'list'});assert.equal((html.match(/scope="row"/g)??[]).length,16);assert(html.includes('role="region"'));assert(html.includes('name="view" value="list"'));assert(!html.includes('data-course-card'));});
 await test('zero results and partial data are not misleading',async()=>{assert((await render({q:'no-matching-course'})).includes('조건에 맞는'));unavailable=true;assert((await render({})).includes('일부 교육과정을'));unavailable=false;});
 let detail=guides[0];
-const detailPage=load('src/app/courses/[id]/page.tsx',{'next/link':Link,'next/navigation':{notFound:()=>{throw Error('404');}},'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseGuide:async()=>detail,canEditGuide:()=>false},'@/lib/portal/data':portalData,'@/components/portal/ui':ui}).default;
+const detailPage=load('src/app/courses/[id]/page.tsx',{'next/link':Link,'next/navigation':{notFound:()=>{throw Error('404');}},'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseGuide:async()=>detail,canEditGuide:()=>false},'@/lib/portal/data':portalData,'@/components/portal/ui':ui,'@/lib/learner-documents/model':documentModel,'@/components/instructor-documents/document-popup':popup}).default;
 await test('details show pending dates and schedule history without opening admissions',async()=>{const html=renderToStaticMarkup(await detailPage({params:Promise.resolve({id:detail.id})}));assert(html.includes('2026년 12월 예정'));assert(html.includes('일정 변경 안내'));assert(html.includes('관련 자격증 미기재'));assert(!html.includes('/apply'));});
+await test('course detail opens its own application document including guide slug',async()=>{const html=renderToStaticMarkup(await detailPage({params:Promise.resolve({id:detail.id})}));assert(html.includes(`type=application&amp;course=${detail.id}`));assert(html.includes('수강신청원서 작성'));});
 await test('unknown or unpublished details return404',async()=>{detail=null;await assert.rejects(detailPage({params:Promise.resolve({id:'private'})}),/404/);});
 await test('recruitment labels use actual windows and do not invent missing admissions',()=>{
   const c={status:'PUBLISHED',apply_from:'2026-10-07T00:00:00Z',apply_until:'2026-10-08T00:00:00Z'};

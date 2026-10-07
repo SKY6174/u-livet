@@ -1,3 +1,5 @@
+import { formatMobilePhone, normalizeMobilePhone } from "../auth/registration";
+
 export const DOCUMENT_TITLES = {
   application: "수강신청원서",
   scholarship: "학습활동 우수 장학금 지급신청서",
@@ -50,9 +52,21 @@ export type LearnerDocumentValues = {
 export function koreaToday() {
   return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 }
-export function initialValues(name = "", email = "", courseName = "", offeringId = "", tuition: number | null = null): LearnerDocumentValues {
+export type LearnerDocumentProfile = { phone: string; birthDate: string };
+export function applicationDocumentHref(course?: string) {
+  const query = new URLSearchParams({ type: "application" });
+  if (course) query.set("course", course);
+  return `/mypage/documents?${query}`;
+}
+export function learnerDocumentProfile(metadata: Record<string, unknown> = {}, nativePhone?: string): LearnerDocumentProfile {
+  const phone = normalizeMobilePhone(nativePhone?.startsWith("82") ? `+${nativePhone}` : nativePhone)
+    ?? normalizeMobilePhone(metadata.mobile_phone);
+  const birth = typeof metadata.birth_date === "string" ? metadata.birth_date : "";
+  return { phone: phone ? formatMobilePhone(phone) : "", birthDate: birth && validDate(birth) && birth <= koreaToday() ? birth : "" };
+}
+export function initialValues(name = "", email = "", courseName = "", offeringId = "", tuition: number | null = null, profile: Partial<LearnerDocumentProfile> = {}): LearnerDocumentValues {
   const tuitionFee = tuition === null ? "" : String(tuition);
-  return { offeringId, courseName, name, phone: "", gender: "", birthDate: "", email,
+  return { offeringId, courseName, name, phone: profile.phone ?? "", gender: "", birthDate: profile.birthDate ?? "", email,
     address: "", purposes: [], privacy: "", publicity: "", portrait: "",
     residentFront: "", residentBack: "", bank: "", account: "", accountHolder: name,
     homePhone: "", refundOccurrence: "", tuitionFee, deductionAmount: "", refundAmount: "",

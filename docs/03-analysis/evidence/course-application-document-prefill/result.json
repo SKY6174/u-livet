@@ -1,0 +1,33 @@
+{
+  "verifiedAt": "2026-10-07T08:52:17.585Z",
+  "environment": {
+    "project": "uc-life-issues",
+    "api": "http://127.0.0.1:56321",
+    "app": "http://127.0.0.1:3101",
+    "mode": "production"
+  },
+  "guide": "application-test-9fc66a35-1edf-4664-b857-e2981b6aaae2",
+  "secondOffering": "5c2e5c9f-931d-4cb2-89ec-1f8b01f8b357",
+  "saved": {
+    "id": "d19155b5-45ee-4b01-8e3f-f76df5df63d3",
+    "offering_id": "af06cb8b-0c8d-4fd1-860f-996f535d22e2",
+    "person_id": "a052a90e-c1fc-446e-9f30-18afaaf5e4cb",
+    "course_name": "[검증용] 수강신청 DB 연결 · 1기",
+    "applicant_name": "[검증용] 수강생",
+    "status": "RECEIVED",
+    "byte_size": 76356,
+    "pdf_sha256": "38e20d0b4b93400b1e0f6bef480ce6c7fc492d767e6af109b24e5fab91a42339"
+  },
+  "checks": [
+    "비로그인 A 소개 → 실제 팝업 → 로그인 URL에 과정 유지",
+    "실제 로그인 후 A 과정·가입 성명·이메일·휴대전화 자동 입력",
+    "없는 가입 항목·서명·동의는 빈칸이며 팝업 열기만으로 접수되지 않음",
+    "360px 모바일·1440px 데스크톱 원서 입력 및 가로 넘침 없음",
+    "자동 입력된 가입 정보도 직접 수정 가능",
+    "B 모집 과정에서 다시 열면 A 대신 B 과정으로 입력",
+    "기존 신청 화면과 나의 신청 현황에서도 같은 과정 원서 연결",
+    "팝업 차단 시 같은 과정의 새 탭 대체 링크 제공",
+    "실제 원서 제출 → 동일 과정·회원의 DB 접수와 비공개 PDF 조회 확인"
+  ],
+  "limitation": "전용 로컬 최신 DB·합성 회원 검증. 운영 회원의 원서를 제출하지 않음."
+}
