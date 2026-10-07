@@ -63,6 +63,9 @@ export default async function ManageOffering(props: {
       }),
     ]);
   const finance = financeResult.data as FinanceConfig | null;
+  const recruitablePolicies = policies.filter(
+    (policy) => policy.org_id === o.org_id && !policy.title.startsWith("[검증용]"),
+  );
   return (
     <div className="page-shell">
       <CourseHeader
@@ -168,14 +171,19 @@ export default async function ManageOffering(props: {
         <section className="panel mb-8">
           <h2 className="section-title">모집 공개</h2>
           <p className="mb-4 text-sm text-slate-600">
-            과정 내용과 아래 승인 정책을 확인한 뒤 공개하세요. 정책 원문은
-            승인된 버전으로 보존됩니다.
+            과정 내용과 아래 승인 정책을 확인한 뒤 공개하세요. 정책 원문은 승인된 버전으로 보존됩니다.
           </p>
+          <div className="notice mb-6 space-y-2">
+            <p className="font-bold">모집 전에 두 정책을 준비해 주세요.</p>
+            <p>모집·개인정보 수집·이용 안내에는 신청 조건과 개인정보 항목·목적·보유기간·동의 거부 안내를, 수료기준에는 출결·평가·재평가·이의신청 기준을 담습니다.</p>
+            <p>기관 검토 후 승인된 실제 운영용 버전만 선택하세요. 검증용 정책은 모집 공개에 사용할 수 없습니다.</p>
+            <Link className="btn-secondary inline-flex" href={`/admin/policies?org=${o.org_id}`}>정책 초안 작성·승인</Link>
+          </div>
           <p className="mb-4 whitespace-pre-wrap">{o.curriculum}</p>
           <ActionForm action={publishOffering} label="과정 승인·모집 공개">
             <input type="hidden" name="offering" value={o.id} />
             {[
-              ["enrollment_policy", "ENROLLMENT", "모집·수집이용 정책"],
+              ["enrollment_policy", "ENROLLMENT", "모집·개인정보 수집·이용 안내"],
               ["completion_policy", "COMPLETION", "수료기준"],
             ].map(([name, kind, label]) => (
               <label key={name} className="field">
@@ -184,14 +192,17 @@ export default async function ManageOffering(props: {
                   <option value="" disabled>
                     승인 정책 선택
                   </option>
-                  {policies
-                    .filter((p) => p.org_id === o.org_id && p.kind === kind)
+                  {recruitablePolicies
+                    .filter((p) => p.kind === kind)
                     .map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.title} · {p.version}
                       </option>
                     ))}
                 </select>
+                {!recruitablePolicies.some((p) => p.kind === kind) && (
+                  <span className="text-sm text-amber-800">선택할 운영용 승인 정책이 없습니다. 위에서 정책을 먼저 작성·승인하세요.</span>
+                )}
               </label>
             ))}
           </ActionForm>
