@@ -424,7 +424,7 @@ export function StudentDashboard({
     surveys?.filter((s) => !s.submitted_at && !s.closed && s.policy_valid) ??
     [];
   const completed = history?.filter((h) => h.approved_at && !h.stale).length;
-  const recommendations = recommendCourses(catalog.courses, courses);
+  const recommendations = recommendCourses(catalog.courses, courses, 3, now);
   const paid = hub?.scholarships
     .filter((s) => s.paid_on)
     .reduce((sum, s) => sum + s.amount, 0);

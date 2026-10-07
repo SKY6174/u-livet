@@ -10,6 +10,8 @@ supabase db push --linked --project-ref uoebygejgglgiivzgyks --skip-vault --yes
 
 Only that migration was pending; it was applied successfully on 2026-10-07. No data was deleted and no existing account roles were changed. New private history is append-only through checked RPCs; older public rejection calls now require the new reason-bearing RPC. Deployment should follow the migration immediately.
 
+Additional corrections use `20261007110653_learner_document_resolution.sql`, applied after dedicated local acceptance. It makes staff notes optional and resolves application documents on approval, including existing approvals. Blank new guidance preserves the last displayed message and records a blank transition note. Scholarship/refund approvals remain pending until completion. No existing decision, revision or transition history is rewritten. The dashboard and admin alerts share the same rule and refresh after saving.
+
 ## Roles and management paths
 A researcher/admin needs canonical COURSE_MANAGER for the offering's organization for course, application, learner and instructor operations. An office position label does not grant access. Each route and DB RPC checks this scope. Existing SYSTEM_ADMIN manages accounts and their deletion separately; the current administrator has both roles for the main organization.
 
@@ -42,6 +44,10 @@ npm run build
 APPLICATION_TEST_DB_DIR=/tmp/u-livet-issues-db node scripts/verify-application-flow.mjs --production
 APPLICATION_TEST_DB_DIR=/tmp/u-livet-issues-db node scripts/verify-management-flow.mjs
 node scripts/verify-role-navigation.mjs
+APPLICATION_TEST_DB_DIR=/tmp/u-livet-issues-db node scripts/verify-document-resolution.mjs
+node scripts/verify-course-catalog.mjs
+node scripts/verify-learner-home.mjs
+node scripts/verify-student-learning.mjs
 ```
 
 The local script creates its own synthetic data and cannot target production or the user's other local database. Production fixture script is intentionally separate and uses actual Auth for its administrator and learner RPC checks.

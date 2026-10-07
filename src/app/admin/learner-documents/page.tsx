@@ -10,6 +10,7 @@ import {
   DOCUMENT_STATUS_TONES,
   NEXT_DOCUMENT_STATUSES,
   documentDate,
+  isOpenLearnerDocument,
   type LearnerDocumentKind,
   type LearnerDocumentStatus,
 } from "@/lib/learner-document-workflow/types";
@@ -61,7 +62,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
     {params.error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900">{params.error}</p>}
     {!data ? <p role="alert" className="panel">자료를 불러오지 못했습니다. 담당 역할과 추가 인증 상태를 확인해 주세요.</p> : <>
       <section className="grid gap-3 sm:grid-cols-3" aria-label="서류 처리 요약">
-        {[{label:"접수·검토",count:requests.filter(r => ["RECEIVED","REVIEWING"].includes(r.status)).length}, {label:"승인",count:requests.filter(r => r.status === "APPROVED").length}, {label:"완료·종결",count:requests.filter(r => ["COMPLETED","REJECTED","CANCELLED"].includes(r.status)).length}].map(item => <div key={item.label} className="panel"><p className="text-sm text-slate-600">{item.label}</p><p className="mt-2 text-3xl font-bold tabular-nums">{item.count.toLocaleString("ko-KR")}<span className="ml-1 text-sm font-medium text-slate-500">건</span></p></div>)}
+        {[{label:"접수·검토",count:requests.filter(r => ["RECEIVED","REVIEWING"].includes(r.status)).length}, {label:"승인·지급 대기",count:requests.filter(r => r.status === "APPROVED" && isOpenLearnerDocument(r)).length}, {label:"완료·종결",count:requests.filter(r => !isOpenLearnerDocument(r)).length}].map(item => <div key={item.label} className="panel"><p className="text-sm text-slate-600">{item.label}</p><p className="mt-2 text-3xl font-bold tabular-nums">{item.count.toLocaleString("ko-KR")}<span className="ml-1 text-sm font-medium text-slate-500">건</span></p></div>)}
       </section>
       <form method="get" className="panel grid items-end gap-4 sm:grid-cols-2 xl:grid-cols-[auto_minmax(150px,1fr)_minmax(220px,1.5fr)_auto]">
         <fieldset className="min-w-0 sm:col-span-2 xl:col-span-1">
@@ -97,7 +98,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {requests.map((request, index) => {
-                  const nextStatuses = NEXT_DOCUMENT_STATUSES[request.status] ?? [];
+                  const nextStatuses = isOpenLearnerDocument(request) ? NEXT_DOCUMENT_STATUSES[request.status] ?? [] : [];
                   const formId = `document-status-${request.id}`;
                   const rowLabel = `${index + 1}번 ${request.applicant_name} ${DOCUMENT_KIND_LABELS[request.kind]}`;
                   return <tr key={request.id} className="align-top hover:bg-slate-50/60">
@@ -128,7 +129,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                       <p className="truncate leading-6 text-slate-600" title={request.current_note || undefined}>{request.current_note || "등록된 안내가 없습니다."}</p>
                       {nextStatuses.length > 0 && <div className="mt-3">
                         <label htmlFor={`${formId}-note`} className="sr-only">{rowLabel} 새 수강생 안내 내용</label>
-                        <input type="text" id={`${formId}-note`} form={formId} name="note" required maxLength={1000} className={`${rowField} min-h-11`} placeholder="검토 결과와 다음 절차를 입력해 주세요." />
+                        <input type="text" id={`${formId}-note`} form={formId} name="note" maxLength={1000} className={`${rowField} min-h-11`} placeholder="검토 결과와 다음 절차 (선택)" />
                       </div>}
                     </td>
                     <td className="px-3 py-5">

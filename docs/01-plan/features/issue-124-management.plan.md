@@ -19,3 +19,6 @@ Resolve https://github.com/SKY6174/u-livet/issues/124. User authorizes push, PR,
 
 ## Acceptance and release
 Test create/edit/publish/assign/search/review/history/roster/contact scope, duplicate applications, capacity races, stale edits, forbidden transitions, missing reasons and unauthorized URL/RPC access. Verify instructor and member deletion retain referenced course/application history. Record screenshots, migrations and role instructions. Push reviewable PR, pass checks, squash merge, verify exact production revision and health.
+
+## Additional requested corrections
+Before release, hide ended courses from public browsing/recommendations, halve English heading label spacing, make the document staff guidance input optional, and resolve the approved application document still counted as unfinished. Application approval resolves this task; approved scholarship/refund documents remain pending until administrative payment completion. Update guarded DB behavior and existing approved application metadata without changing decisions. Verify the real empty-note approval flow, persisted history and immediately refreshed dashboard counts. Repair the branch-only preview configuration before merge.

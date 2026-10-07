@@ -15,7 +15,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 const ERRORS: Record<string, string> = {
   MFA_REAUTH_REQUIRED: "처리 전에 추가 인증을 다시 완료해 주세요.",
   FORBIDDEN: "이 서류를 처리할 권한이 없습니다.",
-  NOTE_REQUIRED: "수강생에게 보여 줄 처리 안내를 입력해 주세요.",
+  NOTE_TOO_LONG: "수강생 안내는 1,000자 이내로 입력해 주세요.",
   STALE_REVISION: "다른 담당자가 먼저 처리했습니다. 최신 상태를 확인해 주세요.",
   INVALID_TRANSITION: "현재 상태에서 선택할 수 없는 처리 단계입니다.",
   NOT_FOUND: "서류를 찾을 수 없습니다.",
@@ -43,7 +43,6 @@ export async function updateLearnerDocumentStatus(form: FormData) {
     !(nextStatus in DOCUMENT_STATUS_LABELS) ||
     !Number.isInteger(revision) ||
     revision < 1 ||
-    !note ||
     note.length > 1000
   )
     redirect(returnPath(form, "처리 단계와 안내 내용을 확인해 주세요.", false));
@@ -65,6 +64,8 @@ export async function updateLearnerDocumentStatus(form: FormData) {
       ),
     );
   revalidatePath("/admin/learner-documents");
+  revalidatePath("/admin");
+  revalidatePath("/");
   revalidatePath("/mypage/documents");
   redirect(
     returnPath(

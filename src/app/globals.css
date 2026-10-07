@@ -19,8 +19,8 @@
   --radius-panel: 1rem;
   --space-unit: 0.5rem;
   /* Shared tracking for current and future menu/page labels. */
-  --tracking-label: 0.05em;
-  --tracking-label-compact: 0.025em;
+  --tracking-label: 0.025em;
+  --tracking-label-compact: 0.0125em;
   --font-sans:
     "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto,
     sans-serif;

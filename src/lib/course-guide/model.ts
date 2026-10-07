@@ -27,7 +27,25 @@ export type CourseGuideSummary = Omit<CourseGuide,
 export type CatalogCourse = Pick<CourseGuide,
   "id" | "name" | "academy" | "summary" | "mode" | "capacity" | "period_label" | "certificate"
 > & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null; card_image_url: string | null; org_id: string | null;
-  status?: string | null; apply_from?: string | null; apply_until?: string | null };
+  status?: string | null; apply_from?: string | null; apply_until?: string | null; ends_on?: string | null };
+
+export function guideEndDate(period: string, year: number): string | null {
+  const match = period.trim().match(/^(?:(\d{4})[./-])?(\d{1,2})[./-](\d{1,2})(?:\s*[-–—~]\s*(?:(\d{4})[./-])?(\d{1,2})[./-](\d{1,2}))?$/);
+  if (!match) return null;
+  const startYear = Number(match[1] ?? year);
+  const startMonth = Number(match[2]);
+  const month = Number(match[5] ?? match[2]);
+  const day = Number(match[6] ?? match[3]);
+  const endYear = match[4] ? Number(match[4]) : startYear + Number(month < startMonth);
+  const date = `${endYear}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const parsed = Date.parse(date);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString().slice(0, 10) === date ? date : null;
+}
+
+export function courseIsUpcoming(course: Pick<CatalogCourse, "status" | "ends_on">, now = Date.now()) {
+  const today = new Date(now + 9 * 3600000).toISOString().slice(0, 10);
+  return course.status !== "ARCHIVED" && (!course.ends_on || course.ends_on >= today);
+}
 
 export function recruitmentLabel(course: Pick<CatalogCourse, "status" | "apply_from" | "apply_until">, now = Date.now()) {
   if (course.status === "ARCHIVED") return "운영 완료";
@@ -57,6 +75,7 @@ export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSumm
       const offering = guide.offering_id ? offeringById.get(guide.offering_id) : null;
       return { ...guide, offeringId: guide.offering_id, tuition: offering?.tuition ?? null,
         status: offering?.status ?? null, apply_from: offering?.apply_from ?? null, apply_until: offering?.apply_until ?? null,
+        ends_on: offering?.ends_on ?? guideEndDate(guide.period_label, guide.year),
         href: `/courses/${guide.id}` };
     }),
     ...offerings.filter((offering) => !linked.has(offering.id)).map((offering) => ({
@@ -66,9 +85,9 @@ export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSumm
     })),
   ];
 }
-export function filterCatalog(courses: CatalogCourse[], filters: ReturnType<typeof catalogFilters>) {
+export function filterCatalog(courses: CatalogCourse[], filters: ReturnType<typeof catalogFilters>, now = Date.now()) {
   const q = filters.q.toLocaleLowerCase("ko-KR").replace(/\s+/g, "");
-  return courses.filter((course) => (!filters.mode || course.mode === filters.mode) &&
+  return courses.filter((course) => courseIsUpcoming(course, now) && (!filters.mode || course.mode === filters.mode) &&
     (!q || `${course.name} ${course.summary} ${course.academy} ${course.certificate ?? ""}`
       .toLocaleLowerCase("ko-KR").replace(/\s+/g, "").includes(q)));
 }

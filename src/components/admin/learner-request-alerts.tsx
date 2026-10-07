@@ -6,13 +6,13 @@ import {
   DOCUMENT_STATUS_LABELS,
   DOCUMENT_STATUS_TONES,
   documentDate,
+  isOpenLearnerDocument,
   type LearnerDocumentAdminContext,
   type LearnerDocumentKind,
   type LearnerDocumentRequest,
 } from "@/lib/learner-document-workflow/types";
 
 const REQUEST_KINDS: LearnerDocumentKind[] = ["APPLICATION", "SCHOLARSHIP", "REFUND"];
-const OPEN_STATUSES = new Set(["RECEIVED", "REVIEWING", "APPROVED"]);
 
 export function LearnerRequestAlerts({ data }: { data: LearnerDocumentAdminContext | null }) {
   if (!data) {
@@ -30,7 +30,7 @@ export function LearnerRequestAlerts({ data }: { data: LearnerDocumentAdminConte
     );
   }
 
-  const openRequests = data.requests.filter((request) => OPEN_STATUSES.has(request.status));
+  const openRequests = data.requests.filter(isOpenLearnerDocument);
   const recentRequests = openRequests.slice(0, 5);
 
   return (
