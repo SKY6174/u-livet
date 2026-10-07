@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarDays, LayoutGrid, List, Search } from "lucide-react";
+import { ArrowUpRight, CalendarDays, LayoutGrid, List, Search } from "lucide-react";
 import { type OperationCourse, type WorkbookSummary } from "@/lib/course-budget/model";
 import { BudgetPanel } from "./budget-panel";
 
@@ -15,13 +15,15 @@ const STATE_TONES: Record<string, string> = {
 const stateTone = (c: OperationCourse) => STATE_TONES[status(c)] ?? STATE_TONES.DRAFT;
 const status = (c: OperationCourse) => c.workspace?.status ?? "DRAFT";
 const stateLabel = (c: OperationCourse) => ({ DRAFT: "개설 준비", ARCHIVED: "운영 완료·보관", PUBLISHED: "모집 공개", CLOSED: "모집 종료" })[status(c)] ?? "개설 준비";
+const COURSE_ACTION_CLASS = "relative inline-flex min-h-11 items-center justify-center rounded-xl border border-teal-200 bg-teal-50 py-2 pl-3 pr-8 text-center text-sm font-semibold text-teal-900 transition-colors hover:border-teal-300 hover:bg-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2";
+const COURSE_ACTION_ICON = <ArrowUpRight size={14} aria-hidden="true" className="absolute right-2 top-2 text-teal-700" />;
 function CourseActions({ course: c, manager, org }: { course: OperationCourse; manager: boolean; org: string }) {
-  return <div className="flex flex-wrap gap-3 text-sm font-semibold text-teal-800">
-    {manager && (c.workspace ? <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}`}>과정 정보 관리 →</Link> : c.source_id && <Link className="hover:underline" href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>과정 개설 준비 →</Link>)}
-    {manager && c.workspace && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>강사 배정 →</Link>}
-    {manager && c.workspace && <Link className="hover:underline" href={`/operation-documents/${c.workspace.id}/plan`}>운영계획서 작성 →</Link>}
-    <Link className="hover:underline" href={`/courses/${c.id}`}>수강생 화면 보기</Link>
-    {manager && c.workspace?.report_revision && <Link className="hover:underline" href={`/admin/offerings/${c.workspace.id}/reports`}>증빙·지급자료</Link>}
+  return <div role="group" aria-label={`${c.name} 관리 메뉴`} className="flex flex-wrap gap-2">
+    {manager && (c.workspace ? <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}`}>과정 정보 관리{COURSE_ACTION_ICON}</Link> : c.source_id && <Link className={COURSE_ACTION_CLASS} href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>과정 개설 준비{COURSE_ACTION_ICON}</Link>)}
+    {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>강사 배정{COURSE_ACTION_ICON}</Link>}
+    {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/operation-documents/${c.workspace.id}/plan`}>운영계획서 작성{COURSE_ACTION_ICON}</Link>}
+    <Link className={COURSE_ACTION_CLASS} href={`/courses/${c.id}`}>수강생 화면 보기{COURSE_ACTION_ICON}</Link>
+    {manager && c.workspace?.report_revision && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/reports`}>증빙·지급자료{COURSE_ACTION_ICON}</Link>}
   </div>;
 }
 type OrganizationOption = { id: string; name: string };

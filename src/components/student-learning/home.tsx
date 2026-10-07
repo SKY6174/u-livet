@@ -5,6 +5,7 @@ import { courseAttendance, nextClass, recommendCourses } from "@/lib/student-lea
 import { dateTime, modeLabel } from "@/lib/portal/data";
 import type { LearningCourse } from "@/lib/student-learning/types";
 import type { getLearnerHomeData } from "@/lib/student-learning/data";
+import { InstructorNames } from "@/components/portal/instructor-names";
 
 type LearnerHomeData = Awaited<ReturnType<typeof getLearnerHomeData>>;
 
@@ -90,7 +91,8 @@ export function LearnerHome({ data, current }: { data: LearnerHomeData; current:
                   <span className="text-slate-500">{course.academy} · {modeLabel[course.mode]}</span>
                 </div>
                 <h3 className="mt-4 text-xl font-bold text-slate-900">{course.name}</h3>
-                <p className="mt-2 text-sm text-slate-600">{course.instructors.join(" · ") || "강사 배정 안내 예정"} · {course.starts_on} ~ {course.ends_on}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600"><InstructorNames instructors={course.instructor_roster ?? course.instructors.map((name) => ({ name, responsible: false }))} /></p>
+                <p className="mt-1 text-sm text-slate-600">{course.starts_on} ~ {course.ends_on}</p>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-xl bg-slate-50 p-4">
                     <p className="flex items-center gap-2 text-xs font-semibold text-slate-600"><CalendarDays className="h-4 w-4 text-teal-700" aria-hidden="true" /> 다음 수업</p>

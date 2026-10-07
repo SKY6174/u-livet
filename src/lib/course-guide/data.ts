@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getCourseCards } from "@/lib/portal/data";
+import { getCourseCards, getCourseInstructorNames } from "@/lib/portal/data";
 import type { Identity } from "@/lib/portal/types";
 import { formatGuideSchedule, guidePeriodLabel, mergeCatalog, parseGuideSchedule, type CourseGuide, type CourseGuideSummary } from "./model";
 
@@ -17,8 +17,12 @@ async function getGuides() {
 }
 export async function getCourseCatalog() {
   const [guides, offerings] = await Promise.all([getGuides(), getCourseCards()]);
+  const names = await getCourseInstructorNames(offerings.offerings.map((offering) => offering.id));
   return {
-    courses: mergeCatalog(guides.guides, offerings.offerings),
+    courses: mergeCatalog(guides.guides, offerings.offerings).map((course) => ({
+      ...course,
+      instructors: !course.offeringId ? [] : names === null ? null : names[course.offeringId] ?? [],
+    })),
     unavailable: guides.unavailable || offerings.unavailable,
   };
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getCourseIntroduction,
+  getCourseInstructorNames,
   getPolicies,
   dateTime,
   modeLabel,
@@ -13,6 +14,7 @@ import { ScholarshipNotice } from "@/components/portal/scholarship-notice";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
 import { parseCourseCurriculum } from "@/lib/course-workspace/curriculum";
+import { InstructorNames } from "@/components/portal/instructor-names";
 export default async function OfferingPage(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -21,22 +23,18 @@ export default async function OfferingPage(props: {
   if (!o) notFound();
   const curriculum = parseCourseCurriculum(o.curriculum);
   const db = await createServerSupabaseClient();
-  const [policies, enrollmentPolicies, { data: offeringPolicy }, { data: financeData }, { data: instructorData }] =
+  const [policies, enrollmentPolicies, { data: offeringPolicy }, { data: financeData }, instructorNames] =
     await Promise.all([
       getPolicies(undefined, o.completion_policy_id),
       getPolicies("ENROLLMENT"),
       db.from("life_offerings").select("enrollment_policy_id").eq("id", o.id).maybeSingle(),
       o.status === "ARCHIVED" ? { data: null } : db.rpc("life_offering_finance", { f: o.id }),
-      o.status === "ARCHIVED" ? { data: [] } : db.rpc("life_public_instructors", { f: o.id }),
+      getCourseInstructorNames([o.id]),
     ]);
   const completion = policies.find((p) => p.id === o.completion_policy_id && !p.title.startsWith("[검증용]"));
   const enrollment = enrollmentPolicies.find((p) => p.id === offeringPolicy?.enrollment_policy_id);
   const finance = financeData as FinanceConfig | null;
-  const instructors = (instructorData ?? []) as {
-    name: string;
-    specialty: string;
-    introduction: string;
-  }[];
+  const instructors = instructorNames === null ? null : instructorNames[o.id] ?? [];
   const open =
     o.status === "PUBLISHED" &&
     !!o.apply_from && !!o.apply_until &&
@@ -64,24 +62,9 @@ export default async function OfferingPage(props: {
             <h2 className="section-title">준비사항</h2>
             <p className="whitespace-pre-wrap">{curriculum.preparation}</p>
           </section>}
-          {!!instructors.length && (
-            <section className="panel">
-              <h2 className="section-title">함께하는 강사</h2>
-              <div className="space-y-5">
-                {instructors.map((teacher, i) => (
-                  <article key={i}>
-                    <h3 className="font-bold">{teacher.name}</h3>
-                    <p className="mt-1 text-sm text-teal-800">
-                      {teacher.specialty}
-                    </p>
-                    <p className="mt-3 whitespace-pre-wrap">
-                      {teacher.introduction}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </section>
-          )}
+          <section className="panel" aria-label="강사 안내">
+            <InstructorNames instructors={instructors} />
+          </section>
           <section className="panel">
             <h2 className="section-title">수료 안내</h2>
             {completion && <p className="mb-2 text-sm text-slate-500">{completion.title} · {completion.version}</p>}

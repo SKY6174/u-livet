@@ -373,6 +373,7 @@ assert.equal(pub.length, 1);
 assert.deepEqual(Object.keys(pub[0]).sort(), [
   "introduction",
   "name",
+  "responsible",
   "specialty",
 ]);
 assert(!JSON.stringify(pub).includes("LOCAL-PRIVATE"));

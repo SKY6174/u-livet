@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { ArrowUpRight, Award, BookOpen } from "lucide-react";
 import { canEditGuide, getCourseGuide } from "@/lib/course-guide/data";
 import { getSessionIdentity } from "@/lib/auth/session";
-import { dateTime, getCourseIntroduction, getPolicies, modeLabel } from "@/lib/portal/data";
+import { dateTime, getCourseIntroduction, getCourseInstructorNames, getPolicies, modeLabel } from "@/lib/portal/data";
+import { InstructorNames } from "@/components/portal/instructor-names";
 import { PageIntro } from "@/components/portal/ui";
 import { ScholarshipNotice } from "@/components/portal/scholarship-notice";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
@@ -13,9 +14,10 @@ import { applicationDocumentHref } from "@/lib/learner-documents/model";
 export default async function CourseGuidePage({ params }: { params: Promise<{ id: string }> }) {
   const course = await getCourseGuide((await params).id);
   if (!course) notFound();
-  const [offering, identity] = await Promise.all([
+  const [offering, identity, names] = await Promise.all([
     course.offering_id ? getCourseIntroduction(course.offering_id) : Promise.resolve(null),
     getSessionIdentity(),
+    getCourseInstructorNames(course.offering_id ? [course.offering_id] : []),
   ]);
   const completion = offering?.completion_policy_id
     ? (await getPolicies("COMPLETION", offering.completion_policy_id))
@@ -52,6 +54,7 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
         </div>
         <aside className="panel order-1 lg:order-2">
           <h2 className="section-title">교육 안내</h2>
+          <p className="mb-5 text-sm leading-6 text-slate-700"><InstructorNames instructors={names === null ? null : names[course.offering_id ?? ""] ?? []} /></p>
           <dl className="space-y-5 text-sm">{information.map(([label, value]) => <div key={label}><dt className="text-slate-500">{label}</dt><dd className="mt-1.5 whitespace-pre-line font-medium leading-6 text-slate-900">{value}</dd></div>)}</dl>
           <DocumentPopup href={applicationDocumentHref(course.id)} windowName="learner-documents" className="btn-primary mt-4 w-full justify-center">수강신청원서 작성</DocumentPopup>
           {offering && <Link href={`/offerings/${offering.id}`} className="btn-secondary mt-4 w-full justify-center gap-2">{offering.status === "ARCHIVED" ? "지난 운영 과정 보기" : "수강신청 안내 확인"}<ArrowUpRight size={16} aria-hidden="true" /></Link>}

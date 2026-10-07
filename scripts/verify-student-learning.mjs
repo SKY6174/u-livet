@@ -222,9 +222,11 @@ await test("learning data loads own approved documents and preserves document-qu
   assert.equal((await learningData.getStudentLearning()).documents, null);
   documentResponse = { data: [approvedDocument], error: null };
 });
+const instructorNames = load("src/components/portal/instructor-names.tsx");
 const Dashboard = load("src/components/student-learning/dashboard.tsx", {
   "next/link": "a",
   "@/components/navigation/menu-hint": menuHint,
+  "@/components/portal/instructor-names": instructorNames,
   "@/components/instructor-documents/document-popup": {
     DocumentPopup: ({ children, href }) => React.createElement("a", { href }, children),
   },

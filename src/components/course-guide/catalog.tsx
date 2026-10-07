@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowUpRight, Award, CalendarDays, Clock3, HeartPulse, Lightbulb, Sparkles, Users } from "lucide-react";
 import { recruitmentLabel, type CatalogCourse } from "@/lib/course-guide/model";
 import { dateTime, modeLabel } from "@/lib/portal/data";
+import { InstructorNames } from "@/components/portal/instructor-names";
 
 function academyStyle(academy: string) {
   if (academy.startsWith("라이프케어")) return { Icon: HeartPulse, badge: "bg-teal-50 text-teal-800", accent: "bg-teal-600" };
@@ -22,6 +23,7 @@ export function GuideCard({ course: c, index, canEdit = false }: { course: Catal
         </div>
         <h2 className="break-words text-xl font-bold leading-snug tracking-tight text-slate-900 group-hover:text-teal-800">{c.name}</h2>
         <p className="mt-3"><span className="badge">{recruitmentLabel(c)}</span></p>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600"><InstructorNames instructors={c.instructors} /></p>
         <p className="mt-3 text-base leading-relaxed text-slate-600">{c.summary}</p>
         <dl className="mt-5 space-y-4 border-t border-slate-100 pt-4 text-base text-slate-600">
           <div><dt className="mb-1 flex items-center gap-2 text-sm"><CalendarDays size={18} aria-hidden="true" />교육기간</dt><dd className="tabular-nums font-medium text-slate-800">{c.period_label}</dd></div>
@@ -56,7 +58,7 @@ export function GuideList({ courses, editableOrgs = [] }: { courses: CatalogCour
         <tbody className="divide-y divide-slate-100">{courses.map((c, index) => (
           <tr key={c.id} className="transition hover:bg-teal-50/40">
             <td className="px-5 py-5 tabular-nums text-slate-400">{String(index + 1).padStart(2, "0")}</td>
-            <th scope="row" className="max-w-xs px-5 py-5 font-normal"><span className={`mb-2 inline-block rounded px-2 py-0.5 text-sm font-medium ${academyStyle(c.academy).badge}`}>{c.academy}</span><Link href={c.href} className="block break-words font-semibold text-slate-900 hover:text-teal-800 hover:underline">{c.name}</Link><span className="badge mt-2">{recruitmentLabel(c)}</span></th>
+            <th scope="row" className="max-w-xs px-5 py-5 font-normal"><span className={`mb-2 inline-block rounded px-2 py-0.5 text-sm font-medium ${academyStyle(c.academy).badge}`}>{c.academy}</span><Link href={c.href} className="block break-words font-semibold text-slate-900 hover:text-teal-800 hover:underline">{c.name}</Link><span className="badge mt-2">{recruitmentLabel(c)}</span><p className="mt-2 text-sm text-slate-600"><InstructorNames instructors={c.instructors} /></p></th>
             <td className="whitespace-nowrap px-5 py-5 text-slate-600">{c.period_label}</td>
             <td className="max-w-xs px-5 py-5 text-slate-600"><p>{c.apply_from && c.apply_until ? `${dateTime(c.apply_from)} ~ ${dateTime(c.apply_until)}` : "별도 모집 안내 확인"}</p><p className="mt-2 font-semibold">{c.tuition === null ? "비용 확인 필요" : c.tuition === 0 ? "무료" : `${c.tuition.toLocaleString("ko-KR")}원`}</p></td>
             <td className="whitespace-nowrap px-5 py-5 text-slate-600">{modeLabel[c.mode]}</td>
