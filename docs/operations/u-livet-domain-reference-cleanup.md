@@ -17,4 +17,7 @@
 
 ## 확인 사항
 
-배포 후 새 스테이징의 HTTPS·보호 상태, 이전 스테이징 주소의 경로·쿼리 보존, 새 스테이징 Google OAuth 시작 요청, 운영 robots·사이트맵 응답을 확인한다. 실제 사용자 Google 로그인 완료는 사용자 계정의 인증 절차가 필요하다.
+- 스테이징 재배포 `dpl_GFJHHGzHLicfdF7HwSwQknZrDWdH`는 Ready이며 `staging.u-livet.org`가 해당 배포로 연결됐다. `/api/version`은 Preview revision `db849bb32668b9874f96982985f8bd4c4722e8f3`을 반환했다. 로그인 페이지의 익명 요청은 기존 Vercel SSO 보호 화면으로 이동한다.
+- 옛 스테이징 주소 두 곳에서 `/courses?source=old`의 경로·쿼리를 유지하며 새 주소로 각각 308·301 이동하는 것을 확인했다. `u-live.org`, `www.u-live.org`는 새 운영 주소로 308 이동한다.
+- 새 `redirect_to`를 포함한 Supabase Google OAuth 시작 요청이 Google 인증 페이지로 302 이동하는 것을 확인했다. 실제 사용자 로그인 완료는 계정 인증 절차가 필요하다.
+- PR #142 병합 커밋 `8c0a2eac805675b898ddd7431353f95bd7238336`의 운영 배포가 Ready이며 `/api/version`의 revision과 일치한다. 운영 `robots.txt`는 `https://u-livet.org/sitemap.xml`을 가리키고 실제 사이트맵의 URL도 새 도메인을 사용한다.
