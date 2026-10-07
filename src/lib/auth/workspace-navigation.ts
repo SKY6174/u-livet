@@ -31,6 +31,9 @@ export function officeSections(member: Member) {
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
       ] : []),
+      ...(manager ? [
+        { label: "모집·수료 정책", href: "/admin/policies", description: "모집 안내와 수료기준의 문안을 작성하고 승인된 버전을 관리합니다." },
+      ] : []),
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "운영계획서", href: "/operation-documents/plan", description: "책임강사 작성, 담당자 예산 검토와 최종 제출" },
       ] : []),
@@ -72,7 +75,7 @@ export function officeActiveHref(path: string) {
   if (within(path, "/operation-documents/result") || /^\/operation-documents\/[^/]+\/result(?:\/|$)/.test(path)) return "/operation-documents/result";
   if (within(path, "/operation-documents")) return "/operation-documents/plan";
   if (within(path, "/admin/reports") || /^\/admin\/offerings\/[^/]+\/reports(?:\/|$)/.test(path)) return "/operation-documents/result";
-  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/development", "/admin/monitoring", "/admin/instructors", "/admin/applications", "/admin/learners", "/admin/parking", "/admin/learner-documents"])
+  for (const href of ["/completion", "/credentials", "/finance", "/performance", "/admin/accounts", "/admin/development", "/admin/policies", "/admin/monitoring", "/admin/instructors", "/admin/applications", "/admin/learners", "/admin/parking", "/admin/learner-documents"])
     if (within(path, href)) return href;
   return path === "/admin" ? "/admin" : "/admin/courses";
 }

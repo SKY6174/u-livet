@@ -18,13 +18,16 @@ export default async function OfferingPage(props: {
   const o = await getCourseIntroduction(params.id);
   if (!o) notFound();
   const db = await createServerSupabaseClient();
-  const [policies, { data: financeData }, { data: instructorData }] =
+  const [policies, enrollmentPolicies, { data: offeringPolicy }, { data: financeData }, { data: instructorData }] =
     await Promise.all([
       getPolicies(undefined, o.completion_policy_id),
+      getPolicies("ENROLLMENT"),
+      db.from("life_offerings").select("enrollment_policy_id").eq("id", o.id).maybeSingle(),
       o.status === "ARCHIVED" ? { data: null } : db.rpc("life_offering_finance", { f: o.id }),
       o.status === "ARCHIVED" ? { data: [] } : db.rpc("life_public_instructors", { f: o.id }),
     ]);
   const completion = policies.find((p) => p.id === o.completion_policy_id);
+  const enrollment = enrollmentPolicies.find((p) => p.id === offeringPolicy?.enrollment_policy_id);
   const finance = financeData as FinanceConfig | null;
   const instructors = (instructorData ?? []) as {
     name: string;
@@ -70,10 +73,18 @@ export default async function OfferingPage(props: {
           )}
           <section className="panel">
             <h2 className="section-title">수료 안내</h2>
+            {completion && <p className="mb-2 text-sm text-slate-500">{completion.title} · {completion.version}</p>}
             <p className="whitespace-pre-wrap">
               {completion?.body ?? "수료기준을 확인 중입니다."}
             </p>
           </section>
+          {enrollment && (
+            <section className="panel">
+              <h2 className="section-title">모집·개인정보 수집·이용 안내</h2>
+              <p className="mb-2 text-sm text-slate-500">{enrollment.title} · {enrollment.version}</p>
+              <p className="whitespace-pre-wrap">{enrollment.body}</p>
+            </section>
+          )}
         </div>
         <aside className="panel order-1 space-y-5 lg:order-2" aria-label="신청에 필요한 정보">
           <h2 className="section-title">수강신청 안내</h2>
