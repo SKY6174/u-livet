@@ -91,7 +91,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
               <colgroup>{[3.5, 16.5, 10, 10, 12, 9.5, 15.5, 10.5, 12.5].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
               <thead className="border-b border-slate-200 bg-slate-50 text-slate-700">
                 <tr>
-                  {["순번", "과정", "신청자", "신청시각", "처리 결과", "처리자", "수강생 안내 내용", "첨부문서", "비고"].map(label => (
+                  {["순번", "과정", "신청자", "신청시각", "처리 결과", "승인자", "수강생 안내 내용", "첨부문서", "비고"].map(label => (
                     <th key={label} scope="col" className={`px-3 py-4 font-semibold ${label === "순번" ? "text-center" : ""}`}>
                       {label}{label === "신청자" && <span className="mt-1 block text-xs font-normal text-slate-500">성명 · 전화번호</span>}
                     </th>
