@@ -36,12 +36,12 @@ export async function ResponsibleInstructorSection({ offeringId }: { offeringId:
     <section className="panel mb-8 scroll-mt-6" id="instructors">
       <h2 className="section-title">강사 배정 · 책임강사 지정</h2>
       <p className="mb-5 text-sm leading-relaxed text-slate-600">
-        먼저 승인된 강사를 기수에 배정하고, 그중 한 명을 책임강사로 지정하세요.
+        먼저 승인된 강사를 이번 개설 과정에 배정하고, 그중 한 명을 책임강사로 지정하세요.
         이 지정은 운영계획서와 운영결과보고서의 작성 권한·표지에 함께 적용됩니다.
       </p>
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
-          <h3 className="font-semibold">1. 기수 강사 배정</h3>
+          <h3 className="font-semibold">1. 이번 과정 강사 배정</h3>
           {instructorsResult.error ? (
             <p role="alert" className="mt-3 text-sm text-red-700">강사 목록을 불러오지 못했습니다.</p>
           ) : instructors.length === 0 ? (
@@ -74,7 +74,7 @@ export async function ResponsibleInstructorSection({ offeringId }: { offeringId:
                 );
                 })}
               </div>
-              {available.length > 0 && <ActionForm action={assignInstructor} label="기수에 배정" resetOnSuccess={false} className="space-y-3">
+              {available.length > 0 && <ActionForm action={assignInstructor} label="강사 배정" resetOnSuccess={false} submitAlign="right" className="space-y-3">
                 <input type="hidden" name="offering" value={offeringId} />
                 <input type="hidden" name="enabled" value="true" />
                 <label className="field">
@@ -98,11 +98,11 @@ export async function ResponsibleInstructorSection({ offeringId }: { offeringId:
             <>
               <p className="mt-2 text-sm">현재 책임강사: <strong>{responsible?.name ?? "미지정"}</strong></p>
               {candidates.length ? (
-                <ActionForm key={responsible?.revision ?? 0} action={assignResponsibleInstructor} label="책임강사 저장" resetOnSuccess={false} className="mt-4 space-y-3">
+                <ActionForm key={responsible?.revision ?? 0} action={assignResponsibleInstructor} label="책임강사 저장" resetOnSuccess={false} submitAlign="right" className="mt-4 space-y-3">
                   <input type="hidden" name="offering" value={offeringId} />
                   <input type="hidden" name="revision" value={responsible?.revision ?? 0} />
                   <label className="field">
-                    이 기수에 배정된 활성 강사
+                    이번 과정에 배정된 활성 강사
                     <select name="person" defaultValue={hasCurrentCandidate ? responsible?.person_id : ""} required>
                       <option value="" disabled>책임강사 선택</option>
                       {candidates.map((candidate) => <option key={candidate.id} value={candidate.id}>

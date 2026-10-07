@@ -37,6 +37,7 @@ export function ActionForm({
   botProtection,
   resetOnSuccess = true,
   className = "space-y-4",
+  submitAlign = "left",
 }: {
   action: (state: ActionState, form: FormData) => Promise<ActionState>;
   children?: React.ReactNode;
@@ -45,6 +46,7 @@ export function ActionForm({
   botProtection?: BotProtection;
   resetOnSuccess?: boolean;
   className?: string;
+  submitAlign?: "left" | "right";
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const pathname = usePathname();
@@ -98,11 +100,13 @@ export function ActionForm({
           onReady={setBotReady}
         />
       )}
-      <Submit
-        label={remaining ? `${remaining}초 후 다시 시도` : label}
-        disabled={blocked}
-        pending={pending}
-      />
+      <div className={submitAlign === "right" ? "flex justify-end" : undefined}>
+        <Submit
+          label={remaining ? `${remaining}초 후 다시 시도` : label}
+          disabled={blocked}
+          pending={pending}
+        />
+      </div>
       {!!state.retryAfter && (
         <p className="text-base text-slate-600">
           {remaining
