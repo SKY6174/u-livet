@@ -30,6 +30,8 @@ const common = {
   '@/app/actions': {},
   '@/components/portal/action-form': { ActionForm: component },
   '@/components/portal/ui': { PageIntro: component, Empty: component },
+  '@/components/classroom/class-questions': { ClassQuestions: component },
+  '@/lib/classroom-questions/data': { getClassQuestions: async () => [] },
 };
 let checks = 0;
 async function test(name, fn) { await fn(); checks++; console.log(`PASS ${name}`); }
@@ -106,21 +108,22 @@ async function management({ role = 'COURSE_MANAGER', failure = false } = {}) {
     started.add(name); if (started.size === expected) release();
     await barrier; return result;
   }
-  const courseRow = { id: course, org_id: org, name: 'Own course' };
+  const courseRow = { id: course, org_id: org, name: 'Own course', year_label: '2026년' };
   const Page = load('src/app/admin/courses/page.tsx', { ...common,
     '@/lib/auth/session': { requireIdentity: async () => ({ roles: [{ role, org_id: org }] }) },
     '@/lib/auth/workspace-navigation': { courseOperationLinks: [] },
     '@/lib/course-workspace/data': { getCourseWorkspaces: () => begin('workspace', { courses: [courseRow, { id: other, org_id: other }], unavailable: failure }) },
     '@/lib/course-budget/data': { getCourseBudgets: (id, rows) => {
       assert.equal(id, org); assert.deepEqual(rows, []);
-      return begin('budget', { courses: [{ offering_id: course }, { offering_id: other }], workbooks: [], unavailable: false });
+      return begin('budget', { courses: [{ offering_id: course, current_responsible_name: 'Current instructor' }, { offering_id: other }], workbooks: [], unavailable: false });
     } },
     '@/lib/course-budget/model': { mergeOperationCourses },
     '@/lib/supabase/server': { createServerSupabaseClient: async () => ({
-      rpc: name => { assert.equal(name, 'life_operation_list'); return begin('responsibility', { data: [], error: null }); },
-      from: name => { assert.equal(name, 'life_project_years'); return { select: fields => {
-        assert.equal(fields, 'id,org_id,label'); return { in: (field, ids) => {
-          assert.equal(field, 'org_id'); assert.deepEqual(ids, [org]); return begin('years', { data: [] });
+      rpc: () => { throw Error('Full operation list must not be requested'); },
+      from: name => { assert(['life_project_years', 'life_organizations'].includes(name)); return { select: fields => {
+        assert.equal(fields, name === 'life_project_years' ? 'id,org_id,label' : 'id,name'); return { in: (field, ids) => {
+          assert.equal(field, name === 'life_project_years' ? 'org_id' : 'id'); assert.deepEqual(ids, [org]);
+          return begin(name, { data: name === 'life_organizations' ? [{ id: org, name: 'Own organization' }] : [] });
         } };
       } }; },
     }) },
@@ -140,6 +143,7 @@ async function management({ role = 'COURSE_MANAGER', failure = false } = {}) {
     if (failure) { assert(html.includes('과정 정보를 불러오지 못했습니다')); assert.equal(dashboard, undefined); }
     else {
       assert.equal(dashboard.courses[0].workspace?.id ?? null, role === 'COURSE_MANAGER' ? course : null);
+      assert.equal(dashboard.courses[0].current_responsible_name, 'Current instructor');
       assert.equal(dashboard.courses[1].workspace, null, 'Do not combine another organization');
       assert.equal(dashboard.manager, role === 'COURSE_MANAGER');
     }

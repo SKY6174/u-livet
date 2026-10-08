@@ -204,7 +204,7 @@ await test('unconfigured DB produces the existing failure state', async () => {
 // Barrier: sequential awaits deadlock this test; all independent reads must start.
 for (const apply of [false, true]) {
   await test(`${apply ? 'application' : 'detail'} independent reads start concurrently`, async () => {
-    const expected = apply ? 2 : 3;
+    const expected = apply ? 2 : 5;
     let started = 0;
     let release;
     const barrier = new Promise(resolve => { release = resolve; });
@@ -213,9 +213,14 @@ for (const apply of [false, true]) {
       'next/link': () => null,
       'next/navigation': { notFound: () => { throw new Error('Unexpected 404'); } },
       '@/lib/auth/session': { requireIdentity: async () => ({ id: 'synthetic' }) },
-      '@/lib/portal/data': { ...data, getOffering: async () => fixtures[2], getCourseIntroduction: async () => fixtures[2], getPolicies: () => wait([]) },
-      '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: () => wait({ data: null }) }) },
+      '@/lib/portal/data': { ...data, getOffering: async () => fixtures[2], getCourseIntroduction: async () => fixtures[2], getPolicies: () => wait([]), getCourseInstructorNames: () => wait({}) },
+      '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: () => wait({ data: null }), from: () => ({ select: () => ({ eq: () => ({ maybeSingle: () => wait({ data: null }) }) }) }) }) },
       '@/components/portal/ui': { PageIntro: () => null },
+      '@/components/portal/scholarship-notice': { ScholarshipNotice: () => null },
+      '@/components/instructor-documents/document-popup': { DocumentPopup: () => null },
+      '@/lib/learner-documents/model': { applicationDocumentHref: () => '/' },
+      '@/lib/course-workspace/curriculum': { parseCourseCurriculum: () => [] },
+      '@/components/portal/instructor-names': { InstructorNames: () => null },
       '@/components/portal/action-form': { ActionForm: () => null },
       '@/app/actions': { applyForCourse: async () => ({}) },
     }).default;
@@ -240,9 +245,14 @@ await test('archived card and detail show completed status without application o
   const Detail = load('src/app/offerings/[id]/page.tsx', {
     'next/link': { default: Link },
     'next/navigation': { notFound: () => { throw new Error('Unexpected 404'); } },
-    '@/lib/portal/data': { ...data, getCourseIntroduction: async () => archive, getPolicies: async () => [] },
-    '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: () => { throw new Error('Archive queried private auxiliary data'); } }) },
+    '@/lib/portal/data': { ...data, getCourseIntroduction: async () => archive, getPolicies: async () => [], getCourseInstructorNames: async () => ({}) },
+    '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: () => { throw new Error('Archive queried private auxiliary data'); }, from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }) }) }) },
     '@/components/portal/ui': ui,
+    '@/components/portal/scholarship-notice': { ScholarshipNotice: () => null },
+    '@/components/instructor-documents/document-popup': { DocumentPopup: () => null },
+    '@/lib/learner-documents/model': { applicationDocumentHref: () => '/' },
+    '@/lib/course-workspace/curriculum': { parseCourseCurriculum: () => [] },
+    '@/components/portal/instructor-names': { InstructorNames: () => null },
   }).default;
   const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: archive.id }) }));
   assert(html.includes('운영이 완료된 과정입니다.'));

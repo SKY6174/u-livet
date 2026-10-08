@@ -34,7 +34,6 @@ export function OperationsDashboard({
   workbooks,
   org,
   manager,
-  responsibleNames,
   organizations,
   years,
   selectedYear,
@@ -43,7 +42,6 @@ export function OperationsDashboard({
   workbooks: WorkbookSummary[];
   org: string;
   manager: boolean;
-  responsibleNames: Record<string, string | null> | null;
   organizations: OrganizationOption[];
   years: number[];
   selectedYear: number;
@@ -57,10 +55,7 @@ export function OperationsDashboard({
   const [filter, setFilter] = useState("all");
   const matches = (c: OperationCourse) => filter === "all" || (filter === "active" ? ["PUBLISHED", "CLOSED"].includes(status(c)) : status(c) === filter);
   const responsibleLabel = (c: OperationCourse) => {
-    if (c.workspace && responsibleNames === null) return c.initial_responsible_name
-      ? `${c.initial_responsible_name} · 초기 지정 (현재 책임강사 확인 불가)`
-      : "확인 불가";
-    if (c.workspace && responsibleNames?.[c.workspace.id]) return responsibleNames[c.workspace.id];
+    if (c.workspace && c.current_responsible_name) return c.current_responsible_name;
     if (!c.initial_responsible_name) return c.workspace ? "미지정" : "과정 개설 전";
     const basis = c.initial_responsible_basis === "CENTER_DIRECTOR" ? "센터장" : "첫 교내 강사";
     return `${c.initial_responsible_name} · ${basis}${c.initial_responsible_verified ? "" : " · 계정 인증 전"}${c.workspace ? " · 책임강사 지정 대기" : " · 과정 개설 전"}`;
