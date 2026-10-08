@@ -29,8 +29,8 @@ export function DeleteDocumentControl({ requestId, revision, courseName, kindLab
   const descriptionId = useId();
   return <>
     <button ref={trigger} type="button" onClick={() => dialog.current?.showModal()} aria-label={`${rowLabel} 삭제`}
-      className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50">
-      <Trash2 size={15} aria-hidden="true" />삭제
+      className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-lg border border-rose-200 bg-white px-2 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50">
+      <Trash2 size={15} className="shrink-0" aria-hidden="true" />삭제
     </button>
     <dialog ref={dialog} aria-labelledby={titleId} aria-describedby={descriptionId} onClose={() => trigger.current?.focus()}
       className="w-[calc(100%-2rem)] max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-xl backdrop:bg-slate-900/40">

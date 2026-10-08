@@ -21,8 +21,6 @@ import { DeleteDocumentControl } from "./delete-document-control";
 
 const field = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
 const rowField = "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
-const submittedDateFormat = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", dateStyle: "medium" });
-const submittedTimeFormat = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", timeStyle: "short" });
 const kindKeys = Object.keys(DOCUMENT_KIND_LABELS) as LearnerDocumentKind[];
 const statusKeys = Object.keys(DOCUMENT_STATUS_LABELS) as LearnerDocumentStatus[];
 const KIND_FILTERS = [
@@ -87,13 +85,13 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
         {requests.length ? <>
           <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 수강 신청과 동의가 접수된 원서는 승인 시 등록 절차로 연결됩니다. 유료 과정은 납부 완료 후 등록이 확정됩니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
           <div role="region" aria-labelledby="document-queue-heading" aria-describedby="document-queue-help" tabIndex={0} className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-            <table className="w-full min-w-[1580px] table-fixed text-left text-sm">
+            <table className="w-full min-w-[1320px] table-fixed text-left text-sm">
               <caption className="sr-only">접수 문서 목록. 각 행에서 처리 결과와 수강생 안내를 입력하고 상태를 저장할 수 있습니다.</caption>
-              <colgroup>{[3.5, 16, 9.5, 9.5, 11, 8.5, 14, 9.5, 12.5, 6].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
+              <colgroup>{[3, 16, 9, 10, 16, 20, 8, 11, 7].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
               <thead className="border-b border-slate-200 bg-slate-50 text-slate-700">
                 <tr>
-                  {["순번", "과정", "신청자", "신청시각", "처리 결과", "승인자", "수강생 안내 내용", "첨부문서", "비고", "관리"].map(label => (
-                    <th key={label} scope="col" className={`px-3 py-4 font-semibold ${label === "순번" ? "text-center" : ""}`}>
+                  {["순번", "과정", "신청자", "처리 결과", "처리 이력", "수강생 안내 내용", "첨부문서", "비고", "관리"].map(label => (
+                    <th key={label} scope="col" className={`px-2 py-4 font-semibold ${label === "순번" ? "text-center" : ""}`}>
                       {label}{label === "신청자" && <span className="mt-1 block text-xs font-normal text-slate-500">성명 · 전화번호</span>}
                     </th>
                   ))}
@@ -105,16 +103,16 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                   const offeringChoices = (data.offerings ?? []).filter(choice => choice.org_id === request.org_id);
                   const canLink = request.kind === "APPLICATION" && !request.offering_id && !["REJECTED", "CANCELLED"].includes(request.status);
                   const registration = request.registration;
+                  const registrationMessage = request.kind === "APPLICATION" && registration ? documentRegistrationMessage(registration) : null;
+                  const approvedEvent = request.events.filter(event => event.to_status === "APPROVED").at(-1);
                   const formId = `document-status-${request.id}`;
                   const rowLabel = `${index + 1}번 ${request.applicant_name} ${DOCUMENT_KIND_LABELS[request.kind]}`;
                   return <tr key={request.id} className="align-top hover:bg-slate-50/60">
-                    <td className="px-3 py-5 text-center tabular-nums text-slate-500">{index + 1}</td>
-                    <th scope="row" className="break-words px-3 py-5 font-normal">
+                    <td className="px-2 py-5 text-center tabular-nums text-slate-500">{index + 1}</td>
+                    <th scope="row" className="break-words px-2 py-5 font-normal">
                       <p className="text-xs font-semibold text-teal-700">{DOCUMENT_KIND_LABELS[request.kind]}</p>
                       <p className="mt-2 font-bold leading-6 text-slate-900">{request.course_name}</p>
                       {request.kind === "APPLICATION" && registration && <div className="mt-2 space-y-2 text-xs leading-5 text-slate-600">
-                        {request.offering_id && <p>연결 과정: {registration.offering_name}<br />{registration.starts_on} ~ {registration.ends_on}</p>}
-                        <p>{documentRegistrationMessage(registration)}</p>
                         {registration.can_manage && <a className="inline-block font-semibold text-teal-800 underline" href={`/admin/offerings/${request.offering_id}/manage`}>개설 과정 관리</a>}
                         {registration.can_manage && registration.application_id && <a className="block font-semibold text-teal-800 underline" href={`/admin/applications/${registration.application_id}`}>수강 신청 확인</a>}
                       </div>}
@@ -131,15 +129,11 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                       </div>}
                       {request.kind === "REFUND" && <p className="mt-3 text-xs leading-5 text-slate-600">자동 산출 반환액<br /><strong className="text-sm text-slate-800">{Number(request.amount ?? 0).toLocaleString("ko-KR")}원</strong></p>}
                     </th>
-                    <td className="break-words px-3 py-5">
+                    <td className="break-words px-2 py-5">
                       <p className="font-semibold">{request.applicant_name}</p>
                       <p className="mt-2 whitespace-nowrap text-slate-600">{request.phone_masked || "전화번호 미등록"}</p>
                     </td>
-                    <td className="px-3 py-5 leading-6 text-slate-600"><time dateTime={request.submitted_at}>
-                      <span className="block whitespace-nowrap">{submittedDateFormat.format(new Date(request.submitted_at))}</span>
-                      <span className="block whitespace-nowrap">{submittedTimeFormat.format(new Date(request.submitted_at))}</span>
-                    </time></td>
-                    <td className="px-3 py-5">
+                    <td className="px-2 py-5">
                       {nextStatuses.length ? <>
                         <label htmlFor={`${formId}-next`} className="sr-only">{rowLabel} 처리 결과</label>
                         <select id={`${formId}-next`} form={formId} name="next_status" required className={rowField} defaultValue="">
@@ -148,20 +142,35 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                         </select>
                       </> : <span className="inline-block py-2 text-slate-500">처리 종결</span>}
                     </td>
-                    <td className="break-words px-3 py-5 text-slate-700">{request.reviewer_name || "—"}</td>
-                    <td className="px-3 py-5">
-                      <p className="truncate leading-6 text-slate-600" title={request.current_note || undefined}>{request.current_note || "등록된 안내가 없습니다."}</p>
+                    <td className="break-words px-2 py-5 text-xs leading-5 text-slate-700">
+                      <p className="font-semibold">접수 완료 <span className="font-normal text-slate-500">(<time dateTime={request.submitted_at}>{documentDate(request.submitted_at)}</time>)</span></p>
+                      {approvedEvent && <p className="mt-2 font-semibold">승인 <span className="font-normal text-slate-500">(<time dateTime={approvedEvent.created_at}>{documentDate(approvedEvent.created_at)}</time>{approvedEvent.actor_name && `, ${approvedEvent.actor_name}`})</span></p>}
+                      <details className="mt-3">
+                        <summary className="min-h-9 cursor-pointer py-1 text-xs font-semibold text-slate-600"><FileClock size={14} className="mr-1 inline-block text-teal-700" aria-hidden="true" />전체 이력 {request.events.length}건</summary>
+                        <ol className="mt-1 space-y-3 border-l-2 border-slate-200 pl-3">{request.events.map(event => <li key={event.id} className="break-words text-xs leading-5">
+                          <p className="font-semibold">{DOCUMENT_STATUS_LABELS[event.to_status]}</p>
+                          <time dateTime={event.created_at} className="block text-slate-500">{documentDate(event.created_at)}</time>
+                          {event.actor_name && <p className="text-slate-500">{event.actor_name}</p>}
+                          <p className="mt-1 whitespace-pre-wrap text-slate-700">{event.note}</p>
+                        </li>)}</ol>
+                      </details>
+                    </td>
+                    <td className="px-2 py-5">
+                      <div className="space-y-2 text-xs leading-5 text-slate-700">
+                        <p className="whitespace-pre-wrap break-words">{request.current_note || "등록된 안내가 없습니다."}</p>
+                        {registrationMessage && <p className="rounded-lg bg-teal-50 px-2 py-1.5 text-teal-900">{registrationMessage}</p>}
+                      </div>
                       {nextStatuses.length > 0 && <div className="mt-3">
                         <label htmlFor={`${formId}-note`} className="sr-only">{rowLabel} 새 수강생 안내 내용</label>
                         <input type="text" id={`${formId}-note`} form={formId} name="note" maxLength={1000} className={`${rowField} min-h-11`} placeholder="검토 결과와 다음 절차 (선택)" />
                       </div>}
                     </td>
-                    <td className="px-3 py-5">
+                    <td className="px-2 py-5">
                       <a href={`/api/learner-documents/${request.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold text-slate-700 hover:bg-slate-50">
                         <FileText size={16} className="shrink-0" aria-hidden="true" /><span>신청서<span className="sr-only"> · {rowLabel} PDF (새 창)</span></span>
                       </a>
                     </td>
-                    <td className="px-3 py-5">
+                    <td className="px-2 py-5">
                       <div className={nextStatuses.length ? "grid grid-cols-2 items-stretch gap-2" : ""}>
                         <span className={`inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-lg border px-1 text-center text-xs font-semibold ${DOCUMENT_STATUS_TONES[request.status]}`}>{DOCUMENT_STATUS_LABELS[request.status]}</span>
                         {nextStatuses.length > 0 && <form id={formId} action={updateLearnerDocumentStatus} aria-label={`${rowLabel} 상태 변경`} className="min-w-0">
@@ -173,17 +182,8 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                         {hiddenFilters}<input type="hidden" name="request_id" value={request.id} /><input type="hidden" name="revision" value={request.revision} />
                         <button type="submit" className="btn-primary w-full text-xs">수강 등록 확정</button>
                       </form>}
-                      <details className="mt-3">
-                        <summary className="min-h-11 cursor-pointer py-2 text-xs font-semibold text-slate-600"><FileClock size={14} className="mr-1 inline-block text-teal-700" aria-hidden="true" />처리 이력 {request.events.length}건</summary>
-                        <ol className="mt-1 space-y-3 border-l-2 border-slate-200 pl-3">{request.events.map(event => <li key={event.id} className="break-words text-xs leading-5">
-                          <p className="font-semibold">{DOCUMENT_STATUS_LABELS[event.to_status]}</p>
-                          <time dateTime={event.created_at} className="block text-slate-500">{documentDate(event.created_at)}</time>
-                          {event.actor_name && <p className="text-slate-500">{event.actor_name}</p>}
-                          <p className="mt-1 whitespace-pre-wrap text-slate-700">{event.note}</p>
-                        </li>)}</ol>
-                      </details>
                     </td>
-                    <td className="px-3 py-5">
+                    <td className="px-2 py-5">
                       <DeleteDocumentControl requestId={request.id} revision={request.revision} courseName={request.course_name}
                         kindLabel={DOCUMENT_KIND_LABELS[request.kind]} rowLabel={rowLabel} filters={{ kind: kind ?? "", status: status ?? "", query }} />
                     </td>

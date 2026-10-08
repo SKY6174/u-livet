@@ -80,6 +80,18 @@ export async function DevelopmentBoard({
         track={selectedTrack ?? ""}
         academy={selectedAcademy ?? ""}
       />
+      {staff && org && (
+        <section className="panel mb-6 flex flex-wrap items-center justify-between gap-5 border-teal-100 bg-gradient-to-r from-teal-50 to-white">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">운영 과정 등록·수정</h2>
+            <p className="mt-1 text-sm text-slate-600">과정을 바로 등록하거나 기존 과정의 공개 안내를 수정할 수 있습니다.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link className="inline-flex min-h-11 items-center rounded-xl bg-teal-800 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-teal-900 hover:shadow-md" href={`/admin/courses?org=${org.id}&year=${selectedYear}&create=1#new-course`}>+ 과정 등록</Link>
+            <Link className="inline-flex min-h-11 items-center rounded-xl border border-teal-200 bg-white px-5 py-2 text-sm font-semibold text-teal-900 hover:bg-teal-50" href={`/admin/courses?org=${org.id}&year=${selectedYear}`}>등록 과정 보기·수정</Link>
+          </div>
+        </section>
+      )}
       {r.error || b?.error || !board || !org || !selectedYearRecord ? (
         <Empty title={selectedYearRecord ? "과정 제안 정보를 불러오지 못했습니다" : "선택한 사업연도가 등록되지 않았습니다"} />
       ) : (
@@ -87,11 +99,6 @@ export async function DevelopmentBoard({
           {staff && (
             <section className="panel mb-6">
               <h2 className="section-title">{selectedYear}년 ({selectedYear - 2024}차년도) · {selectedTrack ? trackLabel(selectedTrack) : "전체"} · {selectedAcademy ?? "아카데미 전체"} 승인 개발·개편</h2>
-              <p className="notice mb-4">
-                승인 취소를 제외한 심의 버전 수입니다. 같은 버전의 여러 개설
-                기수는 중복하지 않습니다. 공식 RISE 성과 산식과 대외 제출은 별도
-                확인합니다.
-              </p>
               {board.counts.length ? (
                 <div className="space-y-3">
                   {board.counts.map((c) => (
@@ -110,7 +117,7 @@ export async function DevelopmentBoard({
               )}
             </section>
           )}
-          <h2 className="section-title">{staff ? "제출된 과정 제안" : "내가 작성한 과정"} · {selectedYear}년 · {selectedTrack ? trackLabel(selectedTrack) : "전체"} · {selectedAcademy ?? "아카데미 전체"}</h2>
+          <h2 className="section-title">{staff ? "제출된 과정 제안·내 초안" : "내가 작성한 과정"} · {selectedYear}년 · {selectedTrack ? trackLabel(selectedTrack) : "전체"} · {selectedAcademy ?? "아카데미 전체"}</h2>
           {!board.items.length ? (
             <Empty title="과정 제안이 없습니다" />
           ) : (
@@ -132,7 +139,7 @@ export async function DevelopmentBoard({
                     {trackLabel(p.track)} · {p.name} · 최초 제안: {reviewLabels[p.kind]}
                   </p>
                   <p className="mt-3 text-sm text-teal-800">
-                    계획·심의·개설 이력 →
+                    {staff && p.status === "DRAFT" ? "초안 수정 →" : "계획·심의·개설 이력 →"}
                   </p>
                 </Link>
               ))}
@@ -144,13 +151,13 @@ export async function DevelopmentBoard({
               확인하세요.
             </p>
           )}
-          {!staff &&
-            (org.proposer ? (
+          {(staff || org.proposer) ? (
               <section className="panel mt-6">
-                <h2 className="section-title">새 과정 제안 시작</h2>
+                <h2 className="section-title">{staff ? "과정 개발·개편안 작성" : "새 과정 제안 시작"}</h2>
+                {staff && <p className="mb-4 text-sm text-slate-600">신규 과정 개발안은 새 초안을 만들고, 기존 과정 개편안은 대상을 선택해 후속 버전으로 작성합니다.</p>}
                 <ActionForm
                   action={startDevelopment}
-                  label="과정 제안 초안 만들기"
+                  label={staff ? "심의안 초안 만들기" : "과정 제안 초안 만들기"}
                 >
                   <input type="hidden" name="o" value={org.id} />
                   <label className="field">
@@ -186,7 +193,7 @@ export async function DevelopmentBoard({
                     </select>
                   </label>
                   <label className="field">
-                    개편 대상 과정 (개편 시 선택)
+                    수정 대상 과정 (기존 과정 수정 시 선택)
                     <select name="target" defaultValue="">
                       <option value="">신규 개발 · 대상 없음</option>
                       {board.courses.map((c) => (
@@ -197,13 +204,12 @@ export async function DevelopmentBoard({
                     </select>
                   </label>
                   <p className="notice">
-                    신규 개발은 대상을 비워 두세요. 승인된 개발 기준이 있어야
-                    시작할 수 있습니다. 개발 승인 후 기수는 사업단이 별도로
-                    개설합니다.
+                    신규 등록은 대상을 비워 두세요. 기존 과정 수정은 대상을 선택하세요.
+                    제출 후 다른 과정담당자의 심의를 거쳐 확정됩니다.
                   </p>
                 </ActionForm>
               </section>
-            ) : (
+            ) : !staff && (
               <p className="notice mt-6">
                 현재 강사 역할 또는 유효한 이력 확인을 받은 뒤 과정 제안을
                 작성할 수 있습니다.{" "}
@@ -214,7 +220,7 @@ export async function DevelopmentBoard({
                   이력 심사 확인
                 </Link>
               </p>
-            ))}
+            )}
         </>
       )}
     </div>
