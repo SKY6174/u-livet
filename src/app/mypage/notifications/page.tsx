@@ -4,7 +4,12 @@ import { ActionForm } from "@/components/portal/action-form";
 import { setMarketing, disconnectContact } from "@/app/message-actions";
 import { dateTime } from "@/lib/portal/data";
 import type { NotificationPreference } from "@/lib/messaging/types";
+import { redirect } from "next/navigation";
+import { requireIdentity } from "@/lib/auth/session";
+import { hasRole, workspaceKind } from "@/lib/auth/workspace-navigation";
 export default async function Notifications() {
+  const me = await requireIdentity("/mypage/notifications");
+  if (workspaceKind(me) !== "learner") redirect(hasRole(me, "INSTRUCTOR") ? "/instructor" : "/mypage");
   const { data, error } = await (
     await createServerSupabaseClient()
   ).rpc("life_notification_preferences");
@@ -113,25 +118,6 @@ export default async function Notifications() {
                 ))}
               </section>
             </div>
-            <details className="mt-8 border-t pt-5">
-              <summary className="cursor-pointer font-semibold">
-                나의 동의·철회 이력 (최근 20개)
-              </summary>
-              {s.events.length ? (
-                <ol className="mt-4 space-y-3 text-sm">
-                  {s.events.map((e) => (
-                    <li key={e.id}>
-                      {dateTime(e.recorded_at)} · {e.accepted ? "동의" : "철회"}{" "}
-                      · {e.title ?? "기존 동의 없음"} {e.version ?? ""}
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <p className="mt-4 text-sm text-slate-500">
-                  기록된 변경이 없습니다.
-                </p>
-              )}
-            </details>
           </article>
         ))
       )}

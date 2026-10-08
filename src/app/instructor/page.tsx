@@ -5,6 +5,8 @@ import { getWorkspaceOfferings } from "@/lib/portal/data";
 import { getInstructorHomeSummary } from "@/lib/classroom-questions/data";
 import { Empty, PageIntro } from "@/components/portal/ui";
 import { memberLabel } from "@/lib/auth/workspace-navigation";
+import { getAccountProfile } from "@/lib/account-profile/data";
+import { AccountInfo } from "@/components/account-profile/account-info";
 import { 
   BookOpen, 
   ClipboardCheck, 
@@ -21,7 +23,7 @@ export default async function InstructorRoom() {
   const me = await requireIdentity("/instructor");
   if (!me.roles.some((r) => r.role === "INSTRUCTOR")) notFound();
 
-  const summary = await getInstructorHomeSummary();
+  const [summary, profile] = await Promise.all([getInstructorHomeSummary(), getAccountProfile()]);
   const assigned = summary?.map((item) => item.offering_id) ?? [];
 
   const { offerings: own, unavailable } = await getWorkspaceOfferings(
@@ -49,15 +51,13 @@ export default async function InstructorRoom() {
             )}
           </div>
           <h2 className="mt-4 text-2xl font-bold text-slate-900">{me.name}</h2>
-          <p className="mt-1 break-all text-base text-slate-600">{me.email}</p>
+          <p className="mt-1 break-all text-base text-slate-600">로그인 이메일 · {me.email}</p>
+          <AccountInfo profile={profile} />
 
           <div className="mt-6 flex flex-wrap gap-3">
             {isExternal && <Link className="btn-primary text-sm" href="/parking">무료 주차권 신청</Link>}
             <Link className="btn-primary text-sm" href="/mypage/instructor/documents">
               강사 서류 제출
-            </Link>
-            <Link className="btn-secondary text-sm" href="/mypage/notifications">
-              연락처·수신 설정
             </Link>
             <Link className="btn-secondary text-sm" href="/mypage/instructor">
               강사 이력·등록 심사
