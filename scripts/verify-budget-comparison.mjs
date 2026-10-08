@@ -83,7 +83,7 @@ const { BudgetPanel } = compile('src/components/course-workspace/budget-panel.ts
   '@/components/portal/action-form': { ActionForm: () => null }, '@/app/admin/courses/budget-actions': { saveCourseBudget: () => {} },
 });
 test('16 programs render paired budget/execution rows with merged identity and edit cells', () => {
-  const html = renderToStaticMarkup(React.createElement(BudgetPanel, { courses, org: 'test', workbooks: [] }));
+  const html = renderToStaticMarkup(React.createElement(BudgetPanel, { courses, org: 'test', workbooks: [], year: 2026 }));
   assert.equal((html.match(/rowSpan="2" class="whitespace-nowrap p-3 text-left font-mono/g) ?? []).length, 16);
   assert.equal((html.match(/<th scope="row" class="p-3 text-left text-xs font-semibold/g) ?? []).length, 32);
   assert(html.includes('2026 예산 및 집행현황')); assert(html.includes('단위: 원'));

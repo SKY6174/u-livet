@@ -18,6 +18,7 @@ export type OperationCourse = CourseGuide & {
   initial_responsible_name?: string | null;
   initial_responsible_basis?: "FIRST_INTERNAL" | "CENTER_DIRECTOR" | null;
   initial_responsible_verified?: boolean;
+  current_responsible_name?: string | null;
   workspace: CourseWorkspace | null;
 };
 export type WorkbookSummary = {

@@ -41,7 +41,7 @@ export default async function CourseOperations({
       : findOpeningCourse(await getCourseOpeningPlan(), params.plan);
   if (params.plan !== undefined && !plan) notFound();
   const db = await createServerSupabaseClient();
-  const [{ courses, unavailable }, { data: years }, { data: organizationRows }, workingCopy, budgets, responsibilityResult] = await Promise.all([
+  const [{ courses, unavailable }, { data: years }, { data: organizationRows }, workingCopy, budgets] = await Promise.all([
     manager ? getCourseWorkspaces() : Promise.resolve({ courses: [], unavailable: false }),
     db
       .from("life_project_years")
@@ -50,18 +50,11 @@ export default async function CourseOperations({
     db.from("life_organizations").select("id,name").in("id", orgs),
     plan ? getOpeningWorkingCopy(org, plan.sourceId) : Promise.resolve({ copy: null, unavailable: false }),
     getCourseBudgets(org, [], year),
-    db.rpc("life_operation_list"),
   ]);
   const scopedCourses = courses.filter(
     (course) => course.org_id === org && Number(course.year_label.match(/\d{4}/)?.[0]) === year,
   );
   const overview = { ...budgets, courses: mergeOperationCourses(budgets.courses, scopedCourses) };
-  const responsibleNames = responsibilityResult.error
-    ? null
-    : Object.fromEntries(
-        ((responsibilityResult.data ?? []) as { id: string; responsible: string | null }[])
-          .map((course) => [course.id, course.responsible]),
-      );
   const linked = new Set(overview.courses.map(c => c.offering_id).filter(Boolean));
   const additional = scopedCourses.filter(c => !linked.has(c.id));
   const yearOptions = Array.from(new Set([
@@ -86,7 +79,6 @@ export default async function CourseOperations({
           workbooks={overview.workbooks}
           org={org}
           manager={manager}
-          responsibleNames={responsibleNames}
           organizations={organizationOptions}
           years={yearOptions}
           selectedYear={year}

@@ -47,7 +47,7 @@ const catalog = load('src/lib/course-guide/data.ts', {
 });
 await test('catalog projects summary fields while preserving publication and sort filters', async () => {
   const result = await catalog.getCourseCatalog();
-  const params = requests.at(-1).searchParams;
+  const params = requests.findLast(url => url.pathname.endsWith('/life_course_guides')).searchParams;
   assert.equal(params.get('published'), 'eq.true');
   assert.equal(params.get('order'), 'year.desc,sort_order.asc');
   for (const key of ['curriculum', 'schedule_history', 'time_label', 'location']) {
