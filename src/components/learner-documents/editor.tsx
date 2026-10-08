@@ -286,9 +286,11 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
               <div><p className="font-semibold text-slate-900">{DOCUMENT_KIND_LABELS[request.kind]}</p><p className="mt-1 text-sm text-slate-600">{request.course_name} · {documentDate(request.submitted_at)}</p></div>
               <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${DOCUMENT_STATUS_TONES[request.status]}`}>{DOCUMENT_STATUS_LABELS[request.status]}</span>
             </div>
-            <p className="mt-3 text-sm leading-6 text-slate-700">{request.current_note}</p>
+            <div className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+              <p>{request.current_note}</p>
+              {request.kind === "APPLICATION" && request.registration && <p className="rounded-lg bg-teal-50 p-3 text-teal-900">{documentRegistrationMessage(request.registration)}</p>}
+            </div>
           </summary>
-          {request.kind === "APPLICATION" && request.registration && <p className="mt-3 rounded-lg bg-teal-50 p-3 text-sm leading-6 text-teal-900">{documentRegistrationMessage(request.registration)}</p>}
           <ol className="mt-4 space-y-3 border-t border-slate-200 pt-4">{request.events.map(event => <li key={event.id} className="flex gap-3 text-sm"><Clock3 className="mt-0.5 shrink-0 text-teal-700" size={16} /><div><p className="font-semibold">{DOCUMENT_STATUS_LABELS[event.to_status]} <span className="font-normal text-slate-500">· {documentDate(event.created_at)}</span></p><p className="mt-1 text-slate-600">{event.note}</p></div></li>)}</ol>
           <div className="mt-4 flex flex-wrap gap-2">
             {request.offering_id && request.registration?.can_apply && <a href={`/offerings/${request.offering_id}/apply`} className="btn-primary">신청 안내·동의 확인 후 수강 신청</a>}
