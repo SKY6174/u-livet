@@ -42,16 +42,18 @@ export default async function InstructorRoom() {
 
         {/* 2. 내 계정 정보 카드 (기존 '내 정보' 카드 디자인 100% 유지) */}
         <section className="panel h-fit w-full" aria-label="강사 계정 정보">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="badge">{memberLabel(me)}</span>
-            {isExternal && (
-              <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <span className="badge shrink-0">{memberLabel(me)}</span>
+            <h2 className="shrink-0 text-xl font-bold text-slate-900">{me.name}</h2>
+            <p className="min-w-0 truncate text-slate-600" title={`로그인 이메일 · ${me.email}`}>로그인 이메일 · {me.email}</p>
+          </div>
+          {isExternal && (
+            <p className="mt-3">
+              <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
                 운영센터 연간 자격 점검 대상
               </span>
-            )}
-          </div>
-          <h2 className="mt-4 text-2xl font-bold text-slate-900">{me.name}</h2>
-          <p className="mt-1 break-all text-base text-slate-600">로그인 이메일 · {me.email}</p>
+            </p>
+          )}
           <AccountInfo profile={profile} />
 
           <div className="mt-6 flex flex-wrap gap-3">
