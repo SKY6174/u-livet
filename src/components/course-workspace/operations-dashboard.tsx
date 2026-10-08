@@ -22,6 +22,7 @@ function CourseActions({ course: c, manager, org }: { course: OperationCourse; m
     {manager && (c.workspace ? <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}`}>과정 정보 관리{COURSE_ACTION_ICON}</Link> : c.source_id && <Link className={COURSE_ACTION_CLASS} href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>과정 개설 준비{COURSE_ACTION_ICON}</Link>)}
     {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>강사 배정{COURSE_ACTION_ICON}</Link>}
     {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/operation-documents/${c.workspace.id}/plan`}>운영계획서 작성{COURSE_ACTION_ICON}</Link>}
+    {manager && <Link className={COURSE_ACTION_CLASS} href={`/admin/courses/guides/${c.id}`}>과정 안내 수정{COURSE_ACTION_ICON}</Link>}
     <Link className={COURSE_ACTION_CLASS} href={`/courses/${c.id}`}>수강생 화면 보기{COURSE_ACTION_ICON}</Link>
     {manager && c.workspace?.report_revision && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/reports`}>증빙·지급자료{COURSE_ACTION_ICON}</Link>}
   </div>;
@@ -87,7 +88,7 @@ export function OperationsDashboard({
     </div>
     <div role="group" aria-label="과정 관리 화면" className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
       {[["courses", "과정 목록"], ["budget", "예산 및 집행현황"]].map(([value, label]) => <button key={value} type="button" aria-pressed={tab === value} onClick={() => setTab(value)} className={`rounded-xl px-5 py-3 text-sm font-bold ${tab === value ? "bg-teal-800 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-teal-50"}`}>{label}</button>)}
-      {manager && <Link className="ml-auto inline-flex min-h-11 items-center rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700" href={`/admin/courses?org=${org}&year=${year}&create=1#new-course`}>새 과정 등록</Link>}
+      {manager && <Link className="ml-auto inline-flex min-h-12 items-center gap-2 rounded-xl bg-teal-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-teal-900 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700" href={`/admin/courses?org=${org}&year=${year}&create=1#new-course`}><span aria-hidden="true" className="text-xl leading-none">+</span> 과정 등록</Link>}
     </div>
     {tab === "courses" && <>
       <div className="flex flex-wrap items-center gap-3">

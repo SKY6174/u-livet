@@ -55,11 +55,11 @@ assert(ok(await board(anchor, 2025, "RCC")).items.some((item) => item.id === a))
 assert.equal(ok(await board(anchor, 2025, "ECC")).items.length, 0);
 assert(ok(await board(anchor, 2026, null)).items.some((item) => item.id === b));
 assert(ok(await board(sanhak, 2025, "WORKER")).items.some((item) => item.id === c));
-const staffBoard = ok(await client.rpc("life_development_board_filtered", {
-  o: anchor, staff: true, y: year(anchor, 2025), track: "RCC",
+const staffBoard = ok(await client.rpc("life_development_board_classified", {
+  o: anchor, staff: true, y: year(anchor, 2025), track: "RCC", academy: null,
 }));
 assert.equal(staffBoard.counts[0].project_year_id, year(anchor, 2025));
-assert(!staffBoard.items.some((item) => item.id === a), "drafts stay private to the author");
+assert(staffBoard.items.some((item) => item.id === a), "manager sees their own draft");
 assert((await client.rpc("life_development_board_filtered", {
   o: anchor, staff: false, y: year(sanhak, 2025), track: null,
 })).error);

@@ -78,7 +78,7 @@ export default async function CourseOperations({
         과정 개설부터 모집·강사 배정·출결까지 교육 운영을 관리합니다.
       </PageIntro>
       {overview.unavailable || unavailable ? (
-        <><Empty title="과정 정보를 불러오지 못했습니다" />{manager && <Link className="mt-4 inline-flex rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700" href={`/admin/courses?org=${org}&create=1#new-course`}>새 과정 등록</Link>}</>
+        <><Empty title="과정 정보를 불러오지 못했습니다" />{manager && <Link className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-teal-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-teal-900 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700" href={`/admin/courses?org=${org}&create=1#new-course`}>+ 과정 등록</Link>}</>
       ) : (
         <OperationsDashboard
           key={`${org}:${year}`}
@@ -98,8 +98,8 @@ export default async function CourseOperations({
         className="mt-10 scroll-mt-6"
         open={!!plan || params.create === "1"}
       >
-        <summary className="mb-5 cursor-pointer text-lg font-bold">
-          새 과정 등록
+        <summary className="mb-5 inline-flex min-h-12 cursor-pointer list-none items-center gap-3 rounded-xl bg-teal-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-teal-900 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 [&::-webkit-details-marker]:hidden">
+          <span aria-hidden="true" className="text-xl leading-none">+</span> 과정 등록
         </summary>
         {workingCopy.unavailable ? <section id="offering-draft" className="panel space-y-4">
           <h2 className="font-bold">개설 준비 임시저장본을 불러오지 못했습니다</h2>

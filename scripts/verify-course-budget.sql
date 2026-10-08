@@ -49,6 +49,8 @@ reset role;
 select set_config('request.jwt.claims',jsonb_build_object('sub',md5('budget-4')::uuid,'role','authenticated','amr',jsonb_build_array(jsonb_build_object('method','totp','timestamp',floor(extract(epoch from now())))),'aal','aal2','session_id',md5('bs-4')::uuid)::text,true);
 set local role authenticated;
 select pg_temp.denied($q$select life_course_budget_overview('10000000-0000-4000-8000-000000000001',2026)$q$,'FORBIDDEN');
+select pg_temp.ok(jsonb_array_length(life_course_budget_overview(md5('budget-other')::uuid,2026)->'courses')=0,'other institution has no anchor courses');
+select pg_temp.denied($q$select life_save_course_budget(md5('budget-other')::uuid,'2026-manual-therapy',current_setting('test.payload')::jsonb,0)$q$,'INVALID_INPUT');
 select pg_temp.ok(life_budget_workbook(md5('budget-other')::uuid,current_setting('test.workbook_id')::uuid) is null,'cross-org workbook hidden');
 reset role;
 select set_config('request.jwt.claims',jsonb_build_object('sub',md5('budget-3')::uuid,'role','authenticated','amr',jsonb_build_array(jsonb_build_object('method','totp','timestamp',floor(extract(epoch from now())))),'aal','aal2','session_id',md5('bs-3')::uuid)::text,true);
