@@ -22,9 +22,11 @@ export default async function MyPage() {
         본인 정보와 계정 보안을 관리합니다.
       </PageIntro>
       <section className="panel mb-8 max-w-3xl" aria-label="내 계정 정보">
-        <span className="badge">{memberLabel(me)}</span>
-        <h2 className="mt-4 text-xl font-bold">{me.name}</h2>
-        <p className="mt-2 break-all text-slate-600">로그인 이메일 · {me.email}</p>
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+          <span className="badge shrink-0">{memberLabel(me)}</span>
+          <h2 className="shrink-0 text-xl font-bold">{me.name}</h2>
+          <p className="min-w-0 truncate text-slate-600" title={`로그인 이메일 · ${me.email}`}>로그인 이메일 · {me.email}</p>
+        </div>
         <AccountInfo profile={await getAccountProfile()} />
       </section>
       {kind === "office" && <Link className="btn-primary" href="/admin">사업단 관리로 이동 →</Link>}
