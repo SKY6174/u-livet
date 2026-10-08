@@ -13,11 +13,12 @@ const load = (file, mocks = {}) => {
 };
 let checks=0;
 const test=async(name,run)=>{await run();checks++;console.log('PASS '+name);};
-const guides=JSON.parse(readFileSync('docs/operations/2026-public-course-guides.json')).courses;
+const organizations=[{id:'anchor-test',slug:'uc-anchor'},{id:'sanhak-test',slug:'uc-sanhak'}];
+const guides=JSON.parse(readFileSync('docs/operations/2026-public-course-guides.json')).courses.map(c=>({...c,org_id:'anchor-test'}));
 const model=load('src/lib/course-guide/model.ts');
 const instructorNames=load('src/components/portal/instructor-names.tsx');
 const offerings=guides.filter(c=>c.offering_id).map(c=>({...c,id:c.offering_id,status:'ARCHIVED',starts_on:'2026-07-01',ends_on:'2026-07-31'}));
-const courses=model.mergeCatalog(guides,offerings);
+const courses=model.mergeCatalog(guides,offerings,organizations);
 const now=Date.parse('2026-10-07T12:00:00+09:00');
 const visible=model.filterCatalog(courses,model.catalogFilters({}),now);
 await test('16 source courses deduplicate the three linked operational offerings',()=>assert.equal(courses.length,16));
@@ -39,8 +40,30 @@ await test('inclusive course end day changes only at Korean midnight',()=>{
   assert.equal(model.guideEndDate('2026.02.30',2026),null);
   assert.equal(model.guideEndDate('2026년 12월 예정',2026),null);
 });
-await test('query arrays and invalid modes cannot break render',()=>assert.deepEqual(model.catalogFilters({q:['a','b'],mode:'invalid',view:['list']}),{q:'',mode:'',state:'current',view:'cards'}));
-await test('view URL preserves and safely encodes query, mode and completion condition',()=>{const url=model.catalogHref(model.catalogFilters({q:'목공 & test',mode:'OFFLINE',state:'completed'}),'list');const p=new URL(url,'http://localhost').searchParams;assert.equal(p.get('q'),'목공 & test');assert.equal(p.get('view'),'list');assert.equal(p.get('mode'),'OFFLINE');assert.equal(p.get('state'),'completed');});
+await test('query arrays and invalid modes cannot break render',()=>assert.deepEqual(model.catalogFilters({q:['a','b'],mode:'invalid',view:['list'],org:['uc-anchor']}),{org:'',q:'',mode:'',state:'current',view:'cards'}));
+await test('view URL preserves and safely encodes organization, query, mode and completion condition',()=>{const url=model.catalogHref(model.catalogFilters({org:'uc-sanhak',q:'목공 & test',mode:'OFFLINE',state:'completed'}),'list');const p=new URL(url,'http://localhost').searchParams;assert.equal(p.get('org'),'uc-sanhak');assert.equal(p.get('q'),'목공 & test');assert.equal(p.get('view'),'list');assert.equal(p.get('mode'),'OFFLINE');assert.equal(p.get('state'),'completed');});
+await test('organization classification uses IDs for guides, linked and additional offerings',()=>{
+  const guide={...guides[0],offering_id:'linked'};
+  const linked={...offerings[0],id:'linked',org_id:'sanhak-test'};
+  const additional={...linked,id:'additional'};
+  const result=model.mergeCatalog([guide,{...guide,id:'unlinked',offering_id:null}],[linked,additional],organizations);
+  assert.deepEqual(result.map(c=>c.organization_slug),['uc-sanhak','uc-anchor','uc-sanhak']);
+  assert.equal(result[2].org_id,null,'additional offerings must not gain a guide-edit link');
+  assert.equal(model.mergeCatalog([{...guide,org_id:'unknown',offering_id:null}],[],organizations)[0].organization_slug,null);
+});
+await test('organization combines with search, mode and completion and keeps unknowns in all',()=>{
+  const base={...courses[0],name:'동일 목공 과정',summary:'',academy:'동일 아카데미',certificate:null,status:'CLOSED',mode:'OFFLINE',ends_on:'2026-10-06'};
+  const items=[{...base,id:'anchor',organization_slug:'uc-anchor'},{...base,id:'sanhak',organization_slug:'uc-sanhak'},
+    {...base,id:'online',organization_slug:'uc-sanhak',mode:'ONLINE'},{...base,id:'future',organization_slug:'uc-sanhak',ends_on:'2027-01-01'},
+    {...base,id:'unknown',organization_slug:null}];
+  assert.deepEqual(model.filterCatalog(items,model.catalogFilters({org:'uc-sanhak',q:'동일목공',mode:'OFFLINE',state:'completed'}),now).map(c=>c.id),['sanhak']);
+  assert.deepEqual(model.filterCatalog(items,model.catalogFilters({org:'uc-anchor',state:'all'}),now).map(c=>c.id),['anchor']);
+  assert.equal(model.filterCatalog(items,model.catalogFilters({state:'all'}),now).length,5);
+});
+await test('invalid and repeated organization values default to all without inventing membership',()=>{
+  for(const org of [undefined,'invalid','UC-ANCHOR','toString',['uc-anchor'],['uc-anchor','uc-sanhak']])assert.equal(model.catalogFilters({org}).org,'');
+  assert(!new URL(model.catalogHref(model.catalogFilters({}),'list'),'http://localhost').searchParams.has('org'));
+});
 await test('completed and current partition the permitted catalogue and all retains every item',()=>{
   const completed=model.filterCatalog(courses,model.catalogFilters({state:'completed'}),now);
   const all=model.filterCatalog(courses,model.catalogFilters({state:'all'}),now);
@@ -75,11 +98,16 @@ await test('completion filter follows Korean midnight, archive state and unknown
   assert.equal(model.filterCatalog([{...endDay,status:'ARCHIVED',ends_on:'2026-12-30'}],filters,now).length,1);
   assert.equal(model.filterCatalog([{...endDay,status:null,ends_on:null}],filters,now).length,0);
 });
-let dbError=null,throwDb=false;
+let dbError=null,orgDbError=null,throwDb=false;
 const selections=[];
 const query={select(v){selections.push(v);return this;},eq(){return this;},order(){return this;},maybeSingle:async()=>({data:guides[0],error:dbError}),then(resolve){resolve({data:dbError?null:guides,error:dbError});}};
-const api=load('src/lib/course-guide/data.ts',{'./model':model,'@/lib/supabase/server':{createServerSupabaseClient:async()=>{if(throwDb)throw Error('network');return{from:()=>query};}},'@/lib/portal/data':{getCourseCards:async()=>({offerings,unavailable:false}),getCourseInstructorNames:async()=>({})}});
+const orgQuery={select(v){selections.push(v);return this;},in(){return this;},then(resolve){resolve({data:orgDbError?null:organizations,error:orgDbError});}};
+const api=load('src/lib/course-guide/data.ts',{'./model':model,'@/lib/supabase/server':{createServerSupabaseClient:async()=>{if(throwDb)throw Error('network');return{from:name=>name==='life_organizations'?orgQuery:query};}},'@/lib/portal/data':{getCourseCards:async()=>({offerings,unavailable:false}),getCourseInstructorNames:async()=>({})}});
 await test('DB-backed catalog reads guides and preserves linked deduplication',async()=>{assert.equal((await api.getCourseCatalog()).courses.length,16);assert(selections.every(s=>!s.includes('*')));});
+await test('organization lookup classifies actual data and failure reports partial availability',async()=>{
+  const result=await api.getCourseCatalog();assert(result.courses.every(c=>c.organization_slug==='uc-anchor'));
+  orgDbError={message:'unavailable'};const partial=await api.getCourseCatalog();assert.equal(partial.unavailable,true);assert(partial.courses.every(c=>c.organization_slug===null));orgDbError=null;
+});
 await test('failed DB guides report partial availability',async()=>{dbError={message:'unavailable'};const r=await api.getCourseCatalog();assert.equal(r.unavailable,true);assert.equal(r.courses.length,3);await assert.rejects(api.getCourseGuide('2026-manual-therapy'),/불러오지/);dbError=null;});
 await test('connection failure handled and invalid detail IDs not queried',async()=>{throwDb=true;assert.equal((await api.getCourseCatalog()).unavailable,true);assert.equal(await api.getCourseGuide('../bad'),null);throwDb=false;});
 const portalData={getCourseInstructorNames:async()=>({}),modeLabel:{OFFLINE:'대면',ONLINE:'온라인',BLENDED:'혼합'},getCourseIntroduction:async()=>null,dateTime:value=>value??'미기재'};
@@ -91,6 +119,10 @@ const catalog=load('src/components/course-guide/catalog.tsx',{'next/link':Link,'
 let unavailable=false;
 const page=load('src/app/courses/page.tsx',{'next/link':Link,'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseCatalog:async()=>({courses,unavailable}),editableGuideOrgs:()=>[]},'@/lib/course-guide/model':{...model,filterCatalog:(items,filters)=>model.filterCatalog(items,filters,now)},'@/components/course-guide/catalog':catalog,'@/components/portal/ui':ui}).default;
 const render=async params=>renderToStaticMarkup(await page({searchParams:Promise.resolve(params)}));
+await test('organization is the first filter and selected institution survives card/list toggles',async()=>{
+  for(const view of ['cards','list']){const html=await render({org:'uc-anchor',view});assert(html.indexOf('name="org"')<html.indexOf('name="q"'));assert(html.includes('value="uc-anchor" selected=""'));assert(html.includes('산학협력단'));assert(html.includes('org=uc-anchor'));}
+  const html=await render({org:'uc-sanhak'});assert(html.includes('value="uc-sanhak" selected=""'));assert(html.includes('조건에 맞는 교육과정이 없습니다'));assert(!html.includes('data-course-card'));
+});
 await test('cards show current courses, certificates and admission information',async()=>{const html=await render({});assert.equal((html.match(/data-course-card/g)??[]).length,visible.length);assert(html.includes('시니어요리지도사'));assert(html.includes('xl:grid-cols-3'));assert(html.includes('aria-current="page"'));assert(html.includes('모집기간'));assert(html.includes('수강료'));assert(html.includes('value="current" selected=""'));assert(!html.includes('class="badge">운영 완료'));assert(html.includes('모집 안내 확인'));});
 await test('completed cards and list show historical links, badges and selected condition',async()=>{
   const completed=model.filterCatalog(courses,model.catalogFilters({state:'completed'}),now);

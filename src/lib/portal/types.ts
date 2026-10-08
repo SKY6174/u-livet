@@ -42,6 +42,7 @@ export type Offering = {
 export type CourseSummary = Pick<
   Offering,
   | "id"
+  | "org_id"
   | "name"
   | "academy"
   | "summary"
