@@ -46,7 +46,7 @@ const LearnerRequestAlerts = load('src/components/admin/learner-request-alerts.t
 const roleCases = [
   [[], [], 'learner'], [['INSTRUCTOR'], [], 'instructor'],
   [['SYSTEM_ADMIN'], ['/admin/courses', '/operation-documents/plan', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/admin/accounts'], 'office'],
-  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/operation-documents/plan', '/admin/applications', '/admin/learners', '/admin/monitoring', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance', '/admin/instructors'], 'office'],
+  [['COURSE_MANAGER'], ['/admin/development', '/admin/courses', '/admin/policies', '/operation-documents/plan', '/admin/applications', '/admin/learners', '/admin/monitoring', '/admin/learner-documents', '/admin/parking', '/operation-documents/result', '/completion', '/credentials', '/performance', '/admin/instructors'], 'office'],
   [['CERTIFIER'], ['/completion', '/credentials'], 'office'],
   [['FINANCE'], ['/admin/learner-documents', '/finance'], 'office'], [['PERFORMANCE'], ['/performance'], 'office'],
 ];
@@ -88,7 +88,7 @@ await test('office navigation follows the operational workflow', () => {
   const sections = nav.officeSections(member('COURSE_MANAGER', 'FINANCE'));
   assert.deepEqual(sections.map(section => section.title), ['기획·개설', '접수·운영', '마감·수료', '정산·성과', '계정·권한']);
   assert.deepEqual(sections.flatMap(section => section.links.map(link => link.href)), [
-    '/admin/development', '/admin/courses', '/operation-documents/plan',
+    '/admin/development', '/admin/courses', '/admin/policies', '/operation-documents/plan',
     '/admin/applications', '/admin/learners',
     '/admin/monitoring', '/admin/learner-documents', '/admin/parking',
     '/operation-documents/result', '/completion', '/credentials',
@@ -187,7 +187,7 @@ await test('office hub rejects guests/learners/teachers and permits each actual 
 await test('course subtrees retain their existing server role gates', async () => {
   const redirectOnly = ['finance', 'performance', 'kpi'];
   for (const dir of readdirSync('src/app/admin', { withFileTypes: true }).filter(dir => dir.isDirectory())) {
-    if (['accounts', 'course-requests', 'learner-documents', 'parking'].includes(dir.name)) continue; // pages enforce their own role gates
+    if (['accounts', 'course-requests', 'learner-documents', 'parking', 'policies'].includes(dir.name)) continue; // pages enforce their own role gates
     if (redirectOnly.includes(dir.name)) continue; // no data; destination layout gates it
     const gate = load(`src/app/admin/${dir.name}/layout.tsx`, { '@/components/navigation/office-section': section }).default;
     const run = async () => {
@@ -224,6 +224,8 @@ await test('legacy registration links keep plan/create intent and discard unrela
 });
 let appReads = 0;
 const MyPage = load('src/app/mypage/page.tsx', { ...common,
+  '@/lib/account-profile/data': { getAccountProfile: async () => ({}) },
+  '@/components/account-profile/account-info': { AccountInfo: () => React.createElement('p', null, '내 정보 수정') },
   '@/lib/student-learning/data': { getStudentLearning: async () => { appReads++; return {}; } },
   '@/components/student-learning/dashboard': { StudentDashboard: () => React.createElement('p', null, '학생 대시보드') },
   '@/components/auth/account-security': { AccountSecurity: () => React.createElement('section', null, '연결된 인증 앱 관리') },
@@ -242,7 +244,7 @@ await test('My Room unifies instructor and dual-role accounts without querying l
   for (const pathname of ['/courses', '/courses/guide', '/offerings/fixture', '/offerings/fixture/apply']) assert(nav.primaryActive(pathname, '/courses'));
   assert(!nav.primaryActive('/offerings-other', '/courses'));
   me=member('COURSE_MANAGER'); const account = renderToStaticMarkup(await MyPage());
-  assert(account.includes('aria-label="내 계정 정보"')); assert(account.includes('href="/mypage/notifications"'));
+  assert(account.includes('aria-label="내 계정 정보"')); assert(account.includes('내 정보 수정')); assert(!account.includes('href="/mypage/notifications"'));
   const before=appReads; me=member(); assert(renderToStaticMarkup(await MyPage()).includes('학생 대시보드')); assert.equal(appReads,before+1);
 });
 let cursor = 0;
