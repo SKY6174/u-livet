@@ -31,7 +31,9 @@ do $$ declare payload jsonb; begin
   assert (select count(*) from public.life_course_introductions('90000000-0000-4000-8000-000000000013'))=0, 'draft hidden even with publication flag';
   assert (select count(*) from public.life_catalog where id='90000000-0000-4000-8000-000000000011')=0, 'private catalog remains protected';
   select to_jsonb(c) into payload from public.life_course_introductions('90000000-0000-4000-8000-000000000011') c;
-  assert not payload ?| array['org_id','course_version_id','enrollment_policy_id','academic_revision','payload','participants','body','account','result_file_id','public_introduction'], 'minimal public projection';
+  assert payload->>'org_id'='90000000-0000-4000-8000-000000000001', 'public classification uses actual organization';
+  assert (select slug from public.life_organizations where id=(payload->>'org_id')::uuid)='public-introduction-test', 'public organization metadata is readable';
+  assert not payload ?| array['course_version_id','enrollment_policy_id','academic_revision','payload','participants','body','account','result_file_id','public_introduction'], 'minimal public projection';
   assert payload->>'status'='ARCHIVED' and payload->>'apply_from' is null, 'archive cannot become enrollment';
   begin
     perform * from public.life_report_files;

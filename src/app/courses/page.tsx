@@ -2,7 +2,7 @@ import Link from "next/link";
 import { LayoutGrid, List, Search } from "lucide-react";
 import { editableGuideOrgs, getCourseCatalog } from "@/lib/course-guide/data";
 import { getSessionIdentity } from "@/lib/auth/session";
-import { catalogFilters, catalogHref, filterCatalog, type CatalogSearch } from "@/lib/course-guide/model";
+import { CATALOG_ORGANIZATIONS, catalogFilters, catalogHref, filterCatalog, type CatalogSearch } from "@/lib/course-guide/model";
 import { GuideCard, GuideList } from "@/components/course-guide/catalog";
 import { Empty, PageIntro } from "@/components/portal/ui";
 
@@ -16,6 +16,7 @@ export default async function Courses(props: { searchParams: Promise<CatalogSear
       <PageIntro eyebrow="COURSES" title="과정 탐색">내가 원하는 배움, 나에게 맞는 일정으로 시작하세요.</PageIntro>
       <form action="/courses" className="mb-8 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <input type="hidden" name="view" value={filters.view} />
+        <label className="field">담당 기관<select name="org" defaultValue={filters.org}><option value="">전체</option>{Object.entries(CATALOG_ORGANIZATIONS).map(([slug, label]) => <option key={slug} value={slug}>{label}</option>)}</select></label>
         <label className="field w-full sm:min-w-[180px] sm:flex-1">과정 검색<input name="q" placeholder="과정명, 관심 분야, 자격증" defaultValue={filters.q} maxLength={100} type="search" /></label>
         <label className="field">운영방식<select name="mode" defaultValue={filters.mode}><option value="">전체</option><option value="ONLINE">온라인</option><option value="OFFLINE">대면</option><option value="BLENDED">혼합</option></select></label>
         <label className="field">운영상태<select name="state" defaultValue={filters.state}><option value="current">진행 중·예정</option><option value="completed">운영 완료</option><option value="all">전체 과정</option></select></label>

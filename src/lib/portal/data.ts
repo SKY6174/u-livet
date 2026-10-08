@@ -33,7 +33,7 @@ export async function getCourseCards(featured = false) {
       : db.rpc("life_course_introductions", {}, { get: true }))
       .select(
         // PostgREST table-returning RPC ordering needs the sort field selected.
-        "id,name,academy,summary,mode,capacity,tuition,status,apply_from,apply_until,starts_on,ends_on,created_at",
+        "id,org_id,name,academy,summary,mode,capacity,tuition,status,apply_from,apply_until,starts_on,ends_on,created_at",
       )
       .order("created_at", { ascending: false })
       .order("id", { ascending: true });

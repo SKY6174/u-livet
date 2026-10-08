@@ -28,7 +28,9 @@ export type CatalogCourse = Pick<CourseGuide,
   "id" | "name" | "academy" | "summary" | "mode" | "capacity" | "period_label" | "certificate"
 > & { teaching_hours: number | null; href: string; offeringId: string | null; tuition: number | null; card_image_url: string | null; org_id: string | null;
   status?: string | null; apply_from?: string | null; apply_until?: string | null; ends_on?: string | null;
-  instructors?: InstructorName[] | null };
+  instructors?: InstructorName[] | null; organization_slug?: string | null };
+export const CATALOG_ORGANIZATIONS = { "uc-anchor": "앵커사업단", "uc-sanhak": "산학협력단" } as const;
+export type CatalogOrganization = { id: string; slug: string };
 
 function isGuideRoom(value: string) { return /\d/.test(value) && /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*호?$/.test(value); }
 
@@ -133,27 +135,31 @@ export function recruitmentLabel(course: Pick<CatalogCourse, "status" | "apply_f
   if (now < Date.parse(course.apply_from)) return "모집 예정";
   return now < Date.parse(course.apply_until) ? "접수 중" : "접수 종료";
 }
-export type CatalogSearch = { q?: string | string[]; mode?: string | string[]; view?: string | string[]; state?: string | string[] };
+export type CatalogSearch = { q?: string | string[]; mode?: string | string[]; view?: string | string[]; state?: string | string[]; org?: string | string[] };
 export function catalogFilters(params: CatalogSearch) {
+  const org = params.org === "uc-anchor" || params.org === "uc-sanhak" ? params.org : "";
   const q = (typeof params.q === "string" ? params.q : "").trim().slice(0, 100);
   const mode = typeof params.mode === "string" && ["ONLINE", "OFFLINE", "BLENDED"].includes(params.mode) ? params.mode : "";
   const state = params.state === "completed" ? "completed" as const : params.state === "all" ? "all" as const : "current" as const;
-  return { q, mode, state, view: params.view === "list" ? "list" as const : "cards" as const };
+  return { org, q, mode, state, view: params.view === "list" ? "list" as const : "cards" as const };
 }
 export function catalogHref(filters: ReturnType<typeof catalogFilters>, view: "cards" | "list") {
   const query = new URLSearchParams({ view });
+  if (filters.org) query.set("org", filters.org);
   if (filters.q) query.set("q", filters.q);
   if (filters.mode) query.set("mode", filters.mode);
   if (filters.state !== "current") query.set("state", filters.state);
   return `/courses?${query}`;
 }
-export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSummary[]): CatalogCourse[] {
+export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSummary[], organizations: CatalogOrganization[] = []): CatalogCourse[] {
+  const organizationById = new Map(organizations.map(org => [org.id, org.slug]));
   const linked = new Set(guides.map((guide) => guide.offering_id).filter(Boolean));
   const offeringById = new Map(offerings.map((offering) => [offering.id, offering]));
   return [
     ...guides.map((guide) => {
       const offering = guide.offering_id ? offeringById.get(guide.offering_id) : null;
       return { ...guide, period_label: guidePeriodLabel(guide.period_label, guide.year), offeringId: guide.offering_id, tuition: offering?.tuition ?? null,
+        organization_slug: organizationById.get(offering?.org_id ?? guide.org_id) ?? null,
         status: offering?.status ?? null, apply_from: offering?.apply_from ?? null, apply_until: offering?.apply_until ?? null,
         ends_on: offering?.ends_on ?? guideEndDate(guide.period_label, guide.year),
         href: `/courses/${guide.id}` };
@@ -162,12 +168,13 @@ export function mergeCatalog(guides: CourseGuideSummary[], offerings: CourseSumm
       ...offering, period_label: formatGuidePeriod(offering.starts_on, offering.ends_on) ?? `${offering.starts_on} ~ ${offering.ends_on}`,
       certificate: null, teaching_hours: null, offeringId: offering.id, href: `/offerings/${offering.id}`,
       card_image_url: null, org_id: null,
+      organization_slug: organizationById.get(offering.org_id) ?? null,
     })),
   ];
 }
 export function filterCatalog(courses: CatalogCourse[], filters: ReturnType<typeof catalogFilters>, now = Date.now()) {
   const q = filters.q.toLocaleLowerCase("ko-KR").replace(/\s+/g, "");
-  return courses.filter((course) => (filters.state === "all" || (filters.state === "completed" ? !courseIsUpcoming(course, now) : courseIsUpcoming(course, now))) && (!filters.mode || course.mode === filters.mode) &&
+  return courses.filter((course) => (!filters.org || course.organization_slug === filters.org) && (filters.state === "all" || (filters.state === "completed" ? !courseIsUpcoming(course, now) : courseIsUpcoming(course, now))) && (!filters.mode || course.mode === filters.mode) &&
     (!q || `${course.name} ${course.summary} ${course.academy} ${course.certificate ?? ""}`
       .toLocaleLowerCase("ko-KR").replace(/\s+/g, "").includes(q)));
 }
