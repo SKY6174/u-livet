@@ -16,7 +16,7 @@ export function PageIntro({
   return (
     <div className="relative mb-8">
       <p className="eyebrow">{eyebrow}</p>
-      <div className="flex items-start gap-2">
+      <div className="flex flex-wrap items-start gap-2">
         <h1 className={`page-title min-w-0 ${children ? "mb-0" : ""}`}>{title}</h1>
         {children && <PageDescriptionHint label={title}>{children}</PageDescriptionHint>}
       </div>
