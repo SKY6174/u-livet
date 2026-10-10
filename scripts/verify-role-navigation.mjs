@@ -109,6 +109,15 @@ await test('learner request alerts count only unresolved requests by document ty
   assert(!output.includes('신청자 2'));
   assert(!output.includes('신청자 5'));
 });
+await test('empty request data and failed queries show distinct guidance', () => {
+  const empty = renderToStaticMarkup(React.createElement(LearnerRequestAlerts, { data: { organizations: [], requests: [] } }));
+  assert(empty.includes('현재 처리할 수강생 요청이 없습니다'));
+  assert(!empty.includes('불러오지 못했습니다'));
+  const failed = renderToStaticMarkup(React.createElement(LearnerRequestAlerts, { data: null }));
+  assert(failed.includes('수강생 요청 알림을 불러오지 못했습니다'));
+  assert(!failed.includes('현재 처리할 수강생 요청이 없습니다'));
+  assert(!failed.includes('미처리 0건'));
+});
 await test('expert management is an independent office menu with correct nested selection', () => {
   const expert = nav.officeSections(member('COURSE_MANAGER')).flatMap(section => section.links).find(link => link.href === '/admin/instructors');
   assert.equal(expert.label, '강사 관리');
@@ -183,6 +192,56 @@ await test('office hub rejects guests/learners/teachers and permits each actual 
     assert.equal(learnerRequestReads - readsBefore, roles.some(role => ['SYSTEM_ADMIN', 'COURSE_MANAGER', 'FINANCE'].includes(role)) ? 1 : 0);
     await AdminLayout({ children: null });
   }
+});
+await test('office roster members without roles receive guidance without protected data or links', async () => {
+  for (const position of Object.keys(audience.OFFICE_POSITIONS)) {
+    me = { ...member(), member_group: 'office', office_position: position };
+    const readsBefore = learnerRequestReads;
+    await AdminLayout({ children: null });
+    const output = renderToStaticMarkup(await Admin({ searchParams: Promise.resolve({}) }));
+    assert(output.includes('아직 부여된 업무 권한이 없습니다'));
+    assert(output.includes('계정 관리 담당자'));
+    assert(output.includes('href="/mypage"'));
+    assert(output.includes('href="/admin"'));
+    assert.equal(learnerRequestReads, readsBefore);
+    for (const href of ['/admin/courses', '/admin/accounts', '/admin/applications', '/admin/learners', '/admin/instructors', '/admin/learner-documents']) {
+      assert(!output.includes(`href="${href}"`), href);
+    }
+    const CourseGate = load('src/app/admin/courses/layout.tsx', { '@/components/navigation/office-section': section }).default;
+    const child = CourseGate({ children: null });
+    await assert.rejects(child.type(child.props), /NOT_FOUND/);
+    await assert.rejects(Admin({ searchParams: Promise.resolve({ create: '1' }) }), /NOT_FOUND/);
+  }
+});
+await test('member-entry operators keep their authorized menu without the no-role notice', async () => {
+  me = { ...member(), member_entry_orgs: [{ org_id: 'own-org', org_name: '검증 기관', is_super_admin: false }] };
+  const output = renderToStaticMarkup(await Admin({ searchParams: Promise.resolve({}) }));
+  assert(output.includes('href="/admin/accounts"'));
+  assert(!output.includes('아직 부여된 업무 권한이 없습니다'));
+  assert(!output.includes('href="/admin/courses"'));
+});
+await test('admin boundaries explain loading, access denial and failures with a working retry', () => {
+  const Loading = load('src/app/admin/loading.tsx').default;
+  const loading = renderToStaticMarkup(React.createElement(Loading));
+  assert(loading.includes('role="status"'));
+  assert(loading.includes('업무 권한'));
+  const NotFound = load('src/app/admin/not-found.tsx', common).default;
+  const denied = renderToStaticMarkup(React.createElement(NotFound));
+  assert(denied.includes('관리 업무에 접근할 수 없습니다'));
+  assert(denied.includes('업무 권한이 없거나'));
+  const ErrorPage = load('src/app/admin/error.tsx', common).default;
+  let retries = 0;
+  const tree = ErrorPage({ reset: () => { retries++; } });
+  const failed = renderToStaticMarkup(tree);
+  assert(failed.includes('role="alert"'));
+  assert(failed.includes('관리 화면을 불러오지 못했습니다'));
+  function clickRetry(node) {
+    if (!React.isValidElement(node)) return;
+    if (node.type === 'button') node.props.onClick();
+    React.Children.forEach(node.props.children, clickRetry);
+  }
+  clickRetry(tree);
+  assert.equal(retries, 1);
 });
 await test('course subtrees retain their existing server role gates', async () => {
   const redirectOnly = ['finance', 'performance', 'kpi'];
