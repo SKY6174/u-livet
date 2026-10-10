@@ -15,10 +15,10 @@ const STATE_TONES: Record<string, string> = {
 const stateTone = (c: OperationCourse) => STATE_TONES[status(c)] ?? STATE_TONES.DRAFT;
 const status = (c: OperationCourse) => c.workspace?.status ?? "DRAFT";
 const stateLabel = (c: OperationCourse) => ({ DRAFT: "개설 준비", ARCHIVED: "운영 완료·보관", PUBLISHED: "모집 공개", CLOSED: "모집 종료" })[status(c)] ?? "개설 준비";
-const COURSE_ACTION_CLASS = "relative flex min-h-12 min-w-0 items-center justify-center break-words rounded-xl border border-teal-200 bg-teal-50 py-2 pl-1.5 pr-5 text-center text-xs font-semibold leading-4 text-teal-900 transition-colors hover:border-teal-300 hover:bg-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2";
+const COURSE_ACTION_CLASS = "relative flex min-h-12 items-center justify-center whitespace-nowrap rounded-xl border border-teal-200 bg-teal-50 py-2 pl-1.5 pr-5 text-center text-xs font-semibold leading-4 text-teal-900 transition-colors hover:border-teal-300 hover:bg-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2";
 const COURSE_ACTION_ICON = <ArrowUpRight size={12} aria-hidden="true" className="absolute right-1.5 top-1.5 text-teal-700" />;
 function CourseActions({ course: c, manager, org }: { course: OperationCourse; manager: boolean; org: string }) {
-  return <div role="group" aria-label={`${c.name} 관리 메뉴`} className="grid grid-cols-3 gap-2">
+  return <div role="group" aria-label={`${c.name} 관리 메뉴`} className="grid grid-cols-[repeat(auto-fit,minmax(8.5rem,1fr))] gap-2">
     {manager && (c.workspace ? <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}`}>과정 정보 관리{COURSE_ACTION_ICON}</Link> : c.source_id && <Link className={COURSE_ACTION_CLASS} href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>과정 개설 준비{COURSE_ACTION_ICON}</Link>)}
     {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>강사 배정{COURSE_ACTION_ICON}</Link>}
     {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/operation-documents/${c.workspace.id}/plan`}>운영계획서 작성{COURSE_ACTION_ICON}</Link>}
