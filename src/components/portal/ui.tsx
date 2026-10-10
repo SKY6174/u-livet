@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CourseSummary } from "@/lib/portal/types";
 import { modeLabel } from "@/lib/portal/data";
 import { ArrowUpRight, CalendarDays, Clock3, Users, Wallet } from "lucide-react";
+import { PageDescriptionHint } from "./page-description-hint";
 
 export function PageIntro({
   eyebrow,
@@ -13,12 +14,12 @@ export function PageIntro({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="mb-8">
+    <div className="relative mb-8">
       <p className="eyebrow">{eyebrow}</p>
-      <h1 className="page-title">{title}</h1>
-      {children && (
-        <div className="mt-3 max-w-3xl text-slate-600">{children}</div>
-      )}
+      <div className="flex items-start gap-2">
+        <h1 className={`page-title min-w-0 ${children ? "mb-0" : ""}`}>{title}</h1>
+        {children && <PageDescriptionHint label={title}>{children}</PageDescriptionHint>}
+      </div>
     </div>
   );
 }

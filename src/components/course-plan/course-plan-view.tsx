@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageIntro } from "@/components/portal/ui";
 import {
   ACADEMIES, AFFILIATIONS, BUDGET_LABELS, filterCourses,
   formatSourceNumber, formatSourceText, sumCourses,
@@ -95,11 +96,9 @@ export function CoursePlanView({ plan, filters }: {
   const courses = filterCourses(plan.courses, filters);
   return (
     <div className="page-shell">
-      <p className="eyebrow">2026 RISE · 연간 교육계획</p>
-      <h1 className="page-title">평생직업교육과정 현황</h1>
-      <p className="mt-3 text-slate-600">
+      <PageIntro eyebrow="2026 RISE · 연간 교육계획" title="평생직업교육과정 현황">
         아카데미별 연간 계획의 과정·인력·일정·예산을 확인하세요. 실제 운영은 과정 운영 관리에서 확인합니다.
-      </p>
+      </PageIntro>
       <section aria-label="세부 과정 전체 합산" className="my-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           ["세부 과정", total.count.toLocaleString("ko-KR"), "개"],

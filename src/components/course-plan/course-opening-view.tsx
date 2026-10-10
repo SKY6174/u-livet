@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageIntro } from "@/components/portal/ui";
 import { ACADEMIES, formatSourceNumber } from "@/lib/course-plan/model";
 import type { OpeningCopyOverview } from "@/lib/course-opening/working-copy-overview";
 import {
@@ -126,9 +127,7 @@ export function CourseOpeningView({ plan, filters, workingCopies = { items: [], 
   const additional = plan.courses.filter((course) => !course.existingCourseId);
   return (
     <div className="page-shell">
-      <p className="eyebrow">2026 RISE · 운영계획서 검토</p>
-      <h1 className="page-title">평생직업교육과정 개설 준비</h1>
-      <p className="mt-3 max-w-3xl text-slate-600">운영계획서의 교육내용·인력·일정을 확인하고, 모집 전에 확정할 조건을 검토하세요. 모든 값은 계획 기준이며 개설 승인이나 모집 공고가 아닙니다.</p>
+      <PageIntro eyebrow="2026 RISE · 운영계획서 검토" title="평생직업교육과정 개설 준비">운영계획서의 교육내용·인력·일정을 확인하고, 모집 전에 확정할 조건을 검토하세요. 모든 값은 계획 기준이며 개설 승인이나 모집 공고가 아닙니다.</PageIntro>
       <section id="draft-overview" aria-label="내 개설 준비 임시저장 현황" className="mt-6 rounded-xl border border-teal-100 bg-teal-50 p-5">
         {workingCopies.unavailable ? <>
           <h2 className="font-bold">임시저장 현황을 불러오지 못했습니다</h2>

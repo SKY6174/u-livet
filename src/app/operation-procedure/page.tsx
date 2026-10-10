@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, Building2, Check, ClipboardCheck, Info, ShieldCheck, UsersRound } from "lucide-react";
+import { PageIntro } from "@/components/portal/ui";
 
 export const metadata: Metadata = {
   title: "평생직업교육 운영절차 | U-LiVET",
@@ -81,11 +82,7 @@ const SECTION_LINKS = [
 export default function OperationProcedure() {
   return (
     <div className="page-shell break-keep">
-      <div className="mb-8">
-        <p className="eyebrow">OPERATION GUIDE</p>
-        <h1 className="page-title">평생직업교육 운영절차</h1>
-        <p className="max-w-3xl leading-8 text-slate-600">교육과정 기획부터 모집·운영, 결과보고와 정산까지의 절차를 안내합니다. 내부·외부 교육과정은 개설 방식에 따라 구분하며, 모집 미달 기준과 정산 원칙은 공통으로 적용합니다.</p>
-      </div>
+      <PageIntro eyebrow="OPERATION GUIDE" title="평생직업교육 운영절차">교육과정 기획부터 모집·운영, 결과보고와 정산까지의 절차를 안내합니다. 내부·외부 교육과정은 개설 방식에 따라 구분하며, 모집 미달 기준과 정산 원칙은 공통으로 적용합니다.</PageIntro>
 
       <nav aria-label="운영절차 바로가기" className="mb-12 flex flex-wrap gap-2">
         {SECTION_LINKS.map(([id, label]) => (
