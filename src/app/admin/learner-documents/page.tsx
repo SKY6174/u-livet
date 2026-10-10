@@ -23,6 +23,7 @@ const field = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2
 const rowField = "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
 const kindKeys = Object.keys(DOCUMENT_KIND_LABELS) as LearnerDocumentKind[];
 const statusKeys = Object.keys(DOCUMENT_STATUS_LABELS) as LearnerDocumentStatus[];
+const DOCUMENT_QUEUE_HELP = "안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 수강 신청과 동의가 접수된 원서는 승인 시 등록 절차로 연결됩니다. 유료 과정은 납부 완료 후 등록이 확정됩니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.";
 const KIND_FILTERS = [
   { value: "", label: "전체" },
   { value: "APPLICATION", label: "수강신청" },
@@ -57,7 +58,8 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
 
   return <div className="page-shell max-w-[1680px] space-y-7">
     <PageIntro eyebrow="LEARNER DOCUMENT DESK" title="수강생 서류 접수·처리">
-      수강신청원서, 장학금 지급신청서, 수강료환불신청서의 원본과 처리 이력을 확인하고 수강생에게 진행 상태를 안내합니다.
+      <p>수강신청원서, 장학금 지급신청서, 수강료환불신청서의 원본과 처리 이력을 확인하고 수강생에게 진행 상태를 안내합니다.</p>
+      <p className="mt-3">{DOCUMENT_QUEUE_HELP}</p>
     </PageIntro>
     {params.notice && <p role="status" className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">{params.notice}</p>}
     {params.error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900">{params.error}</p>}
@@ -83,7 +85,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
       <section aria-labelledby="document-queue-heading">
         <div className="mb-4 flex items-center justify-between"><h2 id="document-queue-heading" className="text-xl font-bold">접수 문서</h2><span className="text-sm text-slate-500">조회 {requests.length.toLocaleString("ko-KR")}건</span></div>
         {requests.length ? <>
-          <p id="document-queue-help" className="mb-3 text-sm leading-6 text-slate-600">안내 내용은 상태 저장 시 수강생에게 즉시 공개됩니다. 수강 신청과 동의가 접수된 원서는 승인 시 등록 절차로 연결됩니다. 유료 과정은 납부 완료 후 등록이 확정됩니다. 상태 변경에는 최근 추가 인증이 필요합니다. 좁은 화면에서는 목록을 좌우로 스크롤해 주세요.</p>
+          <p id="document-queue-help" className="sr-only">{DOCUMENT_QUEUE_HELP}</p>
           <div role="region" aria-labelledby="document-queue-heading" aria-describedby="document-queue-help" tabIndex={0} className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white">
             <table className="w-full min-w-[1320px] table-fixed text-left text-sm">
               <caption className="sr-only">접수 문서 목록. 각 행에서 처리 결과와 수강생 안내를 입력하고 상태를 저장할 수 있습니다.</caption>
@@ -166,7 +168,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                       </div>}
                     </td>
                     <td className="px-2 py-5">
-                      <a href={`/api/learner-documents/${request.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold text-slate-700 hover:bg-slate-50">
+                      <a href={`/api/learner-documents/${request.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold text-slate-700 hover:bg-slate-50">
                         <FileText size={16} className="shrink-0" aria-hidden="true" /><span>신청서<span className="sr-only"> · {rowLabel} PDF (새 창)</span></span>
                       </a>
                     </td>
