@@ -9,16 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       fontSize: {
-        xs: ["1.125rem", { lineHeight: "1.6" }],
-        sm: ["1.125rem", { lineHeight: "1.6" }],
-        base: ["1.25rem", { lineHeight: "1.6" }],
-        lg: ["1.25rem", { lineHeight: "1.5" }],
-        xl: ["1.375rem", { lineHeight: "1.4" }],
-        "2xl": ["1.625rem", { lineHeight: "1.3" }],
-        "3xl": ["2rem", { lineHeight: "1.25" }],
-        "4xl": ["2.375rem", { lineHeight: "1.2" }],
-        "5xl": ["3.125rem", { lineHeight: "1.1" }],
-        "6xl": ["3.875rem", { lineHeight: "1.1" }],
+        xs: ["calc(1rem + var(--type-adjust))", { lineHeight: "1.6" }],
+        sm: ["calc(1rem + var(--type-adjust))", { lineHeight: "1.6" }],
+        base: ["calc(1.125rem + var(--type-adjust))", { lineHeight: "1.6" }],
+        lg: ["calc(1.125rem + var(--type-adjust))", { lineHeight: "1.5" }],
+        xl: ["calc(1.25rem + var(--type-adjust))", { lineHeight: "1.4" }],
+        "2xl": ["calc(1.5rem + var(--type-adjust))", { lineHeight: "1.3" }],
+        "3xl": ["calc(1.875rem + var(--type-adjust))", { lineHeight: "1.25" }],
+        "4xl": ["calc(2.25rem + var(--type-adjust))", { lineHeight: "1.2" }],
+        "5xl": ["calc(3rem + var(--type-adjust))", { lineHeight: "1.1" }],
+        "6xl": ["calc(3.75rem + var(--type-adjust))", { lineHeight: "1.1" }],
       },
       colors: {
         // 울산과학대학교 앵커사업단 브랜드 컬러 팔레트
