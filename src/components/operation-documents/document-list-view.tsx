@@ -79,7 +79,7 @@ interface DocumentListViewProps {
   organizations: { id: string; name: string }[];
 }
 
-const academyLabel = (academy: string) => academy === "로컬창업 아카데미" ? "C1-LOCAL-BUSINESS-00" : academy;
+const programIdLabel = (programId: string) => programId === "C1-RISE-P03" ? "C1-LOCAL-BUSINESS-03" : programId;
 const organizationYearLabel = (course: DocumentCourseItem) => {
   const organization = course.org_name === "울산과학대학교 앵커사업단" ? "앵커사업단" : course.org_name;
   const year = course.year_label.match(/\d+차년도/)?.[0] ?? course.year_label;
@@ -180,7 +180,7 @@ export function DocumentListView({ kind, courses, manager, organizations }: Docu
 
       // 검색어 필터
       if (!q) return true;
-      const combined = `${c.program_id} ${academyLabel(c.academy)} ${c.name} ${c.teachers} ${c.responsible} ${c.source_coordinator} ${c.assistants} ${c.support_staff} ${c.location}`
+      const combined = `${programIdLabel(c.program_id)} ${c.academy} ${c.name} ${c.teachers} ${c.responsible} ${c.source_coordinator} ${c.assistants} ${c.support_staff} ${c.location}`
         .toLowerCase()
         .replace(/\s/g, "");
       return combined.includes(q);
@@ -366,10 +366,10 @@ export function DocumentListView({ kind, courses, manager, organizations }: Docu
                 key={c.id}
                 className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
               >
-                {/* 상단 배지: 아카데미 코드 및 상태 */}
+                {/* 상단 배지: 아카데미 및 상태 */}
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="rounded bg-teal-50 px-2 py-1 font-semibold text-teal-800">
-                    {academyLabel(c.academy)}
+                    {c.academy}
                   </span>
                   <span className={`rounded border px-2 py-0.5 text-xs ${badgeClass}`}>
                     {statusText}
@@ -378,8 +378,8 @@ export function DocumentListView({ kind, courses, manager, organizations }: Docu
 
                 {/* 프로그램 ID 및 과정명 */}
                 <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                  <p className="font-semibold tracking-wide text-slate-400">{c.program_id}</p>
-                  <p className="ml-auto text-right text-slate-500">{organizationYearLabel(c)}</p>
+                  <p className="font-semibold tracking-wide text-slate-400">{programIdLabel(c.program_id)}</p>
+                  <p className="ml-auto text-right text-[calc(1em-2px)] text-slate-500">{organizationYearLabel(c)}</p>
                 </div>
                 {isResult && c.has_source_report && (
                   <p className="mt-1 text-xs font-semibold text-teal-700">
@@ -522,13 +522,13 @@ export function DocumentListView({ kind, courses, manager, organizations }: Docu
 
                     {/* 프로그램 ID */}
                     <td className="whitespace-nowrap p-4 font-mono text-xs font-semibold text-slate-600">
-                      {c.program_id}
+                      {programIdLabel(c.program_id)}
                     </td>
 
                     {/* 세부 프로그램 명칭 */}
                     <th scope="row" className="min-w-64 p-4 font-semibold">
                       <span className="mb-1 block text-xs font-semibold text-teal-700">
-                        {academyLabel(c.academy)}
+                        {c.academy}
                       </span>
                       <span className="text-base font-bold text-slate-900">
                         {c.name}
