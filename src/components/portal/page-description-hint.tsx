@@ -60,7 +60,7 @@ export function PageDescriptionHint({ label, children }: { label: string; childr
       id={bubbleId}
       hidden={!open}
       role="status"
-      className="absolute left-0 top-full z-30 max-h-[50vh] w-[calc(100vw-2.5rem)] max-w-xl overflow-y-auto rounded-2xl border border-teal-200 bg-white p-5 pr-12 text-base leading-relaxed text-slate-700 shadow-xl before:absolute before:-top-2 before:left-6 before:h-4 before:w-4 before:rotate-45 before:border-l before:border-t before:border-teal-200 before:bg-white"
+      className="absolute left-0 top-full z-30 max-h-[50vh] w-[calc(100vw-2.5rem)] max-w-xl overflow-y-auto rounded-2xl border border-teal-200 bg-white p-5 pr-12 text-sm leading-relaxed text-slate-700 shadow-xl before:absolute before:-top-2 before:left-6 before:h-4 before:w-4 before:rotate-45 before:border-l before:border-t before:border-teal-200 before:bg-white"
       onMouseEnter={clearHideTimer}
       onMouseLeave={() => scheduleHide(3000)}
       onFocusCapture={clearHideTimer}
