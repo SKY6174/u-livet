@@ -6,6 +6,7 @@ import { hasRole, isOfficeMember, officeSections } from "@/lib/auth/workspace-na
 import { getAdminLearnerDocuments } from "@/lib/learner-document-workflow/data";
 import { LearnerRequestAlerts } from "@/components/admin/learner-request-alerts";
 import { MenuHint } from "@/components/navigation/menu-hint";
+import { Empty } from "@/components/portal/ui";
 
 const WORKSPACE_ICONS = {
   "/admin/development": Layers3,
@@ -41,6 +42,7 @@ export default async function Admin({ searchParams }: {
     }
     redirect(`/admin/courses?${query.toString()}#new-course`);
   }
+  const sections = officeSections(me);
   const canReviewLearnerRequests = hasRole(me, "SYSTEM_ADMIN", "COURSE_MANAGER", "FINANCE");
   const learnerRequests = canReviewLearnerRequests
     ? await getAdminLearnerDocuments({ kind: null, status: null, query: "" })
@@ -58,8 +60,19 @@ export default async function Admin({ searchParams }: {
       </div>
       {hasRole(me, "COURSE_MANAGER") && <Link className="btn-secondary mb-6" href="/admin/course-requests">수강생 희망 과목 제안·검토 →</Link>}
       {learnerRequests !== undefined && <LearnerRequestAlerts data={learnerRequests} />}
+      {sections.length === 0 && (
+        <Empty title="아직 부여된 업무 권한이 없습니다">
+          <p className="leading-7">사업단 구성원으로 등록되어 있지만, 현재 이 계정에 부여된 관리 업무 권한이 없습니다.</p>
+          <p className="mt-2 leading-7">계정 관리 담당자에게 과정·신청·수강생·강사 관리 등 담당 업무의 권한 부여를 요청해 주세요.</p>
+          <p className="mt-2 leading-7">권한이 부여되면 이 화면을 새로고침하여 업무 메뉴를 확인할 수 있습니다.</p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <a href="/admin" className="btn-secondary">권한 다시 확인</a>
+            <Link href="/mypage" className="btn-secondary">내 정보 확인</Link>
+          </div>
+        </Empty>
+      )}
       <div className="space-y-8">
-        {officeSections(me).map(({ title, links }, sectionIndex) => (
+        {sections.map(({ title, links }, sectionIndex) => (
           <section key={title} aria-labelledby={`workspace-section-${sectionIndex}`}>
             <div className="mb-3 flex items-center gap-3">
               <span aria-hidden="true" className="text-xs font-semibold tabular-nums text-slate-400">{String(sectionIndex + 1).padStart(2, "0")}</span>
