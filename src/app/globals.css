@@ -7,9 +7,7 @@
    ============================================================================== */
 
 :root {
-  --font-body: 1.25rem;
-  --font-support: 1.125rem;
-  --font-menu: 1.375rem;
+  --type-adjust: 0px;
   --color-ink: #1e293b;
   --color-muted: #475569;
   --color-brand: #115e59;
@@ -35,10 +33,17 @@ html {
 }
 
 body {
+  --font-body: calc(1.125rem + var(--type-adjust));
+  --font-support: calc(1rem + var(--type-adjust));
+  --font-menu: calc(1.25rem + var(--type-adjust));
   color: var(--color-ink);
   background-color: #f8fafc;
   font-size: var(--font-body);
   line-height: 1.6;
+}
+
+body[data-typography="learner"] {
+  --type-adjust: 1.25px;
 }
 
 /* 직관적인 포커스 링 (웹 접근성 강화) */
@@ -61,17 +66,17 @@ body {
   /* Keep dense data tables readable without shrinking page copy or print forms. */
   #main table { font-size: calc(1em - 1.5px); }
   #main table:is(.text-xs, .text-sm),
-  #main table :is(.text-xs, .text-sm) { font-size: calc(1.125rem - 1.5px); }
+  #main table :is(.text-xs, .text-sm) { font-size: calc(1rem + var(--type-adjust) - 1.5px); }
   #main table.text-base,
-  #main table .text-base { font-size: calc(1.25rem - 1.5px); }
+  #main table .text-base { font-size: calc(1.125rem + var(--type-adjust) - 1.5px); }
   #main table.text-lg,
-  #main table .text-lg { font-size: calc(1.25rem - 1.5px); }
+  #main table .text-lg { font-size: calc(1.125rem + var(--type-adjust) - 1.5px); }
   #main table.text-xl,
-  #main table .text-xl { font-size: calc(1.375rem - 1.5px); }
+  #main table .text-xl { font-size: calc(1.25rem + var(--type-adjust) - 1.5px); }
   #main table.text-2xl,
-  #main table .text-2xl { font-size: calc(1.625rem - 1.5px); }
+  #main table .text-2xl { font-size: calc(1.5rem + var(--type-adjust) - 1.5px); }
   #main table.text-3xl,
-  #main table .text-3xl { font-size: calc(2rem - 1.5px); }
+  #main table .text-3xl { font-size: calc(1.875rem + var(--type-adjust) - 1.5px); }
   #main table button,
   #main table a.inline-flex { white-space: nowrap; }
 }
@@ -108,13 +113,14 @@ body {
     @apply mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-12;
   }
   .page-title {
-    @apply mb-4 text-[2rem] font-bold leading-tight tracking-tight md:text-[2.625rem];
+    @apply mb-4 font-bold leading-tight tracking-tight;
+    font-size: calc(1.875rem + var(--type-adjust));
   }
   .eyebrow {
     @apply mb-3 text-xs font-bold uppercase tracking-label text-teal-800;
   }
   .section-title {
-    @apply mb-5 text-2xl font-bold leading-snug md:text-[1.875rem];
+    @apply mb-5 text-2xl font-bold leading-snug;
   }
   .panel {
     @apply min-w-0 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6;
@@ -139,6 +145,21 @@ body {
   .badge {
     @apply inline-block rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800;
   }
+  .support-contact {
+    font-size: calc(12.5px + var(--type-adjust));
+  }
+  .support-contact-title {
+    font-size: calc(14.5px + var(--type-adjust));
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .page-title { font-size: calc(2.5rem + var(--type-adjust)); }
+  .section-title { font-size: calc(1.75rem + var(--type-adjust)); }
+}
+
+@media print {
+  body { --type-adjust: 0px; }
 }
 
 /* Course report print templates: named pages retain portrait/landscape in one PDF. */

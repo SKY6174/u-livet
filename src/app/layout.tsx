@@ -4,6 +4,7 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { RoleProvider } from "@/lib/auth/roleContext";
 import { getSessionIdentity } from "@/lib/auth/session";
+import { workspaceKind } from "@/lib/auth/workspace-navigation";
 import { isReviewOnly, REVIEW_MESSAGE } from "@/lib/deployment/review-mode";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.AUTH_SITE_ORIGIN ?? "http://localhost:3100"),
@@ -24,7 +25,7 @@ export default async function RootLayout({
   const reviewOnly = isReviewOnly();
   return (
     <html lang="ko">
-      <body className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+      <body data-typography={identity && (workspaceKind(identity) !== "learner" || identity.member_group === "instructor") ? "staff" : "learner"} className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
         <RoleProvider identity={identity}>
           {reviewOnly && <aside className="border-b border-amber-200 bg-amber-50 px-5 py-3 text-center text-base text-amber-950" role="status">{REVIEW_MESSAGE}</aside>}
           <Header />
