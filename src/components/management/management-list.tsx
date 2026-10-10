@@ -4,11 +4,26 @@ import { dateTime, statusLabel } from "@/lib/portal/data";
 import { APPLICATION_STATUSES, type Filters, type ManagementBoard, type ManagedApplication, type ManagedLearner } from "@/lib/management/data";
 
 export function ApplicationRows({ items }: { items: ManagedApplication[] }) {
-  return <div className="space-y-4">{items.map(a => <article key={a.id} className="panel">
-    <h3 className="text-lg font-bold"><Link className="underline" href={`/admin/applications/${a.id}`}>{a.name} · {a.course_name}</Link></h3>
-    <p className="mt-3">{statusLabel[a.status] ?? a.status} · {dateTime(a.submitted_at)}{!a.active && " · 삭제된 계정"}</p>
-    <p className="mt-2 text-sm text-slate-600">{a.enrollment_status === "ACTIVE" ? "수강 중" : a.enrollment_status === "WITHDRAWN" ? "수강 취소" : "수강 미확정"}</p>
-  </article>)}</div>;
+  return <div role="region" aria-label="신청내역 목록" tabIndex={0} className="overflow-x-auto rounded-2xl border border-slate-200 bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700">
+    <table className="w-full min-w-[960px] text-left text-sm">
+      <caption className="sr-only">신청자별 과정 신청 및 수강 상태</caption>
+      <thead className="bg-slate-50 text-slate-600">
+        <tr>{["신청자", "과정", "신청 상태", "신청일시", "수강 상태"].map(label => <th key={label} scope="col" className="whitespace-nowrap px-4 py-3 font-semibold">{label}</th>)}</tr>
+      </thead>
+      <tbody className="divide-y divide-slate-200">
+        {items.map(a => <tr key={a.id} className="hover:bg-teal-50/40">
+          <th scope="row" className="min-w-32 px-4 py-3 font-semibold">
+            <Link className="underline" href={`/admin/applications/${a.id}`} aria-label={`${a.name} · ${a.course_name} 신청 상세`}>{a.name}</Link>
+            {!a.active && <span className="mt-1 block font-normal text-slate-600">삭제된 계정</span>}
+          </th>
+          <td className="min-w-64 max-w-md break-words px-4 py-3">{a.course_name}</td>
+          <td className="whitespace-nowrap px-4 py-3">{statusLabel[a.status] ?? a.status}</td>
+          <td className="whitespace-nowrap px-4 py-3 text-slate-600"><time dateTime={a.submitted_at}>{dateTime(a.submitted_at)}</time></td>
+          <td className="whitespace-nowrap px-4 py-3 text-slate-600">{a.enrollment_status === "ACTIVE" ? "수강 중" : a.enrollment_status === "WITHDRAWN" ? "수강 취소" : "수강 미확정"}</td>
+        </tr>)}
+      </tbody>
+    </table>
+  </div>;
 }
 export function ManagementList({ kind, data, filters }: { kind: "applications" | "learners"; data: ManagementBoard<ManagedApplication> | ManagementBoard<ManagedLearner>; filters: Filters }) {
   const path = `/admin/${kind}`;
