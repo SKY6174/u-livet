@@ -9,7 +9,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { CalendarDays, LayoutGrid, List, Search } from "lucide-react";
+import { ArrowRight, CalendarDays, LayoutGrid, List, Search } from "lucide-react";
 import { STATUS_LABELS, RESULT_STATUS_LABELS } from "@/lib/operation-documents/model";
 
 /**
@@ -443,13 +443,11 @@ export function DocumentListView({ kind, courses, manager, organizations }: Docu
                 <div className="mt-auto border-t border-slate-100 pt-4">
                   {c.registered ? (
                     <Link
-                      className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50/60 p-3 text-sm font-semibold text-teal-900 transition hover:border-teal-400 hover:bg-teal-100/80"
+                      className="flex items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50/60 p-3 text-sm font-semibold text-teal-900 transition hover:border-teal-400 hover:bg-teal-100/80"
                       href={`/operation-documents/${c.id}/${kind}`}
                     >
-                      <span>{label} 작성·검토 →</span>
-                      <span className="text-xs font-bold text-teal-800">
-                        {statusText}
-                      </span>
+                      <span>{label} 작성·검토</span>
+                      <ArrowRight className="h-5 w-5 shrink-0" aria-hidden="true" />
                     </Link>
                   ) : (
                     <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
