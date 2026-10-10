@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import {
   ArrowUpRight,
   BookOpen,
+  Building2,
   ClipboardCheck,
   GraduationCap,
+  Search,
 } from "lucide-react";
 import { getSessionIdentity } from "@/lib/auth/session";
 import { hasRole, officeSections, workspaceKind } from "@/lib/auth/workspace-navigation";
@@ -42,12 +44,12 @@ export default async function Home() {
           </div>
           <form action="/courses" className="mt-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-end" role="search" aria-label="교육과정 검색">
             <label className="field flex-1">어떤 배움을 찾으세요?<input name="q" maxLength={100} placeholder="과정명 또는 관심 분야" type="search" /></label>
-            <button className="btn-primary sm:shrink-0" type="submit">교육과정 검색</button>
+            <button className="btn-primary gap-2 sm:shrink-0" type="submit"><Search className="h-5 w-5 shrink-0" aria-hidden="true" />교육과정 검색</button>
           </form>
         </section>
         <section className="page-shell" aria-labelledby="recruiting-title">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <h2 id="recruiting-title" className="section-title mb-0">지금 신청할 수 있는 교육과정</h2>
+            <h2 id="recruiting-title" className="section-title mb-0 flex items-center gap-3"><BookOpen className="h-7 w-7 shrink-0 text-teal-800" aria-hidden="true" />지금 신청할 수 있는 교육과정</h2>
             <Link href="/courses" className="btn-secondary">전체 교육과정 보기 →</Link>
           </div>
           {catalog.unavailable ? <Empty title="모집 정보를 불러오지 못했습니다">잠시 후 다시 확인해 주세요.</Empty>
@@ -58,12 +60,12 @@ export default async function Home() {
           <h2 id="start-title" className="section-title">배움의 시작부터, 차근차근</h2>
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              { href: "/terms", title: "수강신청 안내", detail: "신청 방법과 수강료·수료 안내를 확인하세요.", number: "01" },
-              { href: "/mypage", title: "나의 신청 확인", detail: "로그인 후 신청 상태와 수업 일정을 확인하세요.", number: "02" },
-              { href: "/about", title: "앵커사업 소개", detail: "지역과 함께하는 평생직업교육을 알아보세요.", number: "03" },
-            ].map(item => <Link key={item.href} href={item.href} className="panel transition hover:border-teal-600">
-              <span className="text-sm font-bold text-teal-800">{item.number}</span>
-              <h3 className="mt-3 text-xl font-bold">{item.title} →</h3>
+              { href: "/terms", title: "수강신청 안내", detail: "신청 방법과 수강료·수료 안내를 확인하세요.", number: "01", icon: ClipboardCheck },
+              { href: "/mypage", title: "나의 신청 확인", detail: "로그인 후 신청 상태와 수업 일정을 확인하세요.", number: "02", icon: BookOpen },
+              { href: "/about", title: "앵커사업 소개", detail: "지역과 함께하는 평생직업교육을 알아보세요.", number: "03", icon: Building2 },
+            ].map(item => <Link key={item.href} href={item.href} className="panel group transition hover:border-teal-600">
+              <span className="flex items-center justify-between gap-3 text-sm font-bold text-teal-800"><item.icon className="h-8 w-8 shrink-0 rounded-lg bg-teal-50 p-1.5" aria-hidden="true" />{item.number}</span>
+              <h3 className="mt-3 flex items-center justify-between gap-2 text-xl font-bold">{item.title}<ArrowUpRight className="h-5 w-5 shrink-0 text-teal-700 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" /></h3>
               <p className="mt-3 text-base leading-relaxed text-slate-600">{item.detail}</p>
             </Link>)}
           </div>

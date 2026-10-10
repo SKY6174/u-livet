@@ -7,9 +7,9 @@
    ============================================================================== */
 
 :root {
-  --font-body: 1.125rem;
-  --font-support: 1rem;
-  --font-menu: 1.25rem;
+  --font-body: 1.25rem;
+  --font-support: 1.125rem;
+  --font-menu: 1.375rem;
   --color-ink: #1e293b;
   --color-muted: #475569;
   --color-brand: #115e59;
@@ -86,13 +86,13 @@ body {
     @apply mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-12;
   }
   .page-title {
-    @apply mb-4 text-[1.875rem] font-bold leading-tight tracking-tight md:text-[2.5rem];
+    @apply mb-4 text-[2rem] font-bold leading-tight tracking-tight md:text-[2.625rem];
   }
   .eyebrow {
     @apply mb-3 text-xs font-bold uppercase tracking-label text-teal-800;
   }
   .section-title {
-    @apply mb-5 text-2xl font-bold leading-snug md:text-[1.75rem];
+    @apply mb-5 text-2xl font-bold leading-snug md:text-[1.875rem];
   }
   .panel {
     @apply min-w-0 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6;
