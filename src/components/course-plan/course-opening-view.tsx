@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { PageIntro } from "@/components/portal/ui";
 import { ACADEMIES, formatSourceNumber } from "@/lib/course-plan/model";
@@ -192,7 +193,7 @@ export function CourseOpeningView({ plan, filters, workingCopies = { items: [], 
           <h2 className="break-words text-xl font-bold">{course.title}</h2>
           <p className="mt-3 text-sm leading-relaxed text-slate-600">{course.summaryFromPlan}</p>
           <dl className="mt-5 grid gap-4 sm:grid-cols-3">
-            <Field label="계획서 표제 교육기간">{course.schedule.declaredPeriod.startsOn} ~ {course.schedule.declaredPeriod.endsOn}</Field>
+            <Field label="계획서 표제 교육기간">{formatDateRange(course.schedule.declaredPeriod.startsOn, course.schedule.declaredPeriod.endsOn)}</Field>
             <Field label="계획 정원·시수">{course.capacity}명 · {course.teachingHours}시간</Field>
             <Field label="담당교수 (계획서)">{course.facultyCoordinator}</Field>
           </dl>

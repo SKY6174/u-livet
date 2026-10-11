@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/date-format";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Award, CalendarDays, Clock3, HeartPulse, Lightbulb, Sparkles, Users } from "lucide-react";
@@ -10,16 +11,9 @@ function academyStyle(academy: string) {
   if (academy.startsWith("로컬창업")) return { Icon: Lightbulb, badge: "bg-amber-50 text-amber-800", accent: "bg-amber-500" };
   return { Icon: Sparkles, badge: "bg-indigo-50 text-indigo-800", accent: "bg-indigo-500" };
 }
-const recruitmentDate = new Intl.DateTimeFormat("ko-KR", {
-  timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
-});
-function formatRecruitmentDate(value: string) {
-  const parts = recruitmentDate.formatToParts(new Date(value));
-  return ["year", "month", "day"].map(type => parts.find(part => part.type === type)?.value).join(".");
-}
 function RecruitmentDates({ course: c }: { course: CatalogCourse }) {
   return c.apply_from && c.apply_until ? (
-    <span className="whitespace-nowrap tabular-nums"><time dateTime={c.apply_from}>{formatRecruitmentDate(c.apply_from)}</time>{" ~ "}<time dateTime={c.apply_until}>{formatRecruitmentDate(c.apply_until)}</time></span>
+    <span className="whitespace-nowrap tabular-nums"><time dateTime={c.apply_from}>{formatDate(c.apply_from)}</time>{" ~ "}<time dateTime={c.apply_until}>{formatDate(c.apply_until)}</time></span>
   ) : "모집 일정 안내 예정";
 }
 export function GuideCard({ course: c, index, canEdit = false }: { course: CatalogCourse; index: number; canEdit?: boolean }) {

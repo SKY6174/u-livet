@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -27,7 +28,7 @@ export default async function Performance() {
               <span className="badge">{y.org_name}</span>
               <h2 className="mt-3 text-xl font-bold">{y.label}</h2>
               <p className="mt-2 text-sm text-slate-500">
-                {y.starts_on} ~ {y.ends_on}
+                {formatDateRange(y.starts_on, y.ends_on)}
               </p>
               <p className="mt-5 text-teal-800">운영 통계·지표·보고 보기 →</p>
             </Link>

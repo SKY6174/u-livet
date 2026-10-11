@@ -1,3 +1,4 @@
+import { formatDate, formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { MenuHint } from "@/components/navigation/menu-hint";
 import { InstructorNames } from "@/components/portal/instructor-names";
@@ -44,13 +45,7 @@ import {
 import type { LearningCourse } from "@/lib/student-learning/types";
 import type { StudentLearningData } from "@/lib/student-learning/data";
 
-const shortDate = (value: string) =>
-  new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-  }).format(new Date(value));
+const shortDate = formatDate;
 const time = (value: string) =>
   new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",
@@ -192,7 +187,7 @@ function CourseCard({
               className="mt-0.5 h-4 w-4 shrink-0 text-slate-400"
               aria-hidden="true"
             />
-            {c.starts_on} ~ {c.ends_on}
+            {formatDateRange(c.starts_on, c.ends_on)}
           </p>
         </div>
         {session && (

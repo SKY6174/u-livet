@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { statusLabel } from "@/lib/portal/data";
@@ -31,7 +32,7 @@ export function CourseHeader({
             {o.name}
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-500">
-            {o.starts_on} ~ {o.ends_on} · 정원 {o.capacity}명
+            {formatDateRange(o.starts_on, o.ends_on)} · 정원 {o.capacity}명
             {operator ? ` · 운영 담당 ${operator}` : ""}
           </p>
         </div>

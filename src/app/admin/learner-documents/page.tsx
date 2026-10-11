@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import { FileClock, FileText, Search } from "lucide-react";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/portal/ui";
@@ -124,7 +125,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                           <label className="block text-xs font-semibold" htmlFor={`document-link-${request.id}`}>실제 개설 기수</label>
                           <select id={`document-link-${request.id}`} name="offering_id" required defaultValue="" className={rowField}>
                             <option value="" disabled>연결할 기수를 선택해 주세요</option>
-                            {offeringChoices.map(choice => <option key={choice.id} value={choice.id}>{choice.name} · {choice.starts_on}~{choice.ends_on} · {statusLabel[choice.status] ?? choice.status}</option>)}
+                            {offeringChoices.map(choice => <option key={choice.id} value={choice.id}>{choice.name} · {formatDateRange(choice.starts_on, choice.ends_on)} · {statusLabel[choice.status] ?? choice.status}</option>)}
                           </select>
                           <button type="submit" className="btn-secondary w-full text-xs">과정 연결</button>
                         </form> : <p className="text-xs leading-5 text-amber-800">담당자가 교육·모집 일정이 유효한 개설 기수를 준비한 후 연결해 주세요.</p>}

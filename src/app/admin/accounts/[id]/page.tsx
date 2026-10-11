@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { History, Pencil, Trash2 } from "lucide-react";
@@ -71,7 +72,7 @@ export default async function MemberDetail({ params, searchParams }: {
       <h2 className="mb-5 text-lg font-bold">{historyName} <span className="ml-2 text-sm font-normal text-slate-500">{history?.data ? `${history.data.total}건` : ""}</span></h2>
       {history?.error || !history?.data ? <Empty title="이력을 불러오지 못했습니다" /> : !history.data.items.length ? <Empty title="등록된 이력이 없습니다" /> : <>
         <div className="overflow-x-auto"><table className="w-full min-w-[540px] text-left text-sm"><caption className="sr-only">{member.name} {historyName}</caption><thead className="border-b text-slate-500"><tr>{["과정명", "기간", "상태"].map(label => <th key={label} scope="col" className="px-3 py-3 font-semibold">{label}</th>)}</tr></thead>
-          <tbody className="divide-y">{history.data.items.map(item => <tr key={item.id}><th scope="row" className="px-3 py-4 font-medium">{item.name}</th><td className="whitespace-nowrap px-3 py-4 tabular-nums">{item.starts_on} ~ {item.ends_on}</td><td className="whitespace-nowrap px-3 py-4">{HISTORY_STATUS[item.status] || item.status}</td></tr>)}</tbody></table></div>
+          <tbody className="divide-y">{history.data.items.map(item => <tr key={item.id}><th scope="row" className="px-3 py-4 font-medium">{item.name}</th><td className="whitespace-nowrap px-3 py-4 tabular-nums">{formatDateRange(item.starts_on, item.ends_on)}</td><td className="whitespace-nowrap px-3 py-4">{HISTORY_STATUS[item.status] || item.status}</td></tr>)}</tbody></table></div>
         <nav aria-label="구성원 이력 페이지" className="mt-5 flex justify-between text-sm"><span className="text-slate-500">{page} / {Math.max(1, Math.ceil(history.data.total / 20))} 페이지</span><div className="flex gap-4">{page > 1 && <Link className="text-teal-800" href={`${detail}&view=history&page=${page - 1}`}>← 이전</Link>}{page * 20 < history.data.total && <Link className="text-teal-800" href={`${detail}&view=history&page=${page + 1}`}>다음 →</Link>}</div></nav>
       </>}
     </section>}

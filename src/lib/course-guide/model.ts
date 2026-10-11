@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import type { CourseSummary, InstructorName } from "@/lib/portal/types";
 
 export type CourseGuide = {
@@ -75,9 +76,7 @@ export function parseGuidePeriod(period: string, year: number): { startDate: str
 
 export function formatGuidePeriod(startDate: string, endDate: string): string | null {
   if (!validGuideDate(startDate) || !validGuideDate(endDate) || endDate < startDate) return null;
-  const start = startDate.split("-").map(Number);
-  const end = endDate.split("-").map(Number);
-  return `${start[0]}. ${start[1]}. ${start[2]}. - ${start[0] === end[0] ? "" : `${end[0]}. `}${end[1]}. ${end[2]}.`;
+  return formatDateRange(startDate, endDate);
 }
 
 export function guidePeriodLabel(period: string, year: number) {

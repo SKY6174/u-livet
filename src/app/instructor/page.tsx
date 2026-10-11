@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
@@ -57,7 +58,7 @@ export default async function InstructorRoom() {
           <AccountInfo profile={profile} />
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {isExternal && <Link className="btn-primary text-sm" href="/parking">무료 주차권 신청</Link>}
+            <Link className="btn-primary text-sm" href="/parking">무료 주차권 신청</Link>
             <Link className="btn-primary text-sm" href="/mypage/instructor/documents">
               강사 서류 제출
             </Link>
@@ -251,7 +252,7 @@ export default async function InstructorRoom() {
                   </div>
                   <h3 className="mt-3 text-xl font-bold text-slate-900">{o.name}</h3>
                   <p className="mt-2 text-sm text-slate-600">
-                    교육 기간: {o.starts_on} ~ {o.ends_on}
+                    교육 기간: {formatDateRange(o.starts_on, o.ends_on)}
                   </p>
                   <p className="mt-3 text-sm text-slate-600">강의 운영에서 수강 확정 인원을 확인하세요. 모집 공개나 강사 배정만으로 개설이 확정되지는 않으며, 최종 운영 여부는 사업단에 확인해 주세요.</p>
                 </div>

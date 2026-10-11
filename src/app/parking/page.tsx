@@ -1,6 +1,8 @@
+import { formatDate, formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { requireIdentity } from "@/lib/auth/session";
 import { PageIntro } from "@/components/portal/ui";
+import { ParkingWorkflow } from "@/components/parking/workflow";
 import { getMyParkingContext } from "@/lib/parking/data";
 import { PARKING_STATUS_LABELS } from "@/lib/parking/types";
 import { cancelParkingVoucher, requestParkingVoucher } from "./actions";
@@ -9,11 +11,7 @@ const today = () =>
   new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(
     new Date(),
   );
-const shownDate = (value: string) =>
-  new Intl.DateTimeFormat("ko-KR", {
-    dateStyle: "medium",
-    timeZone: "Asia/Seoul",
-  }).format(new Date(value));
+const shownDate = formatDate;
 
 export default async function ParkingPage({
   searchParams,
@@ -30,7 +28,7 @@ export default async function ParkingPage({
   return (
     <div className="page-shell space-y-8">
       <PageIntro eyebrow="MY PARKING" title="무료 주차권 신청">
-        수강 중인 과정 또는 담당하는 교외강사 과정의 교육일에 사용할 주차권을
+        수강 중인 과정 또는 담당하는 교내·교외강사 과정의 교육일에 사용할 주차권을
         신청하세요. 담당 센터가 확인한 후 발급 여부가 표시됩니다.
       </PageIntro>
       {params.notice && (
@@ -55,6 +53,7 @@ export default async function ParkingPage({
         </p>
       ) : (
         <>
+          <ParkingWorkflow />
           <section className="panel" aria-labelledby="parking-request-title">
             <h2 id="parking-request-title" className="text-xl font-bold">
               발급 요청
@@ -81,7 +80,7 @@ export default async function ParkingPage({
                     </option>
                     {available.map((o) => (
                       <option value={o.id} key={o.id}>
-                        {o.name} · {o.center_code} · {o.starts_on}~{o.ends_on}
+                        {o.name} · {o.center_code} · {formatDateRange(o.starts_on, o.ends_on)}
                       </option>
                     ))}
                   </select>
@@ -157,7 +156,7 @@ export default async function ParkingPage({
                           {r.course_name}
                         </h3>
                         <p className="mt-1 text-sm text-slate-600">
-                          {r.center_code} · 사용일 {r.use_on} · {r.quantity}매
+                          {r.center_code} · 사용일 {formatDate(r.use_on)} · {r.quantity}매
                         </p>
                       </div>
                       <span className="badge">

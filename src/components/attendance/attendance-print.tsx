@@ -1,3 +1,4 @@
+import { formatDate, formatDateRange, formatDateTime } from "@/lib/date-format";
 import Image from "next/image";
 import { formatMinutes, sessionMinutes, type AttendanceBook } from "@/lib/attendance/model";
 import type { QrCheckin } from "@/lib/attendance/qr";
@@ -6,9 +7,7 @@ import styles from "./attendance-print.module.css";
 const groupsOf = <T,>(items: T[], size: number) => Array.from(
   { length: Math.ceil(items.length / size) }, (_, i) => items.slice(i * size, (i + 1) * size),
 );
-const date = (value: string) => new Intl.DateTimeFormat("ko-KR", {
-  timeZone: "Asia/Seoul", year: "2-digit", month: "2-digit", day: "2-digit",
-}).format(new Date(value));
+const date = formatDate;
 const time = (value: string) => new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false,
 }).format(new Date(value));
@@ -42,7 +41,7 @@ export function AttendancePrint({ book, title = "출석부", attachmentNumber }:
       {attachmentNumber && <div className="report-attachment-marker">[첨부 #{attachmentNumber}]</div>}
       <h1>{title}</h1>
       <table className="report-table report-form-meta"><tbody>
-        <tr><th>과정명</th><td>{book.offering.name}</td><th>교육기간</th><td>{book.offering.starts_on} ~ {book.offering.ends_on}</td></tr>
+        <tr><th>과정명</th><td>{book.offering.name}</td><th>교육기간</th><td>{formatDateRange(book.offering.starts_on, book.offering.ends_on)}</td></tr>
         <tr><th>교육시간/회</th><td>{perSession}</td><th>전체<br />교육시간</th><td>{formatMinutes(totalMinutes)}분</td></tr>
       </tbody></table>
       <p className={styles.caption}>전체 {sessions.length}회차 · 수강생 {book.members.length}명 · {page + 1}/{pages.length}쪽</p>
@@ -65,7 +64,7 @@ export function AttendancePrint({ book, title = "출석부", attachmentNumber }:
         })}</tbody>
       </table>
       <p className="report-note">QR 시작·종료 시각은 출석 인정시간과 다릅니다. 실제 인정시간은 강사 확정 출결을 따르며 ‘미확정’은 결석을 뜻하지 않습니다.</p>
-      <p className="report-note">조회 시각 {new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", dateStyle: "medium", timeStyle: "short" }).format(new Date(book.generated_at))}</p>
+      <p className="report-note">조회 시각 {formatDateTime(book.generated_at)}</p>
       <Image className="report-form-logo" src="/images/anchor-form-logo.png" width={432} height={71} alt="울산과학대학교 지역성장 인재양성체계(앵커)사업단" unoptimized />
     </section>)}
   </div>;

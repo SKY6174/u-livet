@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { ArrowRight, BookOpen, CalendarDays, MessageCircleQuestion, Users } from "lucide-react";
 import { CourseRecommendationRail } from "./course-recommendation-rail";
@@ -92,7 +93,7 @@ export function LearnerHome({ data, current }: { data: LearnerHomeData; current:
                 </div>
                 <h3 className="mt-4 text-xl font-bold text-slate-900">{course.name}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600"><InstructorNames instructors={course.instructor_roster ?? course.instructors.map((name) => ({ name, responsible: false }))} /></p>
-                <p className="mt-1 text-sm text-slate-600">{course.starts_on} ~ {course.ends_on}</p>
+                <p className="mt-1 text-sm text-slate-600">{formatDateRange(course.starts_on, course.ends_on)}</p>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-xl bg-slate-50 p-4">
                     <p className="flex items-center gap-2 text-xs font-semibold text-slate-600"><CalendarDays className="h-4 w-4 text-teal-700" aria-hidden="true" /> 다음 수업</p>

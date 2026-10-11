@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -85,7 +86,7 @@ export default async function OfferingPage(props: {
           <h2 className="section-title">수강신청 안내</h2>
           <dl className="space-y-4 text-base">
             {[
-              ["교육기간", `${o.starts_on} ~ ${o.ends_on}`],
+              ["교육기간", formatDateRange(o.starts_on, o.ends_on)],
               [
                 "접수기간",
                 o.status === "ARCHIVED" ? "접수 종료" : `${dateTime(o.apply_from)} ~ ${dateTime(o.apply_until)}`,

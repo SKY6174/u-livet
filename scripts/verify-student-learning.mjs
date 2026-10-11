@@ -16,7 +16,7 @@ function load(file, mocks = {}) {
   }).outputText;
   const module = { exports: {} };
   new Function("require", "module", "exports", code)(
-    (name) => (name in mocks ? mocks[name] : require(name)),
+    (name) => (name in mocks ? mocks[name] : name === "@/lib/date-format" ? load("src/lib/date-format.ts") : require(name)),
     module,
     module.exports,
   );

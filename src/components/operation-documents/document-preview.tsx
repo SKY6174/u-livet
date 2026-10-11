@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/date-format";
 /* eslint-disable @next/next/no-img-element -- Embedded private photographs and signatures are also used by the PDF renderer. */
 import type { ReactNode } from "react";
 import {
@@ -30,7 +31,7 @@ const groups = <T,>(rows: T[], size: number): T[][] =>
       )
     : [[]];
 const date = (s: string) =>
-  s ? s.replaceAll("-", ". ") + "." : "     .     .     .";
+  formatDate(s, "     .     .     .");
 function Grid({
   headers,
   rows,

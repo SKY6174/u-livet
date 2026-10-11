@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import type { CourseSummary } from "@/lib/portal/types";
 import { modeLabel } from "@/lib/portal/data";
@@ -64,12 +65,12 @@ export function CourseCard({ offering: o }: { offering: CourseSummary }) {
         <div>
           <dt className="flex items-center gap-2 text-slate-600"><CalendarDays className="h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />교육기간</dt>
           <dd>
-            {o.starts_on} ~ {o.ends_on}
+            {formatDateRange(o.starts_on, o.ends_on)}
           </dd>
         </div>
         <div>
           <dt className="flex items-center gap-2 text-slate-600"><Clock3 className="h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />신청기간</dt>
-          <dd>{o.apply_from && o.apply_until ? `${new Date(o.apply_from).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })} ~ ${new Date(o.apply_until).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}` : "별도 안내"}</dd>
+          <dd>{o.apply_from && o.apply_until ? formatDateRange(o.apply_from, o.apply_until) : "별도 안내"}</dd>
         </div>
         <div>
           <dt className="flex items-center gap-2 text-slate-600"><Users className="h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />운영방식</dt>

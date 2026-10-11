@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/lib/date-format";
 import type { LearnerDocumentType } from "@/lib/learner-documents/model";
 
 export const DOCUMENT_KIND = {
@@ -133,9 +134,5 @@ export function isOpenLearnerDocument(request: Pick<LearnerDocumentRequest, "kin
 }
 
 export function documentDate(value: string) {
-  return new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
+  return formatDateTime(value);
 }

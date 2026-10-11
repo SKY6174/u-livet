@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import {
   Users,
@@ -646,7 +647,7 @@ export function PoolDashboard({
                                   {t.name} ↗
                                 </Link>
                                 <p className="mt-1 text-xs text-slate-500">
-                                  {t.starts_on} ~ {t.ends_on} · {t.sessions}차시
+                                  {formatDateRange(t.starts_on, t.ends_on)} · {t.sessions}차시
                                 </p>
                               </div>
                               <span className="text-sm font-bold text-emerald-700">

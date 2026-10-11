@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 /**
  * @file src/components/operation-documents/document-list.tsx
  * @description 접근 가능한 등록 과정과 2026년 앵커사업단 원문 16개 과정을 병합하여
@@ -127,7 +128,7 @@ export async function DocumentList({
           teaching_hours: prefilled.teachingHours,
           starts_on: matchedDb?.starts_on || prefilled.startsOn,
           ends_on: matchedDb?.ends_on || prefilled.endsOn,
-          period_label: `${matchedDb?.starts_on || prefilled.startsOn} ~ ${matchedDb?.ends_on || prefilled.endsOn}`,
+          period_label: formatDateRange(matchedDb?.starts_on || prefilled.startsOn, matchedDb?.ends_on || prefilled.endsOn),
           time_label: prefilled.timeLabel,
           location: prefilled.location,
           teachers: prefilled.teachers,
@@ -168,7 +169,7 @@ export async function DocumentList({
       teaching_hours: null,
       starts_on: course.starts_on,
       ends_on: course.ends_on,
-      period_label: `${course.starts_on} ~ ${course.ends_on}`,
+      period_label: formatDateRange(course.starts_on, course.ends_on),
       time_label: "운영정보 확인",
       location: course.location,
       teachers: course.responsible || "강사 미지정",

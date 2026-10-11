@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/date-format";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -32,7 +33,7 @@ export default async function Quality({
   return (
     <div className="page-shell">
       <PageIntro eyebrow="COURSE QUALITY" title={b.offering.name}>
-        종강 {b.offering.ends_on} · 만족도와 강사 의견을 검토하고 다음 기수의
+        종강 {formatDate(b.offering.ends_on)} · 만족도와 강사 의견을 검토하고 다음 기수의
         개선을 확인합니다.
       </PageIntro>
       {!b.manager && <div className="notice mb-6">매 강좌 종료 후 개설된 만족도 조사를 수강생에게 안내해 주세요. 수강생은 ‘나의 학습 → 만족도 조사’에서 본인의 설문에 참여합니다. 조사가 없다면 사업단에 개설을 요청해 주세요.</div>}

@@ -1,4 +1,5 @@
 "use client";
+import { formatDateRange } from "@/lib/date-format";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -145,7 +146,7 @@ export function CourseMonitoringDashboard({ courses, organizations, annual }: {
                 <Link href={base} className="mt-2 block break-keep font-bold text-slate-900 hover:text-teal-800 hover:underline">{course.name}</Link>
                 <p className="mt-1 whitespace-nowrap text-xs text-slate-500">{organizationNames.get(course.org_id) ?? "담당 기관"}</p>
                 <p className="whitespace-nowrap text-xs text-slate-500">{courseYearAndField(course)}</p>
-                <p className="mt-1 text-xs text-slate-500">{course.starts_on} ~ {course.ends_on}</p>
+                <p className="mt-1 text-xs text-slate-500">{formatDateRange(course.starts_on, course.ends_on)}</p>
               </th>
               <td className="min-w-44 px-5 py-5">
                 <p>신청 대기·대기자 <strong className="tabular-nums">{course.application_pending}명</strong></p>

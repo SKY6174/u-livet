@@ -1,4 +1,5 @@
 "use client";
+import { formatDate, formatDateTime } from "@/lib/date-format";
 /* eslint-disable @next/next/no-img-element -- Local embedded images are private form values. */
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -518,7 +519,7 @@ export function DocumentEditor({
                 >
                   {courseOptions.map((course) => (
                     <option key={course.id} value={course.id}>
-                      {course.name} · {course.starts_on}
+                      {course.name} · {formatDate(course.starts_on)}
                     </option>
                   ))}
                 </select>
@@ -988,11 +989,7 @@ export function DocumentEditor({
                       v{s.revision} 제출본 보기
                     </Link>{" "}
                     ·{" "}
-                    {new Intl.DateTimeFormat("ko-KR", {
-                      timeZone: "Asia/Seoul",
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    }).format(new Date(s.submitted_at))}{" "}
+                    {formatDateTime(s.submitted_at)}{" "}
                     · {s.name}
                   </p>
                 ))

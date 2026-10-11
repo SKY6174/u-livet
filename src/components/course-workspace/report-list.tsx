@@ -1,4 +1,5 @@
 "use client";
+import { formatDateRange } from "@/lib/date-format";
 import { useState } from "react";
 import Link from "next/link";
 import type { CourseWorkspace } from "@/lib/course-workspace/types";
@@ -36,7 +37,7 @@ export function ReportList({ courses }: { courses: CourseWorkspace[] }) {
                 <span className="text-xs text-slate-500">{course.academy} · {course.year_label}</span>
               </div>
               <h2 className="mt-4 text-lg font-bold"><Link href={report} className="hover:text-teal-800">{course.name}</Link></h2>
-              <p className="mt-3 text-sm text-slate-500">{course.starts_on} ~ {course.ends_on}</p>
+              <p className="mt-3 text-sm text-slate-500">{formatDateRange(course.starts_on, course.ends_on)}</p>
               <p className="mt-3 text-sm text-slate-600">운영 담당 {course.operator || "미입력"} · 원본 PDF {course.document_kinds.length}/6종</p>
               {course.report_missing.length > 0 && <p className="mt-3 text-sm text-amber-800">확인할 내용: {course.report_missing.join(" · ")}</p>}
               <div className="mt-auto flex flex-wrap gap-3 pt-6">

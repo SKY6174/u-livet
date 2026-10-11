@@ -1,5 +1,6 @@
 import "server-only";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { guidePeriodLabel } from "@/lib/course-guide/model";
 import opening from "../../../docs/operations/2026-course-opening-plans.json";
 import { mergeOperationCourses, type OperationCourse, type WorkbookSummary } from "./model";
 import type { CourseWorkspace } from "@/lib/course-workspace/types";
@@ -11,6 +12,7 @@ export async function getCourseBudgets(org: string, workspaces: CourseWorkspace[
     const guides = (data.courses as Omit<OperationCourse, "workspace">[]).map(course => {
       const plan = opening.courses.find(p => p.sourceId === course.source_id);
       return { ...course,
+        period_label: guidePeriodLabel(course.period_label, course.year),
         teachers: plan?.staff.teachers.map(p => `${p.name}(${p.classification})`).join(", ") || "미기재",
         assistants: plan?.staff.assistantInstructors.map(p => `${p.name}(${p.classification})`).join(", ") || "미기재",
         support_staff: plan?.staff.supportStaff.map(p => p.name).join(", ") || "미기재",
