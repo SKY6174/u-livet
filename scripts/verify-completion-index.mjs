@@ -46,7 +46,13 @@ const icon = props => React.createElement("span", props);
 const nav = {
   hasRole: (identity, ...roles) => identity.roles.some(entry => roles.includes(entry.role)),
 };
+const courseList = load("src/components/completion/course-list.tsx", {
+  "next/link": "a",
+  "@/lib/date-format": load("src/lib/date-format.ts"),
+  "@/lib/portal/data": { statusLabel: { PUBLISHED: "모집 공개", ARCHIVED: "운영 완료 · 보고서 보관" } },
+});
 const page = load("src/app/completion/page.tsx", {
+  "@/components/completion/course-list": courseList,
   "next/link": "a",
   "next/navigation": { notFound },
   "lucide-react": { BookOpenCheck: icon, DatabaseZap: icon },
@@ -81,6 +87,9 @@ await test("course managers see every course and registration actions for missin
   unavailable = false;
   const output = renderToStaticMarkup(await page.default());
   assert(output.includes("전체 운영 대상"));
+  assert(output.includes('<table'));
+  assert.equal((output.match(/<tr/g) ?? []).length, 17);
+  assert(output.includes('2026.07.01. ~ 2026.07.16.'));
   assert.equal((output.match(/href="\/completion\//g) ?? []).length, 3);
   assert.equal((output.match(/href="\/admin\/courses\?plan=P/g) ?? []).length, 13);
   for (const course of prefilled.PREFILLED_COURSES) assert(output.includes(course.title), course.title);
@@ -91,7 +100,7 @@ await test("certifiers see missing courses without manager registration links", 
   const output = renderToStaticMarkup(await page.default());
   assert.equal((output.match(/href="\/completion\//g) ?? []).length, 3);
   assert(!output.includes("/admin/courses?plan="));
-  assert(output.includes("과정담당이 DB에 등록하면"));
+  assert(output.includes("과정담당 등록 대기"));
 });
 
 await test("database failure keeps the planned list visible but disables review links", async () => {

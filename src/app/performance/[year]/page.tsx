@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
@@ -45,7 +46,7 @@ export default async function Annual({
   return (
     <div className="page-shell">
       <PageIntro eyebrow="ANNUAL REVIEW" title={b.year.label}>
-        {b.year.starts_on} ~ {b.year.ends_on} · 조회 {dateTime(b.generated_at)}
+        {formatDateRange(b.year.starts_on, b.year.ends_on)} · 조회 {dateTime(b.generated_at)}
       </PageIntro>
       <p className="notice mb-6">
         기수에 지정된 사업연도 기준의 현재 원장입니다. 과거 기준일의 상태를

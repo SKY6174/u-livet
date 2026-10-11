@@ -1,11 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookOpenCheck, DatabaseZap } from "lucide-react";
 import { PageIntro } from "@/components/portal/ui";
+import { CompletionCourseList } from "@/components/completion/course-list";
 import { requireIdentity } from "@/lib/auth/session";
 import { hasRole } from "@/lib/auth/workspace-navigation";
-import { mergeCompletionOfferings, type CompletionCourse } from "@/lib/completion/offerings";
-import { getWorkspaceOfferings, statusLabel } from "@/lib/portal/data";
+import { mergeCompletionOfferings } from "@/lib/completion/offerings";
+import { getWorkspaceOfferings } from "@/lib/portal/data";
 
 export default async function CompletionIndex() {
   const me = await requireIdentity("/completion");
@@ -44,40 +44,7 @@ export default async function CompletionIndex() {
         ))}
       </section>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        {courses.map((course) => course.registered ? (
-          <Link key={course.id} className="panel group hover:border-teal-700 hover:shadow-md" href={`/completion/${course.id}`}>
-            <CourseCard course={course} />
-            <p className="mt-4 text-sm font-semibold text-teal-800">기준·출결·평가 검토 →</p>
-          </Link>
-        ) : (
-          <article key={course.id} className="panel border-dashed bg-slate-50/70">
-            <CourseCard course={course} />
-            {manager && course.sourceId ? (
-              <Link className="mt-4 inline-flex text-sm font-semibold text-teal-800" href={`/admin/courses?plan=${course.sourceId}#new-course`}>
-                과정 등록 후 수료 검토 시작 →
-              </Link>
-            ) : (
-              <p className="mt-4 text-sm text-slate-500">과정담당이 DB에 등록하면 수료 검토를 시작할 수 있습니다.</p>
-            )}
-          </article>
-        ))}
-      </div>
+      <CompletionCourseList courses={courses} manager={manager} />
     </div>
-  );
-}
-
-function CourseCard({ course }: { course: CompletionCourse }) {
-  return (
-    <>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="eyebrow">{course.yearLabel}</span>
-        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${course.registered ? "bg-teal-50 text-teal-800" : "bg-slate-200 text-slate-600"}`}>
-          {course.registered ? statusLabel[course.status ?? ""] ?? "등록 완료" : "과정 등록 필요"}
-        </span>
-      </div>
-      <h2 className="mt-3 text-lg font-semibold text-slate-900">{course.name}</h2>
-      <p className="mt-2 text-sm text-slate-500">{course.academy} · {course.startsOn} ~ {course.endsOn} · 정원 {course.capacity ?? "미정"}명</p>
-    </>
   );
 }

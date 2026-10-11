@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -42,7 +43,7 @@ export default async function Certificate({
           <dd>{s.course_name}</dd>
           <dt>교육기간</dt>
           <dd>
-            {s.starts_on} ~ {s.ends_on}
+            {formatDateRange(s.starts_on, s.ends_on)}
           </dd>
           <dt>확인 시간</dt>
           <dd>

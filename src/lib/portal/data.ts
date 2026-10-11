@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { formatDateTime } from "@/lib/date-format";
 import type { CourseIntroduction, CourseSummary, InstructorName, Offering, Policy, WorkspaceOffering } from "./types";
 export const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -18,12 +19,7 @@ export const statusLabel: Record<string, string> = {
   WITHDRAWN: "수강 취소",
 };
 export function dateTime(value: string | null) {
-  if (!value) return "미기재";
-  return new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
+  return formatDateTime(value);
 }
 export async function getCourseCards(featured = false) {
   try {

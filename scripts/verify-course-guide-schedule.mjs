@@ -2,22 +2,37 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 const module = { exports: {} };
+const dateModule = { exports: {} };
+new Function('exports', ts.transpileModule(readFileSync('src/lib/date-format.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 } }).outputText)(dateModule.exports);
 const code = ts.transpileModule(readFileSync('src/lib/course-guide/model.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
-new Function('exports', code)(module.exports);
+new Function('exports', 'require', code)(module.exports, name => {
+  assert.equal(name, '@/lib/date-format'); return dateModule.exports;
+});
 const m = module.exports;
 let count = 0;
 function check(name, run) { run(); count++; console.log(`PASS ${name}`); }
+check('common date display padding, Seoul boundary, leap years and invalid values', () => {
+  const { formatDate, formatDateRange, formatDateTime } = dateModule.exports;
+  assert.equal(formatDate('2026-07-03'), '2026.07.03.');
+  assert.equal(formatDate('2024-02-29'), '2024.02.29.');
+  assert.equal(formatDate('2026-02-29'), '미기재');
+  assert.equal(formatDate('2026-10-10T15:01:00Z'), '2026.10.11.');
+  assert.equal(formatDate('2026-10-10T14:59:00Z'), '2026.10.10.');
+  assert.equal(formatDateRange('2026-12-20', '2027-01-05'), '2026.12.20. ~ 2027.01.05.');
+  assert.match(formatDateTime('2026-10-10T15:01:00Z'), /^2026\.10\.11\. /);
+  for (const value of [null, '', '미정', 'invalid', '2026-10-10T12:00:00']) assert.equal(formatDate(value), '미기재');
+});
 check('legacy dates and exact requested display round-trip', () => {
   const dates = m.parseGuidePeriod('2026.10.10–12.05', 2026);
   assert.deepEqual(dates, { startDate: '2026-10-10', endDate: '2026-12-05' });
   const label = m.formatGuidePeriod(dates.startDate, dates.endDate);
-  assert.equal(label, '2026. 10. 10. - 12. 5.');
+  assert.equal(label, '2026.10.10. ~ 2026.12.05.');
   assert.deepEqual(m.parseGuidePeriod(label, 2026), dates);
   assert.equal(m.guideEndDate(label, 2026), '2026-12-05');
 });
 check('cross-year dates, ISO and inclusive one-day periods', () => {
   assert.equal(m.guideEndDate('2026.12.20–01.05', 2026), '2027-01-05');
-  assert.equal(m.formatGuidePeriod('2026-12-20', '2027-01-05'), '2026. 12. 20. - 2027. 1. 5.');
+  assert.equal(m.formatGuidePeriod('2026-12-20', '2027-01-05'), '2026.12.20. ~ 2027.01.05.');
   assert.equal(m.guideEndDate('2026-10-10 ~ 2026-12-05', 2026), '2026-12-05');
   assert.deepEqual(m.parseGuidePeriod('07.14', 2026), { startDate: '2026-07-14', endDate: '2026-07-14' });
 });
@@ -57,7 +72,7 @@ check('all existing guides retain dates and times without invented values', () =
   }
 });
 check('catalog date filter accepts normalized period and midnight boundary', () => {
-  const guide = { id: 'example', name: 'example', period_label: '2026. 10. 10. - 12. 5.', year: 2026, offering_id: null };
+  const guide = { id: 'example', name: 'example', period_label: '2026.10.10. ~ 2026.12.05.', year: 2026, offering_id: null };
   const c = m.mergeCatalog([guide], [])[0];
   assert.equal(c.ends_on, '2026-12-05');
   assert.equal(m.courseIsUpcoming(c, Date.parse('2026-12-05T14:59:59Z')), true);

@@ -12,7 +12,7 @@ function load(path, mocks = {}) {
   } }).outputText;
   const module = { exports: {} };
   new Function('require', 'module', 'exports', code)(name => Object.hasOwn(mocks, name)
-    ? mocks[name] : require(name), module, module.exports);
+    ? mocks[name] : name === "@/lib/date-format" ? load("src/lib/date-format.ts") : require(name), module, module.exports);
   return module.exports;
 }
 let checks = 0;

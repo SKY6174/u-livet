@@ -73,7 +73,7 @@ try {
   await page.getByLabel('호실명', { exact: true }).fill('[검증용] 분리한 교육장소');
   await save(page);
   const saved = savedGuide();
-  assert.equal(saved.period_label, '2026. 10. 10. - 12. 5.');
+  assert.equal(saved.period_label, '2026.10.10. ~ 2026.12.05.');
   assert.equal(saved.time_label, '토 14:00 - 18:00\n일 15:00 - 19:00');
   assert.equal(saved.revision, 2);
   assert.equal(saved.location, 'G-110, [검증용] 분리한 교육장소');

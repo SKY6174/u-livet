@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
@@ -55,7 +56,7 @@ export default async function Badge({
               "만료일",
               b.expires_at ? dateTime(b.expires_at) : "승인 기준상 없음",
             ],
-            ["교육기간", a.course.starts_on + " ~ " + a.course.ends_on],
+            ["교육기간", formatDateRange(a.course.starts_on, a.course.ends_on)],
             ["정의 버전", "v" + a.badge.definition_version],
           ].map(([k, v]) => (
             <div key={k}>

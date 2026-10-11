@@ -1,4 +1,5 @@
 "use client";
+import { formatDate, formatDateRange } from "@/lib/date-format";
 
 import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
@@ -71,7 +72,7 @@ function draftFor(guide: MonitoringGuide, plan: MonitoringPlan | null): Draft {
 }
 
 function dateLabel(value: string | null | undefined) {
-  return value ? value.replaceAll("-", ".") : "미설정";
+  return formatDate(value, "미설정");
 }
 
 function DocumentStatus({ label, status }: { label: string; status: string | null | undefined }) {
@@ -236,13 +237,13 @@ export function CourseMonitoringPlanDashboard({ guides, plans, documents, course
                   ] as const).filter(([, date]) => date?.startsWith(`${month.key}-`));
                   const inActual = overlapsMonth(actual?.starts_on ?? null, actual?.ends_on ?? null, month.year, month.month);
                   return <td key={month.key} className="border-r border-slate-100 px-1 py-2 text-center align-top">
-                    {(inDelivery || tentative) && <div title={inDelivery ? `${plannedDelivery ? "D 과정운영 목표" : "공개 안내 참고"}: ${start} ~ ${end}` : guide.period_label}
+                    {(inDelivery || tentative) && <div title={inDelivery ? `${plannedDelivery ? "D 과정운영 목표" : "공개 안내 참고"}: ${formatDateRange(start, end)}` : guide.period_label}
                       className={`rounded-md px-1 py-1 text-[10px] font-semibold ${inDelivery ? plannedDelivery ? "bg-teal-700 text-white" : "bg-teal-100 text-teal-900" : "border border-dashed border-teal-300 bg-teal-50 text-teal-800"}`}>
                       {inDelivery ? "D 운영" : "예정"}
                     </div>}
                     {markers.map(([label, date]) => <div key={label} title={`${label} 목표일 ${date}`}
                       className="mt-1 rounded border border-slate-200 bg-slate-50 px-0.5 py-0.5 text-[10px] font-semibold text-slate-700">{label}</div>)}
-                    {inActual && <div title={`실제 운영: ${actual?.starts_on} ~ ${actual?.ends_on}`} className="mt-1 rounded border border-teal-700 bg-white px-0.5 py-0.5 text-[9px] font-semibold text-teal-800">실제</div>}
+                    {inActual && <div title={`실제 운영: ${formatDateRange(actual?.starts_on, actual?.ends_on)}`} className="mt-1 rounded border border-teal-700 bg-white px-0.5 py-0.5 text-[9px] font-semibold text-teal-800">실제</div>}
                   </td>;
                 })}
                 <td className="px-2 py-2 text-center"><button type="button" onClick={() => openEditor(guide, plan)}

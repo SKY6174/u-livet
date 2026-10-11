@@ -1,4 +1,5 @@
 "use client";
+import { formatDateRange } from "@/lib/date-format";
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Search, CalendarDays, FileText } from "lucide-react";
@@ -150,7 +151,7 @@ export function CourseList({ courses }: { courses: CourseWorkspace[] }) {
                 </h2>
                 <p className="mt-3 flex items-center gap-2 text-xs text-slate-500">
                   <CalendarDays size={14} />
-                  {c.starts_on} ~ {c.ends_on}
+                  {formatDateRange(c.starts_on, c.ends_on)}
                 </p>
                 <dl className="mt-5 grid grid-cols-3 gap-3 rounded-xl bg-slate-50 p-4 text-sm">
                   <div>

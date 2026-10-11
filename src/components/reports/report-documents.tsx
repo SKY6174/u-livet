@@ -1,3 +1,4 @@
+import { formatDate, formatDateRange } from "@/lib/date-format";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { AttendancePrint } from "@/components/attendance/attendance-print";
@@ -24,13 +25,7 @@ const chunk = <T,>(rows: T[], size: number): T[][] =>
         rows.slice(i * size, (i + 1) * size),
       )
     : [[]];
-const day = (value: string) =>
-  new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(value));
+const day = formatDate;
 const clock = (value: string) =>
   new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",
@@ -93,7 +88,7 @@ function Sheet({
       </div>
       <h1>{title}</h1>
       <p className="report-meta">
-        {offering.name} · {offering.starts_on} ~ {offering.ends_on}
+        {offering.name} · {formatDateRange(offering.starts_on, offering.ends_on)}
       </p>
       {offering.status === "ARCHIVED" && <p className="report-note">
         원본 보고서 보관 과정 · 집계는 원본 기준입니다. 개인별 명단·출결·강의확인·지급 내역은 별도 등록 전이며 원본 PDF에서 전체 자료를 확인할 수 있습니다.
@@ -117,7 +112,7 @@ function AttachmentSheet({ title, offering, number, stats, className = "", child
     <div className="report-attachment-marker">[첨부 #{number}]</div>
     <h1>{title}</h1>
     <table className="report-table report-form-meta"><tbody>
-      <tr><th>과정명</th><td>{offering.name}</td><th>교육기간</th><td>{offering.starts_on} ~ {offering.ends_on}</td></tr>
+      <tr><th>과정명</th><td>{offering.name}</td><th>교육기간</th><td>{formatDateRange(offering.starts_on, offering.ends_on)}</td></tr>
       <tr><th>{stats[0][0]}</th><td>{stats[0][1]}</td><th>{stats[1][0]}</th><td>{stats[1][1]}</td></tr>
     </tbody></table>
     {children}
@@ -235,7 +230,7 @@ export function ReportDocuments({
                   ["세부프로그램명", o.name],
                   ["담당 교수", p.professor || "미입력"],
                   ["운영 담당자", p.operator],
-                  ["교육 기간", `${o.starts_on} ~ ${o.ends_on}`],
+                  ["교육 기간", formatDateRange(o.starts_on, o.ends_on)],
                   [
                     "교육 시간",
                     `${source?.classCount ?? sessions.length}회 · ${source?.educationHours ?? hours(totalMinutes)}시간${source ? " (원본 집계)" : ""}`,
@@ -465,7 +460,7 @@ export function ReportDocuments({
         <section className="report-sheet report-portrait report-form-20 report-teaching-ledger" key={`t-${pi}`}>
           <h1>{title("teaching")}</h1>
           <Table head={["과정명","강의기간","승인된 실강의시간"]} rows={[[
-            o.name,`${o.starts_on} ~ ${o.ends_on}`,
+            o.name,formatDateRange(o.starts_on, o.ends_on),
             formatTeachingMinutes(approvedTeachingMinutes),
           ]]} />
           <Table
@@ -473,7 +468,7 @@ export function ReportDocuments({
             columnWidths={["8.33%","16.67%","16.67%","16.67%","20.83%","20.83%"]}
             rows={rows.map((row) => [
               row.session,
-              <span key={row.key} style={{ whiteSpace: "nowrap" }}>{row.date.replaceAll("-", ".")}</span>,
+              <span key={row.key} style={{ whiteSpace: "nowrap" }}>{formatDate(row.date)}</span>,
               <span key={row.key} style={{ whiteSpace: "nowrap" }}>
                 {row.time}
                 <small style={{ display: "block" }}>{row.period}</small>

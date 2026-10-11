@@ -8,7 +8,7 @@ export type ParkingOffering = {
   ends_on: string;
   center_code: ParkingCenterCode | null;
   org_id?: string;
-  kind?: "LEARNER" | "EXTERNAL_INSTRUCTOR";
+  kind?: "LEARNER" | "INTERNAL_INSTRUCTOR" | "EXTERNAL_INSTRUCTOR";
 };
 export type MyParkingRequest = {
   id: string;

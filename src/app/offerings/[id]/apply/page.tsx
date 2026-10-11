@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
@@ -39,7 +40,7 @@ export default async function ApplyPage(props: {
       <section className="panel mb-6" aria-labelledby="application-info-title">
         <h2 id="application-info-title" className="section-title">신청 전 확인하세요</h2>
         <dl className="grid gap-5 text-base sm:grid-cols-2">
-          <div><dt className="text-sm text-slate-600">교육기간</dt><dd className="mt-1 font-semibold">{o.starts_on} ~ {o.ends_on}</dd></div>
+          <div><dt className="text-sm text-slate-600">교육기간</dt><dd className="mt-1 font-semibold">{formatDateRange(o.starts_on, o.ends_on)}</dd></div>
           <div><dt className="text-sm text-slate-600">수강료</dt><dd className="mt-1 font-semibold">{o.tuition === null ? "별도 안내 확인" : o.tuition === 0 ? "무료" : `${o.tuition.toLocaleString("ko-KR")}원`}</dd></div>
           <div className="sm:col-span-2"><dt className="text-sm text-slate-600">신청기간</dt><dd className="mt-1 font-semibold">{dateTime(o.apply_from)} ~ {dateTime(o.apply_until)}</dd></div>
         </dl>

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
@@ -10,6 +11,7 @@ import {
 } from "@/lib/parking/types";
 import { PageIntro } from "@/components/portal/ui";
 import { ParkingPrintButton } from "@/components/parking/print-button";
+import { ParkingWorkflow } from "@/components/parking/workflow";
 import {
   addParkingStock,
   assignParkingCenter,
@@ -18,15 +20,7 @@ import {
 
 const field =
   "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
-const dateText = (value: string | null) =>
-  value
-    ? new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date(value))
-    : "";
+const dateText = formatDate;
 
 export default async function AdminParkingPage({
   searchParams,
@@ -77,12 +71,13 @@ export default async function AdminParkingPage({
       </div>
       {!data ? (
         <p role="alert" className="panel parking-screen">
-          주차권 자료를 불러오지 못했습니다. 데이터베이스와 추가 인증 상태를
+          주차권 자료를 불러오지 못했습니다. 데이터베이스와 로그인 상태를
           확인해 주세요.
         </p>
       ) : (
         <>
           <div className="parking-screen space-y-6">
+            <ParkingWorkflow />
             {params.notice && (
               <p
                 role="status"
@@ -137,7 +132,7 @@ export default async function AdminParkingPage({
                 <div className="rounded-xl bg-slate-50 p-4">
                   <h3 className="font-semibold">3. 지정 승인자 계정</h3>
                   <p className="mt-2 text-sm text-slate-700">
-                    각 담당자가 본인 로그인 계정을 만들고 해당 사업단의 과정 관리자 역할과 추가 인증을 갖춰야 승인할 수 있습니다.
+                    각 담당자가 본인 로그인 계정을 만들고 해당 사업단의 과정 관리자 또는 시스템 관리자 권한을 갖춰야 승인할 수 있습니다.
                   </p>
                   <ul className="mt-2 space-y-1 text-xs text-slate-600">
                     {data.centers.map((c) => (
@@ -356,7 +351,7 @@ export default async function AdminParkingPage({
                         <div>
                           <h3 className="font-bold">{r.course_name}</h3>
                           <p className="mt-1 text-sm text-slate-600">
-                            {r.center_code} · 교육일 {r.use_on} · {r.quantity}매
+                            {r.center_code} · 교육일 {formatDate(r.use_on)} · {r.quantity}매
                           </p>
                         </div>
                         <span className="badge">
@@ -410,7 +405,7 @@ export default async function AdminParkingPage({
                             data.centers.find((c) => c.code === r.center_code)
                               ?.reviewer_name
                           }{" "}
-                          담당자의 본인 계정·추가 인증으로 승인할 수 있습니다.
+                          담당자의 본인 계정으로 로그인해야 승인할 수 있습니다.
                         </p>
                       )}
                     </article>
@@ -449,7 +444,7 @@ export default async function AdminParkingPage({
                           <br />
                           <span className="text-slate-500">{r.phone}</span>
                         </td>
-                        <td className="p-3">{r.use_on}</td>
+                        <td className="p-3">{formatDate(r.use_on)}</td>
                         <td className="p-3">{r.quantity}</td>
                         <td className="p-3">
                           {PARKING_STATUS_LABELS[r.status]}
@@ -524,7 +519,7 @@ export default async function AdminParkingPage({
                             <td>
                               {r.course_name}
                               <br />
-                              <small>교육일 {r.use_on}</small>
+                              <small>교육일 {formatDate(r.use_on)}</small>
                             </td>
                             <td>{r.recipient_name}</td>
                             <td>{r.phone}</td>

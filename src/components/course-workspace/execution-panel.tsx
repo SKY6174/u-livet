@@ -1,4 +1,5 @@
 "use client";
+import { formatDate } from "@/lib/date-format";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileSpreadsheet, Upload } from "lucide-react";
@@ -78,7 +79,7 @@ export function ExecutionPanel({ org, workbooks, onSourceChange }: { org: string
     <div><h3 className="font-bold">집행내역 원본 확인</h3><p className="mt-2 text-sm leading-6 text-slate-500">엑셀 파일의 시트와 제목 행을 선택해 집행내역을 확인하세요. 과정명과 항목명이 일치하는 내역은 위 비교 표에 함께 표시됩니다. 확인한 내역을 저장하면 다른 관리자와 공유됩니다.</p></div>
     <div className="grid gap-5 rounded-2xl border bg-white p-5 md:grid-cols-2">
       <label className="space-y-3"><span className="flex items-center gap-2 text-sm font-bold"><Upload size={18} />집행내역 엑셀 선택</span><input disabled={busy} type="file" accept=".xlsx" onChange={e => void upload(e.target.files?.[0])} className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-4 file:py-2 file:font-semibold file:text-teal-800" /><span className="block text-xs text-slate-500">.xlsx · 최대 5MB · 시트당 2,000행 / 40열</span></label>
-      <label className="text-sm font-bold">저장한 자료<select className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm mt-3 font-normal" disabled={busy || !workbooks.length} value={selectedWorkbook} onChange={e => void load(e.target.value)}><option value="">{workbooks.length ? "파일·시트를 선택하세요" : "아직 저장한 집행내역이 없습니다"}</option>{workbooks.map(w => <option key={w.id} value={w.id}>{w.file_name} · {w.sheet_name} · {new Date(w.created_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}</option>)}</select><span className="mt-2 block text-xs font-normal text-slate-500">최근 저장한 자료 50건 · 이전 자료도 보존됩니다.</span></label>
+      <label className="text-sm font-bold">저장한 자료<select className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm mt-3 font-normal" disabled={busy || !workbooks.length} value={selectedWorkbook} onChange={e => void load(e.target.value)}><option value="">{workbooks.length ? "파일·시트를 선택하세요" : "아직 저장한 집행내역이 없습니다"}</option>{workbooks.map(w => <option key={w.id} value={w.id}>{w.file_name} · {w.sheet_name} · {formatDate(w.created_at)}</option>)}</select><span className="mt-2 block text-xs font-normal text-slate-500">최근 저장한 자료 50건 · 이전 자료도 보존됩니다.</span></label>
     </div>
     {busy && <p role="status" className="text-sm text-teal-800">처리 중입니다…</p>}
     {message && <p role="status" className="text-sm font-semibold text-teal-900">{message}</p>}

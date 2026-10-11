@@ -12,6 +12,7 @@ function load(file, modules) {
   vm.runInNewContext(ts.transpileModule(readFileSync(file, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
   }).outputText, { exports, require: name => {
+    if (name === "@/lib/date-format") return load("src/lib/date-format.ts", {});
     assert.ok(name in modules, `Unexpected import: ${name}`);
     return modules[name];
   } });

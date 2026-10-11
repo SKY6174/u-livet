@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import { randomUUID } from "node:crypto";
 import { ActionForm } from "./action-form";
 import { dateTime } from "@/lib/portal/data";
@@ -64,7 +65,7 @@ function RefundCard({
         신청 {dateTime(r.requested_at)} · {r.reason}
       </p>
       <p className="text-sm">
-        교육기간 {r.snapshot.starts_on} ~ {r.snapshot.ends_on} · 신청 당시 등록
+        교육기간 {formatDateRange(r.snapshot.starts_on, r.snapshot.ends_on)} · 신청 당시 등록
         회차 {r.snapshot.sessions.length}개
       </p>
       {r.rule_label && (

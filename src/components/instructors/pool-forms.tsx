@@ -1,4 +1,5 @@
 "use client";
+import { formatDate } from "@/lib/date-format";
 import { useState } from "react";
 import { ActionForm } from "@/components/portal/action-form";
 import {
@@ -197,7 +198,7 @@ export function AllowanceForm({
             <option value="">과정 없이 활동명으로 등록</option>
             {offerings.map((o) => (
               <option key={o.id} value={o.id}>
-                {o.name} · {o.starts_on}
+                {o.name} · {formatDate(o.starts_on)}
               </option>
             ))}
           </select>

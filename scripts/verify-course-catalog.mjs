@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 const load = (file, mocks = {}) => {
   const code = ts.transpileModule(readFileSync(file, 'utf8'), { compilerOptions: { target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
   const module = { exports: {} };
-  new Function('require', 'module', 'exports', code)(name => name in mocks ? mocks[name] : require(name), module, module.exports);
+  new Function('require', 'module', 'exports', code)(name => name in mocks ? mocks[name] : name === "@/lib/date-format" ? load("src/lib/date-format.ts") : require(name), module, module.exports);
   return module.exports;
 };
 let checks=0;
@@ -114,7 +114,7 @@ const portalData={getCourseInstructorNames:async()=>({}),modeLabel:{OFFLINE:'대
 const Link=({children,scroll,...props})=>React.createElement('a',props,children);
 const documentModel=load('src/lib/learner-documents/model.ts',{'../auth/registration':load('src/lib/auth/registration.ts')});
 const popup={DocumentPopup:({windowName,children,...props})=>React.createElement('a',props,children)};
-const ui=load('src/components/portal/ui.tsx',{'next/link':Link,'@/lib/portal/data':portalData});
+const ui=load('src/components/portal/ui.tsx',{'next/link':Link,'@/lib/portal/data':portalData,'./page-description-hint':{PageDescriptionHint:()=>null}});
 const catalog=load('src/components/course-guide/catalog.tsx',{'next/link':Link,'@/lib/portal/data':portalData,'@/lib/course-guide/model':{...model,recruitmentLabel:course=>model.recruitmentLabel(course,now)},'@/components/portal/instructor-names':instructorNames});
 let unavailable=false;
 const page=load('src/app/courses/page.tsx',{'next/link':Link,'@/lib/auth/session':{getSessionIdentity:async()=>null},'@/lib/course-guide/data':{getCourseCatalog:async()=>({courses,unavailable}),editableGuideOrgs:()=>[]},'@/lib/course-guide/model':{...model,filterCatalog:(items,filters)=>model.filterCatalog(items,filters,now)},'@/components/course-guide/catalog':catalog,'@/components/portal/ui':ui}).default;

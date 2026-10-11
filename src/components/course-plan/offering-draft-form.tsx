@@ -1,3 +1,4 @@
+import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { createOffering } from "@/app/actions";
 import { WorkingCopyForm } from "./working-copy-form";
@@ -19,7 +20,7 @@ function PlanReference({ plan, restored }: { plan: OpeningCourse; restored: bool
       <details className="mt-3 border-t border-teal-200 pt-3">
         <summary className="min-h-11 cursor-pointer py-2 font-semibold text-teal-950">원문 일정·수강료·확인 사항 보기</summary>
         <dl className="mt-3 space-y-3 text-sm">
-          <div><dt className="text-slate-600">표제 교육기간 (미확정)</dt><dd className="mt-1">{plan.schedule.declaredPeriod.startsOn} ~ {plan.schedule.declaredPeriod.endsOn}</dd></div>
+          <div><dt className="text-slate-600">표제 교육기간 (미확정)</dt><dd className="mt-1">{formatDateRange(plan.schedule.declaredPeriod.startsOn, plan.schedule.declaredPeriod.endsOn)}</dd></div>
           <div><dt className="text-slate-600">차시 날짜 (원문 표기)</dt><dd className="mt-1 break-words">{plan.schedule.sessionDatesAsWritten.join(" · ")}</dd></div>
           <div><dt className="text-slate-600">시간·교육방식 (계획)</dt><dd className="mt-1 break-words">{plan.schedule.summary} · {plan.schedule.modeAsWritten} · {plan.teachingHours}시간</dd></div>
           <div><dt className="text-slate-600">수강료 산식 기준 1인 금액 (미승인)</dt><dd className="mt-1">{formatSourceNumber(plan.tuition.perPersonDerivedFromFormula, "원")} ({formatSourceNumber(plan.tuition.hourlyRate, "원")} × {plan.tuition.formulaHours}시간)</dd></div>

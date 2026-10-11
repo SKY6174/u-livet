@@ -12,6 +12,8 @@ const status = JSON.parse(
     stdio: ["ignore", "pipe", "pipe"],
   }),
 );
+// A dedicated local gateway may run separately from the CLI-managed Kong.
+status.API_URL ??= "http://127.0.0.1:55321";
 assert.equal(status.API_URL, "http://127.0.0.1:55321");
 const admin = createClient(status.API_URL, status.SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
@@ -91,7 +93,9 @@ async function account(label, role = null) {
       password: "Local-Only-2026!",
     }),
   );
-  await ensureLocalMfa(client);
+  const security = ok(await client.rpc("life_security_status"));
+  if (security.mfa_required) await ensureLocalMfa(client);
+  else assert.equal(security.active, true);
   const person = ok(await client.rpc("life_identity")).id;
   if (role)
     sql(
@@ -176,15 +180,19 @@ deny(
   await learner.client.rpc("life_parking_assign", { f, c: "ECC" }),
   "FORBIDDEN",
 );
-deny(
+const internalRequest = ok(
   await internal.client.rpc("life_parking_request", {
     f,
     d: today,
     n: 1,
     contact: "010-1234-5678",
   }),
-  "REQUEST_UNAVAILABLE",
 );
+assert.equal(sql(`select applicant_kind from public.life_parking_requests where id='${internalRequest}'`), "INTERNAL_INSTRUCTOR");
+assert.ok(ok(await internal.client.rpc("life_parking_my_context")).requests.some(r => r.id === internalRequest && r.status === "PENDING"));
+sql(`delete from public.life_offering_instructors where offering_id='${f}' and person_id='${internal.person}'`);
+deny(await internal.client.rpc("life_parking_request", { f, d: plus(3), n: 1, contact: "010-1234-5678" }), "REQUEST_UNAVAILABLE");
+sql(`insert into public.life_offering_instructors(offering_id,person_id) values('${f}','${internal.person}')`);
 deny(
   await outsider.client.rpc("life_parking_request", {
     f,
@@ -263,6 +271,10 @@ assert.equal(row.status, "APPROVED");
 assert.equal(row.remaining_after, 1);
 assert.equal(row.reviewer_name, "주차 검증 reviewer");
 assert.equal(dashboard.stock.find((s) => s.center_code === "RCC").balance, 1);
+assert.equal(dashboard.requests.find(item => item.id === internalRequest).status, "PENDING");
+ok(await reviewer.client.rpc("life_parking_decide", { r: internalRequest, approve: true, note: "교내강사 교육일 발급" }));
+assert.equal(ok(await internal.client.rpc("life_parking_my_context")).requests.find(item => item.id === internalRequest).status, "APPROVED");
+assert.equal(sql(`select balance from public.life_parking_stock where org_id='${org}' and center_code='RCC'`), "0");
 const next = ok(
   await external.client.rpc("life_parking_request", {
     f,
@@ -308,6 +320,7 @@ for (const [name, actor] of [
   ["manager", manager],
   ["learner", learner],
   ["external", external],
+  ["internal", internal],
 ])
   writeFileSync(
     `tmp/parking-vouchers/${name}-state.json`,
@@ -330,5 +343,5 @@ sql(
   `update auth.users u set email=p.email from public.user_profiles p where u.id=p.id and u.id='${reviewer.user}'`,
 );
 console.log(
-  "PASS applicant eligibility, center assignment, named reviewer, stock accounting, cancellation and table isolation",
+  "PASS learner/internal/external eligibility, unassigned instructor denial, administrator queue, named reviewer approval, stock accounting, rejection, cancellation and table isolation",
 );
