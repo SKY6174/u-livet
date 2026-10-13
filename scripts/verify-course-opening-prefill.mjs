@@ -24,11 +24,14 @@ const openingModel = load("src/lib/course-opening/model.ts", { "@/lib/course-pla
 const Link = ({ children, ...props }) => React.createElement("a", props, children);
 const createOffering = () => { throw new Error("Rendering must not save an offering"); };
 const { OfferingDraftForm } = load("src/components/course-plan/offering-draft-form.tsx", {
+  "@/lib/date-format": load("src/lib/date-format.ts"),
   "./working-copy-form": { WorkingCopyForm: ({ children }) => React.createElement("form", {}, children) },
   "next/link": Link,
   "@/app/actions": { createOffering },
   "@/lib/course-opening/prefill": prefill,
   "@/lib/course-plan/model": oldModel,
+  "@/lib/course-guide/model": load("src/lib/course-guide/model.ts", { "@/lib/date-format": load("src/lib/date-format.ts") }),
+  "./draft-tuition-fields": load("src/components/course-plan/draft-tuition-fields.tsx", { "@/lib/course-opening/working-copy": load("src/lib/course-opening/working-copy.ts") }),
   "@/components/portal/action-form": { ActionForm: ({ action, children, label }) => {
     assert.equal(action, createOffering);
     return React.createElement("form", {}, children, React.createElement("button", { type: "submit" }, label));
@@ -81,16 +84,18 @@ await check("Prefilled form is editable while all seven undecided required value
       assert.match(input(html, name), /required=""/);
       assert.ok(!input(html, name).includes("value="), name);
     }
-    for (const name of ["fee", "tuition", "instructor", "sourceId"]) assert.equal(input(html, name), "");
+    for (const name of ["fee", "instructor", "sourceId"]) assert.equal(input(html, name), "");
+    assert.match(input(html, "tuition"), /value="0"/);
+    assert.match(select(html, "fee_type"), /value="FREE" selected=""/);
     assert.ok(html.includes("계획서의 기본정보를 불러왔습니다"));
     assert.ok(html.includes(`/admin/course-plan/opening#${course.sourceId}`));
-    assert.ok(html.includes("기수 초안은 무료로 등록됩니다"));
+    assert.ok(html.includes("무료 과정의 수강료는 0원으로 저장됩니다"));
   }
 });
 await check("Reference retains known source conflicts without making them submitted defaults", () => {
   for (const [id, snippets] of Object.entries({ P05: ["2026-10-06", "2026-11-03"], P08: ["2025-08-05", "2026-08-05"], P10: ["2,225,000", "2,250,000"], P11: ["42시간", "48시간", "144,000원"] })) {
     const html = render(prefill.findOpeningCourse(plan, id));
-    for (const text of snippets) assert.ok(html.includes(text), id + text);
+    for (const text of snippets) assert.ok(html.includes(text) || (/^\d{4}-\d{2}-\d{2}$/.test(text) && html.includes(load("src/lib/date-format.ts").formatDate(text))), id + text);
   }
 });
 await check("Manual registration keeps its existing defaults and closed panel", () => {
@@ -102,6 +107,8 @@ await check("Manual registration keeps its existing defaults and closed panel", 
 });
 await check("All 16 review cards link to their own registration form without a write action", () => {
   const { CourseOpeningView } = load("src/components/course-plan/course-opening-view.tsx", {
+    "@/components/portal/ui": { PageIntro: ({ children }) => React.createElement("header", {}, children) },
+    "@/lib/date-format": load("src/lib/date-format.ts"),
     "next/link": Link, "@/lib/course-plan/model": oldModel, "@/lib/course-opening/model": openingModel,
   });
   const html = renderToStaticMarkup(React.createElement(CourseOpeningView, { plan, filters: openingModel.normalizeOpeningFilters({}) }));
@@ -125,8 +132,8 @@ await check("Admin route checks identity and role before loading a plan, and han
     "@/lib/course-budget/data": { getCourseBudgets: async () => ({ courses: [], workbooks: [], unavailable: false }) },
     "@/lib/course-budget/model": load("src/lib/course-budget/model.ts"),
     "@/lib/supabase/server": { createServerSupabaseClient: async () => ({ rpc: async () => ({ data: [], error: null }), from: (table) => {
-      assert.equal(table, "life_project_years");
-      return { select: () => ({ in: async () => ({ data: [{ ...years[0], org_id: "test-org" }, { id: "other-year", label: "타기관", org_id: "other-org" }] }) }) };
+      assert.ok(["life_project_years", "life_organizations"].includes(table));
+      return { select: () => ({ in: async () => ({ data: table === "life_organizations" ? [{ id: "test-org", name: "검증 기관" }] : [{ ...years[0], org_id: "test-org", starts_on: "2026-01-01" }, { id: "other-year", label: "타기관", org_id: "other-org", starts_on: "2026-01-01" }] }) }) };
     } }) },
     "@/components/portal/ui": { PageIntro: ({ children }) => React.createElement("div", {}, children), Empty: () => null },
   }).default;

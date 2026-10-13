@@ -23,6 +23,7 @@ let me = identity, calls = [], revalidated = [], result = { data: { revision: 1,
 const dependencies = {
   'next/cache': { revalidatePath: path => revalidated.push(path) },
   'server-only': {}, '@/lib/course-opening/working-copy': model, './working-copy': model,
+  '@/lib/course-guide/locations':load('src/lib/course-guide/locations.ts'),
   '@/lib/auth/mfa-message': { MFA_REAUTH_MESSAGE: 'MFA required' }, '@/lib/portal/data': { UUID },
   '@/lib/auth/session': { getSessionIdentity: async () => me, requireIdentity: async () => { if (!me) throw Error('LOGIN'); return me; } },
   '@/lib/supabase/server': { createServerSupabaseClient: async () => ({ rpc: async (name,args) => { calls.push({name,args}); if(networkError) throw Error('network'); return result; } }) },
@@ -52,9 +53,12 @@ await check('course registration explains invalid dates before calling either of
   assert.equal(calls.length,before);
   result={data:null,error:null};
   assert((await createOffering({},form(completeOffering))).ok);
-  assert.equal(calls.at(-1).name,'life_create_source_offering');
+  assert.equal(calls.at(-1).name,'life_create_offering_with_tuition');
+  assert.equal(calls.at(-1).args.source_id,'P01');
+  assert.equal(calls.at(-1).args.tuition,0);
   assert((await createOffering({},form({...completeOffering,source:''}))).ok);
-  assert.equal(calls.at(-1).name,'life_create_offering');
+  assert.equal(calls.at(-1).name,'life_create_offering_with_tuition');
+  assert.equal(calls.at(-1).args.source_id,null);
   result={data:null,error:{code:'23514',message:'new row for relation "life_offerings" violates check constraint "life_offerings_check"'}};
   assert.match((await createOffering({},form(completeOffering))).message,/접수 마감/);
   result={data:{revision:1,updated_at:'2026-09-21T00:00:00Z'},error:null};
@@ -92,10 +96,13 @@ const plan=JSON.parse(readFileSync('docs/operations/2026-course-opening-plans.js
 const prefill=load('src/lib/course-opening/prefill.ts');
 const Link=({children,...props})=>React.createElement('a',props,children);
 const formDeps={
+  '@/lib/date-format':load('src/lib/date-format.ts'),
   'next/link':Link,'@/app/actions':{createOffering:()=>{}},'@/lib/course-opening/prefill':prefill,
   '@/lib/course-plan/model':load('src/lib/course-plan/model.ts'),
   '@/components/portal/action-form':{ActionForm:({children})=>React.createElement('form',{},children)},
   './working-copy-form':{WorkingCopyForm:({children})=>React.createElement('form',{},children)},
+  '@/lib/course-guide/model':load('src/lib/course-guide/model.ts',{'@/lib/date-format':load('src/lib/date-format.ts')}),
+  './draft-tuition-fields':load('src/components/course-plan/draft-tuition-fields.tsx',{'@/lib/course-opening/working-copy':model}),
 };
 const {OfferingDraftForm}=load('src/components/course-plan/offering-draft-form.tsx',formDeps);
 await check('restored blank edits remain blank instead of reverting to the plan',()=>{

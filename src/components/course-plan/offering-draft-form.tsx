@@ -7,6 +7,8 @@ import { ActionForm } from "@/components/portal/action-form";
 import type { OpeningCourse } from "@/lib/course-opening/model";
 import { createOfferingPrefill } from "@/lib/course-opening/prefill";
 import { formatSourceNumber } from "@/lib/course-plan/model";
+import { COURSE_ACADEMIES } from "@/lib/course-guide/model";
+import { DraftTuitionFields } from "./draft-tuition-fields";
 
 function PlanReference({ plan, restored }: { plan: OpeningCourse; restored: boolean }) {
   return (
@@ -49,7 +51,13 @@ export function OfferingDraftForm({ orgId, years, plan, copy }: {
               </select>
             </label>
             <label className="field">과정명<input name="title" maxLength={200} required defaultValue={defaults?.title} /></label>
-            <label className="field">아카데미·분야<input name="academy" maxLength={100} required defaultValue={defaults?.academy} /></label>
+            <label className="field">아카데미·분야
+              <select name="academy" required defaultValue={defaults?.academy ?? ""}>
+                <option value="" disabled>아카데미 선택</option>
+                {COURSE_ACADEMIES.map(academy => <option key={academy} value={academy}>{academy}</option>)}
+                {defaults?.academy && !COURSE_ACADEMIES.some(academy => academy === defaults.academy) && <option value={defaults.academy}>{defaults.academy}</option>}
+              </select>
+            </label>
             <label className="field">교육장소<input name="location" maxLength={200} required defaultValue={defaults?.location} /></label>
             <label className="field">
               운영방식
@@ -66,11 +74,8 @@ export function OfferingDraftForm({ orgId, years, plan, copy }: {
               </select>
             </label>
             <label className="field">정원<input type="number" name="capacity" min={1} max={1000} required defaultValue={defaults?.capacity} /></label>
-            <p className="notice self-end">
-              기수 초안은 무료로 등록됩니다.<br />
-              {plan && <>계획서의 수강료 산식은 자동 반영되지 않습니다.<br /></>}
-              유료 과정은 기수 상세에서 승인된 환불 규정과 납부 안내를 설정하세요.
-            </p>
+            <DraftTuitionFields feeType={copy?.payload.fee_type} tuition={copy?.payload.tuition} />
+            {plan && <p className="text-sm text-slate-600 md:col-span-2">계획서의 수강료 산식은 자동 반영되지 않습니다.</p>}
             {([["apply_from", "접수 시작"], ["apply_until", "접수 마감"]] as const).map(([name, label]) => (
               <label key={name} className="field">{label} (한국시간)<input type="datetime-local" name={name} required defaultValue={copy?.payload[name]} /></label>
             ))}
