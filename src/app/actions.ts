@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getSessionIdentity } from "@/lib/auth/session";
 import { UUID } from "@/lib/portal/data";
 import type { ActionState } from "@/lib/portal/types";
-import { OPENING_SOURCE, openingDateOrderError, openingValues, validOpeningValues } from "@/lib/course-opening/working-copy";
+import { OPENING_SOURCE, draftTuition, openingDateOrderError, openingValues, validOpeningValues } from "@/lib/course-opening/working-copy";
 import { validCourseLocation } from "@/lib/course-guide/locations";
 
 const errors: Record<string, string> = {
@@ -27,6 +27,7 @@ const errors: Record<string, string> = {
   INVALID_TRANSITION: "현재 상태에서는 이 작업을 처리할 수 없습니다.",
   ALREADY_REGISTERED: "이미 등록된 과정입니다. 문서 목록을 새로고침해 주세요.",
   INVALID_SOURCE: "연결할 원문 과정을 찾지 못했습니다.",
+  INVALID_TUITION: "무료는 0원, 유료는 1~100,000,000원의 정수로 입력해 주세요.",
   INVALID_YEAR_OR_ORG: "앵커사업단의 2026년 사업연도를 선택해 주세요.",
   WITHDRAWAL_REVIEW_REQUIRED: "교육 시작 후 취소는 사업단 확인이 필요합니다.",
   REASON_REQUIRED: "반려 사유를 1~1,000자로 입력해 주세요.",
@@ -228,6 +229,8 @@ export async function createOffering(
     args[key] = `${value(f, key)}+09:00`;
   }
   const opening = openingValues(f);
+  const tuition = draftTuition(opening);
+  if (tuition === null) return { message: errors.INVALID_TUITION };
   if (!validOpeningValues(opening))
     return { message: "정원·날짜·입력 항목을 확인해 주세요." };
   const dateError = openingDateOrderError(opening);
@@ -235,9 +238,7 @@ export async function createOffering(
   const source = value(f, "source");
   if (source && !OPENING_SOURCE.test(source))
     return { message: "원문 과정 식별자를 확인해 주세요." };
-  return source
-    ? mutate("life_create_source_offering", { ...args, source_id: source })
-    : mutate("life_create_offering", args);
+  return mutate("life_create_offering_with_tuition", { ...args, tuition, source_id: source || null });
 }
 export async function publishOffering(
   _: ActionState,

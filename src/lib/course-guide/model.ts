@@ -1,6 +1,8 @@
 import { formatDateRange } from "@/lib/date-format";
 import type { CourseSummary, InstructorName } from "@/lib/portal/types";
 
+export const COURSE_ACADEMIES = ["스마트테크 아카데미", "라이프케어 아카데미", "로컬창업 아카데미", "팝업 아카데미"] as const;
+
 export type CourseGuide = {
   id: string;
   year: number;
