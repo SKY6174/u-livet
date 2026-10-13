@@ -373,6 +373,7 @@ content.fields.title = "[검증] 평생직업교육 프로그램";
 content.fields.academy = "로컬창업 아카데미";
 content.fields.audience = "성인학습자";
 content.fields.professor = "테스트 teacher";
+content.signature = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9WvFIAAAAASUVORK5CYII=";
 content.fields.program = "로컬창업 프로그램";
 for (const table of schema.tables("plan"))
   if (table.min)

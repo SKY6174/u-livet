@@ -139,15 +139,14 @@
   margin-top: 48mm;
 }
 .op-signature span {
-  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 3mm;
 }
 .op-signature img {
-  position: absolute;
-  width: 30mm;
-  height: 15mm;
+  width: 50mm;
+  height: 24mm;
   object-fit: contain;
-  top: -5mm;
-  left: -8mm;
 }
 .op-result-cover .op-cover-title {
   margin-top: 28mm;

@@ -51,6 +51,7 @@ import {
   drawOperationPhoto,
   operationPhotoSize,
 } from "@/lib/operation-documents/photo-crop";
+import { PLAN_AUDIENCES, selectedAudiences, scheduleDefaults, scheduleRowFromDefaults, budgetCalculation } from "@/lib/operation-documents/plan-input";
 
 async function photoData(file: File): Promise<string> {
   if (
@@ -101,6 +102,9 @@ export function DocumentEditor({
   const [doc, setDoc] = useState(first),
     [content, setContent] = useState<Content>(first.content),
     [budget, setBudget] = useState<Budget>(first.budget);
+  const [scheduleTemplate, setScheduleTemplate] = useState(() =>
+    scheduleDefaults(first.content.tables.schedule[0], documentTables(kind).find(table => table.key === "schedule")!.columns),
+  );
   const [section, setSection] = useState("cover"),
     [dirty, setDirty] = useState(false),
     [busy, setBusy] = useState(false),
@@ -172,6 +176,12 @@ export function DocumentEditor({
     setDirty(true);
     setConfirmed(false);
     setMessage("");
+  }
+  function changeBudgetField(index: number, key: keyof Budget["rows"][number], value: string) {
+    const calculated = kind === "plan" && key === "calculation" ? budgetCalculation(value) : null;
+    changeBudget({ ...budget, rows: budget.rows.map((row, i) => i === index
+      ? { ...row, [key]: value, ...(calculated !== null ? { planned: String(calculated) } : {}) }
+      : row) });
   }
   function changeScholarships(rows: ScholarshipDetail[]) {
     changeBudget(syncScholarshipSummary({ ...budget, scholarships: rows }));
@@ -552,7 +562,7 @@ export function DocumentEditor({
               className="space-y-5 disabled:opacity-80"
             >
               {selected.fields?.filter((field) => field.key !== "title").map((f) => (
-                <Input
+                f.key === "audience" && kind === "plan" ? <AudienceInput key={f.key} value={content.fields[f.key]} onChange={value => change({ ...content, fields: { ...content.fields, [f.key]: value } })} /> : <Input
                   key={f.key}
                   field={f}
                   value={content.fields[f.key]}
@@ -574,6 +584,8 @@ export function DocumentEditor({
                   key={t.key}
                   table={t}
                   rows={content.tables[t.key]}
+                  defaults={kind === "plan" && t.key === "schedule" ? scheduleTemplate : undefined}
+                  changeDefaults={setScheduleTemplate}
                   change={(rows) =>
                     change({
                       ...content,
@@ -675,7 +687,7 @@ export function DocumentEditor({
               {section === "cover" && kind === "plan" && (
                 <div>
                   <h3 className="text-sm font-semibold">
-                    담당교수 서명 (선택)
+                    담당교수 서명 (검토 요청·최종 제출 필수)
                   </h3>
                   <AdvisorySignaturePad
                     signatureUrl={content.signature}
@@ -684,7 +696,7 @@ export function DocumentEditor({
                     }}
                   />
                   <p className="text-xs text-slate-500">
-                    서명은 본인이 직접 입력합니다. 검토 요청·제출 계정과 시각은
+                    담당교수가 직접 서명해 주세요. 서명 없이 임시저장은 가능하며 검토 요청·제출 계정과 시각은
                     별도로 기록됩니다.
                   </p>
                 </div>
@@ -748,7 +760,16 @@ export function DocumentEditor({
                                 note: "비고",
                               }[key]
                             }
-                            <input
+                            {key === "calculation" ? <>
+                              <textarea rows={3} maxLength={1000} value={r.calculation}
+                                placeholder={"15,000원*10시간\n재료비는 항목마다 줄을 나누어 입력"}
+                                onChange={e => changeBudgetField(i, "calculation", e.target.value)} />
+                              <span className="text-xs font-normal text-slate-500">
+                                {r.calculation && budgetCalculation(r.calculation) === null
+                                  ? "자동계산되지 않는 내역입니다. 금액을 직접 확인해 주세요."
+                                  : "× 또는 *로 곱하고, + 또는 줄바꿈으로 합산합니다. 계산된 금액은 직접 조정할 수 있습니다."}
+                              </span>
+                            </> : <input
                               type={
                                 ["planned", "spent"].includes(key)
                                   ? "number"
@@ -758,17 +779,8 @@ export function DocumentEditor({
                               max={999999999999}
                               maxLength={1000}
                               value={r[key as keyof typeof r]}
-                              onChange={(e) =>
-                                changeBudget({
-                                  ...budget,
-                                  rows: budget.rows.map((v, j) =>
-                                    j === i
-                                      ? { ...v, [key]: e.target.value }
-                                      : v,
-                                  ),
-                                })
-                              }
-                            />
+                              onChange={e => changeBudgetField(i, key as keyof typeof r, e.target.value)}
+                            />}
                           </label>
                         ))}
                       </div>
@@ -1026,6 +1038,20 @@ export function DocumentEditor({
     </div>
   );
 }
+function AudienceInput({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const selected = selectedAudiences(value);
+  return <fieldset className="space-y-2">
+    <legend className="font-semibold">주요대상 <span className="text-xs font-normal text-slate-400">검토 요청 시 필수 · 중복 선택 가능</span></legend>
+    <div className="flex flex-wrap gap-3">
+      {PLAN_AUDIENCES.map(audience => <label key={audience} className="flex cursor-pointer items-center gap-2 rounded-lg border bg-white px-4 py-3">
+        <input type="checkbox" checked={selected.includes(audience)} onChange={event =>
+          onChange(PLAN_AUDIENCES.filter(option => option === audience ? event.target.checked : selected.includes(option)).join(" / "))} />
+        {audience}
+      </label>)}
+    </div>
+    {value && !selected.length && <p className="text-xs text-slate-500">기존 표기: {value}</p>}
+  </fieldset>;
+}
 function Input({
   field: f,
   value,
@@ -1092,14 +1118,37 @@ function Rows({
   table,
   rows,
   change,
+  defaults,
+  changeDefaults,
 }: {
   table: Table;
   rows: Record<string, string>[];
   change: (rows: Record<string, string>[]) => void;
+  defaults?: Record<string, string>;
+  changeDefaults?: (values: Record<string, string>) => void;
 }) {
+  const [sourceRow, setSourceRow] = useState("0");
   return (
     <div className="space-y-4">
       <h3 className="font-semibold">{table.label}</h3>
+      {defaults && changeDefaults && <div className="space-y-3 rounded-xl border border-teal-200 bg-teal-50 p-4">
+        <h4 className="font-semibold">강의 기본정보</h4>
+        <p className="text-xs text-slate-600">새 회차에 공통으로 적용합니다. 기존 회차는 변경하지 않으며 일자와 공휴일·보강 날짜는 회차별로 입력하세요.</p>
+        {rows.length > 0 && <div className="flex flex-wrap items-center gap-2">
+          <label className="field">기본정보로 불러올 회차
+            <select value={sourceRow} onChange={event => setSourceRow(event.target.value)}>
+              {rows.map((_, index) => <option key={index} value={index}>{index + 1}회차</option>)}
+            </select>
+          </label>
+          <button type="button" className="btn-secondary" disabled={!rows[Number(sourceRow)]}
+            onClick={() => changeDefaults(scheduleDefaults(rows[Number(sourceRow)], table.columns))}>기본정보 불러오기</button>
+        </div>}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {table.columns.filter(field => Object.hasOwn(defaults, field.key)).map(field =>
+            <Input key={field.key} field={{ ...field, label: `기본 ${field.label}` }} value={defaults[field.key]}
+              onChange={value => changeDefaults({ ...defaults, [field.key]: value })} />)}
+        </div>
+      </div>}
       {rows.map((row, i) => (
         <div key={i} className="rounded-xl border bg-slate-50 p-4">
           <div className="mb-3 flex justify-between text-sm font-semibold">
@@ -1159,7 +1208,7 @@ function Rows({
         type="button"
         className="btn-secondary gap-2"
         disabled={rows.length >= table.max}
-        onClick={() => change([...rows, blankRow(table.columns)])}
+        onClick={() => change([...rows, defaults ? scheduleRowFromDefaults(defaults, table.columns) : blankRow(table.columns)])}
       >
         <Plus size={16} />
         {table.key === "schedule" ? "회차 추가" : "행 추가"}

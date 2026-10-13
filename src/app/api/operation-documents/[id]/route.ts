@@ -7,6 +7,7 @@ import { isSameOriginRequest } from "@/lib/reports/request";
 import { validContent, validBudget } from "@/lib/operation-documents/model";
 import { MFA_REAUTH_MESSAGE } from "@/lib/auth/mfa-message";
 const messages: Record<string, string> = {
+  PLAN_SIGNATURE_REQUIRED: "담당교수 서명 후 검토 요청 또는 최종 제출해 주세요.",
   REVISION_CHANGED:
     "다른 수정이 먼저 저장되었습니다. 현재 입력을 복사해 두고 새로고침해 주세요.",
   DOCUMENT_LOCKED:
