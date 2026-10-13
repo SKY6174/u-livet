@@ -595,6 +595,7 @@ export function missingContent(content: Content, kind: DocumentKind) {
   const missing = fields(kind)
     .filter((f) => f.required && !content.fields[f.key]?.trim())
     .map((f) => f.label);
+  if (kind === "plan" && !content.signature) missing.push("담당교수 서명");
   for (const table of tables(kind))
     if (table.min && content.tables[table.key].length < table.min)
       missing.push(table.label);
