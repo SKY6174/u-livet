@@ -12,3 +12,7 @@
 - 로컬 사람/Auth/역할/수동등록/신청/수강 원본 hash 보존 통과. 운영 계정 관련 원본을 포함한 31개 aggregate count/hash와 보안 advisor 기준값을 저장했다. 원본 연락처/암호는 출력하지 않는다.
 
 출시 확인은 PR 설명에 기록한다: Preview migration/배포 및 운영 migration ledger, 기존 31개 원본 count/hash, 보안 advisor, 운영 브라우저의 정상 명단과 dummy/검증 검색/기존 상세 주소, READY/health/version.
+
+로컬 실행은 `20261008131827_course_catalog_organization.sql`(기존 로컬 catalog 반환형 정렬), `20261017062713_admin_operational_records.sql`, 현재 계정 분류 migration, `scripts/verify-operational-accounts.sql`을 한 transaction으로 결합한다. 각 migration의 바깥 BEGIN/COMMIT을 제거하고 검증 파일의 ROLLBACK만 유지하여 `docker exec -i supabase_db_uc-life-issues psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q`로 실행했다.
+
+Preview 생성 시 Supabase ap-northeast-1 프로젝트 생성 장애가 확인되어, 운영 데이터 복사 없이 이 PR에 연결된 임시 ap-northeast-2 branch를 사용한다. 운영 프로젝트/리전/환경변수는 유지한다.
