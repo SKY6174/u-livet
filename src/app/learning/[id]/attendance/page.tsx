@@ -16,7 +16,7 @@ export default async function MyAttendance({ params }: { params: Promise<{ id: s
     <p className="notice mb-8">종료된 정상 수업만 집계합니다. 미입력은 결석이 아니며 모두 기록된 뒤 출석률을 표시합니다. 최종 수료는 전체 수업과 승인된 기준에 따라 별도로 판정합니다. 기록 정정은 담당 강사에게 문의해 주세요.</p>
     {book.qr_unavailable && <p className="notice mb-5">QR 입실 기록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.</p>}
     <h2 className="section-title">수업별 출석 내역</h2>
-    {!book.sessions.length ? <Empty title="수업 일정이 준비 중입니다" /> : <div className="grid gap-4 md:grid-cols-2">{book.sessions.map(session => {
+    {!book.sessions.length ? <Empty title="등록된 수업 일정이 없습니다">수업 일정은 담당 강사에게 문의해 주세요.</Empty> : <div className="grid gap-4 md:grid-cols-2">{book.sessions.map(session => {
       const record = index.get(`${session.id}:${book.viewer_id}`), state = attendanceState(session, record, now);
       const checkin = book.qr_checkins?.find(q => q.session_id === session.id && q.person_id === book.viewer_id);
       return <article key={session.id} className="panel">

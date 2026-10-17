@@ -76,13 +76,13 @@ export function DossierStartForm({
   if (!privacyPolicies.length || !hasReview) {
     return (
       <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-base leading-7">
-        <h3 className="font-bold">사업단의 강사 등록 안내가 준비 중입니다</h3>
+        <h3 className="font-bold">강사 이력 등록에 필요한 승인 기준이 없습니다</h3>
         <p className="mt-2">다음 항목이 등록되면 이력 작성을 시작할 수 있습니다.</p>
         <ul className="mt-2 list-disc pl-6">
           {!privacyPolicies.length && <li>강사 이력 개인정보 수집·이용 안내</li>}
           {!hasReview && <li>강사 이력 심사 기준</li>}
         </ul>
-        <p className="mt-3">입력 오류가 아닙니다. 지금은 동의하거나 제출할 수 없습니다.</p>
+        <p className="mt-3">사업단에 기준 등록을 문의해 주세요. 등록 전에는 이력을 제출할 수 없습니다.</p>
         <SupportContact className="mt-3 text-teal-900" />
       </div>
     );

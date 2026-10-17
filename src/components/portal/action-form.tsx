@@ -89,7 +89,7 @@ export function ActionForm({
       {children}
       {botProtection?.unavailable && (
         <p role="alert" className="text-red-700">
-          로그인 보안 서비스가 준비 중입니다. 잠시 후 다시 시도하거나 사업단에
+          현재 로그인 보안 확인을 이용할 수 없습니다. 잠시 후 다시 시도하거나 사업단에
           문의해 주세요.
         </p>
       )}

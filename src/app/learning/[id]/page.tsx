@@ -78,7 +78,9 @@ export default async function Classroom(props: {
           <h2 className="section-title">학습자료</h2>
           <div className="space-y-4">
             {!(lessons.data ?? []).length && (
-              <Empty title="학습자료가 준비 중입니다" />
+              <Empty title="공개된 학습자료가 없습니다">
+                자료 열람 일정은 담당 강사에게 문의해 주세요.
+              </Empty>
             )}
             {((lessons.data as Lesson[]) ?? []).map((l) => (
               <details key={l.id} className="panel" open>
