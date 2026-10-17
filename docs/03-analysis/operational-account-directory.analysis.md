@@ -16,3 +16,5 @@
 로컬 실행은 `20261008131827_course_catalog_organization.sql`(기존 로컬 catalog 반환형 정렬), `20261017062713_admin_operational_records.sql`, 현재 계정 분류 migration, `scripts/verify-operational-accounts.sql`을 한 transaction으로 결합한다. 각 migration의 바깥 BEGIN/COMMIT을 제거하고 검증 파일의 ROLLBACK만 유지하여 `docker exec -i supabase_db_uc-life-issues psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q`로 실행했다.
 
 Preview 생성 시 Supabase ap-northeast-1 프로젝트 생성 장애가 확인되어, 운영 데이터 복사 없이 이 PR에 연결된 임시 ap-northeast-2 branch를 사용한다. 운영 프로젝트/리전/환경변수는 유지한다.
+
+운영 보존 검증 범위에 감사 이벤트·강사 배정·강사 서류를 추가하여 총 34개 원본 count/hash 기준값을 확보했다. 최초 31개 기준값도 동일하다. 서울 Preview DB에는 전체 migration 129개와 현재 `20261017065240` ledger/운영 계정 scope가 생성된 것을 확인했다. 초기 생성과 Git 연동 작업이 겹쳐 발생한 ledger 중복 체크는 초기 실행이 끝난 뒤 재검증한다.
