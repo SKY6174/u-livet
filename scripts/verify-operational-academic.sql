@@ -3,7 +3,8 @@
 begin;
 create temp table academic_fixture(k text,f uuid,p uuid,enrollment uuid,run uuid,submission uuid);
 create temp table academic_scope(f uuid,hidden_f uuid,y uuid,s1 uuid,s2 uuid,cancelled uuid,quiz uuid,future_quiz uuid);
-grant select on academic_fixture,academic_scope to authenticated;
+create temp table academic_past(f uuid,session uuid,assignment uuid,submission uuid);
+grant select on academic_fixture,academic_scope,academic_past to authenticated;
 do $$
 declare actor uuid:='454e4e2b-09b0-4619-9470-c0bf4ac228e0';learner uuid:='6ff24c6b-5d15-424e-963c-1b24dbff3903';
  hidden_person uuid:=gen_random_uuid();withdrawn uuid:=gen_random_uuid();pending uuid:=gen_random_uuid();
@@ -62,6 +63,19 @@ begin
  insert into public.life_course_reports(offering_id,payload,updated_by) values(f,'{"operator":"Local report","sourceReport":{"enrolled":999,"completed":999}}',actor);
  update public.life_people set name='academic-renamed-person' where id=hidden_person;
  update public.life_offerings set name='academic-renamed-course' where id=hidden_f;
+ -- Own historical records stay visible after withdrawal even when parents
+ -- (session/unpublished assignment) are no longer readable by that learner.
+ course:=gen_random_uuid();
+ insert into public.life_offerings select (jsonb_populate_record(null::public.life_offerings,to_jsonb(seed)||jsonb_build_object('id',course,'name','Local withdrawn history'))).*;
+ insert into public.life_applications(offering_id,person_id,policy_id,status) values(course,learner,enrollment_policy,'CANCELLED') returning id into app;
+ insert into public.life_enrollments(offering_id,person_id,application_id,status) values(course,learner,app,'WITHDRAWN');
+ assignment:=gen_random_uuid();test_session:=gen_random_uuid();
+ insert into public.life_assignments(id,offering_id,title,instructions,due_at,published) values(assignment,course,'Local unpublished','Local task',now()-interval '1 day',false);
+ insert into public.life_class_sessions(id,offering_id,title,starts_at,ends_at) values(test_session,course,'Local historical session',now()-interval '2 days',now()-interval '2 days'+interval '1 hour');
+ insert into public.life_attendance(session_id,person_id,credited_minutes,reason,recorded_by) values(test_session,learner,45,'Local retained history',actor);
+ insert into public.life_submissions(assignment_id,person_id,body,revision) values(assignment,learner,'Local prior submission',1) returning id into sub;
+ insert into public.life_submission_grades values(sub,1,77,'Local prior feedback',actor,now());
+ insert into academic_past values(course,test_session,assignment,sub);
  -- Finalize only the local fixtures, after inputs have invalidated their seal.
  update public.life_offerings set academic_sealed=true where id in(f,hidden_f);
  -- Create current evidence after all academic inputs have finished changing.
@@ -145,11 +159,16 @@ do $$declare sc academic_scope;x jsonb;begin
  x:=public.life_exam_room(sc.f);
  if jsonb_array_length(x->'attempts')<>2 or not exists(select 1 from jsonb_array_elements(x->'attempts') a where a->>'quiz_id'=sc.future_quiz::text and a->'score'='null'::jsonb)
  or not exists(select 1 from jsonb_array_elements(x->'attempts') a where a->>'quiz_id'=sc.quiz::text and (a->>'score')::numeric=90) then raise exception 'PERSONAL_SCORE_RELEASE_OR_SCOPE_FAILED';end if;
+ if (select count(*) from public.life_attendance where session_id=(select session from academic_past))<>1
+ or (select count(*) from public.life_submissions where id=(select submission from academic_past))<>1
+ or (select count(*) from public.life_submission_grades where submission_id=(select submission from academic_past))<>1 then raise exception 'NORMAL_WITHDRAWN_HISTORY_HIDDEN';end if;
+ if exists(select 1 from public.life_class_sessions where id=(select session from academic_past))
+ or exists(select 1 from public.life_assignments where id=(select assignment from academic_past)) then raise exception 'PARENT_ACCESS_EXPANDED';end if;
  x:=public.life_my_learning();
  if (select count(*) from jsonb_array_elements(x->'courses') c where c->>'id' in(sc.f::text,sc.hidden_f::text))<>1 then raise exception 'LEARNING_COURSE_SCOPE_FAILED';end if;
  begin perform public.life_teaching_attendance(sc.f);raise exception 'UNASSIGNED_TEACHER_EXPOSED';exception when raise_exception then if sqlerrm<>'FORBIDDEN' then raise;end if;end;
  begin perform public.life_completion_board(sc.f);raise exception 'FOREIGN_REVIEW_EXPOSED';exception when raise_exception then if sqlerrm<>'FORBIDDEN' then raise;end if;end;
- raise notice 'PASS personal attendance/quiz/history, pre-close score secrecy and unrelated institution boundaries';
+ raise notice 'PASS personal attendance/quiz/history, pre-close score secrecy, withdrawn personal history and unrelated institution boundaries';
 end$$;
 reset role;
 do $$declare row_value record;h text;begin

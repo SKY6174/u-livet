@@ -12,3 +12,7 @@
 - 출결·등록·제출·점수·시험·정답·QR·판정·승인·보고 원본 hash 불변. 기존 학사 입력 변경 시 revision 증가와 마감 해제가 유지되어, fixture는 입력 완료 뒤 마감·판정 근거를 생성했다.
 
 출시 검증: 운영 원본 84개 항목과 변경 범위 밖 함수 612개 hash baseline 확보. Preview 전체 migration/검사, 운영 SQL 원자적 적용 및 ledger, 실제 화면·배포 SHA·health·보안 advisor 전후 대조를 진행한다.
+
+## 정상 과거 조회 보완
+
+부모 회차/미공개 과제를 볼 수 없는 정상 철회자의 본인 출결·제출·성적을 유지하는 회귀 사례를 추가했다. 최초 restrictive 정책은 해당 정상 이력을 숨기는 문제를 재현했고, 후속 migration의 boolean reference helper 2개로 해결했다. 최종 로컬 전체 검증 통과. 부모 자료 권한과 원본 이력 hash는 그대로 유지된다. 두 migration은 운영에서 하나의 transaction으로 적용한다.

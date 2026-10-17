@@ -11,3 +11,8 @@
 6. 로컬에서 정상/검증 과정·계정과 출석 누락/휴강/정정 revision, 실제 점수/만료 응시, 승인·미승인·철회·오래된 판정을 섞는다. 수료율의 분모/분자, 출결 기대/기록, 최신 판정 선택, 강사/기관·본인·타 기관/익명, direct RLS와 private view 차단, 원본 hash를 확인한다. 기존 63개 항목에 세션/과제/제출/성적/시험/정답/QR/연간 확정 원본을 추가해 운영 전후 count/hash를 비교한다. 변경 읽기 13개와 새 predicate를 제외한 모든 기존 함수 hash가 그대로여야 한다.
 
 출시: 로컬 검증 및 설계 대조 → 데이터 없는 서울 Preview 전체 migration/검사 → PR/check → drift guard를 둔 동일 SQL 원자적 운영 적용/ledger 등록 → main 병합 자동 배포/READY/SHA/health/실제 수료·보고서·모니터링 확인. QA를 위한 운영 권한 확대나 실제 채점·수료 승인·재산출은 실행하지 않는다.
+
+
+## 정상 철회자의 과거 직접 조회 보존
+
+검증 중 부모 테이블의 기존 RLS를 다시 타는 SELECT 정책이 정상 철회자의 본인 출결/미공개 과제 제출 조회까지 좁힐 수 있음을 확인했다. 분류를 위한 회차·과제의 과정 ID 조회만 private security definer 함수 `operational_attendance_reference(session,person)`, `operational_submission_reference(assignment,person)`에서 수행한다. 두 helper는 분류 boolean만 반환하고 빈 search_path·authenticated execute 한정이며, 실제 행 접근은 기존 본인/강사/기관 정책이 계속 검사한다. 후속 migration에서 새 restrictive 정책 2개의 USING만 helper로 변경한다. 정상 철회자가 부모 회차·미공개 과제는 볼 수 없어도 본인 기존 출결/제출/성적은 유지되는 사례를 추가 검증한다. 이 보완은 부모 자료 권한이나 기존 처리 함수를 확대하지 않는다.
