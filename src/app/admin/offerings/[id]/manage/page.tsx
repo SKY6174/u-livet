@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { isOperationalRecruitmentPolicy } from "@/lib/portal/recruitment-policy";
+import { isOperationalCompletionPolicy, isOperationalRecruitmentPolicy } from "@/lib/portal/recruitment-policy";
 import { getPolicies, statusLabel, dateTime } from "@/lib/portal/data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Empty } from "@/components/portal/ui";
@@ -74,7 +74,8 @@ export default async function ManageOffering(props: {
     ]);
   const finance = financeResult.data as FinanceConfig | null;
   const recruitablePolicies = policies.filter(
-    (policy) => policy.org_id === o.org_id && isOperationalRecruitmentPolicy(policy),
+    (policy) => policy.org_id === o.org_id && (policy.kind === "COMPLETION"
+      ? isOperationalCompletionPolicy(policy) : isOperationalRecruitmentPolicy(policy)),
   );
   return (
     <div className="page-shell">

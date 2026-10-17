@@ -1,4 +1,5 @@
 import { applicationIsOpen } from "@/lib/learner-documents/admissions";
+import { isOperationalCompletionPolicy } from "@/lib/portal/recruitment-policy";
 import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -33,7 +34,7 @@ export default async function OfferingPage(props: {
       o.status === "ARCHIVED" ? { data: null } : db.rpc("life_offering_finance", { f: o.id }),
       getCourseInstructorNames([o.id]),
     ]);
-  const completion = policies.find((p) => p.id === o.completion_policy_id && !p.title.startsWith("[검증용]"));
+  const completion = policies.find((p) => p.id === o.completion_policy_id && isOperationalCompletionPolicy(p));
   const enrollment = enrollmentPolicies.find((p) => p.id === offeringPolicy?.enrollment_policy_id);
   const finance = financeData as FinanceConfig | null;
   const instructors = instructorNames === null ? null : instructorNames[o.id] ?? [];

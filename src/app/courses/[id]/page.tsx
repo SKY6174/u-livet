@@ -1,4 +1,5 @@
 import { applicationIsOpen } from "@/lib/learner-documents/admissions";
+import { isOperationalCompletionPolicy } from "@/lib/portal/recruitment-policy";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -22,7 +23,7 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
   ]);
   const completion = offering?.completion_policy_id
     ? (await getPolicies("COMPLETION", offering.completion_policy_id))
-      .find((policy) => !policy.title.startsWith("[검증용]"))
+      .find(isOperationalCompletionPolicy)
     : null;
   const information = [
     ["교육기간", course.period_label],
