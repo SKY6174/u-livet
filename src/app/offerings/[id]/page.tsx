@@ -77,7 +77,7 @@ export default async function OfferingPage(props: {
               {completion?.body ?? "수료기준을 확인 중입니다."}
             </p>
           </section>
-          <ScholarshipNotice />
+          <ScholarshipNotice archived={o.status === "ARCHIVED"} />
           <RefundNotice tuition={o.tuition} finance={finance} />
           {enrollment && (
             <section className="panel">

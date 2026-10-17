@@ -59,7 +59,7 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
               <p className="whitespace-pre-wrap leading-7">{completion.body}</p>
             </> : <p className="text-slate-600">승인된 이수요건을 확인 중입니다. 모집 공고에서 확정 기준을 확인해 주세요.</p>}
           </section>
-          <ScholarshipNotice />
+          <ScholarshipNotice archived={offering?.status === "ARCHIVED"} />
           <RefundNotice tuition={offering?.tuition ?? null} finance={finance} />
           {course.schedule_history.length > 0 && <section className="panel"><h2 className="section-title">일정 변경 안내</h2><ul className="space-y-2 text-sm text-slate-600">{course.schedule_history.map((entry) => <li key={entry}>{entry}</li>)}</ul></section>}
         </div>
