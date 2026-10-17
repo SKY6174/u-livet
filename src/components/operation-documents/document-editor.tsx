@@ -1,5 +1,5 @@
 "use client";
-import { formatDate, formatDateTime } from "@/lib/date-format";
+import { formatDateTime } from "@/lib/date-format";
 /* eslint-disable @next/next/no-img-element -- Local embedded images are private form values. */
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -51,7 +51,8 @@ import {
   drawOperationPhoto,
   operationPhotoSize,
 } from "@/lib/operation-documents/photo-crop";
-import { PLAN_AUDIENCES, selectedAudiences, scheduleDefaults, scheduleRowFromDefaults, budgetCalculation } from "@/lib/operation-documents/plan-input";
+import { PurposeInput, IssuerInput, RecruitmentInput } from "./plan-fields";
+import { PLAN_AUDIENCES, recruitmentRatio, selectedAudiences, scheduleDefaults, scheduleRowFromDefaults, budgetCalculation, validRecruitment } from "@/lib/operation-documents/plan-input";
 
 async function photoData(file: File): Promise<string> {
   if (
@@ -215,6 +216,10 @@ export function DocumentEditor({
     setError("");
     setMessage("");
     try {
+      if (["save", "review", "submit"].includes(intent)) {
+        if (kind === "plan" && !validRecruitment(content.tables.recruitment, content.fields.capacity)) throw new Error("모집대상 인원은 정수이며 합계가 모집인원을 넘을 수 없습니다.");
+        if (content.tables.schedule.some(row => row.startTime && row.endTime && row.startTime >= row.endTime)) throw new Error("강의 종료시간은 시작시간보다 늦어야 합니다.");
+      }
       let revision = doc.revision;
       if (
         ["save", "review", "submit"].includes(intent) &&
@@ -286,6 +291,25 @@ export function DocumentEditor({
     }
   }
   const base = `/operation-documents/${context.course.id}`;
+  const selectedFields = selected.fields?.filter((field) => field.key !== "title" && !(kind === "plan" && ["program", "qualificationNote"].includes(field.key))).map((f) => (
+                f.key === "issuerInfo" && kind === "plan" ? <IssuerInput key={f.key} value={content.fields[f.key]} onChange={value => change({ ...content, fields: { ...content.fields, [f.key]: value } })} /> : f.key === "purposes" && kind === "plan" ? <PurposeInput key={f.key} value={content.fields[f.key]} onChange={value => change({ ...content, fields: { ...content.fields, [f.key]: value } })} /> : f.key === "audience" && kind === "plan" ? <AudienceInput key={f.key} value={content.fields[f.key]} onChange={value => change({ ...content, fields: { ...content.fields, [f.key]: value } })} /> : <Input
+                  key={f.key}
+                  field={f}
+                  value={content.fields[f.key]}
+                  options={
+                    f.key === "academy"
+                      ? Array.from(new Set([context.course.academy, ...ACADEMIES])).filter(Boolean)
+                      : undefined
+                  }
+                  onChange={(value) =>
+                    change({
+                      ...content,
+                      fields: { ...content.fields, [f.key]: value },
+                      ...(kind === "plan" && f.key === "capacity" ? { tables: { ...content.tables, recruitment: content.tables.recruitment.map(row => ({ ...row, ratio: recruitmentRatio(row.count, value) })) } } : {}),
+                    })
+                  }
+                />
+              ));
   return (
     <div className="op-editor mx-auto max-w-[1600px] px-4 py-8 sm:px-8">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -529,7 +553,7 @@ export function DocumentEditor({
                 >
                   {courseOptions.map((course) => (
                     <option key={course.id} value={course.id}>
-                      {course.name} · {formatDate(course.starts_on)}
+                      {course.name}
                     </option>
                   ))}
                 </select>
@@ -559,28 +583,13 @@ export function DocumentEditor({
             )}
             <fieldset
               disabled={readonly}
-              className="space-y-5 disabled:opacity-80"
+              className="min-w-0 space-y-5 disabled:opacity-80"
             >
-              {selected.fields?.filter((field) => field.key !== "title").map((f) => (
-                f.key === "audience" && kind === "plan" ? <AudienceInput key={f.key} value={content.fields[f.key]} onChange={value => change({ ...content, fields: { ...content.fields, [f.key]: value } })} /> : <Input
-                  key={f.key}
-                  field={f}
-                  value={content.fields[f.key]}
-                  options={
-                    f.key === "academy"
-                      ? Array.from(new Set([context.course.academy, ...ACADEMIES])).filter(Boolean)
-                      : undefined
-                  }
-                  onChange={(value) =>
-                    change({
-                      ...content,
-                      fields: { ...content.fields, [f.key]: value },
-                    })
-                  }
-                />
-              ))}
+              {!(kind === "plan" && ["qualifications", "staff"].includes(section)) && <>
+              {selectedFields}
+              </>}
               {selected.tables?.map((t) => (
-                <Rows
+                t.key === "recruitment" && kind === "plan" ? <RecruitmentInput key={t.key} rows={content.tables.recruitment} capacity={content.fields.capacity} onChange={rows => change({ ...content, tables: { ...content.tables, recruitment: rows } })} /> : <Rows
                   key={t.key}
                   table={t}
                   rows={content.tables[t.key]}
@@ -594,6 +603,9 @@ export function DocumentEditor({
                   }
                 />
               ))}
+              {kind === "plan" && ["qualifications", "staff"].includes(section) && <>
+              {selectedFields}
+              </>}
               {kind === "result" && section === "performance" && (
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1095,12 +1107,14 @@ function Input({
               : f.type === "date"
                 ? "date"
                 : f.type === "time"
-                  ? "time"
+                  ? "text"
                   : "text"
           }
+          placeholder={f.type === "time" ? "09:00 (24시간제)" : undefined}
+          inputMode={f.type === "time" ? "numeric" : undefined}
           min={f.key === "completionAttendancePercent" ? 80 : 0}
           max={f.key === "completionAttendancePercent" ? 100 : undefined}
-          step={f.type === "number" ? ".01" : undefined}
+          step={f.type === "number" ? (["capacity", "count", "year"].includes(f.key) ? "1" : ".01") : undefined}
           maxLength={f.max}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -1164,6 +1178,7 @@ function Rows({
               <Trash2 size={16} />
             </button>
           </div>
+          {table.key === "schedule" && row.startTime && row.endTime && row.startTime >= row.endTime && <p role="alert" className="mb-3 text-sm text-red-700">종료시간은 시작시간보다 늦어야 합니다.</p>}
           <div
             className={`grid gap-3 sm:grid-cols-2 ${table.key === "schedule" ? "lg:grid-cols-6" : ""}`}
           >

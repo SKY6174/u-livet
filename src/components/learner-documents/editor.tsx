@@ -75,7 +75,7 @@ function Consent({ id, title, value, onChange, children, error }: {
   </fieldset>;
 }
 
-type DocumentCourse = { id: string; name: string; offeringId: string; tuition: number | null; periodLabel?: string };
+type DocumentCourse = { id: string; name: string; offeringId: string; tuition: number | null; periodLabel?: string; canApply?: boolean };
 
 export function LearnerDocumentEditor({ type: initialType, name, email, courses, requests, eligibility, initialCourse, profile, profileUnavailable, coursesUnavailable }: {
   type: LearnerDocumentType; name: string; email: string; courses: DocumentCourse[];
@@ -94,6 +94,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
     refund: initialValues(name, email, refundInitialCourse?.name, refundInitialCourse?.offeringId ?? "", refundInitialCourse?.tuition ?? null, profile),
   }));
   const values = forms[type];
+  const applicationBlocked = type === "application" && (!!values.offeringId && (!courses.find(course => course.offeringId === values.offeringId)?.canApply || requests.some(request => request.kind === "APPLICATION" && request.offering_id === values.offeringId && !["REJECTED", "CANCELLED"].includes(request.status))));
   const [rendered, setRendered] = useState<{ type: LearnerDocumentType; values: LearnerDocumentValues; bytes: Uint8Array } | null>(null);
   const [previewError, setPreviewError] = useState("");
   const [errors, setErrors] = useState<ReturnType<typeof documentErrors>>({});
@@ -224,6 +225,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
       document.getElementById(first)?.focus();
       return;
     }
+    if (applicationBlocked) { setNotice("신청이 마감되었거나 이미 원서를 접수한 과정입니다. 기존 처리 현황을 확인해 주세요."); return; }
     if (pending || previewError || submitting) return;
     const requestKey = requestKeys.current[type] ?? crypto.randomUUID();
     requestKeys.current[type] = requestKey;
@@ -309,7 +311,7 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
                 <select id="courseName" name="courseName" value={values.offeringId} onChange={e => updateCourse(e.target.value)} className="learner-field" aria-invalid={!!errors.courseName}
                   aria-describedby="courseName-help" disabled={application && !courses.length}>
                   <option value="">{application ? "개설 과정을 선택해 주세요" : refund ? "승인된 수강 과정을 선택해 주세요" : "수료 인정된 과정을 선택해 주세요"}</option>
-                  {(application ? courses : refund ? refundCourses : scholarshipCourses).map(course => <option key={course.id} value={course.offeringId}>{course.name}{course.periodLabel ? ` · ${course.periodLabel}` : ""}{refund ? course.tuition === null ? " · 수강료 미등록" : ` · ${course.tuition.toLocaleString("ko-KR")}원` : ""}</option>)}
+                  {(application ? courses : refund ? refundCourses : scholarshipCourses).map(course => <option key={course.id} value={course.offeringId} disabled={application && (!course.canApply || requests.some(request => request.kind === "APPLICATION" && request.offering_id === course.offeringId && !["REJECTED", "CANCELLED"].includes(request.status)))}>{course.name}{application && !course.canApply ? " · 접수 불가" : application && requests.some(request => request.kind === "APPLICATION" && request.offering_id === course.offeringId && !["REJECTED", "CANCELLED"].includes(request.status)) ? " · 원서 접수됨" : ""}{course.periodLabel ? ` · ${course.periodLabel}` : ""}{refund ? course.tuition === null ? " · 수강료 미등록" : ` · ${course.tuition.toLocaleString("ko-KR")}원` : ""}</option>)}
                 </select>
                 <p id="courseName-help" className={`mt-1.5 text-xs leading-5 ${errors.courseName || coursesUnavailable ? "text-red-700" : "text-slate-500"}`}>
                   {errors.courseName || (application ? coursesUnavailable ? "개설 과정 목록을 불러오지 못했습니다. 페이지를 새로 고쳐 주세요." : !courses.length ? "현재 원서를 작성할 개설 과정이 없습니다." : "개설 과정과 교육기간을 확인해 선택해 주세요." : refund ? "원서가 승인된 수강 과정을 선택해 주세요." : "수료 인정된 과정을 선택해 주세요.")}
@@ -396,7 +398,8 @@ export function LearnerDocumentEditor({ type: initialType, name, email, courses,
           {previewError && <div role="alert" className="mt-3 rounded-xl bg-red-50 p-4 text-sm text-red-800">{previewError}<button type="button" className="ml-2 underline" onClick={() => setRetry(v => v + 1)}>다시 시도</button></div>}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button type="button" onClick={download} disabled={pending || !!previewError} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#123353] bg-white px-5 py-3 font-semibold text-[#123353] hover:bg-slate-50 disabled:cursor-wait disabled:opacity-50"><Download size={18} />PDF 다운로드</button>
-            <button type="button" onClick={() => void submit()} disabled={pending || !!previewError || submitting || submittedValues.current[type] === values} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#123353] px-5 py-3 font-semibold text-white hover:bg-[#1d476d] disabled:cursor-wait disabled:opacity-50"><Send size={18} />{submitting ? "처리 중…" : application ? "입력완료" : "신청처리"}</button>
+            {applicationBlocked && <p role="status" className="mb-3 text-sm text-amber-900">접수 기간이 지났거나 이미 신청원서를 접수한 과정입니다. 다른 과정을 선택하거나 기존 처리 현황을 확인하세요.</p>}
+            <button type="button" onClick={() => void submit()} disabled={applicationBlocked || pending || !!previewError || submitting || submittedValues.current[type] === values} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#123353] px-5 py-3 font-semibold text-white hover:bg-[#1d476d] disabled:cursor-wait disabled:opacity-50"><Send size={18} />{submitting ? "처리 중…" : application ? "입력완료" : "신청처리"}</button>
           </div>
           <p className="mt-2 text-center text-xs text-slate-500">A4 · 1페이지 · PDF 1.7</p>
           {notice && <p role="status" className="mt-3 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm leading-6 text-teal-900">{notice}</p>}

@@ -6,6 +6,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
 import type { ActionState } from "@/lib/portal/types";
 const messages: Record<string, string> = {
+  FINANCE_TERMS_LOCKED: "이미 신청·원서·청구가 접수되어 수강료·규정을 변경할 수 없습니다. 기존 약정은 보존하고 새 개설 과정에서 변경해 주세요.",
+  COURSE_READ_ONLY: "운영 마감·보관 과정의 수강료는 수정할 수 없습니다.",
   MFA_REAUTH_REQUIRED: MFA_REAUTH_MESSAGE,
   FORBIDDEN: "해당 기관의 처리 권한이 없거나 본인 거래입니다.",
   AUTH_REQUIRED: "다시 로그인해 주세요.",
@@ -95,10 +97,12 @@ async function run(
 export async function configureFinance(_: ActionState, f: FormData) {
   return run(
     f,
-    "life_configure_finance",
-    ["f", "policy"],
+    "life_configure_course_finance",
+    value(f, "tuition") === "0" ? ["f"] : ["f", "policy"],
     ["instructions"],
-    ["tuition", "hours"],
+    ["tuition", "hours", "expected_revision"],
+    [],
+    value(f, "tuition") === "0" ? { policy: null } : {},
   );
 }
 export async function reportPayment(_: ActionState, f: FormData) {

@@ -1,4 +1,5 @@
 "use client";
+import { MenuSearch } from "@/components/navigation/menu-search";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -150,6 +151,7 @@ export default function Header() {
         >
           <div className="grid max-h-[calc(100dvh-9rem)] grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
             <div className="min-h-0 overflow-y-auto p-3">
+              <MenuSearch sections={adminSections} onSelect={closeAdminMenu}/>
               <Link
                 href={OFFICE_HOME_LINK.href}
                 tabIndex={openAdminMenu ? 0 : -1}
@@ -313,6 +315,7 @@ export default function Header() {
                 </div>
                 {openMobileAdminMenu && (
                   <div id="mobile-admin-submenu" className="border-t border-slate-100 px-2 py-2">
+                    <MenuSearch sections={adminSections} onSelect={() => { setOpen(false); setOpenMobileAdminMenu(false); }}/>
                     <Link
                       href={OFFICE_HOME_LINK.href}
                       aria-current={activeAdminHref === OFFICE_HOME_LINK.href ? "page" : undefined}

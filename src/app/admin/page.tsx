@@ -6,6 +6,7 @@ import { hasRole, isOfficeMember, officeSections } from "@/lib/auth/workspace-na
 import { getAdminLearnerDocuments } from "@/lib/learner-document-workflow/data";
 import { LearnerRequestAlerts } from "@/components/admin/learner-request-alerts";
 import { MenuHint } from "@/components/navigation/menu-hint";
+import { MenuSearch } from "@/components/navigation/menu-search";
 import { Empty } from "@/components/portal/ui";
 
 const WORKSPACE_ICONS = {
@@ -58,6 +59,7 @@ export default async function Admin({ searchParams }: {
           <Layers3 aria-hidden="true" className="h-3.5 w-3.5 text-teal-700" />업무 홈
         </span>
       </div>
+      {sections.length > 0 && <MenuSearch sections={sections}/>}
       {hasRole(me, "COURSE_MANAGER") && <Link className="btn-secondary mb-6" href="/admin/course-requests">수강생 희망 과목 제안·검토 →</Link>}
       {learnerRequests !== undefined && <LearnerRequestAlerts data={learnerRequests} />}
       {sections.length === 0 && (

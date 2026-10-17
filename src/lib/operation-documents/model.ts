@@ -470,6 +470,11 @@ export function validContent(
     )
   )
     return false;
+  if (kind === "plan") {
+    const counts = (rows.recruitment as Record<string, string>[]).map(row => row.count);
+    if ((vals.capacity !== "" && !/^\d{1,6}$/.test(String(vals.capacity))) || counts.some(count => count !== "" && !/^\d{1,6}$/.test(count)) ||
+      (counts.some(count => count !== "") && (!(Number(vals.capacity) > 0) || counts.reduce((sum, count) => sum + Number(count || 0), 0) > Number(vals.capacity)))) return false;
+  }
   if (
     (rows.schedule as Record<string, string>[]).some(
       (row) => row.startTime && row.endTime && row.startTime >= row.endTime,

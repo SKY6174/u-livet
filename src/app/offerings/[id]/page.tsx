@@ -1,3 +1,4 @@
+import { applicationIsOpen } from "@/lib/learner-documents/admissions";
 import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -37,7 +38,7 @@ export default async function OfferingPage(props: {
   const finance = financeData as FinanceConfig | null;
   const instructors = instructorNames === null ? null : instructorNames[o.id] ?? [];
   const open =
-    o.status === "PUBLISHED" &&
+    applicationIsOpen(o) &&
     !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
     Date.now() < Date.parse(o.apply_until);
@@ -121,7 +122,7 @@ export default async function OfferingPage(props: {
               <p className="mt-3 whitespace-pre-wrap text-sm">{finance.body}</p>
             </details>
           )}
-          <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary w-full justify-center">수강신청원서 작성</DocumentPopup>
+          {open && <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary w-full justify-center">수강신청원서 작성</DocumentPopup>}
           {open ? (
             <Link
               href={`/offerings/${o.id}/apply`}

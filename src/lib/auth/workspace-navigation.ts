@@ -32,7 +32,7 @@ export function officeSections(member: Member) {
         { label: "과정 운영 관리", href: "/admin/courses", description: "과정 개설·모집, 강사 배정과 출결을 관리합니다." },
       ] : []),
       ...(manager ? [
-        { label: "모집·수료 정책", href: "/admin/policies", description: "모집 안내와 수료기준의 문안을 작성하고 승인된 버전을 관리합니다." },
+        { label: "모집·수료·환불 규정", href: "/admin/policies", description: "모집 안내, 수료기준과 환불 규정의 새 버전을 작성·승인합니다." },
       ] : []),
       ...(hasRole(member, "COURSE_MANAGER", "SYSTEM_ADMIN") ? [
         { label: "운영계획서", href: "/operation-documents/plan", description: "책임강사 작성, 담당자 예산 검토와 최종 제출" },
@@ -40,6 +40,7 @@ export function officeSections(member: Member) {
     ] },
     { title: "접수·운영", links: [
       ...(manager ? [
+        { label: "수강료·환불 설정", href: "/admin/courses", description: "과정의 관리 메뉴에서 수강료 금액·납부 안내·환불 규정을 설정합니다." },
         { label: "신청내역 관리", href: "/admin/applications", description: "담당 과정의 신청을 검색하고 승인·반려 사유와 이력을 확인합니다." },
         { label: "수강생 관리", href: "/admin/learners", description: "담당 과정의 수강생과 신청·수강 이력을 확인합니다." },
       ] : []),

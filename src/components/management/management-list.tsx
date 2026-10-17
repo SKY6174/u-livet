@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageIntro, Empty } from "@/components/portal/ui";
 import { dateTime, statusLabel } from "@/lib/portal/data";
+import { DOCUMENT_STATUS_LABELS } from "@/lib/learner-document-workflow/types";
 import { APPLICATION_STATUSES, type Filters, type ManagementBoard, type ManagedApplication, type ManagedLearner } from "@/lib/management/data";
 
 export function ApplicationRows({ items }: { items: ManagedApplication[] }) {
@@ -14,11 +15,13 @@ export function ApplicationRows({ items }: { items: ManagedApplication[] }) {
       <tbody className="divide-y divide-slate-200">
         {items.map(a => <tr key={a.id} className="hover:bg-teal-50/40">
           <th scope="row" className="min-w-32 px-4 py-3 font-semibold">
-            <Link className="underline" href={`/admin/applications/${a.id}`} aria-label={`${a.name} · ${a.course_name} 신청 상세`}>{a.name}</Link>
+            <Link className="underline" href={a.id === a.document_id ? `/admin/learner-documents?kind=APPLICATION#request-${a.document_id}` : `/admin/applications/${a.id}`} aria-label={`${a.name} · ${a.course_name} 신청 상세`}>{a.name}</Link>
             {!a.active && <span className="mt-1 block font-normal text-slate-600">삭제된 계정</span>}
           </th>
           <td className="min-w-64 max-w-md break-words px-4 py-3">{a.course_name}</td>
-          <td className="whitespace-nowrap px-4 py-3">{statusLabel[a.status] ?? a.status}</td>
+          <td className="whitespace-nowrap px-4 py-3">{statusLabel[a.status] ?? DOCUMENT_STATUS_LABELS[a.status as keyof typeof DOCUMENT_STATUS_LABELS] ?? a.status}
+            {a.document_id && <Link className="mt-1 block text-xs text-teal-800 underline" href={`/admin/learner-documents?kind=APPLICATION#request-${a.document_id}`}>원서 · {DOCUMENT_STATUS_LABELS[a.document_status as keyof typeof DOCUMENT_STATUS_LABELS] ?? a.document_status}</Link>}
+          </td>
           <td className="whitespace-nowrap px-4 py-3 text-slate-600"><time dateTime={a.submitted_at}>{dateTime(a.submitted_at)}</time></td>
           <td className="whitespace-nowrap px-4 py-3 text-slate-600">{a.enrollment_status === "ACTIVE" ? "수강 중" : a.enrollment_status === "WITHDRAWN" ? "수강 취소" : "수강 미확정"}</td>
         </tr>)}
@@ -49,7 +52,7 @@ export function ManagementList({ kind, data, filters }: { kind: "applications" |
     <PageIntro eyebrow="COURSE MANAGEMENT" title={kind === "applications" ? "신청내역 관리" : "수강생 관리"}>담당 기관의 과정에 접수된 신청과 수강 이력을 확인합니다.</PageIntro>
     <form className="panel mb-6 grid gap-4 md:grid-cols-4" action={path}>
       <label className="field">과정<select name="course" defaultValue={filters.course}><option value="">전체 담당 과정</option>{data.courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-      {kind === "applications" && <label className="field">신청 상태<select name="status" defaultValue={filters.status}><option value="">전체 상태</option>{APPLICATION_STATUSES.map(s => <option key={s} value={s}>{statusLabel[s] ?? s}</option>)}</select></label>}
+      {kind === "applications" && <label className="field">신청 상태<select name="status" defaultValue={filters.status}><option value="">전체 상태</option>{APPLICATION_STATUSES.map(s => <option key={s} value={s}>{statusLabel[s] ?? DOCUMENT_STATUS_LABELS[s as keyof typeof DOCUMENT_STATUS_LABELS] ?? s}</option>)}</select></label>}
       <label className="field">신청자 이름<input name="q" maxLength={100} defaultValue={filters.q} placeholder="이름 검색" /></label>
       <button className="btn-primary self-end" type="submit">검색</button>
     </form>

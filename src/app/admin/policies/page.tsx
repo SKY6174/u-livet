@@ -1,3 +1,4 @@
+import { RefundRulesFields } from "@/components/policies/refund-rules-fields";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireIdentity } from "@/lib/auth/session";
@@ -9,7 +10,7 @@ import { approvePolicyDraft, createPolicyDraft, updatePolicyDraft } from "@/app/
 type PolicyRow = {
   id: string;
   org_id: string;
-  kind: "ENROLLMENT" | "COMPLETION";
+  kind: "ENROLLMENT" | "COMPLETION" | "REFUND";
   status: "DRAFT" | "APPROVED";
   title: string;
   version: string;
@@ -18,6 +19,7 @@ type PolicyRow = {
 };
 
 const POLICY_GUIDES = {
+  REFUND: { label: "수강료 환불 규정", items: ["기관이 확정한 환불 사유·접수 절차·시점별 반환 기준을 작성합니다.", "승인할 때 계산 조항을 함께 등록합니다. 기존 승인본 변경은 새 버전으로 작성합니다."] },
   ENROLLMENT: {
     label: "모집·개인정보 수집·이용 안내",
     items: [
@@ -52,7 +54,7 @@ export default async function PolicyManagement({
     db.from("life_policy_versions")
       .select("id,org_id,kind,status,title,version,body,approved_at")
       .eq("org_id", orgId)
-      .in("kind", ["ENROLLMENT", "COMPLETION"])
+      .in("kind", ["ENROLLMENT", "COMPLETION", "REFUND"])
       .order("effective_from", { ascending: false }),
   ]);
   const policies = (rows ?? []) as PolicyRow[];
@@ -60,7 +62,7 @@ export default async function PolicyManagement({
 
   return (
     <div className="page-shell">
-      <PageIntro eyebrow="POLICIES" title="모집·수료 정책 관리">
+      <PageIntro eyebrow="POLICIES" title="모집·수료·환불 규정 관리">
         {orgName}의 모집 공개 전에 문안을 작성하고 기관 검토를 거쳐 승인하세요.
       </PageIntro>
       {orgIds.length > 1 && (
@@ -79,11 +81,11 @@ export default async function PolicyManagement({
         <p>검증용 정책은 실제 모집에 사용하지 마세요. 기관의 개인정보 담당자와 과정 책임자가 목적·보유기간·수료 수치를 확정해야 합니다.</p>
       </div>
       {error && <Empty title="정책 목록을 불러오지 못했습니다" />}
-      {!error && (["ENROLLMENT", "COMPLETION"] as const).map((kind) => {
+      {!error && (["ENROLLMENT", "COMPLETION", "REFUND"] as const).map((kind) => {
         const guide = POLICY_GUIDES[kind];
         const own = policies.filter((policy) => policy.kind === kind);
         return (
-          <section key={kind} className="panel mb-8">
+          <section key={kind} id={kind.toLowerCase()} className="panel mb-8 scroll-mt-8">
             <h2 className="section-title">{guide.label}</h2>
             <ul className="mb-6 list-disc space-y-1 pl-6 text-sm leading-relaxed text-slate-700">
               {guide.items.map((item) => <li key={item}>{item}</li>)}
@@ -144,6 +146,7 @@ export default async function PolicyManagement({
                             <input type="hidden" name="policy_id" value={policy.id} />
                             <input type="hidden" name="expected_title" value={policy.title} />
                             <input type="hidden" name="expected_body" value={policy.body} />
+                            <input type="hidden" name="policy_kind" value={kind}/>{kind === "REFUND" && <RefundRulesFields/>}
                             <label className="flex items-start gap-2 text-sm leading-relaxed"><input type="checkbox" name="review_confirmed" required className="mt-1" />기관의 문안 검토와 승인 절차를 완료했습니다.</label>
                           </ActionForm>
                         </div>
