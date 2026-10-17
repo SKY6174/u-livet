@@ -25,7 +25,7 @@ export default async function Classroom(props: {
     .eq("status", "ACTIVE")
     .maybeSingle();
   if (!enrollment.data) notFound();
-  const [lessons, reads, assignments, submissions, grades] = await Promise.all([
+  const [lessons, reads, assignments, submissions, grades, questions] = await Promise.all([
     db
       .from("life_lessons")
       .select("*")
@@ -50,6 +50,7 @@ export default async function Classroom(props: {
       .select("*,life_submissions!inner(life_assignments!inner(offering_id))")
       .eq("life_submissions.life_assignments.offering_id", o.id)
       .eq("life_submissions.person_id", me.id),
+    getClassQuestions(o.id),
   ]);
   if ([lessons, reads, assignments, submissions, grades].some((r) => r.error))
     return (
@@ -59,7 +60,6 @@ export default async function Classroom(props: {
         </Empty>
       </div>
     );
-  const questions = await getClassQuestions(o.id);
   return (
     <div className="page-shell">
       <PageIntro eyebrow="MY CLASSROOM" title={o.name}>

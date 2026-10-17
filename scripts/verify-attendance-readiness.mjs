@@ -44,18 +44,18 @@ await test('original report totals never stand in for actual learners or classes
   const c = { instructors: 0, enrolled: 0, scheduled_sessions: 0, source: { enrolled: 15, completed: 15, classes: 7, hours: 30 } };
   const html = render(c);
   assert(html.includes('3개 항목 등록 필요')); assert(html.includes('0명 확정')); assert(html.includes('0회 등록'));
-  assert(!html.includes('출석부 출력 확인')); assert(!html.includes('운영 자료 연결됨'));
+  assert(!html.includes('02 QR·확정 출석부 출력')); assert(!html.includes('운영 자료 연결됨'));
 });
 await test('archived courses keep source review rather than requesting new operational registration', () => {
   const c = { ...base, status: 'ARCHIVED', enrolled: 0, scheduled_sessions: 0, instructors: 0 };
   assert.deepEqual(progress.attendancePreparation(c), []);
   assert.equal(next(c).label, '원본·보고서 검토');
   const html = render(c); assert(html.includes('원본 출석부 첨부 확인')); assert(!html.includes('등록 필요'));
-  assert(!html.includes('출석부 출력 확인'));
+  assert(!html.includes('02 QR·확정 출석부 출력'));
 });
 await test('archived courses with actual records retain electronic attendance totals', () => {
   const html = render({ status: 'ARCHIVED' });
-  assert(html.includes('입력된 출결')); assert(html.includes('4건')); assert(html.includes('출석부 출력 확인'));
+  assert(html.includes('입력된 출결')); assert(html.includes('4건')); assert(html.includes('02 QR·확정 출석부 출력'));
 });
 await test('draft and pending applications retain their next-task priority', () => {
   assert.equal(next({ status: 'DRAFT', instructors: 0, enrolled: 0 }).label, '개설 준비 확인');

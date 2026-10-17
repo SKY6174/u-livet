@@ -18,7 +18,7 @@ export default async function TeachingEvaluation({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { book } = await getAttendanceBook(id, "instructor");
+  const { book } = await getAttendanceBook(id, "instructor", false);
   if (!book) return <div className="page-shell"><Empty title="출결 정보를 불러오지 못했습니다" /></div>;
   const exams = await (await createServerSupabaseClient()).rpc("life_exam_room", { f: id });
   if (exams.error) return <div className="page-shell"><Empty title="시험 정보를 불러오지 못했습니다" /></div>;

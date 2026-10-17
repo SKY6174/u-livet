@@ -34,7 +34,7 @@ export default async function Teaching(props: {
       Date.parse(assigned.data.valid_until) <= Date.now())
   )
     notFound();
-  const [roster, assignments, lessons, submissions, grades] = await Promise.all(
+  const [roster, assignments, lessons, submissions, grades, questions] = await Promise.all(
     [
       db.rpc("life_roster", { f: o.id }),
       db.from("life_assignments").select("*").eq("offering_id", o.id),
@@ -49,6 +49,7 @@ export default async function Teaching(props: {
       db.from("life_submission_grades")
         .select("*,life_submissions!inner(life_assignments!inner(offering_id))")
         .eq("life_submissions.life_assignments.offering_id", o.id),
+      getClassQuestions(o.id),
     ],
   );
   if ([roster, assignments, lessons, submissions, grades].some((r) => r.error))
@@ -59,7 +60,6 @@ export default async function Teaching(props: {
     );
   const members = (roster.data ?? []) as RosterRow[];
   const tasks = (assignments.data ?? []) as Assignment[];
-  const questions = await getClassQuestions(o.id);
   return (
     <div className="page-shell">
       <PageIntro eyebrow="TEACHING ROOM" title={o.name}>
