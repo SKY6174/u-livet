@@ -16,3 +16,8 @@
 ## 정상 철회자의 과거 직접 조회 보존
 
 검증 중 부모 테이블의 기존 RLS를 다시 타는 SELECT 정책이 정상 철회자의 본인 출결/미공개 과제 제출 조회까지 좁힐 수 있음을 확인했다. 분류를 위한 회차·과제의 과정 ID 조회만 private security definer 함수 `operational_attendance_reference(session,person)`, `operational_submission_reference(assignment,person)`에서 수행한다. 두 helper는 분류 boolean만 반환하고 빈 search_path·authenticated execute 한정이며, 실제 행 접근은 기존 본인/강사/기관 정책이 계속 검사한다. 후속 migration에서 새 restrictive 정책 2개의 USING만 helper로 변경한다. 정상 철회자가 부모 회차·미공개 과제는 볼 수 없어도 본인 기존 출결/제출/성적은 유지되는 사례를 추가 검증한다. 이 보완은 부모 자료 권한이나 기존 처리 함수를 확대하지 않는다.
+
+
+## 실제 통계 화면의 검증 사업연도 제외
+
+운영 UI 검사에서 `d7730717-d1fd-4aeb-a89e-e2241fd0b2ad` 사업연도 선택지가 남아 있음을 확인했다. 해당 연도는 검증 과정 2개만 있고 운영 과정 및 확정 성과 보고서는 0건이다. private non_operational_project_years registry에 정확한 ID 1건을 기록하고 일반 접근을 회수한다. private operational_project_year predicate와 security_invoker operational_project_years view로 annual_options/annual_board의 연도 조회만 제한한다. 원본 기관/연도/역할/미래 계획 연도·빈 정상 연도/보고서는 유지한다. 검증 연도 직접 URL은 기존 FORBIDDEN으로 연결한다. 원본 보존 비교에 사업연도와 기관을 추가한다.
