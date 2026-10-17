@@ -8,7 +8,8 @@ const require = createRequire(import.meta.url);
 function load(file, mocks = {}) {
   const code = ts.transpileModule(readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
   const module = { exports: {} };
-  new Function('require', 'module', 'exports', code)(name => name in mocks ? mocks[name] : require(name), module, module.exports);
+  new Function('require', 'module', 'exports', code)(name => name in mocks ? mocks[name]
+    : name === '@/lib/date-format' ? load('src/lib/date-format.ts') : require(name), module, module.exports);
   return module.exports;
 }
 const model = load('src/lib/attendance/model.ts');
@@ -46,7 +47,7 @@ await test('portrait print groups two sessions per page and keeps QR start/end s
   assert.equal((output.match(/scope="colgroup"/g) ?? []).length, 21);
   assert(output.includes('수강생20') && output.includes('09:03') && output.includes('10:00'));
   assert(output.includes('[첨부 #1]') && output.includes('>시작<') && output.includes('>종료<'));
-  assert(output.includes('>교육시간/회<') && output.includes('>전체 교육시간<'));
+  assert(output.includes('>교육시간/회<') && output.includes('>전체<br/>교육시간<'));
   assert(!output.includes('>확정 상태<') && !output.includes('>인정시간<br/>출석률<'));
   assert(!output.includes('email'));
   const veryWide = renderToStaticMarkup(React.createElement(Printed, { book: { ...large, members: large.members.slice(0, 2),
