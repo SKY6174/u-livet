@@ -1,5 +1,5 @@
 import { applicationIsOpen } from "@/lib/learner-documents/admissions";
-import { isOperationalCompletionPolicy } from "@/lib/portal/recruitment-policy";
+import { isOperationalCompletionPolicy, isOperationalRefundPolicy } from "@/lib/portal/recruitment-policy";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -31,6 +31,8 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
       : Promise.resolve({ data: null }),
   ]);
   const completion = completionPolicies.find(isOperationalCompletionPolicy);
+  const finance = financeData as FinanceConfig | null;
+  const refundReady = offering?.tuition === 0 || (!!finance?.valid && isOperationalRefundPolicy(finance));
   const information = [
     ["교육기간", course.period_label],
     ["요일 · 시간", course.time_label],
@@ -58,14 +60,14 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
             </> : <p className="text-slate-600">승인된 이수요건을 확인 중입니다. 모집 공고에서 확정 기준을 확인해 주세요.</p>}
           </section>
           <ScholarshipNotice />
-          <RefundNotice tuition={offering?.tuition ?? null} finance={financeData as FinanceConfig | null} />
+          <RefundNotice tuition={offering?.tuition ?? null} finance={finance} />
           {course.schedule_history.length > 0 && <section className="panel"><h2 className="section-title">일정 변경 안내</h2><ul className="space-y-2 text-sm text-slate-600">{course.schedule_history.map((entry) => <li key={entry}>{entry}</li>)}</ul></section>}
         </div>
         <aside className="panel order-1 lg:order-2">
           <h2 className="section-title">교육 안내</h2>
           <p className="mb-5 text-sm leading-6 text-slate-700"><InstructorNames instructors={names === null ? null : names[course.offering_id ?? ""] ?? []} /></p>
           <dl className="space-y-5 text-sm">{information.map(([label, value]) => <div key={label}><dt className="text-slate-500">{label}</dt><dd className="mt-1.5 whitespace-pre-line font-medium leading-6 text-slate-900">{value}</dd></div>)}</dl>
-          {offering && applicationIsOpen(offering) ? <DocumentPopup href={applicationDocumentHref(course.id)} windowName="learner-documents" className="btn-primary mt-4 w-full justify-center">수강신청원서 작성</DocumentPopup> : <p className="notice mt-4">현재 접수 기간이 아닙니다.</p>}
+          {offering && applicationIsOpen(offering) && refundReady ? <DocumentPopup href={applicationDocumentHref(course.id)} windowName="learner-documents" className="btn-primary mt-4 w-full justify-center">수강신청원서 작성</DocumentPopup> : <p className="notice mt-4">현재 접수 기간이 아니거나 신청 안내를 확인 중입니다.</p>}
           {offering && <Link href={`/offerings/${offering.id}`} className="btn-secondary mt-4 w-full justify-center gap-2">{offering.status === "ARCHIVED" ? "지난 운영 과정 보기" : "수강신청 안내 확인"}<ArrowUpRight size={16} aria-hidden="true" /></Link>}
         </aside>
       </div>

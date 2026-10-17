@@ -1,5 +1,5 @@
 import { applicationIsOpen } from "@/lib/learner-documents/admissions";
-import { isOperationalCompletionPolicy } from "@/lib/portal/recruitment-policy";
+import { isOperationalCompletionPolicy, isOperationalRefundPolicy } from "@/lib/portal/recruitment-policy";
 import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,7 +43,8 @@ export default async function OfferingPage(props: {
     applicationIsOpen(o) &&
     !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
-    Date.now() < Date.parse(o.apply_until);
+    Date.now() < Date.parse(o.apply_until) &&
+    (o.tuition === 0 || (!!finance?.valid && isOperationalRefundPolicy(finance)));
   return (
     <div className="page-shell">
       <PageIntro eyebrow={`${o.academy} · ${o.year_label}`} title={o.name}>
