@@ -1,5 +1,5 @@
 import { applicationIsOpen } from "@/lib/learner-documents/admissions";
-import { isOperationalCompletionPolicy, isOperationalRefundPolicy } from "@/lib/portal/recruitment-policy";
+import { isOperationalRecruitmentPolicy, isOperationalCompletionPolicy, isOperationalRefundPolicy } from "@/lib/portal/recruitment-policy";
 import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -36,11 +36,12 @@ export default async function OfferingPage(props: {
       getCourseInstructorNames([o.id]),
     ]);
   const completion = policies.find((p) => p.id === o.completion_policy_id && isOperationalCompletionPolicy(p));
-  const enrollment = enrollmentPolicies.find((p) => p.id === offeringPolicy?.enrollment_policy_id);
+  const enrollment = enrollmentPolicies.find((p) => p.id === offeringPolicy?.enrollment_policy_id && isOperationalRecruitmentPolicy(p));
   const finance = financeData as FinanceConfig | null;
   const instructors = instructorNames === null ? null : instructorNames[o.id] ?? [];
   const open =
     applicationIsOpen(o) &&
+    !!enrollment &&
     !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
     Date.now() < Date.parse(o.apply_until) &&

@@ -260,7 +260,7 @@ export async function DocumentList({
               </p>
             </div>
             <Link className="btn-secondary" href="/admin/reports/preview">
-              결과보고서·첨부 5종 양식 검토
+              결과보고서·증빙 안내
             </Link>
           </div>
           {legacy?.unavailable ? (

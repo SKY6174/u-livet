@@ -44,7 +44,7 @@ export function SocialLogin({ next, audience, options, emailForm }: {
               <ProviderLogo provider={id} />
               <span>{providers[id].label} 로그인</span>
             </span>
-            {!enabled && <span className="rounded bg-white/90 px-2 py-1 text-sm font-semibold text-slate-700">준비 중</span>}
+            {!enabled && <span className="rounded bg-white/90 px-2 py-1 text-sm font-semibold text-slate-700">이용 불가</span>}
           </button>
         ))}
       </form>

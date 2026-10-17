@@ -23,7 +23,7 @@ const errors: Record<string, string> = {
     "승인된 환불 규정과 계산 조항을 먼저 등록해 주세요.",
   REFUND_REQUEST_REQUIRED:
     "납부 내역이 있습니다. 나의 납부·환불에서 수강취소와 환불을 신청해 주세요.",
-  PAID_ENROLLMENT_NOT_ENABLED: "유료 과정의 수납 기능은 준비 중입니다.",
+  PAID_ENROLLMENT_NOT_ENABLED: "이 과정은 온라인 수납을 이용할 수 없습니다. 납부 방법은 사업단에 문의해 주세요.",
   DEADLINE_PASSED: "과제 제출 기한이 지났습니다.",
   REVISION_CHANGED: "정보가 변경되었습니다. 새로고침 후 다시 확인해 주세요.",
   RESPONSIBLE_INSTRUCTOR: "현재 책임강사는 배정을 해제할 수 없습니다. 다른 강사를 책임강사로 지정한 뒤 다시 시도해 주세요.",

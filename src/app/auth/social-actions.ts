@@ -24,7 +24,7 @@ export async function loginWithSocial(_: ActionState, form: FormData): Promise<A
   if (isReviewOnly()) return { message: REVIEW_MESSAGE };
   const provider = socialProvider(form.get("provider"));
   const audience = loginAudience(form.get("audience")) ?? "learner";
-  if (!provider || !socialProviderEnabled(provider)) return { message: "이 간편 로그인은 준비 중입니다. 카카오 또는 이메일로 이용해 주세요." };
+  if (!provider || !socialProviderEnabled(provider)) return { message: "현재 이 간편 로그인은 이용할 수 없습니다. 로그인 화면에서 사용 가능한 방식을 선택해 주세요." };
   if (audience === "office" || audience === "internal") return { message: "사업단·교내 강사는 이메일과 비밀번호로 로그인해 주세요." };
   let url: string;
   try {

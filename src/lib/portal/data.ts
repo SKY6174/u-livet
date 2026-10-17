@@ -31,6 +31,9 @@ export async function getCourseCards(featured = false) {
         // PostgREST table-returning RPC ordering needs the sort field selected.
         "id,org_id,name,academy,summary,mode,capacity,tuition,status,apply_from,apply_until,starts_on,ends_on,created_at",
       )
+      // Keep explicitly synthetic courses in management history, outside the public catalog.
+      .not("name", "like", "[검증용]%")
+      .not("academy", "like", "%검증용%")
       .order("created_at", { ascending: false })
       .order("id", { ascending: true });
     query = featured
@@ -47,6 +50,8 @@ export async function getCourseIntroduction(id: string) {
   try {
     const { data, error } = await (await createServerSupabaseClient())
       .rpc("life_course_introductions", { f: id }, { get: true })
+      .not("name", "like", "[검증용]%")
+      .not("academy", "like", "%검증용%")
       .maybeSingle();
     return error ? null : (data as CourseIntroduction | null);
   } catch {

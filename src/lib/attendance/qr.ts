@@ -13,7 +13,7 @@ export function parseKoreanDateTime(value: string) {
   return new Date(time).toISOString();
 }
 export function qrError(message: string, code?: string) {
-  if (code === "PGRST202" || code === "42883") return "QR 출석 기능을 준비 중입니다. 담당 강사에게 출석 확인을 요청해 주세요.";
+  if (code === "PGRST202" || code === "42883") return "현재 QR 출석을 이용할 수 없습니다. 담당 강사에게 출석 확인을 요청해 주세요.";
   return ({
     FORBIDDEN: "현재 배정된 담당 강사만 QR 출석을 관리할 수 있습니다.",
     NOT_ENROLLED: "이 강좌의 수강 확정 계정으로 로그인해 주세요.",

@@ -31,7 +31,9 @@ export default async function Evaluation({
           <h2 className="section-title">나의 출결</h2>
           <div className="space-y-4">
             {!book.sessions.length && (
-              <Empty title="수업 일정이 준비 중입니다" />
+              <Empty title="등록된 수업 일정이 없습니다">
+                수업 일정은 담당 강사에게 문의해 주세요.
+              </Empty>
             )}
             {book.sessions.map((s) => {
               const a = recorded.get(`${s.id}:${book.viewer_id}`);
