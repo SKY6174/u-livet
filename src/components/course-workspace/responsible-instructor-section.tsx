@@ -36,7 +36,7 @@ export async function ResponsibleInstructorSection({ offeringId }: { offeringId:
     <section className="panel mb-8 scroll-mt-6" id="instructors">
       <h2 className="section-title">강사 배정 · 책임강사 지정</h2>
       <p className="mb-5 text-sm leading-relaxed text-slate-600">
-        먼저 승인된 강사를 이번 개설 과정에 배정하고, 그중 한 명을 책임강사로 지정하세요.
+        먼저 승인 역할 또는 활성 강사 대장의 강사를 이번 개설 과정에 배정하고, 그중 한 명을 책임강사로 지정하세요.
         이 지정은 운영계획서와 운영결과보고서의 작성 권한·표지에 함께 적용됩니다.
       </p>
       <div className="grid gap-6 lg:grid-cols-2">
@@ -46,7 +46,7 @@ export async function ResponsibleInstructorSection({ offeringId }: { offeringId:
             <p role="alert" className="mt-3 text-sm text-red-700">강사 목록을 불러오지 못했습니다.</p>
           ) : instructors.length === 0 ? (
             <p className="notice mt-3 text-sm">
-              이 사업단에 승인된 활성 강사 계정이 없습니다. 강사 등록과 역할 승인을 먼저 완료해 주세요.
+              이 사업단에 배정할 활성 강사가 없습니다. 강사 대장에 등록하거나 강사 역할을 승인해 주세요.
               <Link className="ml-2 font-semibold underline" href="/admin/instructors">강사 관리 →</Link>
             </p>
           ) : (
@@ -78,7 +78,7 @@ export async function ResponsibleInstructorSection({ offeringId }: { offeringId:
                 <input type="hidden" name="offering" value={offeringId} />
                 <input type="hidden" name="enabled" value="true" />
                 <label className="field">
-                  승인된 강사 추가
+                  활성 강사 추가
                   <select name="person" required defaultValue="">
                     <option value="" disabled>강사 선택</option>
                     {available.map((instructor) => <option key={instructor.person_id} value={instructor.person_id}>

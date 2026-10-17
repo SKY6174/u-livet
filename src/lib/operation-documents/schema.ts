@@ -81,7 +81,7 @@ export const PLAN_SECTIONS: Section[] = [
     key: "cover",
     label: "표지 · 기본정보",
     fields: [
-      ...COMMON,
+      ...COMMON.map(field => field.key === "program" ? { ...field, required: false } : field),
       f("audience", "주요대상 (성인학습자 / 지역주민)", "text", true),
     ],
   },
@@ -142,7 +142,7 @@ export const PLAN_SECTIONS: Section[] = [
         "qualificationNote",
         "자격증 과정 해당 여부 / 비해당 사유",
         "text",
-        true,
+        false,
       ),
       f(
         "issuerInfo",

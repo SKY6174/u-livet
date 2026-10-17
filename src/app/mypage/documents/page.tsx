@@ -1,3 +1,4 @@
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -28,14 +29,17 @@ export default async function LearnerDocumentsPage({ searchParams }: {
   const selection = new URLSearchParams({ type: requestedType });
   if (typeof query.course === "string") selection.set("course", query.course);
   const identity = await requireIdentity(`/mypage/documents?${selection}`);
-  const [catalog, requests, eligibility, profile] = await Promise.all([
+  const [catalog, requests, eligibility, profile, admissions] = await Promise.all([
     getCourseCatalog(),
     getMyLearnerDocuments(),
     getLearnerDocumentEligibility(),
     getLearnerDocumentProfile(),
+    (await createServerSupabaseClient()).from("life_catalog").select("id,status,apply_from,apply_until,starts_on,academic_sealed"),
   ]);
+  const now = Date.now(), today = new Date(now + 9 * 3600000).toISOString().slice(0, 10);
+  const canApply = new Set((admissions.data ?? []).filter(o => o.status === "PUBLISHED" && !o.academic_sealed && now >= Date.parse(o.apply_from) && now < Date.parse(o.apply_until) && today < o.starts_on).map(o => o.id));
   const courses = catalog.unavailable ? [] : catalog.courses.flatMap(({ id, name, offeringId, tuition, period_label }) =>
-    offeringId && UUID.test(offeringId) ? [{ id, name, offeringId, tuition, periodLabel: period_label }] : []);
+    offeringId && UUID.test(offeringId) ? [{ id, name, offeringId, tuition, periodLabel: period_label, canApply: canApply.has(offeringId) }] : []);
   const availableOfferings = new Set(courses.map(course => course.offeringId).filter(Boolean));
   const initialCourse = courses.find(course => course.id === query.course || course.offeringId === query.course);
   if (query.course && !initialCourse) {

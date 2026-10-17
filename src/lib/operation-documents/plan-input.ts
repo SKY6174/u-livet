@@ -1,6 +1,16 @@
 import type { Field } from "./schema";
 
 export const PLAN_AUDIENCES = ["성인학습자", "지역주민"] as const;
+export const PLAN_PURPOSES = ["자격증", "취창업", "취미·여가", "자기계발", "진로진학", "기타"] as const;
+export function recruitmentRatio(count: string, capacity: string) {
+  return count !== "" && Number(capacity) > 0 ? String(Math.round(Number(count) / Number(capacity) * 10000) / 100) : "";
+}
+export function validRecruitment(rows: Record<string, string>[], capacity: string) {
+  if (capacity !== "" && !/^\d{1,6}$/.test(capacity)) return false;
+  const counts = rows.map(row => row.count);
+  if (counts.some(count => count !== "" && !/^\d{1,6}$/.test(count))) return false;
+  return !counts.some(count => count !== "") || (Number(capacity) > 0 && counts.reduce((sum, count) => sum + Number(count || 0), 0) <= Number(capacity));
+}
 export function selectedAudiences(value: string) {
   return PLAN_AUDIENCES.filter((_, index) => value.includes(index === 0 ? "성인" : "주민"));
 }
@@ -44,7 +54,9 @@ function expression(text: string): Fraction | null {
 function amountLine(line: string): Fraction | null {
   const sides = line.trim().replace(/^[0-9]+[.)]\s+/, "").split("=");
   if (sides.length > 2) return null;
-  const left = expression(sides[0].replace(/^[^0-9+\-*=×xX]+/, ""));
+  // Labels may contain numbers (강사1), 재료2:). They are not prices.
+  const labeled = sides[0].replace(/^.*?[)）:]\s*(?=[0-9])/, "");
+  const left = expression(labeled.replace(/^[^0-9+\-*=×xX]+/, ""));
   if (sides.length === 1) return left;
   const right = expression(sides[1]);
   if (!right || (left && left.n * right.d !== right.n * left.d)) return null;

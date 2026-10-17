@@ -12,6 +12,8 @@ import { CourseHeader } from "@/components/course-workspace/course-header";
 import { ResponsibleInstructorSection } from "@/components/course-workspace/responsible-instructor-section";
 import { getCourseRunInfo, getManagedCourse } from "@/lib/course-workspace/data";
 import type { RosterRow } from "@/lib/portal/types";
+import { ApplicationRows } from "@/components/management/management-list";
+import type { ManagedApplication, ManagementBoard } from "@/lib/management/data";
 import { ApplicationReviewForm } from "@/components/management/application-review-form";
 import { OfferingEditForm } from "@/components/course-workspace/offering-edit-form";
 export default async function ManageOffering(props: {
@@ -29,7 +31,8 @@ export default async function ManageOffering(props: {
           operator={workspace?.operator}
           runInfo={await runInfoPromise}
         />
-        <ResponsibleInstructorSection offeringId={o.id} />
+        <div className="mb-6"><Link href={`/admin/policies?org=${o.org_id}#refund`} className="btn-secondary">환불 규정 작성·새 버전 승인 →</Link></div>
+      <ResponsibleInstructorSection offeringId={o.id} />
         <section className="panel space-y-4">
           <h2 className="section-title">운영이 완료된 보관 과정입니다</h2>
           <p className="text-sm leading-relaxed text-slate-600">
@@ -56,7 +59,7 @@ export default async function ManageOffering(props: {
         </section>
       </div>
     );
-  const [{ data, error }, policies, financeResult, guideResult, runInfo] =
+  const [{ data, error }, policies, financeResult, guideResult, runInfo, applicationResult] =
     await Promise.all([
       (await createServerSupabaseClient()).rpc("life_roster", { f: o.id }),
       getPolicies(),
@@ -66,6 +69,7 @@ export default async function ManageOffering(props: {
       (await createServerSupabaseClient()).from("life_course_guides").select("id")
         .eq("offering_id", o.id).eq("published", true).maybeSingle(),
       runInfoPromise,
+      (await createServerSupabaseClient()).rpc("life_management_applications", { f: o.id, q: "", s: "", page: 1 }),
     ]);
   const finance = financeResult.data as FinanceConfig | null;
   const recruitablePolicies = policies.filter(
@@ -79,8 +83,9 @@ export default async function ManageOffering(props: {
         operator={workspace?.operator}
         runInfo={runInfo}
       />
+      <nav aria-label="과정 운영 설정" className="mb-6 flex flex-wrap gap-3">{[["finance", "수강료·환불 규정"], ["instructors", "강사·책임강사"], ["applications", "신청·수강생"]].map(([anchor,label]) => <a key={anchor} href={`#${anchor}`} className="btn-secondary">{label}</a>)}</nav>
       <OfferingEditForm offering={o} linkedGuideId={guideResult.data?.id ?? null} />
-      <section className="panel mb-8">
+      <section id="finance" className="panel mb-8 scroll-mt-6">
         <h2 className="section-title">수강료·환불 규정</h2>
         <p className="mb-4">
           {o.tuition === null
@@ -88,10 +93,10 @@ export default async function ManageOffering(props: {
             : `현재 수강료 ${o.tuition.toLocaleString("ko-KR")}원`}
           {finance ? ` · ${finance.title} ${finance.version}` : ""}
         </p>
-        {o.status === "DRAFT" ? (
-          <details>
+        {!o.academic_sealed ? (
+          <details open>
             <summary className="cursor-pointer font-semibold">
-              유료 과정 설정
+              수강료·납부 안내 수정
             </summary>
             <div className="mt-4">
               <ActionForm
@@ -99,15 +104,15 @@ export default async function ManageOffering(props: {
                 label="수강료·납부 안내 저장"
                 submitAlign="right"
               >
-                <input type="hidden" name="f" value={o.id} />
+                <input type="hidden" name="f" value={o.id} /><input type="hidden" name="expected_revision" value={o.academic_revision}/>
                 <label className="field">
                   수강료 (원)
                   <input
                     type="number"
                     name="tuition"
-                    min={1}
+                    min={0}
                     max={100000000}
-                    defaultValue={o.tuition || undefined}
+                    defaultValue={o.tuition ?? 0}
                     required
                   />
                 </label>
@@ -115,7 +120,6 @@ export default async function ManageOffering(props: {
                   환불 규정
                   <select
                     name="policy"
-                    required
                     defaultValue={finance?.policy_id ?? ""}
                   >
                     <option value="" disabled>
@@ -139,7 +143,7 @@ export default async function ManageOffering(props: {
                     name="hours"
                     min={1}
                     max={720}
-                    defaultValue={finance?.reservation_hours}
+                    defaultValue={finance?.reservation_hours ?? 72}
                     required
                   />
                 </label>
@@ -152,14 +156,14 @@ export default async function ManageOffering(props: {
                   <textarea
                     name="instructions"
                     maxLength={3000}
-                    defaultValue={finance?.instructions}
+                    defaultValue={finance?.instructions ?? "무료 과정"}
                     required
                     rows={3}
                   />
                 </label>
                 <p className="notice">
                   환불 규정과 조항별 계산 기준이 등록되어 있어야 저장할 수
-                  있습니다. 공개 후에는 수강료·규정을 변경할 수 없습니다.
+                  있습니다. 0원은 무료 과정입니다. 신청·원서·청구가 접수된 뒤에는 기존 약정을 보존하기 위해 변경할 수 없습니다.
                 </p>
               </ActionForm>
             </div>
@@ -173,6 +177,7 @@ export default async function ManageOffering(props: {
           </p>
         )}
       </section>
+      <div className="mb-6"><Link href={`/admin/policies?org=${o.org_id}#refund`} className="btn-secondary">환불 규정 작성·새 버전 승인 →</Link></div>
       <ResponsibleInstructorSection offeringId={o.id} />
       {o.status === "DRAFT" && (
         <section className="panel mb-8">
@@ -222,6 +227,12 @@ export default async function ManageOffering(props: {
         <Link className="btn-secondary" href={`/admin/applications?course=${o.id}`}>이 과정의 신청내역 검색</Link>
         <Link className="btn-secondary" href={`/admin/learners?course=${o.id}`}>이 과정의 수강생 명단</Link>
       </div>
+      <div className="mb-6 space-y-3">
+        <h3 className="font-semibold">일반 신청·수강신청원서 통합 내역</h3>
+        <p className="text-sm text-slate-600">원서만 접수한 신청자도 함께 표시합니다. 서류 승인과 실제 수강 확정 상태를 구분해 확인하세요.</p>
+        {applicationResult.error ? <p role="alert" className="text-red-700">통합 내역을 불러오지 못했습니다.</p> : <ApplicationRows items={((applicationResult.data as ManagementBoard<ManagedApplication> | null)?.items ?? [])}/>}
+      </div>
+      <h3 className="mb-4 font-semibold">수강 등록 심사·처리</h3>
       {error ? (
         <Empty title="신청 내역을 불러오지 못했습니다" />
       ) : !data?.length ? (

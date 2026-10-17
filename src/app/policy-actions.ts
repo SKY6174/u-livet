@@ -9,6 +9,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 const field = (form: FormData, name: string) => String(form.get(name) ?? "").trim();
 
 const policyErrors: Record<string, string> = {
+  REFUND_RULES_REQUIRED: "환불 계산 조항을 한 개 이상 입력해 주세요.",
+  INVALID_REFUND_RULE: "환불 조항의 기준·분자·분모를 확인해 주세요.",
   FORBIDDEN: "이 조직의 정책을 관리할 권한이 없습니다.",
   INVALID_POLICY: "정책 종류, 제목(3~120자), 버전(1~50자), 본문(20~20,000자)을 확인해 주세요.",
   POLICY_NOT_DRAFT: "이미 승인된 정책은 수정하거나 다시 승인할 수 없습니다. 새 버전을 만드세요.",
@@ -19,7 +21,7 @@ const policyErrors: Record<string, string> = {
 async function runPolicyAction(
   org: string,
   rpc: string,
-  args: Record<string, string>,
+  args: Record<string, unknown>,
 ): Promise<ActionState> {
   const me = await getSessionIdentity();
   if (!me?.roles.some((role) => role.role === "COURSE_MANAGER" && role.org_id === org)) {
@@ -48,7 +50,7 @@ export async function createPolicyDraft(_: ActionState, form: FormData): Promise
   const version = field(form, "policy_version");
   const title = field(form, "policy_title");
   const body = field(form, "policy_body");
-  if (!UUID.test(org) || !["ENROLLMENT", "COMPLETION"].includes(kind)
+  if (!UUID.test(org) || !["ENROLLMENT", "COMPLETION", "REFUND"].includes(kind)
     || version.length < 1 || version.length > 50 || title.length < 3 || title.length > 120
     || body.length < 20 || body.length > 20000) {
     return { message: policyErrors.INVALID_POLICY };
@@ -80,6 +82,13 @@ export async function approvePolicyDraft(_: ActionState, form: FormData): Promis
   if (!UUID.test(org) || !UUID.test(id)) return { message: "정책을 다시 선택해 주세요." };
   if (form.get("review_confirmed") !== "on") {
     return { message: "기관의 문안 검토와 승인 여부를 확인해 주세요." };
+  }
+  if (field(form, "policy_kind") === "REFUND") {
+    const labels = form.getAll("rule_label").map(String), bases = form.getAll("rule_basis").map(String), nums = form.getAll("rule_numerator").map(String), denoms = form.getAll("rule_denominator").map(String);
+    if (!labels.length || labels.length > 20 || [bases, nums, denoms].some(items => items.length !== labels.length)) return { message: policyErrors.REFUND_RULES_REQUIRED };
+    const rules = labels.map((label, index) => ({ label: label.trim(), basis: bases[index], numerator: Number(nums[index]), denominator: Number(denoms[index]) }));
+    if (rules.some((rule, index) => !rule.label || rule.label.length>300 || !["TUITION", "PAID"].includes(rule.basis) || !/^\d{1,6}$/.test(nums[index]) || !/^\d{1,6}$/.test(denoms[index]) || rule.denominator<1 || rule.denominator>100000 || rule.numerator>rule.denominator)) return { message: policyErrors.INVALID_REFUND_RULE };
+    return runPolicyAction(org, "life_approve_refund_policy", { policy_id: id, expected_title: field(form, "expected_title"), expected_body: String(form.get("expected_body") ?? ""), rules });
   }
   return runPolicyAction(org, "life_approve_recruitment_policy_draft", {
     policy_id: id,

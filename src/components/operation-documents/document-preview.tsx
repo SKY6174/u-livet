@@ -314,7 +314,7 @@ export function DocumentPreview({
     pages.push(
       <div key="qualifications">
         <h2>4. 관련 자격증</h2>
-        <p>{v.qualificationNote}</p>
+
         {tables("plan")
           .filter((t) => ["national", "private"].includes(t.key))
           .map((t) => (

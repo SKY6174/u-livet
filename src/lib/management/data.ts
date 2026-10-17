@@ -4,10 +4,11 @@ import { hasRole } from "@/lib/auth/workspace-navigation";
 import { UUID } from "@/lib/portal/data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-export const APPLICATION_STATUSES = ["SUBMITTED", "WAITLISTED", "ACCEPTED", "PENDING_PAYMENT", "REJECTED", "CANCELLED", "EXPIRED"];
+export const APPLICATION_STATUSES = ["SUBMITTED", "WAITLISTED", "ACCEPTED", "PENDING_PAYMENT", "REJECTED", "CANCELLED", "EXPIRED", "RECEIVED", "REVIEWING", "APPROVED", "COMPLETED"];
 export type ManagedApplication = {
   id: string; person_id: string; name: string; active: boolean;
-  offering_id: string; course_name: string; status: string;
+  offering_id: string | null; course_name: string; status: string;
+  document_id?: string | null; document_status?: string | null;
   submitted_at: string; enrollment_status: string | null;
 };
 export type ApplicationDetail = {

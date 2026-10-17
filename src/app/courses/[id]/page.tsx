@@ -1,3 +1,4 @@
+import { applicationIsOpen } from "@/lib/learner-documents/admissions";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -56,7 +57,7 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
           <h2 className="section-title">교육 안내</h2>
           <p className="mb-5 text-sm leading-6 text-slate-700"><InstructorNames instructors={names === null ? null : names[course.offering_id ?? ""] ?? []} /></p>
           <dl className="space-y-5 text-sm">{information.map(([label, value]) => <div key={label}><dt className="text-slate-500">{label}</dt><dd className="mt-1.5 whitespace-pre-line font-medium leading-6 text-slate-900">{value}</dd></div>)}</dl>
-          <DocumentPopup href={applicationDocumentHref(course.id)} windowName="learner-documents" className="btn-primary mt-4 w-full justify-center">수강신청원서 작성</DocumentPopup>
+          {offering && applicationIsOpen(offering) ? <DocumentPopup href={applicationDocumentHref(course.id)} windowName="learner-documents" className="btn-primary mt-4 w-full justify-center">수강신청원서 작성</DocumentPopup> : <p className="notice mt-4">현재 접수 기간이 아닙니다.</p>}
           {offering && <Link href={`/offerings/${offering.id}`} className="btn-secondary mt-4 w-full justify-center gap-2">{offering.status === "ARCHIVED" ? "지난 운영 과정 보기" : "수강신청 안내 확인"}<ArrowUpRight size={16} aria-hidden="true" /></Link>}
         </aside>
       </div>

@@ -110,7 +110,7 @@ export default async function AdminLearnerDocumentsPage({ searchParams }: {
                   const approvedEvent = request.events.filter(event => event.to_status === "APPROVED").at(-1);
                   const formId = `document-status-${request.id}`;
                   const rowLabel = `${index + 1}번 ${request.applicant_name} ${DOCUMENT_KIND_LABELS[request.kind]}`;
-                  return <tr key={request.id} className="align-top hover:bg-slate-50/60">
+                  return <tr key={request.id} id={`request-${request.id}`} className="align-top hover:bg-slate-50/60">
                     <td className="px-2 py-5 text-center tabular-nums text-slate-500">{index + 1}</td>
                     <th scope="row" className="break-words px-2 py-5 font-normal">
                       <p className="text-xs font-semibold text-teal-700">{DOCUMENT_KIND_LABELS[request.kind]}</p>

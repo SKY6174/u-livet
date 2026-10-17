@@ -20,7 +20,9 @@ const COURSE_ACTION_ICON = <ArrowUpRight size={12} aria-hidden="true" className=
 const COURSE_ACTION_COLUMN_CLASS = "sticky right-0 w-60 min-w-60 max-w-60 border-l border-slate-200 sm:w-80 sm:min-w-80 sm:max-w-80";
 function CourseActions({ course: c, manager, org }: { course: OperationCourse; manager: boolean; org: string }) {
   return <div role="group" aria-label={`${c.name} 관리 메뉴`} className="grid grid-cols-[repeat(auto-fit,minmax(8.5rem,1fr))] gap-2">
-    {manager && (c.workspace ? <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}`}>과정 정보 관리{COURSE_ACTION_ICON}</Link> : c.source_id && <Link className={COURSE_ACTION_CLASS} href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>과정 개설 준비{COURSE_ACTION_ICON}</Link>)}
+    {manager && (c.workspace ? <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/manage`}>과정·모집 설정{COURSE_ACTION_ICON}</Link> : c.source_id && <Link className={COURSE_ACTION_CLASS} href={`/admin/courses?org=${org}&plan=${c.source_id}#offering-draft`}>과정 개설 준비{COURSE_ACTION_ICON}</Link>)}
+    {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/manage#finance`}>수강료·환불 규정{COURSE_ACTION_ICON}</Link>}
+    {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/manage#applications`}>신청·수강생{COURSE_ACTION_ICON}</Link>}
     {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/admin/offerings/${c.workspace.id}/manage#instructors`}>강사 배정{COURSE_ACTION_ICON}</Link>}
     {manager && c.workspace && <Link className={COURSE_ACTION_CLASS} href={`/operation-documents/${c.workspace.id}/plan`}>운영계획서 작성{COURSE_ACTION_ICON}</Link>}
     {manager && <Link className={COURSE_ACTION_CLASS} href={`/admin/courses/guides/${c.id}`}>과정 안내 수정{COURSE_ACTION_ICON}</Link>}

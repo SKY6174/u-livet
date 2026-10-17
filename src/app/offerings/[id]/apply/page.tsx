@@ -1,3 +1,4 @@
+import { applicationIsOpen } from "@/lib/learner-documents/admissions";
 import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -27,7 +28,7 @@ export default async function ApplyPage(props: {
   );
   const finance = financeData as FinanceConfig | null;
   const open =
-    o.status === "PUBLISHED" &&
+    applicationIsOpen(o) &&
     !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
     Date.now() < Date.parse(o.apply_until) &&
@@ -44,7 +45,7 @@ export default async function ApplyPage(props: {
           <div><dt className="text-sm text-slate-600">수강료</dt><dd className="mt-1 font-semibold">{o.tuition === null ? "별도 안내 확인" : o.tuition === 0 ? "무료" : `${o.tuition.toLocaleString("ko-KR")}원`}</dd></div>
           <div className="sm:col-span-2"><dt className="text-sm text-slate-600">신청기간</dt><dd className="mt-1 font-semibold">{dateTime(o.apply_from)} ~ {dateTime(o.apply_until)}</dd></div>
         </dl>
-        <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary mt-6">이 과정의 수강신청원서 작성</DocumentPopup>
+        {open && <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary mt-6">이 과정의 수강신청원서 작성</DocumentPopup>}
       </section>
       <div className="panel">
         <ActionForm

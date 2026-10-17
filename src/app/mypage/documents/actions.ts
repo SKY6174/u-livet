@@ -25,6 +25,8 @@ export type DocumentActionResult = {
 };
 
 const ERROR_MESSAGES: Record<string, string> = {
+  APPLICATION_CLOSED: "접수가 종료되었거나 아직 시작되지 않은 과정입니다.",
+  DUPLICATE_APPLICATION: "이미 이 과정의 수강신청원서를 접수했습니다. 기존 처리 현황을 확인해 주세요.",
   AUTH_REQUIRED: "로그인 상태를 확인해 주세요.",
   INVALID_INPUT: "입력 내용을 다시 확인해 주세요.",
   COURSE_NOT_FOUND: "선택한 과정을 확인할 수 없습니다.",
@@ -114,20 +116,18 @@ export async function submitLearnerDocument(input: {
   if (values.offeringId) {
     const { data: offering, error } = await db
       .from("life_catalog")
-      .select("id,name,tuition")
+      .select("id,name,tuition,status,apply_from,apply_until,starts_on,academic_sealed")
       .eq("id", values.offeringId)
       .maybeSingle();
     if (error)
       return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
-    // A published guide can accept preparatory documents before its draft
-    // offering is in the public admissions catalog.
-    if (!offering && type === "application") {
-      const { data: guide, error: guideError } = await db.from("life_course_guides")
-        .select("name").eq("offering_id", values.offeringId).eq("published", true).maybeSingle();
-      if (guideError || !guide) return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
-      values.courseName = String(guide.name);
-    } else if (!offering) return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
-    else values.courseName = String(offering.name);
+    if (!offering) return { ok: false, message: ERROR_MESSAGES.COURSE_NOT_FOUND };
+    values.courseName = String(offering.name);
+    if (type === "application") {
+      const now = Date.now(), today = new Date(now + 9 * 3600000).toISOString().slice(0, 10);
+      if (offering.status !== "PUBLISHED" || offering.academic_sealed || now < Date.parse(offering.apply_from) || now >= Date.parse(offering.apply_until) || today >= offering.starts_on)
+        return { ok: false, message: ERROR_MESSAGES.APPLICATION_CLOSED };
+    }
     if (type === "refund") {
       const tuition = offering?.tuition == null ? null : Number(offering.tuition);
       Object.assign(values, refundAmounts(tuition, values.refundOccurrence));
@@ -166,6 +166,8 @@ export async function submitLearnerDocument(input: {
       };
     revalidatePath("/mypage/documents");
     revalidatePath("/admin/learner-documents");
+    revalidatePath("/admin/applications");
+    revalidatePath("/admin/learners");
     return {
       ok: true,
       requestId: String(data),
