@@ -55,7 +55,8 @@ export default async function CourseMonitoring() {
     completed: course.completed,
     source_enrolled: course.source?.enrolled ?? null,
   }));
-  const organizations = orgIds.map((id, index) => ({ id, name: organizationNames.get(id) ?? `담당 기관 ${index + 1}` }));
+  const operationalOrgIds = new Set(courses.map((course) => course.org_id));
+  const organizations = orgIds.filter((id) => operationalOrgIds.has(id)).map((id, index) => ({ id, name: organizationNames.get(id) ?? `담당 기관 ${index + 1}` }));
   const annualPlan = annual && !annual.unavailable ? {
     guides: annual.guides, plans: annual.plans, documents: annual.documents,
     today: new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }),
