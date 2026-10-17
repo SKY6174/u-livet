@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import vm from 'node:vm';
 import ts from 'typescript';
@@ -34,13 +34,22 @@ function page(path, { roles = [], db = {}, workspace = async () => ({ offerings:
     '@/components/teaching/teaching-signature-form': { TeachingSignatureForm: () => null },
     '@/lib/certificates/types': { kindLabel: {}, certificateState: {} },
   };
-  const code = ts.transpileModule(readFileSync(path, 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 },
-  }).outputText;
-  const module = { exports: {} };
-  vm.runInNewContext(code, { exports: module.exports, module,
-    require: name => Object.hasOwn(replacements, name) ? replacements[name] : require(name), Date });
-  return module.exports.default;
+  function loadModule(file) {
+    const code = ts.transpileModule(readFileSync(file, 'utf8'), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 },
+    }).outputText;
+    const module = { exports: {} };
+    vm.runInNewContext(code, { exports: module.exports, module, require: name => {
+      if (Object.hasOwn(replacements, name)) return replacements[name];
+      if (name.startsWith('@/')) {
+        const file = ['.ts', '.tsx'].map(extension => `src/${name.slice(2)}${extension}`).find(existsSync);
+        if (file) return loadModule(file);
+      }
+      return require(name);
+    }, Date });
+    return module.exports;
+  }
+  return loadModule(path).default;
 }
 const instructorRoles = [{ role: 'INSTRUCTOR', org_id: org }];
 const managerRoles = [{ role: 'COURSE_MANAGER', org_id: org }];

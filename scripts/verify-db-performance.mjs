@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { dirname, resolve } from 'node:path';
 import vm from 'node:vm';
 import ts from 'typescript';
 import { createClient } from '@supabase/supabase-js';
@@ -14,7 +15,15 @@ function load(file, replacements) {
   }).outputText;
   const module = { exports: {} };
   vm.runInNewContext(code, { exports: module.exports, module,
-    require: name => Object.hasOwn(replacements, name) ? replacements[name] : require(name), Date });
+    require: name => {
+      if (Object.hasOwn(replacements, name)) return replacements[name];
+      if (name.startsWith('@/') || name.startsWith('.')) {
+        const base = name.startsWith('@/') ? `src/${name.slice(2)}` : resolve(dirname(file), name);
+        const source = ['.ts', '.tsx'].map(extension => base + extension).find(existsSync);
+        if (source) return load(source, replacements);
+      }
+      return require(name);
+    }, Date });
   return module.exports;
 }
 let passed = 0;
