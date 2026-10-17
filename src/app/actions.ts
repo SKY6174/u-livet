@@ -18,6 +18,7 @@ const errors: Record<string, string> = {
   APPROVED_POLICY_REQUIRED: "승인된 모집·수료 정책을 선택해 주세요.",
   NON_OPERATIONAL_ENROLLMENT_POLICY: "검증용 문구나 작성 요령만 있는 모집 안내는 사용할 수 없습니다. 실제 운영 안내를 새 버전으로 작성·승인한 뒤 선택해 주세요.",
   NON_OPERATIONAL_COMPLETION_POLICY: "검증용 문구나 작성 요령만 있는 수료 안내는 사용할 수 없습니다. 실제 운영 안내를 새 버전으로 작성·승인한 뒤 선택해 주세요.",
+  NON_OPERATIONAL_REFUND_POLICY: "검증용 문구나 작성 요령만 있는 환불 안내는 사용할 수 없습니다. 실제 운영 규정과 계산 조항을 새 버전으로 작성·승인한 뒤 선택해 주세요.",
   APPROVED_REFUND_POLICY_REQUIRED:
     "승인된 환불 규정과 계산 조항을 먼저 등록해 주세요.",
   REFUND_REQUEST_REQUIRED:

@@ -10,6 +10,9 @@ import { dateTime, getCourseIntroduction, getCourseInstructorNames, getPolicies,
 import { InstructorNames } from "@/components/portal/instructor-names";
 import { PageIntro } from "@/components/portal/ui";
 import { ScholarshipNotice } from "@/components/portal/scholarship-notice";
+import { RefundNotice } from "@/components/portal/refund-notice";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { FinanceConfig } from "@/lib/finance/types";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
 
@@ -21,10 +24,13 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
     getSessionIdentity(),
     getCourseInstructorNames(course.offering_id ? [course.offering_id] : []),
   ]);
-  const completion = offering?.completion_policy_id
-    ? (await getPolicies("COMPLETION", offering.completion_policy_id))
-      .find(isOperationalCompletionPolicy)
-    : null;
+  const [completionPolicies, { data: financeData }] = await Promise.all([
+    offering?.completion_policy_id ? getPolicies("COMPLETION", offering.completion_policy_id) : Promise.resolve([]),
+    offering && offering.tuition !== null && offering.tuition > 0 && offering.status !== "ARCHIVED"
+      ? createServerSupabaseClient().then(db => db.rpc("life_offering_finance", { f: offering.id }))
+      : Promise.resolve({ data: null }),
+  ]);
+  const completion = completionPolicies.find(isOperationalCompletionPolicy);
   const information = [
     ["교육기간", course.period_label],
     ["요일 · 시간", course.time_label],
@@ -52,6 +58,7 @@ export default async function CourseGuidePage({ params }: { params: Promise<{ id
             </> : <p className="text-slate-600">승인된 이수요건을 확인 중입니다. 모집 공고에서 확정 기준을 확인해 주세요.</p>}
           </section>
           <ScholarshipNotice />
+          <RefundNotice tuition={offering?.tuition ?? null} finance={financeData as FinanceConfig | null} />
           {course.schedule_history.length > 0 && <section className="panel"><h2 className="section-title">일정 변경 안내</h2><ul className="space-y-2 text-sm text-slate-600">{course.schedule_history.map((entry) => <li key={entry}>{entry}</li>)}</ul></section>}
         </div>
         <aside className="panel order-1 lg:order-2">

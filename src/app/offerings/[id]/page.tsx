@@ -14,6 +14,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FinanceConfig } from "@/lib/finance/types";
 import { PageIntro } from "@/components/portal/ui";
 import { ScholarshipNotice } from "@/components/portal/scholarship-notice";
+import { RefundNotice } from "@/components/portal/refund-notice";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
 import { parseCourseCurriculum } from "@/lib/course-workspace/curriculum";
@@ -76,6 +77,7 @@ export default async function OfferingPage(props: {
             </p>
           </section>
           <ScholarshipNotice />
+          <RefundNotice tuition={o.tuition} finance={finance} />
           {enrollment && (
             <section className="panel">
               <h2 className="section-title">모집·개인정보 수집·이용 안내</h2>
@@ -115,14 +117,6 @@ export default async function OfferingPage(props: {
               </div>
             ))}
           </dl>
-          {finance && (
-            <details>
-              <summary className="cursor-pointer font-semibold">
-                수납·환불 안내
-              </summary>
-              <p className="mt-3 whitespace-pre-wrap text-sm">{finance.body}</p>
-            </details>
-          )}
           {open && <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary w-full justify-center">수강신청원서 작성</DocumentPopup>}
           {open ? (
             <Link

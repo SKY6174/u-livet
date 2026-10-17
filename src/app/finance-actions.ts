@@ -6,6 +6,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { UUID } from "@/lib/portal/data";
 import type { ActionState } from "@/lib/portal/types";
 const messages: Record<string, string> = {
+  NON_OPERATIONAL_REFUND_POLICY: "검증용 문구나 작성 요령만 있는 환불 안내는 사용할 수 없습니다. 실제 운영 규정과 계산 조항을 새 버전으로 작성·승인한 뒤 선택해 주세요.",
   FINANCE_TERMS_LOCKED: "이미 신청·원서·청구가 접수되어 수강료·규정을 변경할 수 없습니다. 기존 약정은 보존하고 새 개설 과정에서 변경해 주세요.",
   COURSE_READ_ONLY: "운영 마감·보관 과정의 수강료는 수정할 수 없습니다.",
   MFA_REAUTH_REQUIRED: MFA_REAUTH_MESSAGE,
