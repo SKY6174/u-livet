@@ -9,3 +9,7 @@
 - 변경 TS/TSX ESLint 및 TypeScript 검사 통과. 기존 DB의 비어 있지 않은 청구 7건도 삭제하지 않고 테스트 fixture 범위를 구분했다.
 
 남은 출시 검증: Preview 전체 migration 및 Vercel 빌드/check, 운영 원본 63개 항목 count/hash 및 변경하지 않은 함수 hash·보안 advisor 비교, 실제 운영 읽기 화면과 배포 SHA 확인. 제출된 보고서/문서/제도/실제 계좌·송금은 수정하지 않는다.
+
+## Preview 검증
+
+서울의 데이터 없는 임시 DB에 전체 migration이 적용됐다. 변경 함수 3개의 저장된 definition hash가 로컬 검증본과 같고, private view 5개가 security_invoker이며 anon/authenticated/service_role 직접 조회 권한이 없음을 확인했다. 운영 projection 5개가 모두 0건으로 정상 응답한다. Vercel Preview는 READY이며 `/api/version`이 소스 SHA `b1e9ab26a086263530d6633a0633ebc43c96edc1`을 반환했다. Preview 앱은 reviewOnly 모드이고 DB 검증은 별도 임시 DB에서 수행했다.
