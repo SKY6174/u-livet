@@ -13,3 +13,5 @@
 로컬 실행: `20261008131827_course_catalog_organization.sql`, `20261017062713_admin_operational_records.sql`, `20261017065240_operational_account_directory.sql`, 현재 migration, `scripts/verify-operational-credentials.sql`을 결합한다. migration 외곽 BEGIN/COMMIT 및 검증 파일의 BEGIN을 제거하고 단일 BEGIN과 마지막 ROLLBACK으로 `docker exec -i supabase_db_uc-life-issues psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q`를 실행했다.
 
 운영 기존 34개 원본에 발급/원문/토큰/카운터/공유/발급권/위임/서식/구형 원장을 더해 총 50개 aggregate count/hash와 보안 advisor 기준값을 확보했다. 운영·Preview 체크와 실제 화면 결과는 PR 설명에 이어 기록한다. 원본 연락처·암호·공유 토큰·PDF/JSON 본문은 출력하지 않는다.
+
+Preview에서 전체 migration 130개와 현재 ledger `20261017072037`, private security_invoker view 6개, 미인증 목록/지갑 검사 및 직접 view/helper 접근 차단을 확인했다. Preview 빌드의 `/api/version`은 같은 source commit을 반환한다. 운영 적용 후 비교할 함수는 변경한 읽기 7개와 변경하지 않은 발급/근거/상태/다운로드/진위확인 등 36개, 총 43개다.
