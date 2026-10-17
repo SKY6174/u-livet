@@ -257,8 +257,13 @@ export function FinanceLedger({
               {data.payments.map((p) => (
                 <div key={p.id} className="border-t pt-3">
                   <p className="font-semibold">
-                    {p.person_name} · {money(p.amount)} · 미배분{" "}
+                    {p.person_name} · {money(p.operational_amount)} · 미배분{" "}
                     {money(p.unallocated)}
+                    {p.operational_amount !== p.amount && (
+                      <span className="ml-2 text-sm text-slate-600">
+                        (운영 반영액 · 원입금 {money(p.amount)})
+                      </span>
+                    )}
                   </p>
                   <p className="text-sm break-all">
                     {p.external_ref} · {dateTime(p.deposited_at)} · 입금자{" "}
