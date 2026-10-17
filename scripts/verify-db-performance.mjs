@@ -132,6 +132,8 @@ await test('workspace lookup limits courses to assigned IDs without curriculum',
   assert.deepEqual(result.offerings.map(r => r.id), [fixtures[1].id, fixtures[3].id]);
   assert.equal(result.unavailable, false);
   assert(result.offerings.every(r => !('curriculum' in r)));
+  assert.equal(requests.at(-1).pathname, '/rest/v1/life_workspace_catalog');
+  assert.equal(requests.at(-1).searchParams.get('select'), 'id,org_id,name,status,capacity,year_label,starts_on,ends_on');
   assert(result.offerings.every(r => r.org_id === fixtures[1].org_id));
   assert.equal(requests.at(-1).searchParams.get('id'), `in.(${fixtures[1].id},${fixtures[3].id})`);
   assert.equal(requests.at(-1).searchParams.get('order'), 'created_at.desc,id.asc');

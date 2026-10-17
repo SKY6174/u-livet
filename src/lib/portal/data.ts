@@ -97,7 +97,7 @@ export async function getWorkspaceOfferings(
     return { ...empty, unavailable: true };
   try {
     const { data, error } = await (await createServerSupabaseClient())
-      .from("life_catalog")
+      .from("life_workspace_catalog")
       .select("id,org_id,name,status,capacity,year_label,starts_on,ends_on")
       .in(column, Array.from(new Set(values)))
       .order("created_at", { ascending: false })
