@@ -1,5 +1,5 @@
 import { applicationIsOpen } from "@/lib/learner-documents/admissions";
-import { isOperationalCompletionPolicy } from "@/lib/portal/recruitment-policy";
+import { isOperationalCompletionPolicy, isOperationalRefundPolicy } from "@/lib/portal/recruitment-policy";
 import { formatDateRange } from "@/lib/date-format";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,6 +14,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FinanceConfig } from "@/lib/finance/types";
 import { PageIntro } from "@/components/portal/ui";
 import { ScholarshipNotice } from "@/components/portal/scholarship-notice";
+import { RefundNotice } from "@/components/portal/refund-notice";
 import { DocumentPopup } from "@/components/instructor-documents/document-popup";
 import { applicationDocumentHref } from "@/lib/learner-documents/model";
 import { parseCourseCurriculum } from "@/lib/course-workspace/curriculum";
@@ -42,7 +43,8 @@ export default async function OfferingPage(props: {
     applicationIsOpen(o) &&
     !!o.apply_from && !!o.apply_until &&
     Date.now() >= Date.parse(o.apply_from) &&
-    Date.now() < Date.parse(o.apply_until);
+    Date.now() < Date.parse(o.apply_until) &&
+    (o.tuition === 0 || (!!finance?.valid && isOperationalRefundPolicy(finance)));
   return (
     <div className="page-shell">
       <PageIntro eyebrow={`${o.academy} · ${o.year_label}`} title={o.name}>
@@ -76,6 +78,7 @@ export default async function OfferingPage(props: {
             </p>
           </section>
           <ScholarshipNotice />
+          <RefundNotice tuition={o.tuition} finance={finance} />
           {enrollment && (
             <section className="panel">
               <h2 className="section-title">모집·개인정보 수집·이용 안내</h2>
@@ -115,14 +118,6 @@ export default async function OfferingPage(props: {
               </div>
             ))}
           </dl>
-          {finance && (
-            <details>
-              <summary className="cursor-pointer font-semibold">
-                수납·환불 안내
-              </summary>
-              <p className="mt-3 whitespace-pre-wrap text-sm">{finance.body}</p>
-            </details>
-          )}
           {open && <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary w-full justify-center">수강신청원서 작성</DocumentPopup>}
           {open ? (
             <Link

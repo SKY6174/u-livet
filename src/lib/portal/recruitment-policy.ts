@@ -12,6 +12,11 @@ export const COMPLETION_POLICY_WRITING_GUIDE = [
 
 type PolicyText = { title: string; version: string; body: string };
 
+export const REFUND_POLICY_WRITING_GUIDE = [
+  "기관이 확정한 환불 사유·접수 절차·시점별 반환 기준을 작성합니다.",
+  "승인할 때 계산 조항을 함께 등록합니다. 기존 승인본 변경은 새 버전으로 작성합니다.",
+].join("\n");
+
 function isOperationalPolicy(policy: PolicyText, writingGuide: string) {
   return !/(검증용|issue\s*[0-9]+|dummy-[0-9]+|fixture)/i.test(
     [policy.title, policy.version, policy.body].join("\n"),
@@ -24,4 +29,9 @@ export function isOperationalRecruitmentPolicy(policy: PolicyText) {
 
 export function isOperationalCompletionPolicy(policy: PolicyText) {
   return isOperationalPolicy(policy, COMPLETION_POLICY_WRITING_GUIDE);
+}
+
+export function isOperationalRefundPolicy(policy: PolicyText) {
+  return isOperationalPolicy(policy, REFUND_POLICY_WRITING_GUIDE)
+    && !/(검증\s*전용|\[테스트\])/i.test([policy.title, policy.version, policy.body].join("\n"));
 }

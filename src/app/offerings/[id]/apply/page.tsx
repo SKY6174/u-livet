@@ -6,6 +6,8 @@ import { requireIdentity } from "@/lib/auth/session";
 import { dateTime, getOffering, getPolicies } from "@/lib/portal/data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { FinanceConfig } from "@/lib/finance/types";
+import { isOperationalRefundPolicy } from "@/lib/portal/recruitment-policy";
+import { RefundNotice } from "@/components/portal/refund-notice";
 import { applyForCourse } from "@/app/actions";
 import { ActionForm } from "@/components/portal/action-form";
 import { PageIntro } from "@/components/portal/ui";
@@ -26,7 +28,8 @@ export default async function ApplyPage(props: {
   const policy = policies.find(
     (p) => p.id === o.enrollment_policy_id,
   );
-  const finance = financeData as FinanceConfig | null;
+  const selectedFinance = financeData as FinanceConfig | null;
+  const finance = selectedFinance?.valid && isOperationalRefundPolicy(selectedFinance) ? selectedFinance : null;
   const open =
     applicationIsOpen(o) &&
     !!o.apply_from && !!o.apply_until &&
@@ -47,6 +50,7 @@ export default async function ApplyPage(props: {
         </dl>
         {open && <DocumentPopup href={applicationDocumentHref(o.id)} windowName="learner-documents" className="btn-primary mt-6">이 과정의 수강신청원서 작성</DocumentPopup>}
       </section>
+      <div className="mb-6"><RefundNotice tuition={o.tuition} finance={finance} /></div>
       <div className="panel">
         <ActionForm
           action={applyForCourse}
@@ -61,14 +65,10 @@ export default async function ApplyPage(props: {
                 수강료 {o.tuition.toLocaleString("ko-KR")}원 · 선발 후 입금 확인
                 시 수강 확정
               </p>
-              <p className="mt-2">
-                {finance?.title} · {finance?.version}
-              </p>
-              <p className="whitespace-pre-wrap mt-2">{finance?.body}</p>
-              <p className="mt-2">
+              {finance && <p className="mt-2">
                 선발 후 {finance?.reservation_hours}시간 이내, 교육 시작 전까지
                 납부해야 합니다. 정확한 기한은 청구에서 확인하세요.
-              </p>
+              </p>}
             </div>
           )}
           <h2 className="section-title">모집·개인정보 수집 안내</h2>

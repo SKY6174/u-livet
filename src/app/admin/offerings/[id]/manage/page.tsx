@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { isOperationalCompletionPolicy, isOperationalRecruitmentPolicy } from "@/lib/portal/recruitment-policy";
+import { isOperationalCompletionPolicy, isOperationalRecruitmentPolicy, isOperationalRefundPolicy } from "@/lib/portal/recruitment-policy";
 import { getPolicies, statusLabel, dateTime } from "@/lib/portal/data";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Empty } from "@/components/portal/ui";
@@ -129,7 +129,7 @@ export default async function ManageOffering(props: {
                     </option>
                     {policies
                       .filter(
-                        (p) => p.org_id === o.org_id && p.kind === "REFUND",
+                        (p) => p.org_id === o.org_id && p.kind === "REFUND" && isOperationalRefundPolicy(p),
                       )
                       .map((p) => (
                         <option key={p.id} value={p.id}>
