@@ -90,6 +90,7 @@ export type Payment = {
   person_id: string;
   person_name: string;
   amount: number;
+  operational_amount: number;
   unallocated: number;
   depositor: string;
   external_ref: string;
