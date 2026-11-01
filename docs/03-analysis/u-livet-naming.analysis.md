@@ -31,6 +31,6 @@ issues는 5개 서비스가 실행 중이다. core는 기존과 같이 4개 실�
 - 문서 경계, NAVER, Kakao, social routing의 기존 검증 스크립트 4개는 mock 의존성 누락으로 실패한다. Git HEAD의 변경 전 소스를 메모리에서 로드해도 같은 실패를 재현했다. 이번 이름 변경으로 발생한 실패가 아니다.
 - 첫 Docker 이전은 UNIX socket HTTP Host 헤더 오류로 자동 복구됐다. 재시도에서는 Kong 파일의 UID/GID 보존을 보완했다. 최종 데이터와 서비스 상태 검증은 통과했다.
 - 운영 Supabase 프로젝트 이름은 기존부터 `u-livet`이었다. 운영 DB와 인증 설정은 이번 작업에서 변경하지 않았다.
-- 기존 작업 폴더를 `u-livet-worktrees`로 이동하고 13개 Git worktree 등록 경로를 복구했다. 각 worktree의 porcelain 상태가 이동 전과 같으며 이전 경로도 호환 링크로 접근된다.
+- 기존 작업 폴더를 `u-livet-worktrees`로 이동하고 12개 Git worktree 등록 경로를 복구했다. 각 worktree의 porcelain 상태가 이동 전과 같으며 이전 경로도 호환 링크로 접근된다.
 
 운영 배포 검증은 PR 검사와 병합 후 `u-livet.org/api/version`의 application·revision, 홈페이지·로그인·favicon 응답으로 수행한다.
