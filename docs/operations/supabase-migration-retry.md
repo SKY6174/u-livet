@@ -22,7 +22,7 @@
 npm run test:migration-retry
 ```
 
-실행 조건: Node, Docker의 로컬 Unix 소켓, `supabase_db_uc-life-core`, 원본 Git commit `1a4bf135113778ff701a31b4ad7fbac6e60dadd6` 객체가 필요하다. 검증기는 외부 DB 주소를 받지 않고 환경 파일을 읽지 않는다. 무작위 이름의 임시 DB만 만들고 정리한다. 기존 로컬 프로젝트 DB도 reset하지 않는다.
+실행 조건: Node, Docker의 로컬 Unix 소켓, `supabase_db_u-livet-core`, 원본 Git commit `1a4bf135113778ff701a31b4ad7fbac6e60dadd6` 객체가 필요하다. 검증기는 외부 DB 주소를 받지 않고 환경 파일을 읽지 않는다. 무작위 이름의 임시 DB만 만들고 정리한다. 기존 로컬 프로젝트 DB도 reset하지 않는다.
 
 10개 검사 통과: 원본 009·010 각각 오류 재현, 실패 transaction rollback, 수정본 신규 적용과 반복 실행, 일부 정책 누락/다른 정의 복원, 무관한 정책 보존, 전체 public 테이블의 행 지문 보존, 정책·역할·함수·뷰·인덱스·컬럼·권한·RLS catalog 동일성, 임시 DB 정리. 최소 Auth fixture를 사용하므로 관리형 Auth나 전체 22개 migration의 인수 결과가 아니다.
 

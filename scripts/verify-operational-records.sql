@@ -1,5 +1,5 @@
 -- Local Supabase integration fixture only. Apply the migration and this file in
--- one transaction on supabase_db_uc-life-issues; this file always rolls back.
+-- one transaction on supabase_db_u-livet-issues; this file always rolls back.
 begin;
 create temp table operational_fixture(real_id uuid,hidden_id uuid,hidden_application uuid,staff_user uuid,staff_session uuid,foreign_id uuid);
 grant select on operational_fixture to authenticated;

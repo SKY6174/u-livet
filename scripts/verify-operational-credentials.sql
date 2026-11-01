@@ -1,5 +1,5 @@
 -- LOCAL ONLY: combine prerequisite/current migrations in one transaction on
--- supabase_db_uc-life-issues. All fixtures and schema changes roll back.
+-- supabase_db_u-livet-issues. All fixtures and schema changes roll back.
 begin;
 create temp table credential_fixture(n int,f uuid,person uuid,request uuid,issue uuid,definition uuid,badge_request uuid,award uuid);
 grant select on credential_fixture to authenticated;

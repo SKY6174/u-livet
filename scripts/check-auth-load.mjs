@@ -120,7 +120,7 @@ try {
   console.log(JSON.stringify({ stage: 'local-login-verified', roles: roles.length, visible_courses: catalog.length }));
 
   stage = 'isolated-build';
-  snapshot = mkdtempSync(join(tmpdir(), 'uc-life-auth-load-'));
+  snapshot = mkdtempSync(join(tmpdir(), 'u-livet-auth-load-'));
   const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: ROOT, encoding: 'utf8' }).split('\0').filter(Boolean);
   for (const file of tracked) {
     if (file.split('/').some(part => part.startsWith('.env')) || !existsSync(join(ROOT, file))) continue;

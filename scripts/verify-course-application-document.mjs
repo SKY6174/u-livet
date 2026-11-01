@@ -9,11 +9,11 @@ import { chromium } from "playwright";
 
 const dbDir = process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dbDir, "Dedicated APPLICATION_TEST_DB_DIR is required.");
-assert.match(readFileSync(resolve(dbDir,"supabase/config.toml"),"utf8"),/^project_id = "uc-life-issues"$/m);
+assert.match(readFileSync(resolve(dbDir,"supabase/config.toml"),"utf8"),/^project_id = "u-livet-issues"$/m);
 const status=JSON.parse(execFileSync("supabase",["status","--workdir",dbDir,"-o","json"],{encoding:"utf8",stdio:["ignore","pipe","pipe"]}));
 assert.equal(status.API_URL,"http://127.0.0.1:56321");
-const container="supabase_db_uc-life-issues";
-assert.equal(JSON.parse(execFileSync("docker",["inspect",container],{encoding:"utf8"}))[0].Config.Labels["com.supabase.cli.project"],"uc-life-issues");
+const container="supabase_db_u-livet-issues";
+assert.equal(JSON.parse(execFileSync("docker",["inspect",container],{encoding:"utf8"}))[0].Config.Labels["com.supabase.cli.project"],"u-livet-issues");
 const sql=query=>execFileSync("docker",["exec","-i",container,"psql","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-tA"],{input:query,encoding:"utf8",stdio:["pipe","pipe","pipe"]}).trim();
 const {ids,learner,password}=JSON.parse(readFileSync("/tmp/u-livet-issues-browser-fixtures.json","utf8"));
 for(const id of [ids.offering,ids.org,learner.person]) assert.match(id,/^[0-9a-f-]{36}$/);
@@ -116,6 +116,6 @@ try {
   assert.equal(sql(`select count(*) from public.life_applications where offering_id='${ids.offering}' and person_id='${learner.person}';`),"1");
   pass("실제 원서 제출 → 동일 과정·회원의 DB 접수와 비공개 PDF 조회 확인");
   await submission.screenshot({path:resolve(output,"submitted-desktop.png"),fullPage:true});
-  writeFileSync(resolve(output,"result.json"),JSON.stringify({verifiedAt:new Date().toISOString(),environment:{project:"uc-life-issues",api:status.API_URL,app:base,mode:"production"},guide,secondOffering:second,saved,checks,limitation:"전용 로컬 최신 DB·합성 회원 검증. 운영 회원의 원서를 제출하지 않음."},null,2)+"\n");
+  writeFileSync(resolve(output,"result.json"),JSON.stringify({verifiedAt:new Date().toISOString(),environment:{project:"u-livet-issues",api:status.API_URL,app:base,mode:"production"},guide,secondOffering:second,saved,checks,limitation:"전용 로컬 최신 DB·합성 회원 검증. 운영 회원의 원서를 제출하지 않음."},null,2)+"\n");
   console.log(`${checks.length} real application document flow checks passed; ${output}`);
 } finally {await browser?.close();app.kill("SIGTERM");}

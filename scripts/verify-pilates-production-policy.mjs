@@ -69,5 +69,5 @@ do $$begin
  (select * from before_others except select * from public.life_offerings where id<>'${target}')) then raise exception 'OTHER_COURSES_CHANGED';end if;
 end$$;
 rollback;`;
-execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
 console.log("PASS absent Preview, approved/body/link/course guards, exact correction, retry, revision/audit and unchanged historical evidence; ROLLBACK");

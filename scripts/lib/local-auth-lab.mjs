@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { AUTH_POLICY } from './self-hosted-preflight.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
-const LABEL = 'uc-life.auth-candidate-run';
+const LABEL = 'u-livet.auth-candidate-run';
 const IMAGES = {
   db: 'postgres:17-alpine', auth: 'public.ecr.aws/supabase/gotrue:v2.196.0',
   rest: 'public.ecr.aws/supabase/postgrest:v16.1', mail: 'public.ecr.aws/supabase/mailpit:v1.30.2',
@@ -17,7 +17,7 @@ const requireValue = (condition, code) => { if (!condition) throw new Error(code
 
 export async function createLocalAuthLab() {
   const runId = randomBytes(10).toString('hex');
-  const name = `uc-life-auth-lab-${runId}`;
+  const name = `u-livet-auth-lab-${runId}`;
   const cliEnv = { PATH: process.env.PATH, HOME: process.env.HOME };
   const exec = (args, input) => spawnSync('docker', args, {
     cwd: ROOT, env: cliEnv, input, encoding: 'utf8', timeout: 30000, maxBuffer: 8 * 1024 * 1024,

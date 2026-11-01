@@ -2,7 +2,7 @@
 
 **Vercel + Supabase 배포 준비:** [운영 인수·배포 가이드](docs/operations/vercel-supabase-release.md), [담당자 점검표](ops/release.example.json). `npm run test:release`로 검사 도구를 검증하고 `npm run check:release -- --help`로 사용법을 확인한다. Vercel 빌드는 설정 검사 후 실행하며 실제 게시 승인·원격 인증 호환성 검증은 별도다. 실제 운영 배포는 아직 하지 않았다.
 
-**Supabase 인증 호환성:** ANCHOR/uc-life를 확인했다. 현재 원격은 001~008 적용, 별도 Preview 없음 상태다. [호환성 조사·진단 도구 안내](docs/operations/supabase-auth-compatibility.md), `npm run test:hosted-auth`. 확정 비밀번호 조건과 hosted API 프리셋 차이·Auth 트리거 지원 범위를 해결한 뒤 실제 Preview 인수 검증이 필요하다.
+**Supabase 인증 호환성:** ANCHOR/u-livet를 확인했다. 현재 원격은 001~008 적용, 별도 Preview 없음 상태다. [호환성 조사·진단 도구 안내](docs/operations/supabase-auth-compatibility.md), `npm run test:hosted-auth`. 확정 비밀번호 조건과 hosted API 프리셋 차이·Auth 트리거 지원 범위를 해결한 뒤 실제 Preview 인수 검증이 필요하다.
 
 Next.js 15.5.25 / React 19.3 / Supabase 기반. 현재는 **인증·무료/유료 과정 신청·텍스트 자료/과제 LMS·공식 출결·객관식 시험·수료 검토/승인·이수증/강사 경력증명·입금 대사/환불 관리·문자 예약·연차 평가/성과 보고·디지털배지·강사 이력 심사·과정 개발**을 로컬에서 구현·검증했다. 전체 플랫폼 설계와 운영 배포는 별도 진행 중이다.
 
@@ -19,7 +19,9 @@ Next.js 15.5.25 / React 19.3 / Supabase 기반. 현재는 **인증·무료/유�
 
 ## 로컬 실행
 
-Docker, Node.js 22 이상, Supabase CLI가 필요하다. `uc-life-core` 프로젝트는 기존 `uc-anchor`와 다른 포트(55321/55322)를 사용한다.
+Docker, Node.js 22 이상, Supabase CLI가 필요하다. `u-livet-core` 프로젝트는 기존 `uc-anchor`와 다른 포트(55321/55322)를 사용한다.
+
+프로젝트·컨테이너의 현재 이름, 포트와 작업 경로는 [U-LiVET 로컬 실행 기준](docs/operations/u-livet-local-projects.md)을 따른다.
 
 ```sh
 npm ci
@@ -136,7 +138,7 @@ Turnstile은 `AUTH_TURNSTILE_SITE_KEY`와 `AUTH_CAPTCHA_ENABLED=true`를 설정�
 
 앱 분실 복구는 기관이 승인한 본인 확인·별도 승인·세션 회수·감사기록 후 신뢰된 관리 경로로 처리하는 운영 절차다. 이메일만으로 MFA를 해제하거나 자동 승인하지 않는다. 운영 담당자와 본인 확인 기준은 별도 확정이 필요하다. [설계](docs/02-design/features/anchor-admin-mfa.design.md), [검증 보고](docs/04-report/features/anchor-admin-mfa.report.md).
 
-로컬 회귀 스크립트는 가상 계정에 native TOTP를 등록·확인한다. 테스트 키는 `/tmp/uc-life-mfa-fixtures.json`에0600 권한으로 보관하고 제품 코드에서 사용하지 않는다. 기존 테스트 계정으로 브라우저 로그인하면 인증 앱 확인 화면이 나타난다. 브라우저에서 직접 첫 등록을 보려면 별도의 가상 계정을 사용한다. 임시 키 파일을 잃었을 때 기존 factor를 자동 삭제하지 않는다. 실제 계정·키를 테스트에 입력하지 않는다.
+로컬 회귀 스크립트는 가상 계정에 native TOTP를 등록·확인한다. 테스트 키는 `/tmp/u-livet-mfa-fixtures.json`에0600 권한으로 보관하고 제품 코드에서 사용하지 않는다. 기존 테스트 계정으로 브라우저 로그인하면 인증 앱 확인 화면이 나타난다. 브라우저에서 직접 첫 등록을 보려면 별도의 가상 계정을 사용한다. 임시 키 파일을 잃었을 때 기존 factor를 자동 삭제하지 않는다. 실제 계정·키를 테스트에 입력하지 않는다.
 
 이번 검사: 기존309개+MFA32개, 총341개 통과. 원격 환경에는 적용하지 않았다. 로컬 `configure-auth-local.mjs`는 정확한 비밀번호 정책과 TOTP 활성화를 함께 확인한다.
 

@@ -20,7 +20,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -340,7 +340,7 @@ assert((await api().rpc("life_security_status")).error);
 pass("anonymous clients cannot inspect account security status");
 const browser = await account(true);
 writeFileSync(
-  "/tmp/uc-life-mfa-browser.json",
+  "/tmp/u-livet-mfa-browser.json",
   JSON.stringify({
     email: browser.email,
     userId: browser.user.id,

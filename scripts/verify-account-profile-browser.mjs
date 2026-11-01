@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 
 assert.equal(process.argv.length, 2);
 const DB = 'life_account_profile_test_20261008';
-const SOURCE = 'supabase_db_uc-life-issues';
+const SOURCE = 'supabase_db_u-livet-issues';
 const runId = randomBytes(8).toString('hex');
 const owned = [], contexts = [];
 let next, browser, proxy;
@@ -39,7 +39,7 @@ function startClone(name, port) {
   const uriKey = name.includes('_auth_') ? 'GOTRUE_DB_DATABASE_URL' : 'PGRST_DB_URI';
   const uri = new URL(env[uriKey]); uri.pathname = '/' + DB; env[uriKey] = uri.toString();
   const network = Object.keys(source.NetworkSettings.Networks)[0];
-  assert(network.includes('uc-life-issues'));
+  assert(network.includes('u-livet-issues'));
   const clone = 'account-profile-' + runId + '-' + port;
   docker(['run', '-d', '--name', clone, '--label', 'account-profile-test=' + runId, '--network', network,
     '-p', `127.0.0.1::${port}`, ...Object.entries(env).flatMap(([key, value]) => ['-e', `${key}=${value}`]), source.Config.Image]);
@@ -69,8 +69,8 @@ try {
     delete from auth.mfa_factors;
     insert into auth.identities(user_id,provider_id,provider,identity_data,created_at,updated_at,last_sign_in_at)
       select id,id::text,'email',jsonb_build_object('sub',id,'email',email),now(),now(),now() from auth.users;`);
-  const auth = startClone('supabase_auth_uc-life-issues', 9999);
-  const rest = startClone('supabase_rest_uc-life-issues', 3000);
+  const auth = startClone('supabase_auth_u-livet-issues', 9999);
+  const rest = startClone('supabase_rest_u-livet-issues', 3000);
   await ready(auth.url + '/health', auth.name);
   sql(docker(['exec', SOURCE, 'psql', '-XqAt', '-U', 'supabase_admin', '-d', 'postgres', '-c', "select pg_get_functiondef(oid)||';' from pg_proc where pronamespace='auth'::regnamespace and proname in ('uid','jwt','role');"]));
   proxy = http.createServer(async (request, response) => {

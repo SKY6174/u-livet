@@ -23,7 +23,7 @@ const route = load('src/app/api/auth/naver/userinfo/route.ts', { fetch: async (.
   if (upstream instanceof Error) throw upstream;
   return upstream;
 } }).GET;
-const request = authorization => new Request('https://uc-life.example.invalid/api/auth/naver/userinfo?url=https://evil.invalid', {
+const request = authorization => new Request('https://u-livet.example.invalid/api/auth/naver/userinfo?url=https://evil.invalid', {
   headers: authorization === undefined ? {} : { authorization },
 });
 for (const token of [undefined, '', 'Basic abc', 'Bearer a b', 'Bearer ' + 'x'.repeat(4096)]) {
@@ -74,12 +74,12 @@ let exchanges = 0;
 const callback = load('src/app/auth/callback/route.ts', {}, {
   'next/server': { NextResponse: { redirect: url => ({ url, headers: new Map() }) } },
   '@/lib/supabase/server': { createServerSupabaseClient: async () => { exchanges++; throw new Error('not expected'); } },
-  '@/lib/auth/recovery': { recoveryOrigin: () => 'https://uc-life.example.invalid' },
+  '@/lib/auth/recovery': { recoveryOrigin: () => 'https://u-livet.example.invalid' },
   '@/lib/auth/social': {}, '@/lib/auth/registration': registration,
   '@/lib/deployment/review-mode': { isReviewOnly: () => false },
 }).GET;
 const qr = '/learning/10000000-0000-4000-8000-000000000001/attendance/checkin?session=10000000-0000-4000-8000-000000000002&t=' + 'a'.repeat(64);
-const response = await callback(new Request('https://uc-life.example.invalid/auth/callback?error=access_denied&error_code=provider_email_needs_verification&error_description=secret&next=' + encodeURIComponent(qr)));
+const response = await callback(new Request('https://u-livet.example.invalid/auth/callback?error=access_denied&error_code=provider_email_needs_verification&error_description=secret&next=' + encodeURIComponent(qr)));
 check('verification is not misreported as cancellation and retains QR context', response.url.searchParams.get('social_error') === 'email-verification' && response.url.searchParams.get('next') === qr && exchanges === 0);
 check('raw provider message is never reflected', !response.url.toString().includes('secret'));
 check('verification guidance explains the next step', registration.socialLoginError('email-verification').includes('회원가입 화면') && !registration.socialLoginError('email-verification').includes('보낸 인증 메일'));

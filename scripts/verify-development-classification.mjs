@@ -6,7 +6,7 @@ import { ensureLocalMfa } from "./local-mfa.mjs";
 
 const status = JSON.parse(execFileSync("supabase", ["status", "-o", "json"], { encoding: "utf8" }));
 assert.equal(status.API_URL, "http://127.0.0.1:55321");
-const sql = (query) => execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-core",
+const sql = (query) => execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-core",
   "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-qtA"],
 { input: query, encoding: "utf8" }).trim();
 const ok = (result) => {

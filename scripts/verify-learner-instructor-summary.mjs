@@ -26,8 +26,8 @@ console.log('PASS superscript, comma format, empty/error states and escaped name
 
 const status = JSON.parse(execFileSync('supabase', ['status', '--workdir', '/tmp/u-livet-issues-db', '-o', 'json'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
 assert.equal(status.API_URL, 'http://127.0.0.1:56321');
-assert.equal(execFileSync('docker', ['inspect', 'supabase_db_uc-life-issues', '--format', '{{ index .Config.Labels "com.supabase.cli.project" }}'], { encoding: 'utf8' }).trim(), 'uc-life-issues');
-const sql = (input) => execFileSync('docker', ['exec', '-i', 'supabase_db_uc-life-issues', 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-qtA'], { input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+assert.equal(execFileSync('docker', ['inspect', 'supabase_db_u-livet-issues', '--format', '{{ index .Config.Labels "com.supabase.cli.project" }}'], { encoding: 'utf8' }).trim(), 'u-livet-issues');
+const sql = (input) => execFileSync('docker', ['exec', '-i', 'supabase_db_u-livet-issues', 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-qtA'], { input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
 const fixture = JSON.parse(readFileSync('/tmp/u-livet-issues-browser-fixtures.json', 'utf8'));
 const auth = createClient(status.API_URL, status.ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 const session = await auth.auth.signInWithPassword({ email: fixture.learner.email, password: fixture.password });

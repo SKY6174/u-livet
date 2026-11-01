@@ -1,5 +1,5 @@
 -- Synthetic local fixtures only. Never included in migrations or automatic seeds.
--- Executed solely inside the dedicated supabase_db_uc-life-core container.
+-- Executed solely inside the dedicated supabase_db_u-livet-core container.
 insert into public.life_people(id,name) values('20000000-0000-4000-8000-000000000001','로컬 테스트 정책 승인자') on conflict do nothing;
 insert into public.life_policy_versions(id,org_id,kind,version,title,body,status,approved_by,approved_at)
 values

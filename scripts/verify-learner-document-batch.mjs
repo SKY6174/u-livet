@@ -8,11 +8,11 @@ import { createClient } from "@supabase/supabase-js";
 
 const dir = process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dir);
-assert.match(readFileSync(resolve(dir,"supabase/config.toml"),"utf8"), /^project_id = "uc-life-issues"$/m);
+assert.match(readFileSync(resolve(dir,"supabase/config.toml"),"utf8"), /^project_id = "u-livet-issues"$/m);
 const config = JSON.parse(execFileSync("supabase",["status","--workdir",dir,"-o","json"],{encoding:"utf8",stdio:["ignore","pipe","pipe"]}));
 assert.equal(config.API_URL,"http://127.0.0.1:56321");
-const container="supabase_db_uc-life-issues";
-assert.equal(JSON.parse(execFileSync("docker",["inspect",container],{encoding:"utf8"}))[0].Config.Labels["com.supabase.cli.project"],"uc-life-issues");
+const container="supabase_db_u-livet-issues";
+assert.equal(JSON.parse(execFileSync("docker",["inspect",container],{encoding:"utf8"}))[0].Config.Labels["com.supabase.cli.project"],"u-livet-issues");
 const sql=q=>execFileSync("docker",["exec","-i",container,"psql","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-qtA"],{input:q,encoding:"utf8",stdio:["pipe","pipe","pipe"]}).trim();
 const {ids,learner,manager,instructor,password}=JSON.parse(readFileSync("/tmp/u-livet-issues-browser-fixtures.json","utf8"));
 for (const id of [ids.offering,ids.org,ids.otherOrg,learner.person,instructor.person]) assert.match(id,/^[0-9a-f-]{36}$/);

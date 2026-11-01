@@ -10,7 +10,7 @@ const prerequisites = [
   '20261017062713_admin_operational_records.sql',
 ].map(name => body(`supabase/migrations/${name}`)).join('\n');
 const fixture = readFileSync('scripts/verify-admin-loading.sql', 'utf8');
-const result = spawnSync('docker', ['exec', '-i', 'supabase_db_uc-life-issues',
+const result = spawnSync('docker', ['exec', '-i', 'supabase_db_u-livet-issues',
   'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-At'], {
   input: `begin;\n${prerequisites}\n${fixture.replace('-- APPLY_OPTIMIZATION_HERE', migration)}`,
   encoding: 'utf8', timeout: 240000, maxBuffer: 4 * 1024 * 1024,

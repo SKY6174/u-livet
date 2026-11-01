@@ -152,7 +152,7 @@ do $$declare f uuid:=current_setting('test.publish')::uuid;begin
 end$$;
 reset role;
 rollback;`;
-execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
 console.log("PASS correction/retry/evidence; UI/DB policy classification, insert/update/rename/status guards, synthetic exemption, real publication RPC and privileges; ROLLBACK");
 
 const { publishOffering } = load("src/app/actions.ts", {

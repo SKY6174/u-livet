@@ -8,15 +8,15 @@ import { createClient } from "@supabase/supabase-js";
 import { chromium } from "playwright";
 
 const dbDir = process.env.APPLICATION_TEST_DB_DIR;
-assert.ok(dbDir, "Set APPLICATION_TEST_DB_DIR to the dedicated uc-life-issues project.");
-assert.match(readFileSync(resolve(dbDir, "supabase/config.toml"), "utf8"), /^project_id = "uc-life-issues"$/m);
+assert.ok(dbDir, "Set APPLICATION_TEST_DB_DIR to the dedicated u-livet-issues project.");
+assert.match(readFileSync(resolve(dbDir, "supabase/config.toml"), "utf8"), /^project_id = "u-livet-issues"$/m);
 const status = JSON.parse(execFileSync("supabase", ["status", "--workdir", dbDir, "-o", "json"], {
   encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
 }));
 assert.equal(status.API_URL, "http://127.0.0.1:56321", "Never run against a hosted or existing local project.");
-const container = "supabase_db_uc-life-issues";
+const container = "supabase_db_u-livet-issues";
 const inspected = JSON.parse(execFileSync("docker", ["inspect", container], { encoding: "utf8" }))[0];
-assert.equal(inspected.Config.Labels["com.supabase.cli.project"], "uc-life-issues");
+assert.equal(inspected.Config.Labels["com.supabase.cli.project"], "u-livet-issues");
 const sql = query => execFileSync("docker", ["exec", "-i", container, "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-tA"], {
   input: query, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"],
 }).trim();
@@ -174,7 +174,7 @@ try {
     }
   }
   await before.close();
-  const evidence = { verifiedAt: new Date().toISOString(), environment: { project: "uc-life-issues", api: status.API_URL, app: base },
+  const evidence = { verifiedAt: new Date().toISOString(), environment: { project: "u-livet-issues", api: status.API_URL, app: base },
     application, roster: row, displayTime, managePath, checks, screenshots: ["admin-roster.png"],
     limitation: "전용 로컬 최신 스키마에서 검증. 운영 DB의 실제 신청 건 검증 결과가 아님." };
   writeFileSync(resolve(output, "result.json"), JSON.stringify(evidence, null, 2) + "\n");

@@ -73,7 +73,7 @@ function fixture({ state = 'PENDING', signedIn = true, statusError = false, hasP
     'next/server': { NextResponse: { redirect: url => ({ url: url.toString(), headers: new Map() }) } },
     '@/lib/supabase/server': server, '@/lib/auth/social': social,
     '@/lib/auth/naver-signup':load('src/lib/auth/naver-signup.ts'), '@/lib/auth/registration': registration,
-    '@/lib/auth/recovery': { recoveryOrigin: () => 'https://uc-life.example.invalid' },
+    '@/lib/auth/recovery': { recoveryOrigin: () => 'https://u-livet.example.invalid' },
     '@/lib/deployment/review-mode': { isReviewOnly: () => false },
   }).GET;
   return { calls, social, callback, render: async params => renderToStaticMarkup(await page({ searchParams: Promise.resolve(params) })) };
@@ -117,8 +117,8 @@ for (const [options, expected] of [
   [{ exchangeError: true }, '/auth/login?social_error=callback'],
 ]) {
   const f = fixture({ ...options, provider });
-  const response = await f.callback(new Request('https://uc-life.example.invalid/auth/callback?code=synthetic&next=' + encodeURIComponent(safeNext)));
-  check(provider + ' callback automatically selects the correct destination: ' + JSON.stringify(options), response.url === 'https://uc-life.example.invalid' + expected);
+  const response = await f.callback(new Request('https://u-livet.example.invalid/auth/callback?code=synthetic&next=' + encodeURIComponent(safeNext)));
+  check(provider + ' callback automatically selects the correct destination: ' + JSON.stringify(options), response.url === 'https://u-livet.example.invalid' + expected);
   check('callback is never cached and does not leak a referrer', response.headers.get('Cache-Control') === 'private, no-store' && response.headers.get('Referrer-Policy') === 'no-referrer');
 }
 }
@@ -134,12 +134,12 @@ for (const [options, query, expected] of [
   [{ state: 'UNAVAILABLE' }, 'code=synthetic', registration.socialLoginRetry(qrNext, 'unavailable')],
   [{}, '', registration.socialLoginRetry(qrNext, 'callback')],
 ]) {
-  const result = await fixture(options).callback(new Request('https://uc-life.example.invalid/auth/callback?' + query + '&next=' + encodeURIComponent(qrNext)));
-  check('QR return survives authentication, signup, MFA and retries: ' + query, result.url === 'https://uc-life.example.invalid' + expected);
+  const result = await fixture(options).callback(new Request('https://u-livet.example.invalid/auth/callback?' + query + '&next=' + encodeURIComponent(qrNext)));
+  check('QR return survives authentication, signup, MFA and retries: ' + query, result.url === 'https://u-livet.example.invalid' + expected);
 }
 for (const next of ['https://evil.invalid', '//evil.invalid', qrNext + '&t=' + 'c'.repeat(64)]) {
-  const result = await fixture().callback(new Request('https://uc-life.example.invalid/auth/callback?error=access_denied&next=' + encodeURIComponent(next)));
-  check('retry rejects unsafe or ambiguous QR context', result.url === 'https://uc-life.example.invalid/auth/login?social_error=cancelled');
+  const result = await fixture().callback(new Request('https://u-livet.example.invalid/auth/callback?error=access_denied&next=' + encodeURIComponent(next)));
+  check('retry rejects unsafe or ambiguous QR context', result.url === 'https://u-livet.example.invalid/auth/login?social_error=cancelled');
 }
 
 // Optional localhost-only visual fixture using the actual server component and built CSS.

@@ -18,7 +18,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -363,7 +363,7 @@ try {
   pass("anonymous and direct table access denied");
   if (process.env.KEEP_POOL_FIXTURE === "1") {
     writeFileSync(
-      "/tmp/uc-life-pool-fixture.json",
+      "/tmp/u-livet-pool-fixture.json",
       JSON.stringify({
         org,
         otherOrg,

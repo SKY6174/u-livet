@@ -42,7 +42,7 @@ function fixture(overrides = {}) {
     'next/navigation': { redirect: url => { throw Error('REDIRECT ' + url); } },
     'next/cache': { revalidatePath: () => calls.push(['revalidate']) },
     '@/lib/supabase/server': { createServerSupabaseClient: async () => client },
-    '@/lib/auth/recovery': { createRecoveryClient: () => verifier, recoveryOrigin: () => 'https://uc-life.example.invalid' },
+    '@/lib/auth/recovery': { createRecoveryClient: () => verifier, recoveryOrigin: () => 'https://u-livet.example.invalid' },
     '@/lib/auth/abuse': { guardAuthRequest: async () => overrides.limited ? { allowed: false, state: { message: 'limited' } } : { allowed: true } },
     '@/lib/auth/registration': registration, '@/lib/auth/naver-signup': gate,
     '@/lib/deployment/review-mode': { isReviewOnly: () => !!overrides.review, REVIEW_MESSAGE: 'review' },

@@ -119,7 +119,7 @@ do $$begin if exists(select * from before_policies except select * from public.l
  or exists(select * from before_rules except select * from public.life_refund_rules) then raise exception 'EXISTING_POLICY_CHANGED';end if;end$$;
 rollback;`;
 try {
-  execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+  execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
 } catch (error) { console.error(error.stderr?.toString()); throw error; }
 console.log("PASS TS/SQL policy classification; real MFA finance RPC atomic rejection/success, policy update/explicit synthetic/rename guards, immutable historical policies and financial ledgers, private privileges; ROLLBACK");
 const { configureFinance } = load("src/app/finance-actions.ts", {

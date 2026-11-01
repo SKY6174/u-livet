@@ -22,7 +22,7 @@ const fixture = body('scripts/verify-operational-academic.sql').replace(
   'create temp table academic_preserved',
   () => `${clone}\n${body('supabase/migrations/20261017105436_optimize_learner_instructor_reads.sql')}\ncreate temp table academic_preserved`,
 );
-const result = spawnSync('docker', ['exec', '-i', 'supabase_db_uc-life-issues',
+const result = spawnSync('docker', ['exec', '-i', 'supabase_db_u-livet-issues',
   'psql', '-X', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-At'], {
   input: `begin;\nset local statement_timeout='30s';\n${prerequisites}\n${fixture}\n${readFileSync('scripts/verify-learner-instructor-loading.sql','utf8')}`,
   encoding: 'utf8', timeout: 240000, maxBuffer: 4 * 1024 * 1024,

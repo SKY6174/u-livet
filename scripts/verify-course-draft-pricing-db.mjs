@@ -92,5 +92,5 @@ do $$begin
  raise notice 'PASS: anonymous/service-role denied; authenticated allowed; missing identity rejected';
 end$$;
 `;
-const output = execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1"], { input: `begin;\n${migration}\n${checks}\nrollback;`, encoding: "utf8", maxBuffer: 2_000_000 });
+const output = execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1"], { input: `begin;\n${migration}\n${checks}\nrollback;`, encoding: "utf8", maxBuffer: 2_000_000 });
 console.log(output.split("\n").filter(line => /ROLLBACK/.test(line)).join("\n"));

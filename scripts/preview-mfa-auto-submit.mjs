@@ -9,7 +9,7 @@ import ts from 'typescript';
 const require = createRequire(import.meta.url);
 const webpack = require('next/dist/compiled/webpack/webpack');
 webpack.init();
-const dir = mkdtempSync(join(tmpdir(), 'uc-life-mfa-fixture-'));
+const dir = mkdtempSync(join(tmpdir(), 'u-livet-mfa-fixture-'));
 const write = (name, text) => { const path = join(dir, name); writeFileSync(path, text); return path; };
 function component(name) {
   return write(name + '.js', ts.transpileModule(readFileSync('src/components/auth/' + name + '.tsx', 'utf8'), {

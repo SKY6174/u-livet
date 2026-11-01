@@ -17,7 +17,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -585,7 +585,7 @@ const browserRequest = ok(
   await browserLearner.c.rpc("life_request_badge", { ...reqArgs, d: third }),
 );
 writeFileSync(
-  "/tmp/uc-life-badges-browser.json",
+  "/tmp/u-livet-badges-browser.json",
   JSON.stringify({
     offering: f,
     definition: third,

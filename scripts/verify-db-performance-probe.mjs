@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
 import { isExpectedLoginRedirect } from './lib/db-performance.mjs';
 
-const site = 'https://uc-life.example/';
+const site = 'https://u-livet.example/';
 assert.equal(isExpectedLoginRedirect('/', site, 307, '/auth/login'), true);
 assert.equal(isExpectedLoginRedirect('/', site, 308, site + 'auth/login?next=%2F'), true);
 for (const [label, status, location] of [

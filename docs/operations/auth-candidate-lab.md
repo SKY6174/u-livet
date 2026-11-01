@@ -35,7 +35,7 @@ npm run test:auth-candidate
 
 호스트·DB URL·비밀 입력 인자를 받지 않는다. 기존 `.env.local`과 인증 fixture를 읽지 않는다. 로컬 태그를 image ID로 해석하고 실행 컨테이너가 같은 ID인지 검사한다. 이 ID는 해당 로컬 이미지 식별자이며 운영 배포에 필요한 registry manifest digest와 혼동하지 않는다.
 
-매번 임의 이름과 `uc-life.auth-candidate-run` 라벨로 컨테이너 5개와 네트워크 2개를 생성한다. DB는 tmpfs에 저장하고 host port를 열지 않는다. Auth/REST/Mailpit도 내부망에만 연결한다. relay만 127.0.0.1 임시 포트 하나를 열어 고정 경로를 전달한다. 실제 비밀·토큰·메일 본문·MFA secret을 출력하거나 파일에 저장하지 않는다.
+매번 임의 이름과 `u-livet.auth-candidate-run` 라벨로 컨테이너 5개와 네트워크 2개를 생성한다. DB는 tmpfs에 저장하고 host port를 열지 않는다. Auth/REST/Mailpit도 내부망에만 연결한다. relay만 127.0.0.1 임시 포트 하나를 열어 고정 경로를 전달한다. 실제 비밀·토큰·메일 본문·MFA secret을 출력하거나 파일에 저장하지 않는다.
 
 DB bootstrap의 Auth 역할은 `search_path=auth`로 설정한다. Docker Desktop의 port binding을 위해 relay는 ingress에서 시작한 다음 내부망을 연결한다. 예전 개발 스택·Cloud main/Preview DB에는 SQL을 실행하지 않는다.
 
