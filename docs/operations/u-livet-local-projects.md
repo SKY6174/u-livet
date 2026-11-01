@@ -6,6 +6,7 @@
 | --- | --- |
 | 저장소 | `https://github.com/SKY6174/u-livet` |
 | 기본 checkout | `/Users/thomas/Documents/u-livet` |
+| 기존 worktree 모음 | `/Users/thomas/Documents/u-livet-worktrees` |
 | 패키지·버전 API application | `u-livet` |
 | Vercel 프로젝트 | `u-livet` |
 | 운영·Preview | `https://u-livet.org` · `https://staging.u-livet.org` |
@@ -15,6 +16,8 @@
 | favicon | `/images/u-livet-favicon.png` |
 
 기본 DB 컨테이너는 `supabase_db_u-livet-core`, 이슈 검증용은 `supabase_db_u-livet-issues`다. 로컬 스크립트도 새 이름을 사용한다. 기존 포트와 데이터는 보존한다.
+
+기존 `u-live` 작업 폴더는 `u-livet-worktrees`로 옮기고 13개 worktree의 Git 등록 경로를 복구했다. 이전 폴더 이름과 `uc-life` 별칭은 기존 작업의 접근을 위한 호환 심볼릭 링크로 남긴다. 새 경로에서 모든 worktree의 미커밋 상태가 이전과 같음을 확인했다.
 
 이전 설치의 Docker 그룹을 옮길 때는 먼저 `ops/rename-local-projects.py`를 `--apply` 없이 실행해 범위를 확인한다. 이 스크립트는 정확한 두 로컬 프로젝트만 대상으로 하며, `--source-root`와 Git 외부의 새 `--backup-dir`를 명시해야 한다. `--apply`는 서비스를 정지한 뒤 이미지 snapshot, 데이터 볼륨 복사, 이름·레이블·경로 변환과 logical DB dump 비교를 수행한다. 실패하면 기존 컨테이너를 재시작한다.
 

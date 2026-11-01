@@ -10,6 +10,8 @@ Docker Desktop의 두 그룹은 `u-livet-core`, `u-livet-issues`로 이전했다
 
 현재 실행 기준은 [로컬 운영 안내](../../operations/u-livet-local-projects.md)에 기록했다. 기존 checkout에 있던 미커밋 변경은 별도 worktree를 사용해 보호했다. 기본 checkout에는 로컬 실행에 필요한 Supabase project ID와 Vercel 연결 이름만 동기화했다.
 
+이전 작업 폴더도 `/Users/thomas/Documents/u-livet-worktrees`로 이동하고 13개 Git worktree의 등록 경로를 수정했다. 모든 worktree의 변경 상태를 전후 비교했으며, 기존 경로는 호환 심볼릭 링크로 유지한다.
+
 ## 확인 결과
 
 린트, 타입 검사, production build, 배포 준비 검사 111개, 매뉴얼 5개 버전 검사, 변경한 JavaScript 문법 검사와 로컬 HTTP 확인을 통과했다. 이전부터 mock 의존성이 누락된 검증 스크립트 4개의 실패는 변경 전 소스로 재현해 구분했다.
