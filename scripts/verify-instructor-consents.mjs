@@ -19,7 +19,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -338,7 +338,7 @@ try {
       await (await fetch(link.data.signed_url)).arrayBuffer(),
     );
     assert.equal(new TextDecoder().decode(bytes.slice(0, 8)), "%PDF-1.7");
-    writeFileSync(`/tmp/uc-life-${document_type}-signed.pdf`, bytes);
+    writeFileSync(`/tmp/u-livet-${document_type}-signed.pdf`, bytes);
     const after = await send("consent-context", document_type);
     assert.equal(after.data.form.signature, "");
     assert.equal(after.data.history.length, 1);

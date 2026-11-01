@@ -17,7 +17,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -795,7 +795,7 @@ sql(
   `insert into public.life_offering_instructors(offering_id,person_id) values('${browserOffering}','${teacher.p}');delete from public.life_performance_grants where person_id='${preparer.p}' and permission='APPROVE';`,
 );
 writeFileSync(
-  "/tmp/uc-life-annual-browser.json",
+  "/tmp/u-livet-annual-browser.json",
   JSON.stringify({
     year,
     offering: f,

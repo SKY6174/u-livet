@@ -13,7 +13,7 @@ const migration = transactionBody('20261017092356_optimize_management_read_scope
 const fixture = readFileSync('scripts/verify-management-read-scope.sql', 'utf8');
 const sql = `begin;\n${prerequisites.map(transactionBody).join('\n')}\n${fixture.replace('-- APPLY_OPTIMIZATION_HERE', migration)}`;
 const result = spawnSync('docker', [
-  'exec', '-i', 'supabase_db_uc-life-issues', 'psql', '-U', 'postgres', '-d',
+  'exec', '-i', 'supabase_db_u-livet-issues', 'psql', '-U', 'postgres', '-d',
   'postgres', '-v', 'ON_ERROR_STOP=1', '-At',
 ], { input: sql, encoding: 'utf8', timeout: 240000, maxBuffer: 2 * 1024 * 1024 });
 if (result.status !== 0) {

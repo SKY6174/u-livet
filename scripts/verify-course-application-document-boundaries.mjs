@@ -107,11 +107,11 @@ const middleware=load("src/middleware.ts",{
   "@/lib/deployment/review-mode":{isReviewOnly:()=>false},
   "@supabase/ssr":{createServerClient:(url,key,input)=>({auth:{getUser:async()=>{if(refresh)input.cookies.setAll([{name:"auth",value:"refreshed",options:{}}]);}}})},
 }).middleware;
-const request=(pathname,search="")=>({method:"GET",headers:new Headers({"x-u-live-document-return-to":"/forged"}),nextUrl:{pathname,search},cookies:{getAll:()=>[],set(){},toString:()=>"auth=refreshed"}});
+const request=(pathname,search="")=>({method:"GET",headers:new Headers({"x-u-livet-document-return-to":"/forged"}),nextUrl:{pathname,search},cookies:{getAll:()=>[],set(){},toString:()=>"auth=refreshed"}});
 await test("protected layout receives actual document URL and spoofed headers are overwritten",async()=>{
   for(const renew of [false,true]){refresh=renew;await middleware(request("/mypage/documents",`?type=application&course=${course.id}`));
-    assert.equal(options.request.headers.get("x-u-live-document-return-to"),`/mypage/documents?type=application&course=${course.id}`);
+    assert.equal(options.request.headers.get("x-u-livet-document-return-to"),`/mypage/documents?type=application&course=${course.id}`);
     if(renew)assert.equal(options.request.headers.get("cookie"),"auth=refreshed");}
-  await middleware(request("/courses"));assert.equal(options.request.headers.get("x-u-live-document-return-to"),null);
+  await middleware(request("/courses"));assert.equal(options.request.headers.get("x-u-livet-document-return-to"),null);
 });
 console.log(`${checks} application document boundary checks passed.`);

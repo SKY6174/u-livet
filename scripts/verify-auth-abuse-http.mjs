@@ -33,7 +33,7 @@ const sql = (query) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -231,7 +231,7 @@ try {
   await native.auth.signOut();
   // Local synthetic browser fixture only; no recovery hash or live session persisted.
   writeFileSync(
-    "/tmp/uc-life-abuse-browser.json",
+    "/tmp/u-livet-abuse-browser.json",
     JSON.stringify({
       email,
       password: "updatedhttptest2026!",

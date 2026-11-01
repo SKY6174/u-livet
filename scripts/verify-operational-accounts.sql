@@ -1,5 +1,5 @@
 -- Local integration fixture only. Apply prerequisite/current migrations and
--- this file in ONE transaction on supabase_db_uc-life-issues. Always rolls back.
+-- this file in ONE transaction on supabase_db_u-livet-issues. Always rolls back.
 begin;
 create temp table member_fixture(actor uuid,staff_user uuid,visible uuid,hidden uuid,foreign_person uuid,real_course uuid,hidden_course uuid,year integer);
 grant select on member_fixture to authenticated;

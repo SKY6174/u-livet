@@ -7,7 +7,7 @@ import http from 'node:http';
 import { chromium } from 'playwright';
 
 assert.equal(process.argv.length, 2);
-const SOURCE = 'supabase_db_uc-life-issues';
+const SOURCE = 'supabase_db_u-livet-issues';
 const runId = randomBytes(6).toString('hex');
 const DB = 'life_course_org_test_' + runId;
 let databaseCreated = false, service, next, browser, proxy, logs = '';
@@ -31,12 +31,12 @@ try {
   const seed = readFileSync('scripts/verify-public-course-introductions.sql', 'utf8').split('set local role anon;')[0]
     .replace('public-introduction-test', 'uc-anchor').replaceAll('2026-09-01', '2026-10-01').replaceAll('2026-09-30', '2026-12-31');
   sql(seed + seed.replace('begin;', '').replaceAll('90000000', '91000000').replace('uc-anchor', 'uc-sanhak') + 'commit;');
-  const original = inspect('supabase_rest_uc-life-issues');
+  const original = inspect('supabase_rest_u-livet-issues');
   const env = Object.fromEntries(original.Config.Env.map(value => { const i = value.indexOf('='); return [value.slice(0, i), value.slice(i + 1)]; }));
   const uri = new URL(env.PGRST_DB_URI); uri.pathname = '/' + DB; env.PGRST_DB_URI = uri.toString();
   // The source uses a JWK set; give this isolated anonymous-only REST its own HS256 key.
   env.PGRST_JWT_SECRET = randomBytes(48).toString('base64');
-  const network = Object.keys(original.NetworkSettings.Networks)[0]; assert(network.includes('uc-life-issues'));
+  const network = Object.keys(original.NetworkSettings.Networks)[0]; assert(network.includes('u-livet-issues'));
   service = 'course-org-test-' + runId;
   docker(['run', '-d', '--name', service, '--label', 'course-org-test=' + runId, '--network', network,
     '-p', '127.0.0.1::3000', ...Object.entries(env).flatMap(([key, value]) => ['-e', key + '=' + value]), original.Config.Image]);

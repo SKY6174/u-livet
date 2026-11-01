@@ -13,7 +13,7 @@ const nextConfig = {
     return [
       {
         source: "/favicon.ico",
-        destination: "/images/u-live-favicon.png",
+        destination: "/images/u-livet-favicon.png",
       },
     ];
   },

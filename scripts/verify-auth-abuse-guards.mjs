@@ -16,7 +16,7 @@ const status = JSON.parse(
 );
 assert.equal(status.API_URL, "http://127.0.0.1:55321");
 const fixture = JSON.parse(
-  readFileSync("/tmp/uc-life-abuse-browser.json", "utf8"),
+  readFileSync("/tmp/u-livet-abuse-browser.json", "utf8"),
 );
 assert.ok(fixture.email.endsWith("@example.invalid"));
 const manifest = JSON.parse(

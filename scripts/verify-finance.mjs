@@ -17,7 +17,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -699,7 +699,7 @@ const browserOffering = await course({ amount: 120000 });
 await apply(learner, browserOffering);
 const browserInvoice = await inv(learner, browserOffering);
 writeFileSync(
-  "/tmp/uc-life-finance-browser.json",
+  "/tmp/u-livet-finance-browser.json",
   JSON.stringify({
     offering: browserOffering,
     invoice: browserInvoice.id,

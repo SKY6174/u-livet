@@ -108,5 +108,5 @@ do $$begin
 end$$;
 reset role;
 rollback;`;
-execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
 console.log("PASS local RPC: duplicate/retry/deadline; unified document/application/learner views; external/inactive instructors; refund approval/rule immutability; tuition/revision/free-course; access boundaries; ROLLBACK");

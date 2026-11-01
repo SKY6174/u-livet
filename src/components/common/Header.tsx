@@ -225,7 +225,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 md:px-8">
         <Link href="/" aria-label="U-LiVET — 열린 배움, 더 넓은 내일" className="flex min-w-0 items-center gap-3">
           <Image
-            src="/images/u-live-favicon.png"
+            src="/images/u-livet-favicon.png"
             alt=""
             width={64}
             height={61}

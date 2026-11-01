@@ -49,7 +49,7 @@ function evaluateCompletion(
         │
         ▼
 [검증 QR 코드 생성]
-(URL: https://uc-life.ulsan.ac.kr/verify?code=UC-ANCHOR-2026-00042&hash=... )
+(URL: https://u-livet.ulsan.ac.kr/verify?code=UC-ANCHOR-2026-00042&hash=... )
         │
         ▼
 [PDF 수료증 동적 렌더링 & Supabase Storage 보관]

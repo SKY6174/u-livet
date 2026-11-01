@@ -20,7 +20,7 @@ const sql = (query) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -253,7 +253,7 @@ const match = message.HTML.match(
 assert.ok(match);
 pass("real recovery email arrives in local mailbox with Korean fragment link");
 writeFileSync(
-  "/tmp/uc-life-recovery-browser.json",
+  "/tmp/u-livet-recovery-browser.json",
   JSON.stringify({
     email: browser.email,
     userId: browser.user.id,

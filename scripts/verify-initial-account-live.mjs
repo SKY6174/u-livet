@@ -9,7 +9,7 @@ import { totp } from './local-mfa.mjs';
 assert.ok(process.argv.length === 2 || (process.argv.length === 3 && process.argv[2] === '--web'));
 const WEB = process.argv[2] === '--web';
 const REF = 'bfqwntulxabfrimcypvx';
-const DEPLOY = 'uc-life-git-preview-ucsky6174.vercel.app';
+const DEPLOY = 'staging.u-livet.org';
 const ORIGIN = `https://${DEPLOY}`;
 const token = execFileSync('security', ['find-generic-password','-s','Supabase CLI','-a','supabase','-w'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 async function management(path, body) {

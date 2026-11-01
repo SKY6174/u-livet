@@ -82,5 +82,5 @@ end $$;
 reset role;
 rollback;`;
 // The named local stack and synthetic fixture filter prohibit production use.
-execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
 console.log("PASS unsigned draft saves; unsigned review/submit denied; signed transitions, revisions, multiline budget/snapshots and access retained; ROLLBACK");

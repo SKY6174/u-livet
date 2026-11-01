@@ -9,10 +9,10 @@ const dir = resolve(process.env.APPLICATION_TEST_DB_DIR ?? resolve(tmpdir(), "u-
 const configPath = resolve(dir, "supabase/config.toml");
 mkdirSync(resolve(dir, "supabase"), { recursive: true });
 if (existsSync(configPath)) {
-  assert.match(readFileSync(configPath, "utf8"), /^project_id = "uc-life-issues"$/m);
+  assert.match(readFileSync(configPath, "utf8"), /^project_id = "u-livet-issues"$/m);
 } else {
   const config = readFileSync("supabase/config.toml", "utf8")
-    .replace('project_id = "uc-life-core"', 'project_id = "uc-life-issues"')
+    .replace('project_id = "u-livet-core"', 'project_id = "u-livet-issues"')
     .replaceAll("553", "563");
   writeFileSync(configPath, config);
 }

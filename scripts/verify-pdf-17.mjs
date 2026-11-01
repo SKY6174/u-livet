@@ -68,7 +68,7 @@ await test('completion and teaching certificates keep Korean content and explici
       snapshot:{kind,person_name:'가상 강사',person_id:'synthetic',offering_id:'synthetic',course_name:'PDF 1.7 검증용 과정',starts_on:'2026-09-01',ends_on:'2026-09-22',
         evidence:{minutes:120,logs:[{title:'가상 강의',starts_at:'2026-09-21T01:00:00Z',minutes:120}]},
         issuer:{organization_name:'가상 검증 기관',title:'기관장',holder_name:'테스트',seal_omission_basis:'검증 자료',test_only:true},
-        template:{title:kind==='COMPLETION'?'이수증':'강의경력증명서',body:'PDF 버전 확인을 위한 가상 자료입니다.',version:'test',layout:'v1'}}},'https://uc-life.org');
+        template:{title:kind==='COMPLETION'?'이수증':'강의경력증명서',body:'PDF 버전 확인을 위한 가상 자료입니다.',version:'test',layout:'v1'}}},'https://u-livet.org');
     requirePdf17(bytes);
     const parsed=await PDFDocument.load(bytes);
     assert.equal(parsed.catalog.get(PDFName.of('Version')).toString(),'/1.7');

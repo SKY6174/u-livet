@@ -114,7 +114,7 @@ end $verify$;
 rollback;`;
 
 const result = spawnSync('docker', [
-  'exec', '-i', 'supabase_db_uc-life-core', 'psql', '-U', 'postgres', '-d',
+  'exec', '-i', 'supabase_db_u-livet-core', 'psql', '-U', 'postgres', '-d',
   'postgres', '-v', 'ON_ERROR_STOP=1', '-At',
 ], { input: sql, encoding: 'utf8', timeout: 90000, maxBuffer: 1024 * 1024 });
 

@@ -26,7 +26,7 @@ const runSql = (sql, filename) => {
   const file = path.join(evidence, filename);
   writeFileSync(file, sql, { mode: 0o600 });
   return local
-    ? execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-core", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-tA"], { input: sql, encoding: "utf8", maxBuffer: 1024 * 1024 })
+    ? execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-core", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-tA"], { input: sql, encoding: "utf8", maxBuffer: 1024 * 1024 })
     : execFileSync("supabase", ["db", "query", "--linked", "--project-ref", project, "--file", file, "--output", "json"], { encoding: "utf8", maxBuffer: 1024 * 1024 });
 };
 const queryRow = (sql, filename) => {

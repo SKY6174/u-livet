@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 import { ensureLocalMfa } from './local-mfa.mjs';
 const status = JSON.parse(execFileSync('supabase', ['status', '-o', 'json'], { stdio: ['ignore', 'pipe', 'pipe'] }));
 assert.equal(status.API_URL, 'http://127.0.0.1:55321');
-const sql = query => execFileSync('docker', ['exec', '-i', 'supabase_db_uc-life-core', 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-tA'], { input: query, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+const sql = query => execFileSync('docker', ['exec', '-i', 'supabase_db_u-livet-core', 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-tA'], { input: query, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
 const org = '10000000-0000-4000-8000-000000000001', year = '10000000-0000-4000-8000-000000000002';
 const privacy = '20000000-0000-4000-8000-000000000011', enrollment = '20000000-0000-4000-8000-000000000012';
 const create = () => createClient(status.API_URL, status.ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });

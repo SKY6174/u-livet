@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import http from "node:http";
 
-const NAME = "supabase_auth_uc-life-core";
+const NAME = "supabase_auth_u-livet-core";
 const BACKUP = `${NAME}_policy_backup`;
 const run = (args) =>
   execFileSync("docker", args, {
@@ -22,7 +22,7 @@ assert.equal(
   "Dedicated local project only",
 );
 const old = inspect(NAME);
-assert.equal(old.Config.Labels["com.supabase.cli.project"], "uc-life-core");
+assert.equal(old.Config.Labels["com.supabase.cli.project"], "u-livet-core");
 assert.equal(old.State.Running, true);
 assert.equal(old.Mounts.length, 0, "Auth must not have data volumes");
 const symbols = Array.from({ length: 94 }, (_, i) =>
@@ -88,7 +88,7 @@ const networks = Object.fromEntries(
     },
   ]),
 );
-assert.deepEqual(Object.keys(networks), ["supabase_network_uc-life-core"]);
+assert.deepEqual(Object.keys(networks), ["supabase_network_u-livet-core"]);
 const body = JSON.stringify({
   ...old.Config,
   Env: Object.entries({ ...env, ...expected }).map(

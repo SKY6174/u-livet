@@ -17,7 +17,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -899,7 +899,7 @@ ok(
   }),
 );
 writeFileSync(
-  "/tmp/uc-life-instructor-browser.json",
+  "/tmp/u-livet-instructor-browser.json",
   JSON.stringify({
     org: o,
     year: y,

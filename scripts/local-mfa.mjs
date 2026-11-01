@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHmac } from "node:crypto";
 import { readFileSync, writeFileSync, chmodSync } from "node:fs";
-const CACHE = "/tmp/uc-life-mfa-fixtures.json";
+const CACHE = "/tmp/u-livet-mfa-fixtures.json";
 let localChecked = false;
 export function totp(secret, time = Date.now()) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";

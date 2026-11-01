@@ -12,7 +12,7 @@ const status = JSON.parse(execFileSync("supabase", ["status", "-o", "json"], {
 assert.equal(status.API_URL, "http://127.0.0.1:55321");
 const admin = createClient(status.API_URL, status.SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 const run = Date.now().toString(36);
-const sql = query => execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-core", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-tA"], { input: query, encoding: "utf8" }).trim();
+const sql = query => execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-core", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-tA"], { input: query, encoding: "utf8" }).trim();
 const ok = result => { assert.equal(result.error, null, JSON.stringify(result.error)); return result.data; };
 const deny = (result, expected) => { assert.ok(result.error, "expected denial"); if (expected) assert.equal(result.error.message, expected); };
 const signup = JSON.parse(sql("select row_to_json(s) from life_private.signup_settings s"));

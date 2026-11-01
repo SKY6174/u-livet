@@ -18,7 +18,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -458,7 +458,7 @@ mkdirSync("output/pdf", { recursive: true });
 writeFileSync("output/pdf/test-completion.pdf", pdf);
 writeFileSync("output/pdf/test-teaching.pdf", replacementPdf);
 writeFileSync(
-  "/tmp/uc-life-certificate-browser.json",
+  "/tmp/u-livet-certificate-browser.json",
   JSON.stringify({
     offering,
     issuer,

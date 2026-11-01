@@ -82,7 +82,7 @@ for (const table of ['life_submissions', 'life_submission_grades']) {
 sql += `rollback;
 select count(*) from auth.users where id='${user}';
 select count(*) from life_offerings where id in (${list});`;
-const result = spawnSync('docker', ['exec', '-i', 'supabase_db_uc-life-core', 'psql',
+const result = spawnSync('docker', ['exec', '-i', 'supabase_db_u-livet-core', 'psql',
   '-X', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-qAt'], {
   input: sql, encoding: 'utf8', timeout: 180000,
 });

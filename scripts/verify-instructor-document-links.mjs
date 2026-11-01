@@ -19,7 +19,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -410,7 +410,7 @@ try {
     );
     const fresh = ok(await issue(person));
     writeFileSync(
-      "/tmp/uc-life-document-links-fixture.json",
+      "/tmp/u-livet-document-links-fixture.json",
       JSON.stringify({
         org,
         person,

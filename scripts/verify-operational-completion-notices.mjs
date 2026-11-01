@@ -168,7 +168,7 @@ end$$;
 reset role;
 rollback;`;
 try {
-  execFileSync("docker", ["exec", "-i", "supabase_db_uc-life-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+  execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-issues", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-q"], { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
 } catch (error) { console.error(error.stderr?.toString()); throw error; }
 console.log("PASS absent Preview, approval/body/link/state guards, copied version/retry/audit/80% threshold, shared version and historical evidence preserved; ROLLBACK");
 console.log("PASS UI/SQL classification; offering insert/update/rename, course-version update, explicit synthetic exemption, MFA publication RPC and private trigger privileges");

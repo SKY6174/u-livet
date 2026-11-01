@@ -6,13 +6,13 @@ import { fileURLToPath } from 'node:url';
 
 // Disposable local database test. Never loads env files or accepts a remote target.
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
-const CONTAINER = 'supabase_db_uc-life-core';
+const CONTAINER = 'supabase_db_u-livet-core';
 const BASELINE_COMMIT = '1a4bf135113778ff701a31b4ad7fbac6e60dadd6';
 const FILES = [
   '009_fix_rls_recursion_and_optimize_performance.sql',
   '010_role_based_db_separation_and_optimization.sql',
 ];
-const dbName = `uc_life_retry_${randomBytes(10).toString('hex')}`;
+const dbName = `u_livet_retry_${randomBytes(10).toString('hex')}`;
 const env = { ...process.env };
 for (const key of ['DOCKER_HOST', 'DOCKER_CONTEXT', 'DOCKER_TLS_VERIFY', 'DOCKER_CERT_PATH']) delete env[key];
 let checks = 0;
@@ -58,7 +58,7 @@ const baseSql = readdirSync(new URL('../supabase/migrations/', import.meta.url))
   .map(name => readFileSync(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8')).join('\n');
 
 function setup() {
-  assert.match(dbName, /^uc_life_retry_[a-f0-9]{20}$/);
+  assert.match(dbName, /^u_livet_retry_[a-f0-9]{20}$/);
   requireSuccess(query(`CREATE DATABASE ${quoted(dbName)} TEMPLATE template0;`, 'postgres'), 'Create disposable database');
   created = true;
   requireSuccess(apply(`

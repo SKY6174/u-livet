@@ -5,7 +5,7 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const documentAddress = (await headers()).get("x-u-live-document-return-to");
+  const documentAddress = (await headers()).get("x-u-livet-document-return-to");
   await requireIdentity(documentAddress ? safeReturnTo(documentAddress) : "/mypage");
   return children;
 }

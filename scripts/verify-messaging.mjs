@@ -17,7 +17,7 @@ const sql = (q) =>
     [
       "exec",
       "-i",
-      "supabase_db_uc-life-core",
+      "supabase_db_u-livet-core",
       "psql",
       "-U",
       "postgres",
@@ -495,7 +495,7 @@ sql(
 );
 const browserJob = ok(await preview(marketing));
 writeFileSync(
-  "/tmp/uc-life-messaging-browser.json",
+  "/tmp/u-livet-messaging-browser.json",
   JSON.stringify({ offering, job: browserJob, ops, marketing, policy }),
   { mode: 0o600 },
 );

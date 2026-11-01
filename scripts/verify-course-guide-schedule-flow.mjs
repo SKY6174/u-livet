@@ -9,11 +9,11 @@ import { createClient } from '@supabase/supabase-js';
 
 const dbDir = process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dbDir, 'Dedicated APPLICATION_TEST_DB_DIR is required.');
-assert.match(readFileSync(resolve(dbDir, 'supabase/config.toml'), 'utf8'), /^project_id = "uc-life-issues"$/m);
+assert.match(readFileSync(resolve(dbDir, 'supabase/config.toml'), 'utf8'), /^project_id = "u-livet-issues"$/m);
 const status = JSON.parse(execFileSync('supabase', ['status', '--workdir', dbDir, '-o', 'json'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
 assert.equal(status.API_URL, 'http://127.0.0.1:56321');
-const container = 'supabase_db_uc-life-issues';
-assert.equal(JSON.parse(execFileSync('docker', ['inspect', container], { encoding: 'utf8' }))[0].Config.Labels['com.supabase.cli.project'], 'uc-life-issues');
+const container = 'supabase_db_u-livet-issues';
+assert.equal(JSON.parse(execFileSync('docker', ['inspect', container], { encoding: 'utf8' }))[0].Config.Labels['com.supabase.cli.project'], 'u-livet-issues');
 const sql = query => execFileSync('docker', ['exec', '-i', container, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-qtA'], { input: query, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
 const { ids, manager, learner, password } = JSON.parse(readFileSync('/tmp/u-livet-issues-browser-fixtures.json', 'utf8'));
 assert.match(ids.org, /^[0-9a-f-]{36}$/);

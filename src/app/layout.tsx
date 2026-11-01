@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "U-LiVET — Ulsan Lifelong Vocational Education & Training. 교육과정 신청부터 학습과 경력까지, 울산과학대학교 앵커사업 평생직업교육.",
   icons: {
-    icon: { url: "/images/u-live-favicon.png", type: "image/png" },
+    icon: { url: "/images/u-livet-favicon.png", type: "image/png" },
   },
 };
 export const dynamic = "force-dynamic";
