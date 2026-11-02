@@ -1,6 +1,6 @@
 # Supabase Preview 함수 번들 설계
 
-2026-11-02 · [계획](../../01-plan/features/preview-function-bundle.plan.md)
+2026-11-02 · [계획](preview-function-bundle.plan.md)
 
 ## 확인한 원인
 

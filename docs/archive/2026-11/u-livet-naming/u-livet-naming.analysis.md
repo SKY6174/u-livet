@@ -1,6 +1,6 @@
 # U-LiVET 실행 이름 통일 검증
 
-2026-11-02 · [설계](../02-design/features/u-livet-naming.design.md)
+2026-11-02 · [설계](u-livet-naming.design.md)
 
 ## 구현 및 로컬 이전: 8/8 일치
 
