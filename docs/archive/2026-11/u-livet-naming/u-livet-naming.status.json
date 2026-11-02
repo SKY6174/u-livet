@@ -1,0 +1,191 @@
+{
+  "feature": "u-livet-naming",
+  "phase": "archived",
+  "previousPhase": "completed",
+  "completedAt": "2026-11-01T15:14:01.884Z",
+  "archivedAt": "2026-11-02T00:28:56.908Z",
+  "documents": {
+    "plan": "u-livet-naming.plan.md",
+    "design": "u-livet-naming.design.md",
+    "analysis": "u-livet-naming.analysis.md",
+    "report": "u-livet-naming.report.md"
+  },
+  "statusAtCompletion": {
+    "phase": "completed",
+    "matchRate": null,
+    "iterationCount": 1,
+    "documents": {},
+    "taskChain": [
+      {
+        "phase": "plan",
+        "status": "completed",
+        "createdAt": "2026-11-01T14:57:35.025Z",
+        "completedAt": "2026-11-01T14:58:16.660Z"
+      },
+      {
+        "phase": "design",
+        "status": "completed",
+        "createdAt": "2026-11-01T14:57:35.025Z",
+        "completedAt": "2026-11-01T14:58:16.681Z"
+      },
+      {
+        "phase": "do",
+        "status": "completed",
+        "createdAt": "2026-11-01T14:57:35.025Z",
+        "completedAt": "2026-11-01T15:05:52.689Z"
+      },
+      {
+        "phase": "check",
+        "status": "completed",
+        "createdAt": "2026-11-01T14:57:35.025Z",
+        "completedAt": "2026-11-01T15:06:18.045Z"
+      },
+      {
+        "phase": "report",
+        "status": "completed",
+        "createdAt": "2026-11-01T14:57:35.025Z",
+        "completedAt": "2026-11-01T15:14:01.887Z"
+      }
+    ],
+    "timestamps": {
+      "started": "2026-11-01T14:57:35.026Z",
+      "lastUpdated": "2026-11-01T15:14:01.887Z"
+    },
+    "completedAt": "2026-11-01T15:14:01.884Z"
+  },
+  "historyAtCompletion": [
+    {
+      "feature": "u-livet-naming",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-11-01T14:58:16.658Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-11-01T14:58:16.659Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-11-01T14:58:16.666Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-11-01T14:58:16.680Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-11-01T14:58:16.680Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-11-01T15:05:52.676Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-11-01T15:05:52.687Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-11-01T15:06:18.041Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-11-01T15:06:18.043Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-11-01T15:06:18.053Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-11-01T15:06:18.054Z"
+    },
+    {
+      "feature": "u-livet-naming",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-11-01T15:14:01.886Z"
+    }
+  ],
+  "releaseVerification": {
+    "verifiedAt": "2026-11-01T15:13:56.786Z",
+    "pullRequest": "https://github.com/SKY6174/u-livet/pull/201",
+    "mergeCommit": "f35ba5eac9b0deb868615fd5d4b59da1fbbcc02c",
+    "checks": [
+      {
+        "path": "/api/version",
+        "status": 200,
+        "application": "u-livet",
+        "revision": "f35ba5eac9b0deb868615fd5d4b59da1fbbcc02c",
+        "environment": "production"
+      },
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/auth/login",
+        "status": 200
+      },
+      {
+        "path": "/api/health",
+        "status": 200,
+        "health": "healthy"
+      },
+      {
+        "path": "/favicon.ico",
+        "status": 200,
+        "sha256": "068d09efdaf715614fcff37c53b043b60029fed2addb0d723ab96b6d65d4adae"
+      },
+      {
+        "path": "/images/u-livet-favicon.png",
+        "status": 200,
+        "sha256": "068d09efdaf715614fcff37c53b043b60029fed2addb0d723ab96b6d65d4adae"
+      }
+    ]
+  },
+  "documentIntegrity": {
+    "plan": {
+      "sourceSha256": "6b76c25fe4112dbf2eda7703e3d103c93a37e3e3f3fbf80f89c64de69d6a464d",
+      "archivedSha256": "6b76c25fe4112dbf2eda7703e3d103c93a37e3e3f3fbf80f89c64de69d6a464d"
+    },
+    "design": {
+      "sourceSha256": "b64d36f57f37a52cd08ba7ad135d47e14e8ff0ee5ee1d49d79f0a4a3b1274548",
+      "archivedSha256": "38b2246081ce5641bfa1e581db6a7f1eab024a58455032e5888060e04e9a9799"
+    },
+    "analysis": {
+      "sourceSha256": "0b392e394d57775e6ef0a19b3a8cc0e72523607c7a238215d4a710e442cc9cf2",
+      "archivedSha256": "85a7e1084e281ac14c21d4e719e5dbe2cce119d8351eebd17ebe004e83c47f9c"
+    },
+    "report": {
+      "sourceSha256": "8874ae5902424b7f546571fe4036db990584f464ef77a36699669445e68f5bb5",
+      "archivedSha256": "b553733811a24a2a2e612c23d73f5e7590fd0480de5cb5825b93b82be2b16cc9"
+    }
+  }
+}

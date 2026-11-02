@@ -1,6 +1,6 @@
 # U-LiVET 실행 이름과 경로 통일 설계
 
-2026-11-01 · [계획](../../01-plan/features/u-livet-naming.plan.md)
+2026-11-01 · [계획](u-livet-naming.plan.md)
 
 ## 저장소 변경
 

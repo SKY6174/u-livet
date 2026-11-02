@@ -1,6 +1,6 @@
 # Preview 함수 번들 검증
 
-2026-11-02 · [설계](../02-design/features/preview-function-bundle.design.md)
+2026-11-02 · [설계](preview-function-bundle.design.md)
 
 ## 설계 대비 구현
 

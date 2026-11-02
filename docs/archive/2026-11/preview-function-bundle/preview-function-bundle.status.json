@@ -1,0 +1,197 @@
+{
+  "feature": "preview-function-bundle",
+  "phase": "archived",
+  "previousPhase": "completed",
+  "completedAt": "2026-11-02T00:06:33.525Z",
+  "archivedAt": "2026-11-02T00:28:56.908Z",
+  "documents": {
+    "plan": "preview-function-bundle.plan.md",
+    "design": "preview-function-bundle.design.md",
+    "analysis": "preview-function-bundle.analysis.md",
+    "report": "preview-function-bundle.report.md"
+  },
+  "statusAtCompletion": {
+    "phase": "completed",
+    "matchRate": null,
+    "iterationCount": 1,
+    "documents": {},
+    "taskChain": [
+      {
+        "phase": "plan",
+        "status": "completed",
+        "createdAt": "2026-11-01T23:48:58.901Z",
+        "completedAt": "2026-11-01T23:48:58.912Z"
+      },
+      {
+        "phase": "design",
+        "status": "completed",
+        "createdAt": "2026-11-01T23:48:58.901Z",
+        "completedAt": "2026-11-01T23:50:09.007Z"
+      },
+      {
+        "phase": "do",
+        "status": "completed",
+        "createdAt": "2026-11-01T23:48:58.901Z",
+        "completedAt": "2026-11-01T23:59:38.896Z"
+      },
+      {
+        "phase": "check",
+        "status": "completed",
+        "createdAt": "2026-11-01T23:48:58.901Z",
+        "completedAt": "2026-11-02T00:00:37.495Z"
+      },
+      {
+        "phase": "report",
+        "status": "completed",
+        "createdAt": "2026-11-01T23:48:58.901Z",
+        "completedAt": "2026-11-02T00:06:33.528Z"
+      }
+    ],
+    "timestamps": {
+      "started": "2026-11-01T23:48:58.901Z",
+      "lastUpdated": "2026-11-02T00:06:33.528Z"
+    },
+    "completedAt": "2026-11-02T00:06:33.525Z"
+  },
+  "historyAtCompletion": [
+    {
+      "feature": "preview-function-bundle",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-11-01T23:48:58.912Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-11-01T23:48:58.912Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-11-01T23:50:08.992Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-11-01T23:50:09.004Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-11-01T23:50:09.006Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-11-01T23:59:38.889Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-11-01T23:59:38.893Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-11-02T00:00:37.494Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-11-02T00:00:37.495Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "from": "act",
+      "to": "report",
+      "timestamp": "2026-11-02T00:00:37.500Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-11-02T00:00:37.501Z"
+    },
+    {
+      "feature": "preview-function-bundle",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-11-02T00:06:33.527Z"
+    }
+  ],
+  "releaseVerification": {
+    "verifiedAt": "2026-11-02T00:06:19.382Z",
+    "pullRequest": "https://github.com/SKY6174/u-livet/pull/202",
+    "mergeCommit": "c8c365c9d38efe1ea2b533257d169abe739936a9",
+    "checks": [
+      {
+        "path": "/api/version",
+        "status": 200,
+        "application": "u-livet",
+        "revision": "c8c365c9d38efe1ea2b533257d169abe739936a9",
+        "environment": "production"
+      },
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/auth/login",
+        "status": 200
+      },
+      {
+        "path": "/api/health",
+        "status": 200,
+        "health": "healthy"
+      }
+    ],
+    "supabase": {
+      "main": "FUNCTIONS_DEPLOYED",
+      "instructorDocuments": {
+        "version": 201,
+        "status": "ACTIVE",
+        "unauthenticatedStatus": 403
+      },
+      "operationReportAi": {
+        "version": 6,
+        "status": "ACTIVE",
+        "unauthenticatedStatus": 401
+      }
+    },
+    "bundleBytes": 4685687,
+    "pdfComparison": "All rendered pixels and extracted text identical for three document types",
+    "previewCheck": "SUCCESS"
+  },
+  "documentIntegrity": {
+    "plan": {
+      "sourceSha256": "c1325c67cd49e5f49c8e938f47730729865f5f1e3606874f6e360e7a38207d44",
+      "archivedSha256": "c1325c67cd49e5f49c8e938f47730729865f5f1e3606874f6e360e7a38207d44"
+    },
+    "design": {
+      "sourceSha256": "b13af6cd1ead2681d0e490fff616ce28755d33645f1fd5172ab2a8873effe625",
+      "archivedSha256": "e6f981a0f66d55a1d50a3d29dfb759b2bbb94adfa56978579274a78831febdb8"
+    },
+    "analysis": {
+      "sourceSha256": "45aa992b087944053ddf58a38aebf0f7aa1c6d2b9d372f4ed49227c34c530239",
+      "archivedSha256": "88377089d3f24ee906365ea47369a332f33d32c5384114b9cdcf4019c92023ea"
+    },
+    "report": {
+      "sourceSha256": "f1011653db7e4e274ca33c5b19d38636f24a4cdfc0a6a0c6839178758e7e1c8d",
+      "archivedSha256": "e79397d11a967be90a9465be7037c9a9b0d5f5c248663f71424449dea07ac11a"
+    }
+  }
+}
