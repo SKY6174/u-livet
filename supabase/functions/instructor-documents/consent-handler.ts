@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.108.2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2.108.2";
 import {
   CONSENT_TITLES,
   TEMPLATE_VERSION,
@@ -8,23 +8,7 @@ import {
   renderConsentPdf,
   consentStatus,
 } from "../_shared/instructor-consent.ts";
-import type { ConsentAssets } from "../_shared/instructor-consent.ts";
-let assets: Promise<ConsentAssets> | undefined;
-const loadAssets = () =>
-  (assets ??= Promise.all(
-    [
-      "KoPubDotum-Medium.ttf",
-      "KoPubDotum-Bold.ttf",
-      "criminal-consent.pdf",
-    ].map((name) =>
-      Deno.readFile(new URL(`./assets/${name}`, import.meta.url)),
-    ),
-  )
-    .then(([regular, bold, criminal]) => ({ regular, bold, criminal }))
-    .catch((e) => {
-      assets = undefined;
-      throw e;
-    }));
+import { loadConsentAssets } from "./consent-assets.ts";
 export const CONSENT_ACTIONS = [
   "consent-context",
   "consent-save-draft",
@@ -189,7 +173,7 @@ export async function handleConsentAction(
   }
   let bytes: Uint8Array;
   try {
-    bytes = await renderConsentPdf(type, form, await loadAssets(), false);
+    bytes = await renderConsentPdf(type, form, loadConsentAssets(), false);
   } catch (e) {
     if (e instanceof Error && e.message.includes("서명"))
       throw fail("INVALID_DOCUMENT", e.message);

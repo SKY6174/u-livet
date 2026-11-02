@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "sources": {
+    "scripts/build-edge-functions.mjs": "6d80f56c10129e0074247ac2b0b1bf75ff19c2417068017c5dab1ee33c41583b",
+    "supabase/functions/_shared/brotli-edge.ts": "f4f3c378fe998216af14374dfb73f2620a291a3c7f94b59395d417ead8f01f09",
+    "supabase/functions/_shared/fontkit-edge.ts": "2c51d753375a4189507f5a828b72563902fef8ed83bcf9d27e145ec603eb2b0d",
+    "supabase/functions/_shared/instructor-consent-model.ts": "50c6a135ccdb431586a24658944268e5425ffa1303e4e23f3ab8acadee7deea8",
+    "supabase/functions/_shared/instructor-consent.ts": "f2b0c6e60472227bd94fb9c2ac8b58095f4949da7f9cab8224254c09e6aa8b09",
+    "supabase/functions/instructor-documents/consent-assets.ts": "e4f8e4d09fb3569ef328b431787bf40a3ad64548823902c62486ae16246a6265",
+    "supabase/functions/instructor-documents/consent-handler.ts": "1707fcb18f3f46924c6d5e760dc64ee138caba525f8ed70cce374295d8bdad3d",
+    "supabase/functions/instructor-documents/index.ts": "e6bf7789b8fdaaa910a52b98e5474c83f040c05e274e317e0cb9ba1c99a5f335",
+    "supabase/functions/operation-report-ai/index.ts": "c456806bd39ffc2801df53393a7a461357356bb691e95bf09560c7f7b939618a",
+    "supabase/functions/operation-report-ai/source-evidence.ts": "1f21435012329bb1a9f6e91c515ca533f8fc9e157e7b6dd7f85aca8d031bd7f2",
+    "tools/edge-functions/package-lock.json": "290e3e3214e4bea70059c3c76af238251c33966261859919036ebda9170afe6b",
+    "tools/edge-functions/package.json": "68c51e4465fb314e02fba0b0874266fb6be9baef8f2880f1dc943cb2774e1f75"
+  },
+  "entries": {
+    "instructor-documents": {
+      "path": "supabase/functions/instructor-documents/index.bundle.mjs",
+      "bytes": 4684912,
+      "sha256": "4fa006af2c9d57487e0413a923da8e6939284ec37767daae65fd0315a4646884"
+    },
+    "operation-report-ai": {
+      "path": "supabase/functions/operation-report-ai/index.bundle.mjs",
+      "bytes": 218144,
+      "sha256": "6aa42281e9da5c1f2f76e86ca625d2f851eef3e656896e557f455f54130d6986"
+    }
+  }
+}
