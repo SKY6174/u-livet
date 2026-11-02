@@ -426,5 +426,7 @@ enabled = true
 # The handler verifies either the logged-in JWT or an individual document PIN session.
 [functions.instructor-documents]
 verify_jwt = false
+entrypoint = "./functions/instructor-documents/index.bundle.mjs"
 
-static_files = ["./functions/instructor-documents/assets/*"]
+[functions.operation-report-ai]
+entrypoint = "./functions/operation-report-ai/index.bundle.mjs"

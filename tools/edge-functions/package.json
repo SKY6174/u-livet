@@ -1,0 +1,10 @@
+{
+  "name": "u-livet-edge-function-build",
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "2.108.2",
+    "esbuild": "0.25.12",
+    "fontkit": "2.0.4",
+    "pdf-lib": "1.17.1"
+  }
+}

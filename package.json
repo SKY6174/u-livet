@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "npm run manuals:check",
-    "prebuild:vercel": "npm run manuals:check",
+    "prebuild": "npm run manuals:check && npm run edge-assets:check",
+    "prebuild:vercel": "npm run manuals:check && npm run edge-assets:check",
+    "edge-assets:build": "node scripts/build-edge-consent-assets.mjs",
+    "edge-assets:check": "node scripts/verify-edge-consent-assets.mjs && node scripts/verify-edge-function-bundles.mjs",
+    "edge-functions:build": "node scripts/build-edge-functions.mjs",
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx --max-warnings=0",
     "manuals:build": "node scripts/build-manuals.mjs --draft",

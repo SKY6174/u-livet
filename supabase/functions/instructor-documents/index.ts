@@ -1,7 +1,7 @@
 import { CONSENT_ACTIONS, handleConsentAction } from "./consent-handler.ts";
 // Adapted from uc-anchor expert intake; only instructor-document actions are exposed.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.2";
-import { PDFDocument, PDFName } from "https://esm.sh/pdf-lib@1.17.1?target=deno";
+import { createClient } from "npm:@supabase/supabase-js@2.108.2";
+import { PDFDocument, PDFName } from "pdf-lib";
 
 
 
