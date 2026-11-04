@@ -1,10 +1,12 @@
 # U-LIFE · 앵커사업 평생직업교육
 
-**Vercel + Supabase 배포 준비:** [운영 인수·배포 가이드](docs/operations/vercel-supabase-release.md), [담당자 점검표](ops/release.example.json). `npm run test:release`로 검사 도구를 검증하고 `npm run check:release -- --help`로 사용법을 확인한다. Vercel 빌드는 설정 검사 후 실행하며 실제 게시 승인·원격 인증 호환성 검증은 별도다. 실제 운영 배포는 아직 하지 않았다.
+운영은 [u-livet.org](https://u-livet.org)에서 제공한다. 검토용 배포가 필요할 때는 별도 Supabase DB를 사용하는 [수동 Vercel Preview 절차](docs/operations/review-preview.md)를 따른다.
 
-**Supabase 인증 호환성:** ANCHOR/u-livet를 확인했다. 현재 원격은 001~008 적용, 별도 Preview 없음 상태다. [호환성 조사·진단 도구 안내](docs/operations/supabase-auth-compatibility.md), `npm run test:hosted-auth`. 확정 비밀번호 조건과 hosted API 프리셋 차이·Auth 트리거 지원 범위를 해결한 뒤 실제 Preview 인수 검증이 필요하다.
+운영 환경은 [관리형 Cloud 운영 가이드](docs/operations/managed-cloud-release.md)를 따른다. `npm run test:release`로 검사 도구를 검증하고 `npm run check:release -- --help`로 사용법을 확인한다.
 
-Next.js 15.5.25 / React 19.3 / Supabase 기반. 현재는 **인증·무료/유료 과정 신청·텍스트 자료/과제 LMS·공식 출결·객관식 시험·수료 검토/승인·이수증/강사 경력증명·입금 대사/환불 관리·문자 예약·연차 평가/성과 보고·디지털배지·강사 이력 심사·과정 개발**을 로컬에서 구현·검증했다. 전체 플랫폼 설계와 운영 배포는 별도 진행 중이다.
+초기 Supabase 인증 조사와 진단 도구는 [호환성 조사·진단 도구 안내](docs/operations/supabase-auth-compatibility.md)에 기록돼 있다. 검사 명령은 `npm run test:hosted-auth`다.
+
+Next.js 15.5.25 / React 19.3 / Supabase 기반. 초기 개발에서 **인증·무료/유료 과정 신청·텍스트 자료/과제 LMS·공식 출결·객관식 시험·수료 검토/승인·이수증/강사 경력증명·입금 대사/환불 관리·문자 예약·연차 평가/성과 보고·디지털배지·강사 이력 심사·과정 개발**을 로컬에서 구현·검증했다.
 
 - [전체 기획](docs/01-plan/features/anchor-lifelong-education-platform.plan.md)
 - [전체 상세설계](docs/02-design/features/anchor-lifelong-education-platform.design.md)
