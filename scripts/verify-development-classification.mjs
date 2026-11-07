@@ -1,10 +1,11 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { ensureLocalMfa } from "./local-mfa.mjs";
 
-const status = JSON.parse(execFileSync("supabase", ["status", "-o", "json"], { encoding: "utf8" }));
+const status = JSON.parse(execFileSync(SUPABASE_CLI, ["status", "-o", "json"], { encoding: "utf8" }));
 assert.equal(status.API_URL, "http://127.0.0.1:55321");
 const sql = (query) => execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-core",
   "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-qtA"],

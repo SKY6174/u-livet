@@ -1,5 +1,9 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 import { execFileSync, spawn } from "node:child_process";
 import { localAuthAbuseEnv } from "./local-auth-abuse-env.mjs";
+
+if (process.argv.includes("--build")) execFileSync(process.execPath,
+  ["node_modules/eslint/bin/eslint.js", "src", "--max-warnings=0"], { stdio: "inherit" });
 
 execFileSync(process.execPath, ["scripts/configure-auth-local.mjs"], {
   stdio: "inherit",
@@ -7,7 +11,7 @@ execFileSync(process.execPath, ["scripts/configure-auth-local.mjs"], {
 
 // Supply local credentials only to the child process; preserve the user's .env.local.
 const status = JSON.parse(
-  execFileSync("supabase", ["status", "-o", "json"], {
+  execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   }),
@@ -19,7 +23,7 @@ const child = spawn(
   [
     "node_modules/next/dist/bin/next",
     ...(process.argv.includes("--build")
-      ? ["build"]
+      ? ["build", "--webpack"]
       : [
           process.argv.includes("--production") ? "start" : "dev",
           "-p",

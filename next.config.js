@@ -26,10 +26,7 @@ const nextConfig = {
     ],
     "/api/pdf-assets/**": ["./node_modules/pdfjs-dist/cmaps/**/*", "./node_modules/pdfjs-dist/standard_fonts/**/*", "./node_modules/pdfjs-dist/wasm/**/*"],
   },
-  // 빌드에서도 린트·타입 오류를 확인한다.
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
+  // Next 16 removed the eslint config key; npm prebuild runs ESLint explicitly.
   // TypeScript 엄격한 타입 검사는 유지하여 코드 품질 보장
   typescript: {
     ignoreBuildErrors: false,

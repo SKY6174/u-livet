@@ -76,7 +76,7 @@ export function ResultPdfImport({ courseId, disabled, content, budget, budgetEdi
     setMessage("AI 제안이 준비되었습니다. 원본과 비교한 뒤 반영할 항목을 선택해 주세요.");
   }
 
-  async function process(file: File) {
+  async function processPdfFile(file: File) {
     setMessage("원본 PDF의 내용과 사진을 읽고 있습니다.");
     let extracted: Awaited<ReturnType<typeof extractResultPdf>>;
     try { extracted = await extractResultPdf(file); }
@@ -114,7 +114,7 @@ export function ResultPdfImport({ courseId, disabled, content, budget, budgetEdi
       const bytes = await response.blob();
       if (bytes.size > 4_194_304 || bytes.type !== "application/pdf") throw new Error("보관된 PDF 형식이나 크기를 확인해 주세요.");
       setFileId(existingFile.id);
-      await process(new File([bytes], existingFile.filename, { type: "application/pdf" }));
+      await processPdfFile(new File([bytes], existingFile.filename, { type: "application/pdf" }));
     } catch (cause) { setError(cause instanceof Error ? cause.message : "원본을 불러오지 못했습니다."); }
     finally { setBusy(false); }
   }
@@ -131,7 +131,7 @@ export function ResultPdfImport({ courseId, disabled, content, budget, budgetEdi
       if (!saved.ok || !savedBody?.fileId) throw new Error(savedBody?.message || "PDF를 보관하지 못했습니다.");
       setFileId(savedBody.fileId);
       setExistingFile({ id: savedBody.fileId, filename: file.name, size: file.size });
-      await process(file);
+      await processPdfFile(file);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "업로드하지 못했습니다.");
     } finally { setBusy(false); }

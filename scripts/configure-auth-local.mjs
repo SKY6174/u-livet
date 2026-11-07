@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import http from "node:http";
@@ -11,7 +12,7 @@ const run = (args) =>
   }).trim();
 const inspect = (name) => JSON.parse(run(["inspect", name]))[0];
 const status = JSON.parse(
-  execFileSync("supabase", ["status", "-o", "json"], {
+  execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   }),

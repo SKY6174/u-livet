@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Dedicated local native Auth -> RPC -> server action -> enrollment acceptance.
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
@@ -11,7 +12,7 @@ import { chromium } from "playwright";
 const dir=process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dir);
 assert.match(readFileSync(resolve(dir,"supabase/config.toml"),"utf8"),/^project_id = "u-livet-issues"$/m);
-const config=JSON.parse(execFileSync("supabase",["status","--workdir",dir,"-o","json"],{encoding:"utf8",stdio:["ignore","pipe","pipe"]}));
+const config=JSON.parse(execFileSync(SUPABASE_CLI,["status","--workdir",dir,"-o","json"],{encoding:"utf8",stdio:["ignore","pipe","pipe"]}));
 assert.equal(config.API_URL,"http://127.0.0.1:56321");
 const {ids,password,manager}=JSON.parse(readFileSync("/tmp/u-livet-issues-browser-fixtures.json","utf8"));
 const sql=q=>execFileSync("docker",["exec","-i","supabase_db_u-livet-issues","psql","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-qtA"],{input:q,encoding:"utf8",stdio:["pipe","pipe","pipe"]}).trim();

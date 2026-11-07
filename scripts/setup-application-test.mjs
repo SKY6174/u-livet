@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Start a separate local Supabase without touching an existing project's data.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -21,13 +22,13 @@ for (const name of ["migrations", "templates"]) {
   if (!existsSync(path)) symlinkSync(resolve("supabase", name), path, "dir");
 }
 try {
-  execFileSync("supabase", ["start", "--workdir", dir, "--exclude", "realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor"],
+  execFileSync(SUPABASE_CLI, ["start", "--workdir", dir, "--exclude", "realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor"],
     { stdio: ["ignore", "pipe", "pipe"] });
 } catch {
   // CLI status/start output contains local keys; never include it in reports.
   throw new Error("Dedicated Supabase start failed. Inspect its local containers; no keys were logged.");
 }
-const status = JSON.parse(execFileSync("supabase", ["status", "--workdir", dir, "-o", "json"],
+const status = JSON.parse(execFileSync(SUPABASE_CLI, ["status", "--workdir", dir, "-o", "json"],
   { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
 assert.equal(status.API_URL, "http://127.0.0.1:56321");
 console.log(`Dedicated Supabase ready. Run APPLICATION_TEST_DB_DIR=${dir} npm run test:application-flow`);

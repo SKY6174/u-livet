@@ -24,4 +24,4 @@ node scripts/verify-edge-consent-assets.mjs --eszip /absolute/path/function.eszi
 
 PDF 회귀 스크립트는 로컬 Docker의 고정 Edge Runtime에서 합성 입력만 사용한다. 256MB·2초 CPU 제한과 frozen prototype을 적용하고 세 종류의 원본/압축 PDF 및 미인증 요청 차단을 확인한다. 실제 DB·메일·AI 호출은 하지 않는다. 출력은 Git에서 제외된 `tmp/edge-consent-pdf`에 남는다.
 
-일반 Preview 함수 배포는 `supabase functions deploy --project-ref <preview-ref> --use-api`로 확인한다. 운영은 검증한 PR을 병합한 뒤 자동 함수 배포 상태와 실제 응답을 확인한다. `--no-verify-jwt`, schema reset 또는 검증 우회로 크기 오류를 해결하지 않는다.
+일반 Preview 함수 배포는 `npm exec -- supabase functions deploy --remote=<preview-ref> --use-api --yes`로 확인한다. 운영은 검증한 PR을 병합한 뒤 자동 함수 배포 상태와 실제 응답을 확인한다. `--no-verify-jwt`, schema reset 또는 검증 우회로 크기 오류를 해결하지 않는다.

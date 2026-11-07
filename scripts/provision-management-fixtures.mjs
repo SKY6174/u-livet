@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Explicitly authorized issue-124 production fixtures. No email is sent.
 // Credentials stay in ignored ops/evidence; output contains synthetic identifiers only.
 import assert from "node:assert/strict";
@@ -11,10 +12,10 @@ assert.ok(process.argv.includes("--production"), "Pass --production only after e
 const project = process.argv[process.argv.indexOf("--project-ref") + 1];
 assert.equal(project, "uoebygejgglgiivzgyks", "Only the reviewed u-livet project is allowed.");
 const query = text => {
-  const output = execFileSync("supabase", ["db", "query", "--linked", "--project-ref", project, "-o", "json", text], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  const output = execFileSync(SUPABASE_CLI, ["db", "query", `--remote=${project}`, "--yes", "-o", "json", text], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   return JSON.parse(output.slice(output.indexOf("{"))).rows;
 };
-const keys = JSON.parse(execFileSync("supabase", ["projects", "api-keys", "--project-ref", project, "--reveal", "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
+const keys = JSON.parse(execFileSync(SUPABASE_CLI, ["projects", "api-keys", `--remote=${project}`, "--reveal", "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
 const url = `https://${project}.supabase.co`;
 const client = key => createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 const admin = client(keys.find(k=>k.name === "service_role").api_key);

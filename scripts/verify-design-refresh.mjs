@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Real local Auth and pages; run test:application-flow first to create private fixtures.
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
@@ -9,7 +10,7 @@ import { chromium } from "playwright";
 const dbDir = process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dbDir, "Set APPLICATION_TEST_DB_DIR to the dedicated u-livet-issues project.");
 assert.match(readFileSync(resolve(dbDir, "supabase/config.toml"), "utf8"), /^project_id = "u-livet-issues"$/m);
-const status = JSON.parse(execFileSync("supabase", ["status", "--workdir", dbDir, "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
+const status = JSON.parse(execFileSync(SUPABASE_CLI, ["status", "--workdir", dbDir, "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
 assert.equal(status.API_URL, "http://127.0.0.1:56321");
 const fixture = JSON.parse(readFileSync("/tmp/u-livet-issues-browser-fixtures.json", "utf8"));
 const base = "http://127.0.0.1:3100";

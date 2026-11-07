@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Bounded benchmark against existing synthetic LOCAL fixtures only.
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
@@ -89,7 +90,7 @@ async function stop(childProcess) {
 
 try {
   assert.equal(process.argv.length, 2, 'No alternate target or load is accepted');
-  const status = JSON.parse(execFileSync('supabase', ['status', '-o', 'json'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
+  const status = JSON.parse(execFileSync(SUPABASE_CLI, ['status', '-o', 'json'], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
   assert.equal(status.API_URL, API, 'Dedicated local Supabase is required');
   report.revision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
   for (const role of roles) {
@@ -137,7 +138,8 @@ try {
     AUTH_SITE_ORIGIN: origin, CERTIFICATE_VERIFY_ORIGIN: origin, PREVIEW_REVIEW_ONLY: 'false',
     AUTH_CAPTCHA_ENABLED: 'false', AUTH_TURNSTILE_SITE_KEY: '', AUTH_LOCAL_CAPTCHA_TEST: '',
     AUTH_TRUSTED_IP_HEADER: '', AUTH_EMAIL_ENABLED: 'false', PUBLIC_SIGNUP_ENABLED: 'false' };
-  await command([join(ROOT, 'node_modules/next/dist/bin/next'), 'build'], env);
+  await command([join(ROOT, 'node_modules/eslint/bin/eslint.js'), 'src', '--max-warnings=0'], env);
+  await command([join(ROOT, 'node_modules/next/dist/bin/next'), 'build', '--webpack'], env);
   console.log('PASS isolated production build');
   stage = 'local-server';
   server = spawn(process.execPath, [join(ROOT, 'node_modules/next/dist/bin/next'), 'start', '-H', '127.0.0.1', '-p', String(port)],

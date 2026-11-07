@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Dedicated local Auth -> browser/server actions -> RPC -> DB acceptance checks.
 // Run verify-application-flow.mjs --production first to provision reusable local fixtures.
 import assert from "node:assert/strict";
@@ -11,7 +12,7 @@ import { chromium } from "playwright";
 const dir = process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dir);
 assert.match(readFileSync(resolve(dir, "supabase/config.toml"), "utf8"), /^project_id = "u-livet-issues"$/m);
-const config = JSON.parse(execFileSync("supabase", ["status", "--workdir", dir, "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
+const config = JSON.parse(execFileSync(SUPABASE_CLI, ["status", "--workdir", dir, "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
 assert.equal(config.API_URL, "http://127.0.0.1:56321");
 const fixture = JSON.parse(readFileSync("/tmp/u-livet-issues-browser-fixtures.json", "utf8"));
 const { ids, password, manager, instructor } = fixture;

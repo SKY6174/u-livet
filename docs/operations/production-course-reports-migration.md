@@ -28,12 +28,12 @@ Preview의 저장 SQL MD5 `f7ad6dd29545bae3642d2eadce6c87c6`는 원본 파일 MD
 
 ## 실행 직전 확인
 
-아래 명령은 저장소 루트에서 실행한다. 검증한 CLI는 2.115.0이다.
+아래 명령은 저장소 루트에서 실행한다. 현재 CLI는 package-lock.json에 고정한 3.0.0이다. `npm ci` 후 아래 명령을 사용한다.
 
 ```sh
 shasum -a 256 supabase/migrations/20260919043637_anchor_course_reports.sql
-supabase db query --linked --project-ref uoebygejgglgiivzgyks --file ops/production-course-reports-check.sql --output json
-supabase db push --project-ref uoebygejgglgiivzgyks --dry-run --include-all --skip-vault
+npm exec -- supabase db query --remote=uoebygejgglgiivzgyks --read-only --file ops/production-course-reports-check.sql --output json
+npm exec -- supabase db push --remote=uoebygejgglgiivzgyks --dry-run --include-all --skip-vault --yes
 ```
 
 점검 SQL은 읽기 전용 transaction이다. 적용 전 기대값은 migration 24개, `migration_applied=false`, 보고서 테이블 2개와 함수 11개 모두 `exists=false`다.
@@ -59,7 +59,7 @@ supabase db push --project-ref uoebygejgglgiivzgyks --dry-run --include-all --sk
 ```sh
 umask 077
 mkdir -p tmp/production-db-preparation
-supabase db dump --project-ref uoebygejgglgiivzgyks --schema public,life_private --file tmp/production-db-preparation/schema-before.sql
+npm exec -- supabase db dump --remote=uoebygejgglgiivzgyks --schema public,life_private --file tmp/production-db-preparation/schema-before.sql
 ```
 
 [운영 백업 화면](https://supabase.com/dashboard/project/uoebygejgglgiivzgyks/database/backups/scheduled) · [Supabase 백업 안내](https://supabase.com/docs/guides/platform/backups)
@@ -70,9 +70,9 @@ supabase db dump --project-ref uoebygejgglgiivzgyks --schema public,life_private
 재점검에는 읽기 전용 SQL과 dry-run을 사용한다. 처음 적용하는 다른 대상에는 사전 목록을 다시 확인한다.
 
 ```sh
-supabase db push --project-ref uoebygejgglgiivzgyks --include-all --skip-vault
-supabase db query --linked --project-ref uoebygejgglgiivzgyks --file ops/production-course-reports-check.sql --output json
-supabase db push --project-ref uoebygejgglgiivzgyks --dry-run --include-all --skip-vault
+npm exec -- supabase db push --remote=uoebygejgglgiivzgyks --include-all --skip-vault --yes
+npm exec -- supabase db query --remote=uoebygejgglgiivzgyks --read-only --file ops/production-course-reports-check.sql --output json
+npm exec -- supabase db push --remote=uoebygejgglgiivzgyks --dry-run --include-all --skip-vault --yes
 ```
 
 사후 기대값:

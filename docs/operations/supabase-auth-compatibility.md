@@ -96,10 +96,10 @@ live는 서로 다른 20자 프로젝트 ref를 요구하며 고정 Management A
 메타데이터 진단 SQL은 migration에 포함하지 않는다. 대상 Preview가 확인된 뒤 명시적으로 실행한다. uc-life main에 대해서는 이번에 동일한 SELECT만 수행했다.
 
 ```sh
-supabase db query --linked --project-ref PREVIEW_REF --file scripts/inspect-hosted-auth.sql --output-format json
+npm exec -- supabase db query --remote=PREVIEW_REF --read-only --file scripts/inspect-hosted-auth.sql --output-format json
 ```
 
-`--project-ref`만으로는 현재 CLI에서 동작하지 않아 `--linked`를 함께 지정한다. `supabase link`, reset, push, migration apply는 필요 없다. 쿼리는 pg_catalog만 읽으며 컬럼/타입, postgres 권한, 기대 트리거의 존재·활성·연결 함수만 반환한다. 트리거 본문 전체의 동일성을 증명하지 않는다.
+CLI 3.0.0에서는 원격 대상을 `--remote=PREVIEW_REF`로 명시한다. 읽기 전용 진단은 `--read-only`로 실행한다. `supabase link`, reset, push, migration apply는 필요 없다. 쿼리는 pg_catalog만 읽으며 컬럼/타입, postgres 권한, 기대 트리거의 존재·활성·연결 함수만 반환한다. 트리거 본문 전체의 동일성을 증명하지 않는다.
 
 ## 후속 인수 시험 순서
 
