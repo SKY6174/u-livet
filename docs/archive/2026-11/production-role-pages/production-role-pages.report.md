@@ -27,6 +27,12 @@
 
 ## 릴리스 상태
 
-운영 CORS 설정 복구와 페이지 검증은 완료했다. 재발 방지 도구의 PR·필수 CI·외부 승인·merge 및 이후 Vercel 운영 revision 검증은 이어서 진행한다. 최종 배포 결과는 PR 설명에 기록한다.
+[PR #207](https://github.com/SKY6174/u-livet/pull/207)은 필수 CI 통과 후 UC1973가 승인·merge했다. 운영 Vercel 배포는 READY이며 `https://u-livet.org/api/version`에서 `774931160c4181d18dde2601d2c73eb867d79889`, `/api/health`에서 healthy를 확인했다. 완료 시각은 2026-11-08 01:50:50 KST다.
 
-설계 비교와 상세 범위: [분석](../03-analysis/production-role-pages.analysis.md). 재실행/정리: [운영 가이드](../operations/production-page-verification.md). 비공개 원본 결과는 Git에서 제외한 `ops/evidence/production-role-pages/matrix-final.json`에 보관한다.
+새 배포에서 네 권한의 로그인·권한 경계·서류함 18/18건과 CORS 4건을 재검사했다. 강사 session/context 200 및 파일 입력 UI를 확인했다. 재검사용 임시 계정 2개와 권한 6개·세션도 모두 정리했고, 앞선 비공개 기수 8행은 삭제 상태를 유지했다. 배포 후 최근 5분 오류/fatal 로그 조회 결과는 없었다.
+
+계획·설계·분석·보고 및 검증 증빙을 2026-11-08 보관했다. 이 작업의 구현·검증·배포·정리는 완료 상태다.
+
+설계 비교와 상세 범위: [분석](production-role-pages.analysis.md). 재실행/정리: [운영 가이드](../../../operations/production-page-verification.md). 비공개 원본 결과는 Git에서 제외한 `ops/evidence/production-role-pages/matrix-final.json`에 보관한다.
+
+보관한 [검증 집계·배포 증빙](production-role-pages.verification.json), [개별 검사 결과](production-role-pages.cases.csv), [단계 이력·문서 무결성](production-role-pages.status.json).
