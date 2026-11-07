@@ -24,6 +24,7 @@ Date: 2026-11-07. Feature: supabase-cli-v3.
 - 53 affected JavaScript modules and the Python source parsed; git diff --check passed.
 - Release readiness: 111 checks; hosted Auth preflight: 69; managed Cloud: 28; workspace queries: 8; DB response: 10; DB performance: 16; DB latency: 11. Total: 253.
 - Review deployment configuration: 29 additional checks. Migration retry: 10 checks. Total existing regression checks: 292. All 137 repository migration files also replayed in the disposable CLI v3 database.
+- GitHub Actions run 42380698954 passed the required PR quality gate with CLI 3 on a fresh Ubuntu runner, including 33 live core Auth/RLS/application checks (325 existing regression checks in total). The core fixture corrections follow existing PR #204: current paused-MFA policy assertions, valid phone metadata, signup settings restored in finally, and supported synthetic offering names.
 - npm dependency audit: 0 vulnerabilities after patched transitive packages and a targeted minimatch override for the TypeScript ESLint subtree.
 - Final browser run: all 108 page modules covered; 115/115 page cases and 4/4 live authorization boundaries passed (119 total). Every normal page exercised the hydrated header menu at mobile width, then rendered at desktop width; hidden print headers were checked through the same React event handler.
 
@@ -31,7 +32,7 @@ Date: 2026-11-07. Feature: supabase-cli-v3.
 
 Browser coverage checks rendering, hydration, real sessions, route aliases and access boundaries. It does not exercise every form mutation, remote OAuth provider, email delivery or real credential/PDF issuance. Certificate and badge detail fixtures are revoked records in the disposable database; no document is issued. The guest invitation shell and malformed-code rejection are covered; an actual hosted invitation submission is outside this local run.
 
-The older verify-role-navigation script has pre-existing drift (an unresolved date-format alias, followed by outdated menu expectations when that alias was supplied). It is not claimed as passing. The live browser suite and existing workspace/query authorization checks provide the current-route verification. Existing older core/application fixture scripts retain their dedicated u-livet-core/u-livet-issues guards; no hosted DB was used to bypass them.
+The older verify-role-navigation script has pre-existing drift (an unresolved date-format alias, followed by outdated menu expectations when that alias was supplied). It is not claimed as passing. The live browser suite and existing workspace/query authorization checks provide the current-route verification. Core/application fixture scripts retain their dedicated u-livet-core/u-livet-issues guards; core ran on a fresh CI database, and no hosted DB was used to bypass these guards.
 
 Initial page runs exposed production-only React #418/parentNode failures on admin and public routes. Six dev repetitions passed. Removing the admin loading boundary did not eliminate the failure in the full suite, so that file was restored. Next 16.4.5 contains the upstream hydration replay restoration logic absent in the old bundled renderer; it and React 19.3.1 are now pinned. Six focused production repetitions passed. The relationship to the published cursor/parser reports is an inference; no React internals were patched and no runtime hydration errors were suppressed.
 
@@ -48,6 +49,13 @@ The flat ESLint configuration preserves the prior hooks baseline: three newly en
 - https://nextjs.org/docs/app/guides/upgrading/version-16
 
 Modern Web Guidance search/list and the HTML guide were checked during hydration diagnosis. No guide-specific UI implementation change was applicable.
+
+## Release handoff
+
+- PR: https://github.com/SKY6174/u-livet/pull/206. Source and CI are pushed to codex/supabase-cli-v3.
+- The required PR quality gate and Supabase Preview checks passed. Main requires one approving review from a different account and enforces this for administrators. The normal merge attempt was rejected by that policy; protection was not altered.
+- Initial Vercel preview dpl_CXTeDarNxXpxBSrzcUNfdDKZrqQZ was blocked by review-only environment checks: the Supabase integration injected unused credentials and an additional public key name into this task's branch. Only that branch's generated, unused variables were blanked, and the extra public variable was renamed to an unused server name with an empty value. The separate preview URL/anon key were retained. No production or other branch settings changed. Preview rebuild verification is recorded in the PR description.
+- Production merge/deployment remains pending the required external GitHub review. After approval, use normal squash merge, verify the Git-triggered production build and read-only health/version checks against the merge commit.
 
 ## Complete page inventory
 
