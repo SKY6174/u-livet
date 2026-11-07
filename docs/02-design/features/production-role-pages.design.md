@@ -1,0 +1,34 @@
+# Production role page verification design
+
+Date: 2026-11-08 (Asia/Seoul). Plan: production-role-pages.plan.md.
+
+## Runner
+
+- Add a dedicated production browser runner; never relax the existing local suite's container and URL guards.
+- Require --production, fixed https://u-livet.org origin and the expected deployed revision. Read a supplied private account/session manifest; accept no credentials on command arguments or in console output.
+- Discover all src/app/**/page.tsx modules. Build a matrix for learner, instructor and administrator plus guest checks. Define expected outcomes from route/layout authorization and actual fixture ownership, before running requests.
+- Resolve dynamic URLs from existing authorized records with read-only SQL/API discovery. For missing records, use a fixed invalid identifier and label the case missing-record/negative. Never count it as positive detail coverage.
+- Check HTTP status, final route, meaningful rendering, hydrated mobile-menu state, desktop rendering, error boundaries and browser exceptions. Bound concurrency to two pages; use load/web assertions, not networkidle. Save only redacted route/status/error metadata.
+- Permit ordinary read requests and menu interactions. Block form mutations and credential/file issuance. Keep cookies/session state in memory and delete private temporary files after the run.
+
+## Accounts and production data
+
+- Existing dedicated synthetic learner credentials were found in ignored issue-124 fixture evidence. Validate project, email namespace, Auth ID/person linkage and current roles before reuse; never print the password or session.
+- No active instructor/administrator test identities exist. Select a supplied dedicated login session or narrowly scoped temporary synthetic setup before privileged testing. Do not impersonate a real administrator via generated login links.
+- Any temporary identity/role setup must use unique test identifiers, expiry where supported, exact ownership guards and finally cleanup. Do not replace occupied member-entry operator slots, alter actual staff permissions or change signup/security settings.
+- The user selected temporary instructor/administrator accounts. Create two unique @example.invalid identities without email delivery, preserve private credentials with mode 0600, and grant only INSTRUCTOR or SYSTEM_ADMIN/COURSE_MANAGER/CERTIFIER/FINANCE/PERFORMANCE in the existing main institution with a 60-minute expiry. Revoke their sessions/roles after verification; never claim designated member-entry operator coverage from these ordinary administrator roles.
+- Test ordinary administrator roles separately from designated capabilities: SYSTEM_ADMIN permits directory/read/edit; manual registration needs a member-entry operator and password-reset mail has its own designated-account rule. Use the temporary instructor's actual profile for administrator detail/history and test all three directory groups. Do not alter the existing designated operators.
+- Native email accounts return EMAIL_LOGIN_REQUIRED on OAuth completion, which intentionally ends their session. Run that page only after all concurrent role reads; its redirect does not indicate a product defect. Learner document boards render a restricted empty list; assert the underlying list is empty and no document detail links appear.
+- Production currently has zero certificate, badge, proposal and performance-report records. Exercise their empty/missing states; do not fabricate official issuance or performance evidence to produce an artificial positive result.
+- The user additionally authorized one private temporary course to cover valid classroom detail states. Keep its offering and version DRAFT, explicitly synthetic, free and outside recruitment. Link only synthetic test identities; create no attendance, grade, completion or credential evidence. Prove insert/delete in a rolled-back transaction, verify anonymous catalog reads stay empty, then commit the owned fixture and remove every owned row after browser verification. Preserve a cleanup manifest before writes and verify zero remaining fixture rows.
+- The old learner identity is itself classified as non-operational, so direct enrollment reads correctly exclude it. For positive classroom coverage, reuse the newly created temporary administrator as a learner with all five grants temporarily expired, then restore exactly their original expiration before the administrator stage. This keeps two temporary Auth identities total and does not alter any existing user's permissions. Keep the instructor a different identity. Restore the original manifest and discard backup passwords during cleanup.
+- Ordinary assigned instructors cannot open official operation-document editors. After checking those denials, add a responsible-instructor designation only to the owned QA course and verify both document kinds and print views. Roll back its insert/delete first, then remove it with the other fixture rows; never change a real course's responsible instructor or submit an official document.
+
+## Corrections and release
+
+- Reproduced defect: instructor document session POST and preflight reject https://u-livet.org. The deployed bundle exactly matches main; the existing origin configuration contains only https://uc-life.org and https://www.uc-life.org. Their exact comma-separated value was verified against the provider's SHA-256 digest, so no secret value retrieval or allowlist replacement is needed.
+- Append only https://u-livet.org to that production configuration after checking the original digest has not changed. Preserve both legacy origins, reject an unrelated origin, and leave Preview and other secrets untouched. Supabase applies secret configuration immediately without a function source redeployment. Record before/after public origin lists and hashes.
+- Add a read-only origin regression probe with strict response validation and offline cases in CI. Allow only synthetic-user document session creation/revocation and advisory-intake-context reads in the browser runner; require the actual document UI, not just the global header. Upload, save, AI and issuance actions remain blocked.
+- Reproduce failures and distinguish authorization/missing-data outcomes from bugs. Reference the affected feature's design and update this document for any correction.
+- Add focused regression coverage only for reproduced defects, run affected checks and compile Next.js in production mode with isolated review configuration, then rerun production/preview routes as appropriate. The actual production configuration and revision are verified on Vercel after merge.
+- Open a reviewable PR with redacted evidence. Preserve required CI and external review; merge after approval and verify the production revision, complete affected role matrix and runtime logs.
