@@ -1,0 +1,153 @@
+{
+  "feature": "production-role-pages",
+  "archivedAt": "2026-11-07T16:58:03.158Z",
+  "caseFile": "production-role-pages.cases.csv",
+  "caseFileSha256": "210535c52ceee7979f476192b4db1f93be7b3f84ef62bf13c3806179216e480c",
+  "scope": "Page rendering and authorization with native Auth; controlled document session/context reads only.",
+  "fullMatrix": {
+    "checkedAt": "2026-11-07T16:29:50.516Z",
+    "revision": "8f6c5bf18e314fb8785795de162f4c97519dd686",
+    "pageModulesPerRole": 108,
+    "cases": 447,
+    "passed": 447,
+    "failed": 0,
+    "byRole": {
+      "learner": {
+        "cases": 110,
+        "pageModules": 108,
+        "passed": 110
+      },
+      "instructor": {
+        "cases": 114,
+        "pageModules": 108,
+        "passed": 114
+      },
+      "administrator": {
+        "cases": 113,
+        "pageModules": 108,
+        "passed": 113
+      },
+      "guest": {
+        "cases": 110,
+        "pageModules": 108,
+        "passed": 110
+      }
+    },
+    "outcomesByRole": {
+      "learner": {
+        "render": 50,
+        "denied": 54,
+        "missing": 5,
+        "login": 1
+      },
+      "instructor": {
+        "render": 59,
+        "denied": 49,
+        "missing": 5,
+        "login": 1
+      },
+      "administrator": {
+        "render": 96,
+        "denied": 11,
+        "missing": 5,
+        "login": 1
+      },
+      "guest": {
+        "render": 26,
+        "login": 83,
+        "missing": 1
+      }
+    },
+    "blockedMutations": [],
+    "documentBackendReads": [
+      {
+        "role": "instructor",
+        "action": "session",
+        "status": 200
+      },
+      {
+        "role": "instructor",
+        "action": "advisory-intake-context",
+        "status": 200
+      }
+    ]
+  },
+  "releaseVerification": {
+    "checkedAt": "2026-11-07T16:50:47.859368+00:00",
+    "pullRequest": "https://github.com/SKY6174/u-livet/pull/207",
+    "revision": "774931160c4181d18dde2601d2c73eb867d79889",
+    "deployment": "dpl_4juc4FUkpMDmiL72HiwDKa7mx7jV",
+    "state": "READY",
+    "origin": "https://u-livet.org",
+    "health": "healthy",
+    "pageVerification": {
+      "modules": 108,
+      "cases": 447,
+      "passed": 447
+    },
+    "postDeployment": {
+      "cases": 18,
+      "passed": 18,
+      "edgeReads": [
+        {
+          "role": "instructor",
+          "action": "session",
+          "status": 200
+        },
+        {
+          "role": "instructor",
+          "action": "advisory-intake-context",
+          "status": 200
+        }
+      ],
+      "corsPreflights": 4
+    },
+    "runtimeErrorFatalGroups": 0,
+    "temporaryCleanup": {
+      "completed": true,
+      "remainingAuthUsersAndSessions": 0,
+      "remainingDocumentSessions": 0,
+      "remainingGrantedRoles": 0,
+      "privateFixtureRows": 0,
+      "passwordCopiesDiscarded": true
+    }
+  },
+  "corsPreflights": {
+    "checkedAt": "2026-11-07T16:49:24.103Z",
+    "endpoint": "https://uoebygejgglgiivzgyks.supabase.co/functions/v1/instructor-documents",
+    "results": [
+      {
+        "origin": "https://uc-life.org",
+        "allowed": true,
+        "status": 204
+      },
+      {
+        "origin": "https://www.uc-life.org",
+        "allowed": true,
+        "status": 204
+      },
+      {
+        "origin": "https://u-livet.org",
+        "allowed": true,
+        "status": 204
+      },
+      {
+        "origin": "https://untrusted-origin.invalid",
+        "allowed": false,
+        "status": 204
+      }
+    ]
+  },
+  "sourceEvidenceSha256": {
+    "matrix-final.json": "9f210e858e0141864b9f19b225ad81d06aa97b9cdfc318923e3a8324b518ab34",
+    "pages-learner-instructor-administrator-guest-focused.json": "98011c530f9b00575d8ad872987dbbf5f5aaa01fb0e40d06476bdd166763c894",
+    "release-final.json": "689877c04d338744b4e48dd6c63c5ca6d7a9aed215f0de790b8ea17c3e670694",
+    "origins-live.json": "2a75255f154b41d0a2846c5e1e6c75899236419a77ffb4d8d1340572532bdf01"
+  },
+  "privacy": "Actual dynamic paths, account/person/course IDs, credentials, tokens and private screenshots are excluded. Original evidence stays in ignored ops/evidence/production-role-pages.",
+  "limitations": [
+    "No valid issued certificate, badge, proposal or performance-report records existed; missing/denied views only.",
+    "Designated member registration/password-reset mail, invitation PIN submission and attendance QR check-in were not executed.",
+    "No attendance, grade, completion, official document submission, credential issuance, mail, payment or AI workflow ran."
+  ]
+}
