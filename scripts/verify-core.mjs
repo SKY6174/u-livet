@@ -1,5 +1,4 @@
 import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
-import { ensureLocalMfa } from "./local-mfa.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -78,18 +77,35 @@ async function account(label, role = "ADMIN") {
           role,
           privacy_policy_id: PRIVACY,
           privacy_accepted: true,
+          mobile_phone: "+821000000000",
         },
       }),
     ).user;
   const client = anon();
   checked(await client.auth.signInWithPassword({ email, password: PASSWORD }));
-  await ensureLocalMfa(client);
+  const security = checked(await client.rpc("life_security_status"));
+  assert.equal(security.active, true);
+  assert.equal(security.needs_reset, false);
+  assert.equal(security.mfa_required, false);
   const identity = checked(await client.rpc("life_identity"));
   return { client, user, identity, email };
 }
-const learner = await account("learner"),
-  teacher = await account("instructor"),
-  manager = await account("operator");
+async function withFixtureSignup(run) {
+  const original = JSON.parse(sql("select row_to_json(s) from life_private.signup_settings s where singleton"));
+  sql(`update life_private.signup_settings set enabled=true,policy_id='${PRIVACY}',org_id='${ORG}' where singleton`);
+  try {
+    return await run();
+  } finally {
+    sql(`update life_private.signup_settings set enabled=${original.enabled},
+      policy_id=${original.policy_id ? "'" + original.policy_id + "'" : "null"},org_id='${original.org_id}' where singleton`);
+  }
+}
+
+const [learner, teacher, manager] = await withFixtureSignup(async () => [
+  await account("learner"),
+  await account("instructor"),
+  await account("operator"),
+]);
 // Reset only this synthetic learner's test work, making this script repeatable.
 sql(`delete from public.life_submission_grades where submission_id in (select id from public.life_submissions where person_id='${learner.identity.id}');
 delete from public.life_submissions where person_id='${learner.identity.id}';
@@ -276,7 +292,7 @@ const day = (delta) =>
 const createArgs = {
   o: ORG,
   y: YEAR,
-  title: "[테스트] 좌석 경쟁",
+  title: "[검증용] 좌석 경쟁",
   academy: "테스트",
   summary: "로컬 경쟁 검증",
   curriculum: "테스트용",
@@ -316,9 +332,11 @@ checked(
     completion_policy: COMPLETION,
   }),
 );
-const racers = await Promise.all(
-  Array.from({ length: 8 }, (_, i) =>
-    account(`race-${randomUUID().slice(0, 8)}-${i}`),
+const racers = await withFixtureSignup(async () =>
+  Promise.all(
+    Array.from({ length: 8 }, (_, i) =>
+      account(`race-${randomUUID().slice(0, 8)}-${i}`),
+    ),
   ),
 );
 await Promise.all(
@@ -465,7 +483,7 @@ pass(
 );
 // Keep stress-test fixtures out of the public local preview.
 sql(
-  "update public.life_offerings set status='DRAFT' where name='[테스트] 좌석 경쟁';",
+  "update public.life_offerings set status='DRAFT' where name='[검증용] 좌석 경쟁';",
 );
 console.log(
   `Verified ${checks} checks. Local fixtures: learner/instructor/operator@example.invalid (local only).`,

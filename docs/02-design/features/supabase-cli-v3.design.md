@@ -18,6 +18,8 @@
 
 ## Release
 
+- Satisfy the existing `PR quality gate` branch requirement with a GitHub Actions job that runs audit, lint, release checks, the pinned local CLI and real core Auth/RLS/application regressions on a fresh runner. Adapt the existing PR #204 workflow and fixture corrections; retain CLI 3 and do not change branch protection or reduce its review requirement.
+- Keep fixture signup changes scoped to tests with restoration in finally; assert the currently deployed security policy rather than enrolling the paused MFA policy. Prepare a preview for review when external approval blocks merge.
 - Use Git integration for Vercel deployment after merge, avoiding a duplicate CLI deployment. Verify team `team_4YIBigc2M47U1IrndTo6xlfF`, project `prj_h5sjV2a5VUNpxFMEa1dPYwoFMAz0`, merged commit and production READY state.
 - Verify production health/public pages read-only. Keep browser state, tokens and raw CLI status out of Git and reports.
 
