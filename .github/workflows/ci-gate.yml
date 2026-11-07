@@ -30,5 +30,6 @@ jobs:
       - run: npm run lint
       - run: npm run test:release
       - run: npm run test:supabase-cli
+      - run: npm run test:production-origins
       - run: npm exec -- supabase start
       - run: npm run test:core
