@@ -1,10 +1,11 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Local synthetic RLS benchmark. All fixtures live in one rolled-back transaction.
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 
 assert.equal(process.argv.length, 2, 'No alternate target is accepted');
-const local = JSON.parse(execFileSync('supabase', ['status', '-o', 'json'], {
+const local = JSON.parse(execFileSync(SUPABASE_CLI, ['status', '-o', 'json'], {
   encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
 }));
 assert.equal(local.API_URL, 'http://127.0.0.1:55321');

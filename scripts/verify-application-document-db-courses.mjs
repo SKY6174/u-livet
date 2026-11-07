@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Native Auth -> real RPC boundaries in the dedicated synthetic local database.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -9,7 +10,7 @@ import { createClient } from "@supabase/supabase-js";
 const dir = process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dir, "Dedicated APPLICATION_TEST_DB_DIR is required.");
 assert.match(readFileSync(resolve(dir, "supabase/config.toml"), "utf8"), /^project_id = "u-livet-issues"$/m);
-const config = JSON.parse(execFileSync("supabase", ["status", "--workdir", dir, "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
+const config = JSON.parse(execFileSync(SUPABASE_CLI, ["status", "--workdir", dir, "-o", "json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }));
 assert.equal(config.API_URL, "http://127.0.0.1:56321");
 const container = "supabase_db_u-livet-issues";
 assert.equal(JSON.parse(execFileSync("docker", ["inspect", container], { encoding: "utf8" }))[0].Config.Labels["com.supabase.cli.project"], "u-livet-issues");

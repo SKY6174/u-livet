@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Real popup/login/prefill/edit/submit/PDF flow in dedicated local Supabase only.
 // First run verify-application-flow.mjs to create private synthetic fixtures.
 import assert from "node:assert/strict";
@@ -10,7 +11,7 @@ import { chromium } from "playwright";
 const dbDir = process.env.APPLICATION_TEST_DB_DIR;
 assert.ok(dbDir, "Dedicated APPLICATION_TEST_DB_DIR is required.");
 assert.match(readFileSync(resolve(dbDir,"supabase/config.toml"),"utf8"),/^project_id = "u-livet-issues"$/m);
-const status=JSON.parse(execFileSync("supabase",["status","--workdir",dbDir,"-o","json"],{encoding:"utf8",stdio:["ignore","pipe","pipe"]}));
+const status=JSON.parse(execFileSync(SUPABASE_CLI,["status","--workdir",dbDir,"-o","json"],{encoding:"utf8",stdio:["ignore","pipe","pipe"]}));
 assert.equal(status.API_URL,"http://127.0.0.1:56321");
 const container="supabase_db_u-livet-issues";
 assert.equal(JSON.parse(execFileSync("docker",["inspect",container],{encoding:"utf8"}))[0].Config.Labels["com.supabase.cli.project"],"u-livet-issues");

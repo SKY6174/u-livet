@@ -14,7 +14,7 @@ try {
   }
   const check = spawnSync(process.execPath, [fileURLToPath(new URL('./check-release-readiness.mjs', import.meta.url)), '--config-only'], { stdio: 'inherit' });
   if (check.error || check.status !== 0) throw new Error('CONFIG_BLOCKED');
-  const build = spawnSync(process.execPath, [resolve('node_modules/next/dist/bin/next'), 'build'], { stdio: 'inherit' });
+  const build = spawnSync(process.execPath, [resolve('node_modules/next/dist/bin/next'), 'build', '--webpack'], { stdio: 'inherit' });
   process.exitCode = build.error ? 1 : build.status ?? 1;
 } catch {
   console.error('BUILD_BLOCKED: Vercel 대상·환경 설정·로컬 환경파일 포함 여부를 확인하세요. 운영 가이드 참조.');

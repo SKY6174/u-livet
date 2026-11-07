@@ -4,7 +4,7 @@
 
 **Supabase 인증 호환성:** ANCHOR/u-livet를 확인했다. 현재 원격은 001~008 적용, 별도 Preview 없음 상태다. [호환성 조사·진단 도구 안내](docs/operations/supabase-auth-compatibility.md), `npm run test:hosted-auth`. 확정 비밀번호 조건과 hosted API 프리셋 차이·Auth 트리거 지원 범위를 해결한 뒤 실제 Preview 인수 검증이 필요하다.
 
-Next.js 15.5.25 / React 19.3 / Supabase 기반. 현재는 **인증·무료/유료 과정 신청·텍스트 자료/과제 LMS·공식 출결·객관식 시험·수료 검토/승인·이수증/강사 경력증명·입금 대사/환불 관리·문자 예약·연차 평가/성과 보고·디지털배지·강사 이력 심사·과정 개발**을 로컬에서 구현·검증했다. 전체 플랫폼 설계와 운영 배포는 별도 진행 중이다.
+Next.js 16.4.5 / React 19.3.1 / Supabase 기반. 현재는 **인증·무료/유료 과정 신청·텍스트 자료/과제 LMS·공식 출결·객관식 시험·수료 검토/승인·이수증/강사 경력증명·입금 대사/환불 관리·문자 예약·연차 평가/성과 보고·디지털배지·강사 이력 심사·과정 개발**을 로컬에서 구현·검증했다. 전체 플랫폼 설계와 운영 배포는 별도 진행 중이다.
 
 - [전체 기획](docs/01-plan/features/anchor-lifelong-education-platform.plan.md)
 - [전체 상세설계](docs/02-design/features/anchor-lifelong-education-platform.design.md)
@@ -19,13 +19,23 @@ Next.js 15.5.25 / React 19.3 / Supabase 기반. 현재는 **인증·무료/유�
 
 ## 로컬 실행
 
-Docker, Node.js 22 이상, Supabase CLI가 필요하다. `u-livet-core` 프로젝트는 기존 `uc-anchor`와 다른 포트(55321/55322)를 사용한다.
+Docker, Node.js 22 이상이 필요하다. Supabase CLI는 devDependency의 **3.0.0**으로 통일한다. `npm ci` 후 `npm exec -- supabase --version`으로 확인하고, 직접 실행도 `npm exec -- supabase …`를 사용한다. npm 테스트는 같은 CLI를 PATH에서 사용한다. `u-livet-core` 프로젝트는 기존 `uc-anchor`와 다른 포트(55321/55322)를 사용한다.
 
 프로젝트·컨테이너의 현재 이름, 포트와 작업 경로는 [U-LiVET 로컬 실행 기준](docs/operations/u-livet-local-projects.md)을 따른다.
 
+CLI 버전·v3 명령 호환성은 `npm run test:supabase-cli`로 확인한다. 직접 `node`로 실행하는 관리·검증 스크립트도 공통 실행 경로를 통해 npm lockfile의 CLI를 사용한다.
+
+전체 페이지 검사는 다음과 같이 실행한다. `--setup`은 `/tmp/u-livet-cli3-test`에 전용 프로젝트와 포트 57321/57322를 준비하며, 기존 로컬·원격 DB를 재설정하지 않는다. migration 파일이 바뀌면 전용 스택을 새로 준비해야 한다.
+
+```sh
+npm run test:pages -- --setup --build
+```
+
+검사는 모든 `src/app/**/page.tsx`를 자동 발견하고 실제 로컬 Auth 세션으로 공개·수강생·강사·관리자 화면, 문서 종류, 잘못된 링크 및 권한 차단을 검증한다. 새 동적 경로의 fixture가 없으면 실패한다. 합성 증명·배지는 취소 상태로 렌더링만 검사하며 실제 발급·메일 발송을 수행하지 않는다. 결과는 Git 제외 경로 `ops/evidence/supabase-cli-v3/pages.json`에 저장한다. 특정 화면의 재현은 `npm run test:pages -- --route=/admin/scholarships`로 실행한다.
+
 ```sh
 npm ci
-supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+npm exec -- supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 node scripts/configure-auth-local.mjs
 npm run test:core
 node scripts/verify-learning.mjs
@@ -78,11 +88,11 @@ node scripts/verify-auth-recovery.mjs
 node scripts/verify-admin-mfa.mjs
 npm run lint
 npm run build
-supabase db advisors --local --type security --level warn
-supabase migration list --local
+npm exec -- supabase db advisors --type security --level warn
+npm exec -- supabase migration list
 ```
 
-`test:core`는 로컬 가상 학습자의 이전 과제·신청을 초기화하고 33개 DB/Auth/Data API/RPC 검증을 실행한다. 신규 로컬 DB에서 전체 SQL 재생은 `supabase db reset --local --no-seed`로 검사할 수 있다. 이 명령은 해당 로컬 프로젝트의 데이터를 삭제하므로 운영 연결 옵션을 추가하지 않는다.
+`test:core`는 로컬 가상 학습자의 이전 과제·신청을 초기화하고 33개 DB/Auth/Data API/RPC 검증을 실행한다. 신규 로컬 DB에서 전체 SQL 재생은 `npm exec -- supabase db reset --no-seed`로 검사할 수 있다. 이 명령은 해당 로컬 프로젝트의 데이터를 삭제하므로 운영 연결 옵션을 추가하지 않는다.
 
 `npm run test:db-performance`는 조회 범위·실패 처리 회귀검사를 DB 연결 없이 실행한다. 기존 로컬 시험 데이터를 준비한 뒤 `npm run test:auth-load`로 로그인/MFA, 역할별 화면의 동시 요청 1·4·8개, 권한 차단과 사용자 세션 격리를 확인할 수 있다. 로컬 Supabase 55321과 가상 계정만 허용하며 URL이나 부하 인자를 받지 않는다. 현재 Git 추적 파일을 별도 임시 폴더에서 프로덕션 빌드하므로 `.env.local`과 기존 `.next`는 유지된다. 소스 파일을 새로 추가했다면 측정 전에 Git 추적 대상에 포함해야 한다.
 

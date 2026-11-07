@@ -5,14 +5,14 @@
   "description": "울산과학대학교 앵커사업단 평생직업교육 포털 및 LMS 플랫폼",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "prebuild": "npm run manuals:check && npm run edge-assets:check",
-    "prebuild:vercel": "npm run manuals:check && npm run edge-assets:check",
+    "build": "next build --webpack",
+    "prebuild": "npm run lint && npm run manuals:check && npm run edge-assets:check",
+    "prebuild:vercel": "npm run lint && npm run manuals:check && npm run edge-assets:check",
     "edge-assets:build": "node scripts/build-edge-consent-assets.mjs",
     "edge-assets:check": "node scripts/verify-edge-consent-assets.mjs && node scripts/verify-edge-function-bundles.mjs",
     "edge-functions:build": "node scripts/build-edge-functions.mjs",
     "start": "next start",
-    "lint": "eslint src --ext .ts,.tsx --max-warnings=0",
+    "lint": "eslint src --max-warnings=0",
     "manuals:build": "node scripts/build-manuals.mjs --draft",
     "manuals:release": "node scripts/build-manuals.mjs --release",
     "manuals:check": "node scripts/build-manuals.mjs --check",
@@ -39,7 +39,9 @@
     "test:auth-candidate": "node scripts/verify-auth-candidate.mjs",
     "test:review-preview": "node scripts/verify-review-preview.mjs",
     "test:managed-cloud": "node scripts/verify-managed-cloud.mjs",
-    "test:application-flow": "node scripts/verify-application-flow.mjs"
+    "test:application-flow": "node scripts/verify-application-flow.mjs",
+    "test:supabase-cli": "node scripts/verify-supabase-cli.mjs",
+    "test:pages": "node scripts/verify-all-pages.mjs"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "1.1.1",
@@ -49,12 +51,12 @@
     "html2canvas": "1.4.1",
     "jspdf": "4.2.1",
     "lucide-react": "^0.439.0",
-    "next": "15.5.25",
+    "next": "16.4.5",
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.3.289",
     "qrcode": "^1.5.4",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "read-excel-file": "9.3.10",
     "tailwind-merge": "^2.5.2",
     "write-excel-file": "4.1.1"
@@ -65,10 +67,11 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "autoprefixer": "^10.4.20",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "15.5.25",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.5",
     "playwright": "1.62.1",
     "postcss": "8.5.28",
+    "supabase": "3.0.0",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4"
   },
@@ -77,8 +80,8 @@
   },
   "overrides": {
     "postcss": "$postcss",
-    "@typescript-eslint/typescript-estree@^7.0.0": {
-      "minimatch": "9.0.9"
+    "@typescript-eslint/typescript-estree@^8.0.0": {
+      "minimatch": "11.0.5"
     }
   }
 }

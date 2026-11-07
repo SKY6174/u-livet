@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Dedicated local database only; synthetic accounts, no outbound email or AI calls.
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
@@ -7,7 +8,7 @@ import { ensureLocalMfa } from "./local-mfa.mjs";
 import { writeFileSync } from "node:fs";
 
 const status = JSON.parse(
-  execFileSync("supabase", ["status", "-o", "json"], {
+  execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   }),

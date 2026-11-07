@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Synthetic local test accounts only. Never imported by application code.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -27,7 +28,7 @@ export function totp(secret, time = Date.now()) {
 export async function ensureLocalMfa(client) {
   if (!localChecked) {
     const status = JSON.parse(
-      execFileSync("supabase", ["status", "-o", "json"], {
+      execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
         encoding: "utf8",
         stdio: ["ignore", "pipe", "pipe"],
       }),

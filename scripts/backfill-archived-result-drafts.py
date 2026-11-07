@@ -20,6 +20,9 @@ import pymupdf
 from PIL import Image, ImageOps
 
 
+SUPABASE_CLI = str(Path(__file__).resolve().parents[1] / "node_modules" / ".bin" / "supabase")
+
+
 UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
 SHA256 = re.compile(r"^[0-9a-f]{64}$", re.I)
 PHOTO_MAX = 30
@@ -30,13 +33,13 @@ def quoted(value):
     return "'" + str(value).replace("'", "''") + "'"
 
 
-def db_query(project_ref, sql):
+def db_query(project_ref, sql, *, read_only=True):
     with tempfile.NamedTemporaryFile(mode="w", suffix=".sql", prefix="draft-", dir="tmp/pdfs", delete=False, encoding="utf-8") as file:
         file.write(sql)
         path = Path(file.name)
     try:
         result = subprocess.run(
-            ["supabase", "db", "query", "--linked", "--project-ref", project_ref, "--file", str(path), "--output", "json"],
+            [SUPABASE_CLI, "db", "query", f"--remote={project_ref}", "--read-only" if read_only else "--yes", "--file", str(path), "--output", "json"],
             capture_output=True, text=True, check=False,
         )
         if result.returncode:
@@ -192,7 +195,7 @@ def verify_and_apply(project_ref, entry, apply):
       select kind,status,jsonb_array_length(content->'photos')-2 as photo_count,revision
         from public.life_operation_documents where offering_id={quoted(offering_id)}::uuid and kind='result';
       commit;"""
-    result = db_query(project_ref, sql)
+    result = db_query(project_ref, sql, read_only=False)
     if len(result) != 1 or result[0]["status"] != "DRAFT" or result[0]["photo_count"] != len(photos):
         raise RuntimeError("Post-insert result verification failed")
 

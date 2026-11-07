@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -15,7 +16,7 @@ const manifest = JSON.parse(
   readFileSync(".next/server/server-reference-manifest.json", "utf8"),
 );
 const status = JSON.parse(
-  execFileSync("supabase", ["status", "-o", "json"], {
+  execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   }),
