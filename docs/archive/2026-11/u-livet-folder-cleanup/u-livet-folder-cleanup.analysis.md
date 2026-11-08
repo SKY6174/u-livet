@@ -1,6 +1,6 @@
 # U-LiVET 폴더 정리 검증
 
-2026-11-08 · [설계](../02-design/features/u-livet-folder-cleanup.design.md)
+2026-11-08 · [설계](u-livet-folder-cleanup.design.md)
 
 ## 로컬 구조 검증: 8/8
 
@@ -28,4 +28,4 @@ Docker 컨테이너 34개의 마운트를 검사했으며 이동 대상 경로�
 
 ## 릴리스 검증
 
-PR 검사를 통과한 커밋을 병합하고, 기본 checkout을 fast-forward한 뒤 해당 병합 SHA의 운영 배포를 확인한다. 최종 PR URL·병합 SHA·배포 ID·응답 검증은 로컬 백업의 `release-verification.json`에 기록한다. Git 연동 배포가 생성되면 추가 수동 배포를 생성하지 않는다.
+[PR #209](https://github.com/SKY6174/u-livet/pull/209)는 UC1973 승인과 필수 CI 통과 후 병합했다. 기본 checkout은 병합 커밋 `967e01f3c324dbbbd173d56f1434a72d237066e9`로 동기화했다. 해당 커밋의 Git 연동 운영 배포가 `READY`가 된 뒤 홈·로그인·버전 API의 HTTP 200과 운영 revision 일치를 확인했다. 배포 후 15분 범위의 error·fatal 로그 조회 결과는 0건이었다. 최종 검증값은 로컬 백업의 `release-verification.json`과 [보관 상태 기록](u-livet-folder-cleanup.status.json)에 기록했다.
