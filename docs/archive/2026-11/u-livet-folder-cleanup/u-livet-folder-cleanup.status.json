@@ -1,0 +1,115 @@
+{
+  "feature": "u-livet-folder-cleanup",
+  "phase": "archived",
+  "previousPhase": "completed",
+  "completedAt": "2026-11-08T15:11:13.398Z",
+  "archivedAt": "2026-11-08T15:16:16.413469Z",
+  "documents": {
+    "plan": "u-livet-folder-cleanup.plan.md",
+    "design": "u-livet-folder-cleanup.design.md",
+    "analysis": "u-livet-folder-cleanup.analysis.md",
+    "report": "u-livet-folder-cleanup.report.md"
+  },
+  "statusAtCompletion": {
+    "phase": "completed",
+    "matchRate": null,
+    "iterationCount": 1,
+    "documents": {},
+    "taskChain": [
+      {
+        "phase": "plan",
+        "status": "completed",
+        "createdAt": "2026-11-08T14:07:50.471Z",
+        "completedAt": "2026-11-08T14:07:51.074Z"
+      },
+      {
+        "phase": "design",
+        "status": "completed",
+        "createdAt": "2026-11-08T14:07:50.471Z",
+        "completedAt": "2026-11-08T14:07:51.137Z"
+      },
+      {
+        "phase": "do",
+        "status": "completed",
+        "createdAt": "2026-11-08T14:07:50.471Z",
+        "completedAt": "2026-11-08T14:11:22.320Z"
+      },
+      {
+        "phase": "check",
+        "status": "completed",
+        "createdAt": "2026-11-08T14:07:50.471Z",
+        "completedAt": "2026-11-08T14:11:55.107Z"
+      },
+      {
+        "phase": "report",
+        "status": "completed",
+        "createdAt": "2026-11-08T14:07:50.471Z",
+        "completedAt": "2026-11-08T15:11:13.406Z"
+      }
+    ],
+    "timestamps": {
+      "started": "2026-11-08T14:07:50.472Z",
+      "lastUpdated": "2026-11-08T15:11:13.406Z"
+    },
+    "completedAt": "2026-11-08T15:11:13.398Z"
+  },
+  "historyAtCompletion": [
+    {
+      "feature": "u-livet-folder-cleanup",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-11-08T15:11:13.401Z"
+    }
+  ],
+  "releaseVerification": {
+    "checkedAt": "2026-11-08T15:10:48.764574+00:00",
+    "pullRequest": "https://github.com/SKY6174/u-livet/pull/209",
+    "revision": "967e01f3c324dbbbd173d56f1434a72d237066e9",
+    "deployment": "dpl_8YEMv9noS3t6YmsHRqZbMCakzUMQ",
+    "state": "READY",
+    "origin": "https://u-livet.org",
+    "ci": "success",
+    "reviewers": [
+      "UC1973"
+    ],
+    "httpChecks": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/auth/login",
+        "status": 200
+      },
+      {
+        "path": "/api/version",
+        "status": 200
+      }
+    ],
+    "runtimeErrorFatalLogs": 0,
+    "runtimeLogWindow": "15m"
+  },
+  "documentIntegrity": {
+    "plan": {
+      "sourceSha256": "911baf544b22d69ae82e475049b5b8e62282e358f6ff54d0530c49f3d7a50a26",
+      "archivedSha256": "911baf544b22d69ae82e475049b5b8e62282e358f6ff54d0530c49f3d7a50a26",
+      "adjustment": "Unchanged"
+    },
+    "design": {
+      "sourceSha256": "f3a4872d5be3b5889971981342b2e286abade3c832bd57c71ca9cd7341d5de1f",
+      "archivedSha256": "be31663ce6f9c52f063ab9669cb99edd4c96579ebbb0825b7235f2cdb308555b",
+      "adjustment": "Archive-relative links"
+    },
+    "analysis": {
+      "sourceSha256": "0ae2eb508e1a35bdb6d01a5ce2aafe5553b5e17d775fe19a5697578e7aba2042",
+      "archivedSha256": "b30d67a5d3b585f93c64c2912636fac2e3df113569eb6bc6530250c4beb0af9a",
+      "adjustment": "Final release status and archive-relative links"
+    },
+    "report": {
+      "sourceSha256": "eab4b89ac132d112b6fd34ce9d950a482e098ca9f6e7989952b7c130bbe94214",
+      "archivedSha256": "dc34adaa01356bac6018aa76c60ebaaf61612193517844f6af85b23a6adb009f",
+      "adjustment": "Final release status and archive-relative links"
+    }
+  }
+}

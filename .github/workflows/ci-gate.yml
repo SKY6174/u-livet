@@ -1,0 +1,35 @@
+name: Pull request quality
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-quality-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: PR quality gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --include=dev --include=optional --prefer-offline --no-audit
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run lint
+      - run: npm run test:release
+      - run: npm run test:supabase-cli
+      - run: npm run test:production-origins
+      - run: npm exec -- supabase start
+      - run: npm run test:core

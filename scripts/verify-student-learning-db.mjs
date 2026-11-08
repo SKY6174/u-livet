@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Synthetic accounts and fixtures on the dedicated local database only.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -6,7 +7,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { ensureLocalMfa } from "./local-mfa.mjs";
 const status = JSON.parse(
-  execFileSync("supabase", ["status", "-o", "json"], {
+  execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
     stdio: ["ignore", "pipe", "pipe"],
   }),
 );

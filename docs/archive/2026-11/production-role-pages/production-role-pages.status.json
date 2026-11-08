@@ -1,0 +1,205 @@
+{
+  "feature": "production-role-pages",
+  "phase": "archived",
+  "previousPhase": "completed",
+  "completedAt": "2026-11-07T16:50:50.472Z",
+  "archivedAt": "2026-11-07T16:58:03.158Z",
+  "documents": {
+    "plan": "production-role-pages.plan.md",
+    "design": "production-role-pages.design.md",
+    "analysis": "production-role-pages.analysis.md",
+    "report": "production-role-pages.report.md"
+  },
+  "statusAtCompletion": {
+    "phase": "completed",
+    "matchRate": null,
+    "iterationCount": 2,
+    "documents": {},
+    "taskChain": [
+      {
+        "phase": "plan",
+        "status": "completed",
+        "createdAt": "2026-11-07T15:34:56.703Z",
+        "completedAt": "2026-11-07T15:35:31.988Z"
+      },
+      {
+        "phase": "design",
+        "status": "completed",
+        "createdAt": "2026-11-07T15:34:56.703Z",
+        "completedAt": "2026-11-07T15:37:43.348Z"
+      },
+      {
+        "phase": "do",
+        "status": "completed",
+        "createdAt": "2026-11-07T15:34:56.703Z",
+        "completedAt": "2026-11-07T15:52:33.409Z"
+      },
+      {
+        "phase": "check",
+        "status": "completed",
+        "createdAt": "2026-11-07T15:34:56.703Z",
+        "completedAt": "2026-11-07T16:07:22.364Z"
+      },
+      {
+        "phase": "report",
+        "status": "completed",
+        "createdAt": "2026-11-07T15:34:56.703Z",
+        "completedAt": "2026-11-07T16:50:50.479Z"
+      }
+    ],
+    "timestamps": {
+      "started": "2026-11-07T15:34:56.704Z",
+      "lastUpdated": "2026-11-07T16:50:50.479Z"
+    },
+    "completedAt": "2026-11-07T16:50:50.472Z"
+  },
+  "historyAtCompletion": [
+    {
+      "feature": "production-role-pages",
+      "from": "plan",
+      "to": "design",
+      "timestamp": "2026-11-07T15:35:31.985Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "action": "phase_complete",
+      "phase": "plan",
+      "nextPhase": "design",
+      "timestamp": "2026-11-07T15:35:31.987Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "from": "design",
+      "to": "design",
+      "timestamp": "2026-11-07T15:35:35.387Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "from": "design",
+      "to": "do",
+      "timestamp": "2026-11-07T15:37:43.347Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "action": "phase_complete",
+      "phase": "design",
+      "nextPhase": "do",
+      "timestamp": "2026-11-07T15:37:43.348Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "from": "do",
+      "to": "check",
+      "timestamp": "2026-11-07T15:52:33.406Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "action": "phase_complete",
+      "phase": "do",
+      "nextPhase": "check",
+      "timestamp": "2026-11-07T15:52:33.408Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "from": "check",
+      "to": "act",
+      "timestamp": "2026-11-07T16:07:22.360Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "action": "phase_complete",
+      "phase": "check",
+      "nextPhase": "act",
+      "timestamp": "2026-11-07T16:07:22.362Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "from": "check",
+      "to": "report",
+      "timestamp": "2026-11-07T16:39:28.131Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "action": "phase_complete",
+      "phase": "act",
+      "nextPhase": "report",
+      "timestamp": "2026-11-07T16:39:28.132Z"
+    },
+    {
+      "feature": "production-role-pages",
+      "action": "phase_complete",
+      "phase": "report",
+      "nextPhase": "completed",
+      "timestamp": "2026-11-07T16:50:50.475Z"
+    }
+  ],
+  "releaseVerification": {
+    "checkedAt": "2026-11-07T16:50:47.859368+00:00",
+    "pullRequest": "https://github.com/SKY6174/u-livet/pull/207",
+    "revision": "774931160c4181d18dde2601d2c73eb867d79889",
+    "deployment": "dpl_4juc4FUkpMDmiL72HiwDKa7mx7jV",
+    "state": "READY",
+    "origin": "https://u-livet.org",
+    "health": "healthy",
+    "pageVerification": {
+      "modules": 108,
+      "cases": 447,
+      "passed": 447
+    },
+    "postDeployment": {
+      "cases": 18,
+      "passed": 18,
+      "edgeReads": [
+        {
+          "role": "instructor",
+          "action": "session",
+          "status": 200
+        },
+        {
+          "role": "instructor",
+          "action": "advisory-intake-context",
+          "status": 200
+        }
+      ],
+      "corsPreflights": 4
+    },
+    "runtimeErrorFatalGroups": 0,
+    "temporaryCleanup": {
+      "completed": true,
+      "remainingAuthUsersAndSessions": 0,
+      "remainingDocumentSessions": 0,
+      "remainingGrantedRoles": 0,
+      "privateFixtureRows": 0,
+      "passwordCopiesDiscarded": true
+    }
+  },
+  "verificationArtifacts": {
+    "summary": "production-role-pages.verification.json",
+    "summarySha256": "7406e03352339c225364243c4378b311b13b16b0f76853dea1b5a522827ccaef",
+    "cases": "production-role-pages.cases.csv",
+    "casesSha256": "210535c52ceee7979f476192b4db1f93be7b3f84ef62bf13c3806179216e480c",
+    "rows": 465
+  },
+  "documentIntegrity": {
+    "plan": {
+      "sourceSha256": "d3fda808b787780b613f63b7ed2ecd8910f9fd8f411a0e9ec37b206f66c9c358",
+      "archivedSha256": "d3fda808b787780b613f63b7ed2ecd8910f9fd8f411a0e9ec37b206f66c9c358",
+      "adjustment": "Unchanged"
+    },
+    "design": {
+      "sourceSha256": "06f35b44fafd65ed857976811997370230b1fbb0cf3080d33d86fcd51839a574",
+      "archivedSha256": "06f35b44fafd65ed857976811997370230b1fbb0cf3080d33d86fcd51839a574",
+      "adjustment": "Unchanged"
+    },
+    "analysis": {
+      "sourceSha256": "9bbd18f6802225a5f8a32cfa7a137c7edff968c8b23eca718e79e81ad8d199c6",
+      "archivedSha256": "218d0bda81c8a93a4adb9e418bd7124a90ad631bf690f5ebd2803546df5d1c8c",
+      "adjustment": "Final release status and archive-relative links"
+    },
+    "report": {
+      "sourceSha256": "7960694a97a0915b329c56d451a06ffe59e0757873784fc82771601b3b0686f9",
+      "archivedSha256": "80c40428b5495a87c5959646a3785e2ef150021e54ddd275c71513d9baca44d6",
+      "adjustment": "Final release status and archive-relative links"
+    }
+  }
+}

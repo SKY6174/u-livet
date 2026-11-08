@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Dedicated local database only; synthetic accounts, no outbound email or AI calls.
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
@@ -6,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 import { ensureLocalMfa } from './local-mfa.mjs';
 import { PDFDocument, PDFName } from 'pdf-lib';
 
-const status = JSON.parse(execFileSync('supabase', ['status', '-o', 'json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+const status = JSON.parse(execFileSync(SUPABASE_CLI, ['status', '-o', 'json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
 assert.equal(status.API_URL, 'http://127.0.0.1:55321');
 const sql = q => execFileSync('docker', ['exec','-i','supabase_db_u-livet-core','psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-qtA'], {input:q,encoding:'utf8',stdio:['pipe','pipe','pipe']}).trim();
 const service = createClient(status.API_URL,status.SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});

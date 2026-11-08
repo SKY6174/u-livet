@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Administrative, idempotent import of user-supplied historical reports.
 // Manifest and generated SQL contain private material and must remain outside Git.
 import assert from "node:assert/strict";
@@ -27,7 +28,7 @@ const runSql = (sql, filename) => {
   writeFileSync(file, sql, { mode: 0o600 });
   return local
     ? execFileSync("docker", ["exec", "-i", "supabase_db_u-livet-core", "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-tA"], { input: sql, encoding: "utf8", maxBuffer: 1024 * 1024 })
-    : execFileSync("supabase", ["db", "query", "--linked", "--project-ref", project, "--file", file, "--output", "json"], { encoding: "utf8", maxBuffer: 1024 * 1024 });
+    : execFileSync(SUPABASE_CLI, ["db", "query", `--remote=${project}`, ...(apply ? ["--yes"] : ["--read-only"]), "--file", file, "--output", "json"], { encoding: "utf8", maxBuffer: 1024 * 1024 });
 };
 const queryRow = (sql, filename) => {
   const output = runSql(local ? `select row_to_json(r) from (${sql}) r;` : sql, filename);

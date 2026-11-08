@@ -1,9 +1,10 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Manual, local-only simulation. This script never sends a text message.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createClient } from "@supabase/supabase-js";
 const status = JSON.parse(
-  execFileSync("supabase", ["status", "-o", "json"], {
+  execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   }),

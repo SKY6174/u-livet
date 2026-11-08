@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Dedicated local synthetic database only; no remote targets or mail.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -5,7 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 import { ensureLocalMfa } from './local-mfa.mjs';
-const status = JSON.parse(execFileSync('supabase', ['status', '-o', 'json'], { stdio: ['ignore', 'pipe', 'pipe'] }));
+const status = JSON.parse(execFileSync(SUPABASE_CLI, ['status', '-o', 'json'], { stdio: ['ignore', 'pipe', 'pipe'] }));
 assert.equal(status.API_URL, 'http://127.0.0.1:55321');
 const sql = query => execFileSync('docker', ['exec', '-i', 'supabase_db_u-livet-core', 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-tA'], { input: query, encoding: 'utf8', stdio: ['pipe','pipe','pipe'] }).trim();
 const org = '10000000-0000-4000-8000-000000000001', year = '10000000-0000-4000-8000-000000000002';

@@ -1,3 +1,4 @@
+import { SUPABASE_CLI } from "./lib/supabase-cli.mjs";
 // Synthetic accounts on the dedicated local Supabase only. No email, AI or transfers.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -6,7 +7,7 @@ import { writeFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { ensureLocalMfa } from "./local-mfa.mjs";
 const status = JSON.parse(
-  execFileSync("supabase", ["status", "-o", "json"], {
+  execFileSync(SUPABASE_CLI, ["status", "-o", "json"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   }),
