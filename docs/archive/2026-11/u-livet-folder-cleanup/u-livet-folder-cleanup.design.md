@@ -1,6 +1,6 @@
 # U-LiVET 로컬 폴더 정리 설계
 
-2026-11-08 · [계획](../../01-plan/features/u-livet-folder-cleanup.plan.md)
+2026-11-08 · [계획](u-livet-folder-cleanup.plan.md)
 
 ## 디렉터리
 
