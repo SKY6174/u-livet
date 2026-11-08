@@ -27,3 +27,15 @@ README의 운영 미배포 설명을 현재 운영 사이트 안내로 바꾸고
 두 워크트리의 일반 파일 4,053개를 각각 압축하고 파일별 SHA-256 및 전체 Git bundle 검증을 완료했다. `.git`, `.local`, `node_modules`, `.next*`는 제외했으며 Git 이력은 bundle로 보존했다. 원래 HEAD·상태·압축본 해시는 Git 제외 경로 `.local/backups/pr-review-20261109/manifest.json`에 있다.
 
 PR #204는 원본 보존 후 닫고, PR #205는 필수 CI·리뷰 통과 후 병합한다. 처리 완료된 두 워크트리는 Git 명령으로 제거한다. 최종 PR 상태·워크트리 목록·운영 배포 SHA·응답 검증은 같은 백업 폴더의 `release-verification.json`에 기록한다. 운영 DB나 Preview 설정 변경은 이 검토의 구현 범위에 포함하지 않는다.
+
+## 기존 Preview 설계와의 대조
+
+[검토용 Preview 설계](../02-design/features/anchor-review-preview-deploy.design.md)를 기준으로 확인했다.
+
+- 서버 전용 검토 플래그와 Production에서의 검토 모드 차단: 문서와 설정 회귀 검사 일치.
+- 운영과 다른 DB·site, 공개키만 허용하는 경계: 문서와 설정 회귀 검사 일치.
+- GET/HEAD 외 쓰기 403, cookie를 사용하지 않는 서버 조회, 로그인 identity 차단: 기존 구현과 문서 유지.
+- 실제 Preview 배포의 SHA·환경·읽기 전용 표식 대조: 갱신 절차에 명시.
+- 비공개 환경 파일·원본 증거 제외: Git 제외 경로와 보관 절차 유지.
+
+읽기 전용 설정 회귀 29개와 배포 준비 회귀 111개가 통과했다. 앱·CI·의존성·DB 파일은 검토 기준 main과 동일하며, 문서 변경에서 추가 구현이 필요한 설계 누락은 발견하지 않았다.
