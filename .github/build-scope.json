@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "documentationFiles": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    ".agents/AGENTS.md",
+    "DEV_LOG.md",
+    "MILESTONE_LOG.md"
+  ],
+  "documentationPrefixes": [
+    "docs/01-plan/",
+    "docs/02-design/",
+    "docs/03-analysis/",
+    "docs/04-report/",
+    "docs/diary/",
+    ".agents/skills/",
+    ".codex/skills/",
+    "skills/"
+  ]
+}
