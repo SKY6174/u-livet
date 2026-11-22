@@ -1,6 +1,6 @@
 # U-LiVET · 앵커사업 평생직업교육
 
-운영은 [u-livet.org](https://u-livet.org)에서 제공한다. 검토용 배포가 필요할 때는 별도 Supabase DB를 사용하는 [Vercel Preview 절차](docs/operations/review-preview.md)를 따른다.
+운영은 [u-livet.org](https://u-livet.org)에서 제공하며, `main`의 Git 연동으로 배포한다. 2026-11-22부터 상시 staging/Preview를 사용하지 않는다. 인증·쓰기 검증은 운영과 분리된 로컬 전용 Supabase 테스트 환경에서 수행한다. [이전 Vercel Preview 절차](docs/operations/review-preview.md)는 과거 운영 기록이다. 현재 기준은 [프로젝트 작업 지침](AGENTS.md)을 따른다.
 
 운영 환경은 [관리형 Cloud 운영 가이드](docs/operations/managed-cloud-release.md)를 따른다. `npm run test:release`로 검사 도구를 검증하고 `npm run check:release -- --help`로 사용법을 확인한다.
 
