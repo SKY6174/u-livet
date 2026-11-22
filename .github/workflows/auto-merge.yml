@@ -1,0 +1,67 @@
+name: Automatic PR merge
+
+on:
+  workflow_run:
+    workflows: [Pull request quality]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-merge-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    if: >-
+      github.repository == 'SKY6174/u-livet' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # The workflow runs from main. Never download or execute PR code here.
+      - name: Merge the verified PR or enable auto-merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: python
+        run: |
+          import json
+          import os
+          import re
+          import subprocess
+
+          repo = os.environ["GH_REPO"]
+          with open(os.environ["GITHUB_EVENT_PATH"]) as event_file:
+              run = json.load(event_file)["workflow_run"]
+
+          if (repo != "SKY6174/u-livet" or run["event"] != "pull_request"
+                  or run["conclusion"] != "success"):
+              raise SystemExit("Not a successful pull request quality run")
+          sha = run["head_sha"]
+          if not re.fullmatch(r"[0-9a-f]{40}", sha):
+              raise SystemExit("Invalid quality-run SHA")
+
+          def api(path):
+              return json.loads(subprocess.check_output(["gh", "api", path], text=True))
+
+          numbers = {pr["number"] for pr in run.get("pull_requests", [])}
+          if not numbers:
+              numbers = {pr["number"] for pr in api(f"repos/{repo}/commits/{sha}/pulls?per_page=100")}
+          for number in sorted(numbers):
+              if type(number) is not int or number < 1:
+                  raise SystemExit("Invalid PR number")
+              pr = api(f"repos/{repo}/pulls/{number}")
+              if (pr["state"] != "open" or pr["draft"]
+                      or pr["base"]["ref"] != "main"
+                      or pr["base"]["repo"]["full_name"] != repo
+                      or pr["head"]["sha"] != sha):
+                  print(f"Skipping PR #{number}: closed, draft, different base, or superseded SHA")
+                  continue
+              subprocess.run([
+                  "gh", "pr", "merge", str(number), "--repo", repo,
+                  "--merge", "--auto", "--match-head-commit", sha,
+              ], check=True)

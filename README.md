@@ -4,6 +4,8 @@
 
 운영 환경은 [관리형 Cloud 운영 가이드](docs/operations/managed-cloud-release.md)를 따른다. `npm run test:release`로 검사 도구를 검증하고 `npm run check:release -- --help`로 사용법을 확인한다.
 
+`main` 대상의 비초안 PR은 필수 `PR quality gate`와 보호 조건을 통과하면 검토 승인 없이 자동 병합한다. 품질 검사 완료 후 자동화가 최신 PR SHA를 대조하며, 병합 후 기존 Git 연동으로 운영 배포한다. 문서 전용 변경은 기존 빌드 생략 정책을 적용한다. [자동 병합 설계](docs/02-design/features/u-livet-auto-merge-release.design.md).
+
 초기 Supabase 인증 조사와 진단 도구는 [호환성 조사·진단 도구 안내](docs/operations/supabase-auth-compatibility.md)에 기록돼 있다. 검사 명령은 `npm run test:hosted-auth`다.
 
 Next.js 16.4.5 / React 19.3.1 / Supabase 기반. 초기 개발에서 **인증·무료/유료 과정 신청·텍스트 자료/과제 LMS·공식 출결·객관식 시험·수료 검토/승인·이수증/강사 경력증명·입금 대사/환불 관리·문자 예약·연차 평가/성과 보고·디지털배지·강사 이력 심사·과정 개발**을 로컬에서 구현·검증했다.
